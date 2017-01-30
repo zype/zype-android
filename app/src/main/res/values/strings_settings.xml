@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_auto_download">Auto Download Content</string>
+    <string name="pref_terms_policy"><![CDATA[Terms of service & Privacy]]></string>
+    <string name="pref_download_preferences">Download Preferences</string>
+    <string name="pref_version">Version</string>
+    <string name="pref_powered">Powered by Zype</string>
+    <string name="pref_download_wifi">Download on Wi-Fi Only</string>
+    <string name="pref_title_download_type">Download type of content</string>
+    <string name="pref_live_notification">Live Show Notifications</string>
+    <string name="pref_auto_remove_watched">Auto-remove watched content</string>
+    <string name="pref_max_load_total_size">Max downloads total size</string>
+    <string name="pref_current_download_size">Current downloads size</string>
+    <string name="pref_storage">Storage</string>
+</resources>

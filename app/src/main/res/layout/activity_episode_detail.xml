@@ -1,0 +1,25 @@
+<LinearLayout
+    android:id="@+id/root_view"
+    style="@style/activity"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.zype.android.ui.video_details.VideoDetailActivity">
+
+    <FrameLayout
+        android:id="@+id/video_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/episode_video_height"
+        android:background="@color/colorPrimaryDark" />
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
+        style="@style/DetailTabLayout"
+        android:shrinkColumns="*" />
+
+    <com.zype.android.ui.video_details.VideoDetailPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"/>
+
+</LinearLayout>

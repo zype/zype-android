@@ -1,0 +1,9 @@
+<WebView
+    android:id="@+id/terms_webview"
+    style="@style/activity"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.zype.android.ui.settings.TermsActivity"
+    >
+
+</WebView>

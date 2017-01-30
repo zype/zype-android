@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.zype.android"
+    >
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+
+    <!-- Google Analytics required permissions -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Google Analytics - Optional permission for reliable local dispatching on non-Google Play devices -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <permission
+        android:name="com.zype.android.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.zype.android.permission.C2D_MESSAGE" />
+
+    <application
+        android:name="com.zype.android.ZypeApp"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:theme="@style/AppThemeWithoutActionBar"
+        tools:ignore="AllowBackup">
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.gms.analytics.globalConfigResource"
+            android:resource="@xml/analytics_global_config" />
+        <!-- TODO: Provide real Fabric api key -->
+<!--
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="" />
+-->
+        <!-- TODO change youtube id to REAL -->
+        <meta-data
+            android:name="com.zype.android.TouTube.ApiKey"
+            android:value="AIzaSyAOfxiG4aV66h3XmssCEkP3qCvCqMbDGDI" />
+
+        <activity
+            android:name="com.zype.android.ui.main.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name="com.zype.android.ui.launch.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.zype.android.ui.video_details.VideoDetailActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
+            android:exported="true"
+            android:label="@string/title_activity_episode_detail"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.zype.android.ui.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeWithActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zype.android.ui.main.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.zype.android.ui.chromecast.LivePlayerActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
+            android:exported="true"
+            android:label="@string/title_activity_live"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.zype.android.ui.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeWithActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zype.android.ui.main.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.zype.android.ui.main.fragments.highlight.HighlightDetailActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
+            android:label="@string/title_activity_highlight_detail"
+            android:parentActivityName="com.zype.android.ui.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeWithActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zype.android.ui.main.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.zype.android.ui.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBar"
+            android:windowSoftInputMode="adjustResize|stateVisible" />
+        <activity
+            android:name="com.zype.android.ui.settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeLightWithActionBar"
+            />
+        <activity android:name="com.zype.android.ui.ActivityForTests" />
+        <activity
+            android:name="com.zype.android.ui.main.fragments.settings.WebActivity"
+            android:label="@string/title_activity_web"
+            android:parentActivityName="com.zype.android.ui.settings.SettingsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeWithActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zype.android.ui.settings.SettingsActivity" />
+        </activity>
+        <activity
+            android:name="com.zype.android.ui.video_details.fragments.guests.SocialWebActivity"
+            android:label="@string/title_activity_web"
+            android:parentActivityName="com.zype.android.ui.video_details.VideoDetailActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeWithActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zype.android.ui.video_details.VideoDetailActivity" />
+        </activity>
+        <!-- <activity android:name=".ui.episode_details.episode_fragments.video.YouTubePlayerActivity" /> -->
+
+        <service
+            android:name="com.zype.android.service.DownloaderService"
+            android:exported="false" />
+
+        <provider
+            android:name="com.zype.android.core.provider.ZypeContentProvider"
+            android:authorities="com.zype.android.provider"
+            android:enabled="true"
+            android:exported="false" />
+
+        <activity
+            android:name="com.zype.android.ui.settings.TermsActivity"
+            android:label="@string/title_activity_terms"
+            android:parentActivityName="com.zype.android.ui.settings.SettingsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeLightWithActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zype.android.ui.settings.SettingsActivity" />
+        </activity>
+        <activity
+            android:name="com.zype.android.ui.search.SearchActivity"
+            android:label="@string/title_activity_search"
+            android:parentActivityName="com.zype.android.ui.main.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeWithActionBar"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zype.android.ui.main.MainActivity" />
+        </activity>
+
+        <!--
+         Optionally, register AnalyticsReceiver and AnalyticsService to support background
+         dispatching on non-Google Play devices
+        -->
+        <receiver android:name="com.google.android.gms.analytics.AnalyticsReceiver">
+            <intent-filter>
+                <action android:name="com.google.android.gms.analytics.ANALYTICS_DISPATCH" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.google.android.gms.analytics.AnalyticsService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!--
+             Optionally, register CampaignTrackingReceiver and CampaignTrackingService to enable
+             installation campaign reporting
+        -->
+        <receiver
+            android:name="com.google.android.gms.analytics.CampaignTrackingReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+
+        <receiver android:name="com.zype.android.receiver.RemoteControlReceiver">
+            <intent-filter android:priority="2147483647">
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+                <action android:name="MEDIA_STOP" /> <!-- this constant -->
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".service.BackgroundSoundService" />
+
+        <activity
+            android:name="com.zype.android.ui.main.fragments.playlist.PlaylistActivity"
+            android:label="@string/title_activity_playlist"
+            android:theme="@style/AppThemeWithActionBar" />
+        <activity
+            android:name="com.zype.android.ui.main.fragments.videos.VideosActivity"
+            android:theme="@style/AppThemeWithActionBar"
+            />
+    </application>
+
+</manifest>

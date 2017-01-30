@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#37474F</color>
+
+    <color name="accent_color">#0AABF5</color>
+
+    <color name="colorPrimaryDark">#1f1d15</color>
+    <color name="colorPrimaryWhite">#FFFFFF</color>
+    <color name="windowBackground">@color/colorPrimaryWhite</color>
+    <color name="orange_text_color">#eaa824</color>
+    <color name="blue_text_color">#0AABF5</color>
+    <color name="textColorPrimary">@color/colorPrimaryDark</color>
+    <color name="search_background">@color/colorPrimaryWhite</color>
+
+    <!--Launch-->
+    <color name="launch_background">#FFFFFF</color>
+    <!--TAB-->
+    <color name="tabBackground">@color/colorPrimaryWhite</color>
+    <color name="tabTextColor">@android:color/black</color>
+    <color name="tabSelectedTextColor">@color/blue_text_color</color>
+    <color name="tabIndicatorColor">@color/blue_text_color</color>
+    <color name="tab_indicator">#00000000</color>
+
+    <color name="tabAdditionalTextUnselectedColor">@color/colorPrimaryWhite</color>
+    <color name="tabAdditionalTextSelectedColor">@color/blue_text_color</color>
+    <color name="tabAdditionalBgUnselectedColor">@color/blue_text_color</color>
+    <color name="tabAdditionalBgSelectedColor">@color/colorPrimaryWhite</color>
+
+    <!--TEXT-->
+    <color name="textCommonColor">@android:color/black</color>
+    <color name="facebook_bg_color">#3b5998</color>
+    <color name="youtube_bg_color">#d34836</color>
+    <color name="twitter_bg_color">#4099ff</color>
+    <color name="semi_transparent">#aa000000</color>
+    <color name="snackbar_error">#e84e25</color>
+    <color name="snackbar_warning">#990099</color>
+    <color name="snackbar_positive">#009900</color>
+    <color name="black_38">#61000000</color>
+    <color name="black_12">#1F000000</color>
+    <color name="white_50">#80FFFFFF</color>
+</resources>

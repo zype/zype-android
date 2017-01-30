@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="activity_name_login">Login screen</string>
+    <string name="activity_name_main">Main screen</string>
+    <string name="activity_name_search">Search screen</string>
+    <string name="activity_name_launch">Launch screen</string>
+    <string name="activity_name_episode_details">Episode details screen</string>
+    <string name="activity_name_playlist">Playlist screen</string>
+    <string name="activity_name_videos">Videos screen</string>
+
+    <string name="fragment_name_summary">Summary fragment</string>
+    <string name="fragment_name_options">Options fragment</string>
+    <string name="fragment_name_latest">Latest fragment</string>
+    <string name="fragment_name_playlist">Playlist fragment</string>
+    <string name="fragment_name_favorite">Favorite fragment</string>
+    <string name="fragment_name_download">Download fragment</string>
+    <string name="fragment_name_audio">Audio fragment</string>
+    <string name="fragment_name_video">Video fragment</string>
+    <string name="fragment_name_web_view_video">Web view Video fragment</string>
+    <string name="activity_name_live">Live activity</string>
+</resources>

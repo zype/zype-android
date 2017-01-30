@@ -1,0 +1,15 @@
+<FrameLayout
+    style="@style/activity"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.zype.android.ui.launch.LaunchActivity"
+    android:background="@color/launch_background"
+    >
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@drawable/splash_logo"
+        />
+
+</FrameLayout>

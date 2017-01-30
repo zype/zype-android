@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    style="@style/item"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/review_indicator"
+        android:layout_width="@dimen/small_icon_width"
+        android:layout_height="@dimen/small_icon_height"
+        android:layout_gravity="center_vertical"
+        tools:src="@drawable/ic_play_half"/>
+
+    <FrameLayout
+        style="@style/thumbnail"
+        android:id="@+id/layoutThumbnail"
+        >
+        <ImageView
+            android:id="@+id/icon"
+            style="@style/thumbnail"
+            tools:src="@drawable/placeholder_video"
+            />
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:id="@+id/progressBarThumbnail"
+            />
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_margin="8dp"
+            android:id="@+id/imageLocked"
+            android:src="@drawable/icon_locked"
+            />
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_margin="8dp"
+            android:id="@+id/imageUnlocked"
+            android:src="@drawable/icon_unlocked"
+            />
+    </FrameLayout>
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        tools:showIn="@layout/activity_videos">
+
+        <ImageView
+            android:id="@+id/button_download"
+            android:layout_width="@dimen/small_icon_width"
+            android:layout_height="@dimen/small_icon_height"
+            android:layout_toLeftOf="@+id/button_popup"
+            android:layout_toStartOf="@+id/button_popup"
+            android:src="@drawable/icn_cloud"/>
+
+        <ImageView
+            android:id="@+id/button_popup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_more_vert_black_24dp"
+            android:tint="@color/accent_color"
+            />
+
+        <TextView
+            android:id="@+id/title"
+            style="@style/text.title"
+            android:paddingTop="16dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_toLeftOf="@+id/button_download"
+            android:ellipsize="end"
+            android:maxLines="3"
+            tools:text="@string/long_text"/>
+
+        <include layout="@layout/video_item_description"/>
+    </RelativeLayout>
+
+
+
+</LinearLayout>

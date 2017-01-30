@@ -1,0 +1,12 @@
+<LinearLayout
+    style="@style/activity"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context="com.zype.android.ui.main.fragments.playlist.PlaylistActivity">
+
+    <include layout="@layout/layout_playlist"/>
+
+
+</LinearLayout>

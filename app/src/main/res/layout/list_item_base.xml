@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    style="@style/item"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/icon"
+        style="@style/thumbnail"
+        tools:src="@drawable/image_logo"/>
+
+    <include layout="@layout/video_item_title_base"
+             android:layout_above="@+id/view_description"/>
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/video_item_description"/>
+
+
+</RelativeLayout>

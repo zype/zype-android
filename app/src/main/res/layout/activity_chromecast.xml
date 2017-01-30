@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/root_view"
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/video_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/episode_video_height"/>
+
+    <!--<TableLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_horizontal">-->
+
+    <!--<TableRow>-->
+
+    <!--<Button-->
+    <!--android:id="@+id/btn_play_live_video"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_column="0"-->
+    <!--android:enabled="false"-->
+    <!--android:text="Play Video" />-->
+
+    <!--<Button-->
+    <!--android:id="@+id/btn_cast_live_video"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_column="1"-->
+    <!--android:enabled="false"-->
+    <!--android:text="Cast video" />-->
+    <!--</TableRow>-->
+
+    <!--<TableRow-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <!--<Button-->
+    <!--android:id="@+id/btn_play_live_audio"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_column="0"-->
+    <!--android:enabled="false"-->
+    <!--android:text="Play audio" />-->
+
+    <!--<Button-->
+    <!--android:id="@+id/btn_cast_live_audio"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_column="1"-->
+    <!--android:enabled="false"-->
+    <!--android:text="Cast Audio" />-->
+
+    <!--</TableRow>-->
+    <!--&lt;!&ndash;<TableRow&ndash;&gt;-->
+    <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:layout_height="match_parent">&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<Button&ndash;&gt;-->
+    <!--&lt;!&ndash;android:id="@+id/btn_play_test_web"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:layout_column="0"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:enabled="false"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:text="Test open web" />&ndash;&gt;-->
+
+    <!--&lt;!&ndash;<Button&ndash;&gt;-->
+    <!--&lt;!&ndash;android:id="@+id/btn_cast_test_chrome"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:layout_column="1"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:enabled="false"&ndash;&gt;-->
+    <!--&lt;!&ndash;android:text="Open Chrome" />&ndash;&gt;-->
+
+    <!--&lt;!&ndash;</TableRow>&ndash;&gt;-->
+    <!--</TableLayout>-->
+
+</LinearLayout>

@@ -1,0 +1,21 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.zype.android.ui.main.fragments.favorite.FavoritesFragment"
+    >
+    <ListView
+        android:id="@+id/listFavorites"
+        style="@style/common_list"
+        tools:listitem="@layout/list_item_base"
+        />
+    <TextView
+        android:id="@+id/empty"
+        style="@style/text.title"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        tools:text="@string/download_empty_list"/>
+</FrameLayout>

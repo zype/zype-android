@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/downloadVideo"
+        android:title="@string/menu_download_video"
+        android:visible="false"
+        />
+
+    <item
+        android:id="@+id/downloadAudio"
+        android:title="@string/menu_download_audio"
+        android:visible="false"
+        />
+    <item
+        android:id="@+id/downloadStop"
+        android:title="@string/menu_download_stop"
+        android:visible="false"
+        />
+
+    <item
+        android:id="@+id/downloadDeleteVideo"
+        android:title="@string/menu_download_delete_video"
+        android:visible="false"
+        />
+
+    <item
+        android:id="@+id/downloadDeleteAudio"
+        android:title="@string/menu_download_delete_audio"
+        android:visible="false"/>
+
+    <item
+        android:id="@+id/unfavorite"
+        android:title="@string/menu_unfavorite"/>
+
+    <item
+        android:id="@+id/favorite"
+        android:title="@string/menu_favorite"/>
+
+    <item
+        android:id="@+id/share"
+        android:title="@string/menu_share"/>
+</menu>

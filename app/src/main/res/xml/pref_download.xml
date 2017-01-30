@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreference
+            android:defaultValue="true"
+            android:key="DOWNLOAD_WIFI"
+            android:title="@string/pref_download_wifi"/>
+    <com.zype.android.ui.settings.ListPreferenceCompat
+            android:defaultValue="0"
+            android:entries="@array/pref_download_type"
+            android:entryValues="@array/pref_download_type_values"
+            android:key="DOWNLOAD_TYPE"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="%s"
+            android:title="@string/pref_title_download_type"/>
+
+    <com.zype.android.ui.settings.ListPreferenceCompat
+            android:defaultValue="1"
+            android:entries="@array/pref_max_total_array"
+            android:entryValues="@array/pref_total_values"
+            android:key="PREF_MAX_DOWNLOAD_TOTAL_SIZE"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="%s"
+            android:title="@string/pref_max_load_total_size"/>
+
+    <EditTextPreference
+            android:key="PREF_CURRENT_DOWNLOADS_SIZE"
+            android:selectable="false"
+            android:editable="false"
+            android:persistent="false"
+            android:title="@string/pref_current_download_size"/>
+
+    <SwitchPreference
+            android:defaultValue="true"
+            android:key="PREF_AUTO_REMOVE_WATCHED_CONTENT"
+            android:title="@string/pref_auto_remove_watched"/>
+
+    <com.zype.android.ui.settings.ListPreferenceCompat
+            android:defaultValue="0"
+            android:entries="@array/pref_storage_type"
+            android:entryValues="@array/pref_storage_values"
+            android:key="PREF_STORAGE"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:summary="%s"
+            android:title="@string/pref_storage"/>
+
+</PreferenceScreen>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/clickView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_item_height"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/options_title"
+        style="@style/text.title"
+        android:padding="8dp"
+        tools:text="test"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:paddingRight="8dp"
+        android:paddingLeft="8dp"
+        android:id="@+id/frameLayout">
+
+        <ImageView
+            android:id="@+id/options_image"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            tools:src="@drawable/icn_favorites"/>
+
+        <TextView
+            android:id="@+id/options_text"
+            style="@style/text.common"
+            android:layout_gravity="center"
+            android:gravity="center"
+            tools:text="video"/>
+    </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_toRightOf="@+id/options_title"
+        android:layout_toLeftOf="@+id/frameLayout"
+        android:layout_toStartOf="@+id/frameLayout"/>
+</RelativeLayout>
