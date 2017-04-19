@@ -2,6 +2,7 @@ package com.zype.android.ui.video_details;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.base.BaseVideoActivity;
@@ -70,7 +71,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
 
     @Override
     protected int getLayoutId() {
-        return R.layout.activity_episode_detail;
+        return R.layout.activity_video_detail;
     }
 
     @Override
@@ -122,7 +123,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
 
     @Subscribe
     public void handleDownloadVideo(DownloadVideoEvent event) {
-        if (!SettingsProvider.getInstance().isDownloadsEnabled())
+        if (!ZypeSettings.isDownloadsEnabled())
             return;
         Logger.d("handleDownloadVideo");
         File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
@@ -132,14 +133,14 @@ public class VideoDetailActivity extends BaseVideoActivity {
             String fileId = event.mFileId;
             DataHelper.saveVideoUrl(getContentResolver(), fileId, url);
         } else {
-            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for video file");
+//            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for video file");
             Logger.e("Server response must contains \"mp\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
         }
     }
 
     @Subscribe
     public void handleDownloadAudio(DownloadAudioEvent event) {
-        if (!SettingsProvider.getInstance().isDownloadsEnabled())
+        if (!ZypeSettings.isDownloadsEnabled())
             return;
         File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
         String url;
@@ -148,7 +149,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
             String fileId = event.mFileId;
             DataHelper.saveAudioUrl(getContentResolver(), fileId, url);
         } else {
-            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for audio file");
+//            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for audio file");
             Logger.e("Server response must contains \"m4a\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
         }
     }

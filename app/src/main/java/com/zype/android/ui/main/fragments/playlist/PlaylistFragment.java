@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -48,8 +49,7 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
     private TextView mTvEmpty;
     private LoaderManager mLoader;
     private ArrayList<PlaylistData> mPlaylistList;
-    // TODO: Should we really to have parenId hardcoded?
-    private String parentId = "577e65c85577de0d1000c1ee";
+    private String parentId = ZypeSettings.ROOT_PLAYLIST_ID;
 
     public PlaylistFragment() {
         // Required empty public constructor
@@ -215,7 +215,7 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
                 selection,
                 selectionArgs,
                 Contract.Playlist.COLUMN_PRIORITY + " ASC"
-                );
+        );
     }
 
     @Override
@@ -254,7 +254,7 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
             int i = DataHelper.insertPlaylists(getActivity().getContentResolver(), data.getResponse());
             Logger.d("added " + i + " playlists");
         } else {
-            mTvEmpty.setText(R.string.latest_no_video);
+            mTvEmpty.setText(R.string.videos_empty);
         }
     }
 }

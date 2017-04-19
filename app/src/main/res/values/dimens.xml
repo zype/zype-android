@@ -15,7 +15,7 @@
     <dimen name="alert_dialog_padding_material">24dp</dimen>
     <dimen name="icon_settings_height">32dp</dimen>
     <dimen name="icon_settings_width">32dp</dimen>
-    <dimen name="view_search_field_corner_radius">6dp</dimen>
+    <dimen name="view_search_field_corner_radius">8dp</dimen>
     <dimen name="tab_height">48dp</dimen>
     <dimen name="tab_max_width">140dp</dimen>
     <dimen name="list_item_height">48dp</dimen>

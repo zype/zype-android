@@ -11,6 +11,7 @@ import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.ui.dialog.LatestMenuDialogFragment;
+import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
 import com.zype.android.ui.main.fragments.videos.VideosMenuItem;
 import com.zype.android.ui.player.PlayerFragment;
@@ -54,6 +55,8 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     private boolean isVideoDownloading;
     private boolean isVideoDownloaded;
     private boolean isAudioDownloaded;
+
+    private boolean onAir;
 
     private boolean playAsVideo = true;
 
@@ -171,6 +174,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
             Cursor cursor = CursorHelper.getVideoCursor(getActivity().getContentResolver(), videoId);
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
+                    onAir = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_ON_AIR)) == 1;
                     if (cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_VIDEO)) == 1) {
                     } else if (cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_AUDIO)) == 1) {
                         playAsVideo = false;
@@ -256,7 +260,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         }*/
         list.add(new Options(2, getFavoriteTitle(isFavorite), getFavoriteIcon(isFavorite)));
         list.add(new Options(3, getString(R.string.option_share), R.drawable.icn_share));
-        if (mListener.getCurrentFragment() != BaseVideoActivity.TYPE_YOUTUBE) {
+        if (mListener.getCurrentFragment() != BaseVideoActivity.TYPE_YOUTUBE && !onAir) {
             list.add(new Options(1, getString(R.string.option_download), R.drawable.icn_downloads));
         }
         return list;
@@ -351,12 +355,16 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                 if (isAudioDownloading || isVideoDownloading) {
                     downloadItems.add(new VideosMenuItem(0, R.string.menu_cancel_download));
                 } else {
+                    boolean downloadUrlExist = true;
                     if (isAudioDownloaded) {
                         downloadItems.add(new VideosMenuItem(1, R.string.menu_delete_download_audio));
                     } else {
                         String audioUrl = DataHelper.getAudioUrl(getActivity().getContentResolver(), videoId);
                         if (!TextUtils.isEmpty(audioUrl)) {
                             downloadItems.add(new VideosMenuItem(2, R.string.option_download_audio));
+                        }
+                        else {
+                            downloadUrlExist = false;
                         }
                     }
                     if (isVideoDownloaded) {
@@ -366,6 +374,13 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                         if (!TextUtils.isEmpty(videoUrl)) {
                             downloadItems.add(new VideosMenuItem(4, R.string.option_download_video));
                         }
+                        else {
+                            downloadUrlExist = false;
+                        }
+                    }
+                    // Get audio and video download urls if not exist
+                    if (!downloadUrlExist) {
+                        ((BaseVideoActivity) getActivity()).getDownloadUrls(videoId);
                     }
                 }
                 final LatestMenuDialogFragment fragment = LatestMenuDialogFragment.newInstance(downloadItems);
@@ -399,6 +414,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                 if (!downloadItems.isEmpty()) {
                     fragment.show(getActivity().getFragmentManager(), "menu");
                 } else {
+                    UiUtils.showErrorSnackbar(mOptionList, "Download url not found");
                     Logger.v("Still don't have url to load");
                 }
                 break;

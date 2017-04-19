@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zype.android.R;
-import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ZypeSettings;
 import com.zype.android.ui.main.fragments.download.DownloadFragment;
 import com.zype.android.ui.main.fragments.favorite.FavoritesFragment;
 import com.zype.android.ui.main.fragments.playlist.PlaylistFragment;
@@ -41,7 +41,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     }
 
     private void setDownloadsData() {
-        if (SettingsProvider.getInstance().isDownloadsEnabled()){
+        if (ZypeSettings.isDownloadsEnabled()){
             imageResId = new int[] {
                     R.drawable.icn_latest,
                     R.drawable.icn_downloads,
@@ -71,7 +71,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if (SettingsProvider.getInstance().isDownloadsEnabled()) {
+        if (ZypeSettings.isDownloadsEnabled()) {
             switch (position) {
                 case 0:
                     return PlaylistFragment.newInstance();
@@ -100,14 +100,14 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        if (SettingsProvider.getInstance().isDownloadsEnabled())
+        if (ZypeSettings.isDownloadsEnabled())
             return 4;
         else
             return 3;
     }
 
     public View getTabView(int position) {
-        View v = LayoutInflater.from(context).inflate(R.layout.latest_tab, null);
+        View v = LayoutInflater.from(context).inflate(R.layout.tab_main, null);
         TextView tv = (TextView) v.findViewById(R.id.tab_title);
         Locale l = Locale.getDefault();
         String title = context.getString(stringResId[position]).toUpperCase(l);

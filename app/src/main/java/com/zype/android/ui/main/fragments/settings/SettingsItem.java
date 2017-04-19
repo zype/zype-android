@@ -29,6 +29,12 @@ public class SettingsItem {
         this.iconColorRes = -1;
         this.title = context.getString(titleId);
     }
+    public SettingsItem(Context context, int id, String title) {
+        this.id = id;
+        this.iconId = -1;
+        this.iconColorRes = -1;
+        this.title = title;
+    }
 
     public SettingsItem(Context context, int id, @DrawableRes int drawable, @ColorRes int colorRes, @StringRes int titleId) {
         this.id = id;
@@ -36,4 +42,11 @@ public class SettingsItem {
         this.iconColorRes = colorRes;
         this.title = context.getString(titleId);
     }
+    public SettingsItem(Context context, int id, @DrawableRes int drawable, @ColorRes int colorRes, String title) {
+        this.id = id;
+        this.iconId = drawable;
+        this.iconColorRes = colorRes;
+        this.title = title;
+    }
+
 }

@@ -41,8 +41,12 @@ public class SettingsListAdapter extends ArrayAdapter<SettingsItem> {
         viewHolder.id = item.id;
         viewHolder.title.setText(item.title);
         if (item.iconId != -1) {
+            viewHolder.icon.setVisibility(View.VISIBLE);
             viewHolder.icon.setImageResource(item.iconId);
             viewHolder.icon.setColorFilter(ContextCompat.getColor(getContext(), item.iconColorRes), PorterDuff.Mode.SRC_ATOP);
+        }
+        else {
+            viewHolder.icon.setVisibility(View.INVISIBLE);
         }
         return convertView;
     }

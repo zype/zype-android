@@ -1,9 +1,13 @@
 package com.zype.android.ui.main.fragments;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.AttrRes;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
@@ -87,13 +91,9 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
         for (int i = 0; i < tabHost.getTabWidget().getChildCount(); i++) {
             if (tabHost.getTabWidget().getChildAt(i).isSelected()) {
                 selectedTab = i;
-                tabHost.getTabWidget().getChildAt(i).setBackgroundColor(getResources().getColor(R.color.tabAdditionalBgUnselectedColor)); //unselected tab
-                TextView tv = (TextView) tabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title); //Unselected Tabs
-                tv.setTextColor(getResources().getColor(R.color.tabAdditionalTextUnselectedColor));
+                tabHost.getTabWidget().getChildAt(i).setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.accent));
             } else {
-                tabHost.getTabWidget().getChildAt(i).setBackgroundColor(getResources().getColor(R.color.tabAdditionalBgSelectedColor)); //unselected tab
-                TextView tv = (TextView) tabHost.getTabWidget().getChildAt(i).findViewById(android.R.id.title); //Unselected Tabs
-                tv.setTextColor(getResources().getColor(R.color.tabAdditionalTextSelectedColor));
+                tabHost.getTabWidget().getChildAt(i).setBackgroundColor(ContextCompat.getColor(getActivity(), android.R.color.transparent));
             }
         }
     }

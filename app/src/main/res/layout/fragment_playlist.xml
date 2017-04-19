@@ -5,16 +5,10 @@
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
     android:orientation="vertical"
-    tools:context="com.zype.android.ui.main.fragments.playlist.PlaylistFragment">
+    tools:context="com.zype.android.ui.main.fragments.playlist.PlaylistFragment"
+    >
 
     <include layout="@layout/view_search_field"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:background="@color/accent_color"/>
 
     <include layout="@layout/layout_playlist"/>
 

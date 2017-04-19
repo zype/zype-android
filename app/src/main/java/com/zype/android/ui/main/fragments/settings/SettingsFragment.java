@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.zype.android.R;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
@@ -26,13 +28,12 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
 
     private ListAdapter mAdapter;
     private Button mSigninButton;
-    private View mSigninButtonFake;
+//    private View mSigninButtonFake;
 
     private OnMainActivityFragmentListener mListener;
     private OnLoginAction mOnLoginListener;
 
     public SettingsFragment() {
-        // Required empty public constructor
     }
 
     public static SettingsFragment newInstance() {
@@ -44,10 +45,10 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
         super.onCreate(savedInstanceState);
         List<SettingsItem> settingsItems = new ArrayList<>();
         settingsItems.add(new SettingsItem(getActivity(), 0, R.drawable.icn_settings, R.color.black_38, R.string.settings));
-        settingsItems.add(new SettingsItem(getActivity(), 1, R.drawable.icn_facebook, R.color.facebook_bg_color, R.string.settings_facebook));
-        settingsItems.add(new SettingsItem(getActivity(), 2, R.drawable.icn_twitter, R.color.twitter_bg_color, R.string.settings_twitter));
-        settingsItems.add(new SettingsItem(getActivity(), 3, R.string.settings_web));
-        settingsItems.add(new SettingsItem(getActivity(), 4, R.string.settings_instagram));
+        settingsItems.add(new SettingsItem(getActivity(), 1, R.drawable.icn_facebook, R.color.facebook_bg_color, String.format(getString(R.string.settings_facebook), getString(R.string.app_name))));
+        settingsItems.add(new SettingsItem(getActivity(), 2, R.drawable.icn_twitter, R.color.twitter_bg_color, String.format(getString(R.string.settings_twitter), getString(R.string.app_name))));
+        settingsItems.add(new SettingsItem(getActivity(), 3, String.format(getString(R.string.settings_web), getString(R.string.app_name))));
+        settingsItems.add(new SettingsItem(getActivity(), 4, String.format(getString(R.string.settings_instagram), getString(R.string.app_name))));
         mAdapter = new SettingsListAdapter(getActivity(), R.layout.list_item_settings, settingsItems);
     }
 
@@ -59,7 +60,7 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         mSigninButton = (Button) view.findViewById(R.id.sign_in_button);
-        mSigninButtonFake = view.findViewById(R.id.fake_sign_in_button);
+//        mSigninButtonFake = view.findViewById(R.id.fake_sign_in_button);
         return view;
     }
 
@@ -70,8 +71,8 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
     }
 
     private void initSignInButton() {
-        if (SettingsProvider.getInstance().isLogined()) {
-            mSigninButtonFake.setOnClickListener(new View.OnClickListener() {
+        if (SettingsProvider.getInstance().isLoggedIn()) {
+            mSigninButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mOnLoginListener.onLogout();
@@ -80,7 +81,7 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
             });
             mSigninButton.setText(R.string.action_sign_out);
         } else {
-            mSigninButtonFake.setOnClickListener(new View.OnClickListener() {
+            mSigninButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mOnLoginListener.onRequestLogin();
@@ -88,6 +89,24 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
             });
             mSigninButton.setText(R.string.action_sign_in);
         }
+//        if (SettingsProvider.getInstance().isLogined()) {
+//            mSigninButtonFake.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    mOnLoginListener.onLogout();
+//                    initSignInButton();
+//                }
+//            });
+//            mSigninButton.setText(R.string.action_sign_out);
+//        } else {
+//            mSigninButtonFake.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    mOnLoginListener.onRequestLogin();
+//                }
+//            });
+//            mSigninButton.setText(R.string.action_sign_in);
+//        }
     }
 
     @Override
@@ -97,21 +116,25 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
                 break;
             case 1:
-                // TODO: Add valid Facebook url
-//                String facebookUrl = "https://www.facebook.com/[app_name]";
-//                AppUtils.openFacebook(getContext(), facebookUrl);
+                if (!TextUtils.isEmpty(ZypeSettings.FACEBOOK_ID)) {
+                    String facebookUrl = String.format("https://www.facebook.com/%1$s", ZypeSettings.FACEBOOK_ID);
+                    AppUtils.openFacebook(getContext(), facebookUrl);
+                }
                 break;
             case 2:
-                // TODO: Add valid Twitter id and url
-//                AppUtils.openTwitter(getContext(), "[app_name]", "https://twitter.com/[app_name]");
+                if (!TextUtils.isEmpty(ZypeSettings.TWITTER_ID)) {
+                    AppUtils.openTwitter(getContext(), ZypeSettings.TWITTER_ID, String.format("https://twitter.com/%1$s", ZypeSettings.TWITTER_ID));
+                }
                 break;
             case 3:
-                // TODO: Add valid web url
-//                AppUtils.openWeb(getContext(), "http://www.[app_name]");
+                if (!TextUtils.isEmpty(ZypeSettings.WEB_URL)) {
+                    AppUtils.openWeb(getContext(), ZypeSettings.WEB_URL);
+                }
                 break;
             case 4:
-                // TODO: Add valid Instagram id and url
-//                AppUtils.openInstagram(getContext(), "[app_name]", "http://www.instagram.com/[app_name]");
+                if (!TextUtils.isEmpty(ZypeSettings.INSTAGRAM_ID)) {
+                    AppUtils.openInstagram(getContext(), ZypeSettings.INSTAGRAM_ID, String.format("http://www.instagram.com/%1$s", ZypeSettings.INSTAGRAM_ID));
+                }
                 break;
         }
     }

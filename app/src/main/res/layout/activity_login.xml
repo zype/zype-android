@@ -30,15 +30,15 @@
             android:orientation="vertical"
             android:layout_marginTop="80dp"
             >
-<!--
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:contentDescription="@string/image_description_logo"
-                android:src="@drawable/image_logo" />
--->
+            <!--
+                        <ImageView
+                            android:id="@+id/imageView2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:contentDescription="@string/image_description_logo"
+                            android:src="@drawable/image_logo" />
+            -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
             </LinearLayout>
             <Button
                 android:id="@+id/email_sign_in_button"
-                style="@style/Button"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

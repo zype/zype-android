@@ -412,11 +412,11 @@ public class DataHelper {
     }
 
     // Playlist video
-    public static int insertPlaylistVideo(@NonNull ContentResolver contentResolver, @NonNull List<VideoData> videoList, String parentId) {
+    public static int insertPlaylistVideo(@NonNull ContentResolver contentResolver, @NonNull List<VideoData> videoList, String parentId, int baseNumber) {
         ContentValues[] values = new ContentValues[videoList.size()];
         for (int i = 0; i < videoList.size(); i++) {
             ContentValues value = new ContentValues();
-            value.put(Contract.PlaylistVideo.NUMBER, i);
+            value.put(Contract.PlaylistVideo.NUMBER, baseNumber + i);
             value.put(Contract.PlaylistVideo.PLAYLIST_ID, parentId);
             value.put(Contract.PlaylistVideo.VIDEO_ID, videoList.get(i).getId());
             values[i] = value;

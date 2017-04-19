@@ -9,10 +9,11 @@
         android:id="@+id/list_settings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/fake_sign_in_button"
+        android:layout_above="@+id/sign_in_button"
         android:divider="@drawable/list_latest_divider"
         android:dividerHeight="1dp"/>
 
+<!--
     <FrameLayout
         android:id="@+id/fake_sign_in_button"
         style="?android:attr/buttonStyle"
@@ -21,13 +22,23 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:background="@color/accent_color">
+        android:background="@color/accent">
 
+-->
         <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:id="@+id/sign_in_button"
-            style="@style/button_log"
-            android:text="@string/action_sign_in"/>
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:text="@string/action_sign_in"
+            android:textStyle="bold"
+            />
+<!--
     </FrameLayout>
+-->
 
 
 </RelativeLayout>

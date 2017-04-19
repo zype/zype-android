@@ -19,6 +19,7 @@
         android:id="@+id/tab_title"
         android:layout_gravity="center"
         android:gravity="center_horizontal"
+        android:textColor="@color/tab_item_title"
         tools:text="title"
         />
 </LinearLayout>

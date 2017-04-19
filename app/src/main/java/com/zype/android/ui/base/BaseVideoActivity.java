@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -148,7 +149,12 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
         baseView = getBaseView();
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         mActionBar = getSupportActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+
         if (getIntent() != null && getIntent().hasExtra(BundleConstants.VIDEO_ID) && !TextUtils.isEmpty(getIntent().getStringExtra(BundleConstants.VIDEO_ID))) {
             mVideoId = getIntent().getStringExtra(BundleConstants.VIDEO_ID);
             mType = getIntent().getIntExtra(BundleConstants.VIDEO_TYPE, TYPE_UNKNOWN);
@@ -160,7 +166,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             if (mType == TYPE_UNKNOWN) {
                 mType = getMediaType(VideoHelper.getFullData(getContentResolver(), mVideoId));
             }
-            getChromeCastUrlIfNotExist(mVideoId);
+//            getDownloadUrls(mVideoId);
         } else {
             mType = TYPE_WEB;
             Logger.e("VideoId is empty !!");// но тут должен быть путь
@@ -194,20 +200,20 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
 
     protected abstract Class<?> getActivityClass();
 
-    private void getChromeCastUrlIfNotExist(String episodeId) {
+    public void getDownloadUrls(String videoId) {
         if (mType != TYPE_YOUTUBE && mType != PlayerFragment.TYPE_VIDEO_LIVE && mType != PlayerFragment.TYPE_AUDIO_LIVE) {
-            String videoUrl = DataHelper.getVideoUrl(getContentResolver(), episodeId);
-            String audioUrl = DataHelper.getAudioUrl(getContentResolver(), episodeId);
+            String videoUrl = DataHelper.getVideoUrl(getContentResolver(), videoId);
+            String audioUrl = DataHelper.getAudioUrl(getContentResolver(), videoId);
             if (videoUrl == null) {
-                getVideoEpisodeUrl(episodeId);
+                getVideoDownloadUrl(videoId);
             }
             if (audioUrl == null) {
-                getAudioEpisodeUrl(episodeId);
+                getAudioDownloadUrl(videoId);
             }
         }
     }
 
-    private void getAudioEpisodeUrl(String episodeId) {
+    private void getAudioDownloadUrl(String episodeId) {
         if (SettingsProvider.getInstance().getSubscriptionCount() > 0) {
             DownloadAudioParamsBuilder playerParamsBuilder = new DownloadAudioParamsBuilder()
                     .addAudioId(episodeId);
@@ -215,7 +221,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         }
     }
 
-    private void getVideoEpisodeUrl(String episodeId) {
+    private void getVideoDownloadUrl(String episodeId) {
         if (SettingsProvider.getInstance().getSubscriptionCount() > 0) {
             DownloadVideoParamsBuilder downloadVideoParamsBuilder = new DownloadVideoParamsBuilder()
                     .addVideoId(episodeId);
@@ -297,9 +303,14 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     protected void requestVideoUrl(String videoId) {
-        PlayerParamsBuilder playerParamsBuilder = new PlayerParamsBuilder()
-                .addApiKey()
-                .addVideoId(videoId);
+        PlayerParamsBuilder playerParamsBuilder = new PlayerParamsBuilder();
+        if (SettingsProvider.getInstance().isLoggedIn()) {
+            playerParamsBuilder.addAccessToken();
+        }
+        else {
+            playerParamsBuilder.addAppKey();
+        }
+        playerParamsBuilder.addVideoId(videoId);
         getApi().executeRequest(WebApiManager.Request.PLAYER_VIDEO, playerParamsBuilder.build());
 
         //do not load guests
@@ -313,7 +324,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     protected void requestAudioUrl(String audioId) {
         PlayerParamsBuilder playerParamsBuilder = new PlayerParamsBuilder()
                 .addVideoId(audioId)
-                .addApiKey()
+                .addAppKey()
                 .addAudio();
         getApi().executeRequest(WebApiManager.Request.PLAYER_AUDIO, playerParamsBuilder.build());
     }

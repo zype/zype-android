@@ -15,10 +15,16 @@ import com.zype.android.webapi.model.settings.SettingsData;
 import com.zype.android.webapi.model.zobjects.Picture;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 public class SettingsProvider extends CommonPreferences {
+
+    public static final String DOWNLOADS_ENABLED = "DownloadsEnabled";
+    public static final String THEME_LIGHT = "ThemeLight";
+
+    private static final HashMap<String, Object> defaultValues = new HashMap<>();
 
     private static final String DEFAULT_STRING = "";
     private static final long DEFAULT_LONG = -1L;
@@ -80,8 +86,8 @@ public class SettingsProvider extends CommonPreferences {
     public static final boolean DEFAULT_LOAD_WIFI_ONLY = true;
     public static final boolean DEFAULT_AUTO_REMOVE_WATCHED_CONTENT = false;
 
-    // svetliy addition
-    public static final boolean DEFAULT_DOWNLOADS_ENABLED = true;
+//    // svetliy addition
+//    public static final boolean DEFAULT_DOWNLOADS_ENABLED = true;
 
     public SettingsProvider(Context context) {
         super(context);
@@ -93,6 +99,7 @@ public class SettingsProvider extends CommonPreferences {
             throw new IllegalStateException("Already created!");
         }
         sInstance = new SettingsProvider(c);
+        initDefaultValues();
     }
 
     public static synchronized SettingsProvider getInstance() {
@@ -100,6 +107,11 @@ public class SettingsProvider extends CommonPreferences {
             throw new IllegalStateException("Call create() first");
         }
         return sInstance;
+    }
+
+    private static void initDefaultValues() {
+        defaultValues.put(DOWNLOADS_ENABLED, true);
+        defaultValues.put(THEME_LIGHT, true);
     }
 
     public void logout() {
@@ -558,9 +570,9 @@ public class SettingsProvider extends CommonPreferences {
         set(DEFAULT + SETTINGS_MIGRATION, migrated);
     }
 
-    public boolean isDownloadsEnabled() {
-        return DEFAULT_DOWNLOADS_ENABLED;
-    }
+//    public boolean isDownloadsEnabled() {
+//        return DEFAULT_DOWNLOADS_ENABLED;
+//    }
 
     // Live stream settings
     //
@@ -603,4 +615,7 @@ public class SettingsProvider extends CommonPreferences {
         return get(LIVE_STREAM_TIME, 0);
     }
 
+    public boolean getBoolean(String key) {
+        return get(key, (Boolean) defaultValues.get(key));
+    }
 }

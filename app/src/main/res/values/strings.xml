@@ -6,7 +6,7 @@
     <string name="title_activity_highlight_detail">Back</string>
 
     <string name="title_tab_latest">latest</string>
-    <string name="title_tab_download">download</string>
+    <string name="title_tab_download">downloads</string>
     <string name="title_tab_favorite">favorites</string>
     <string name="title_tab_highlight">highlight</string>
     <string name="title_tab_home">home</string>
@@ -33,7 +33,7 @@
 
     <string name="search">Search</string>
     <string name="long_text">Very long text. Very long text. Very long text. Very long text. Very long text. Very long text. Very long text.Very long text. Very long text. Very long text. Very long text. Very long text. Very long text. Very long text.</string>
-    <string name="latest_no_video">There are no shows yet this week. Keep an eye out here or check out the archives.</string>
+    <string name="videos_empty">There are no videos in playlist</string>
     <string name="alert_dialog_title_free_space">Free space left</string>
     <string name="alert_dialog_message_free_space">Need to free space up before downloading</string>
 
@@ -75,10 +75,10 @@
 
     <!--Settings-->
     <string name="settings">Settings</string>
-    <string name="settings_facebook">[app_name] on Facebook</string>
-    <string name="settings_twitter">[app_name] on Twitter</string>
-    <string name="settings_web">[app_name] on Web</string>
-    <string name="settings_instagram">[app_name] on Instagram</string>
+    <string name="settings_facebook">%1$s on Facebook</string>
+    <string name="settings_twitter">%1$s on Twitter</string>
+    <string name="settings_web">%1$s on Web</string>
+    <string name="settings_instagram">%1$s on Instagram</string>
 
     <!--Other-->
     <string name="instagram_title">Instagram</string>

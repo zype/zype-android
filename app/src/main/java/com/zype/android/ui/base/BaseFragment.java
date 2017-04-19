@@ -55,8 +55,10 @@ public abstract class BaseFragment extends Fragment {
         if (isVisibleToUser) {
             final Tracker tracker = ZypeApp.getTracker();
             if (tracker != null) {
-                tracker.setScreenName(((BaseActivity) getActivity()).getActivityName() + " | " + getFragmentName());
-                tracker.send(new HitBuilders.ScreenViewBuilder().build());
+                if (getActivity() != null) {
+                    tracker.setScreenName(((BaseActivity) getActivity()).getActivityName() + " | " + getFragmentName());
+                    tracker.send(new HitBuilders.ScreenViewBuilder().build());
+                }
             }
         }
     }

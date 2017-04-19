@@ -12,7 +12,7 @@ public class VideoParamsBuilder extends ParamsBuilder {
     public static final String VIDEO_ID = "id";
     public static final String PLAYLIST_ID = "playlist_id";
 
-//    public VideoParamsBuilder addApiKey() {
+//    public VideoParamsBuilder addAppKey() {
 //        addGetParam(API_KEY, WebApiManager.API_KEY);
 //        return this;
 //    }

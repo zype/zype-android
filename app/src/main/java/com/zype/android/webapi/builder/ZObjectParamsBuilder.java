@@ -11,7 +11,7 @@ public class ZObjectParamsBuilder extends ParamsBuilder {
     public static final String TYPE_CONTENT = "content";
     public static final String VIDEO_ID = "video_id";
 
-//    public ZObjectParamsBuilder addApiKey() {
+//    public ZObjectParamsBuilder addAppKey() {
 //        addGetParam(API_KEY, WebApiManager.API_KEY);
 //        return this;
 //    }

@@ -18,7 +18,9 @@
 
             <TabWidget
                 android:id="@android:id/tabs"
-                style="@style/tab_additional">
+                style="@style/tab_additional"
+                android:layout_marginTop="8dp"
+                >
             </TabWidget>
 
             <FrameLayout

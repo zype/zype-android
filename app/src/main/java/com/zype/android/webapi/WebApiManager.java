@@ -14,6 +14,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.bus.EventBus;
 import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.events.UnrsolvedHostErrorEvent;
@@ -90,7 +91,7 @@ import retrofit.client.OkClient;
  */
 public class WebApiManager {
 
-    public static final String APP_KEY = "iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l";
+    public static final String APP_KEY = ZypeSettings.APP_KEY;
     public static final String CUSTOM_HEADER_KEY = "User-Agent";
     private static final String TAG = WebApiManager.class.getSimpleName();
     private static final String ENDPOINT_API = "https://api.zype.com";

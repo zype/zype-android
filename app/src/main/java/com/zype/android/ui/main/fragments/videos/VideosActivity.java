@@ -13,7 +13,9 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -50,6 +52,7 @@ import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
 import com.zype.android.webapi.events.video.RetrieveVideoEvent;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.File;
+import com.zype.android.webapi.model.video.Pagination;
 import com.zype.android.webapi.model.video.Video;
 import com.zype.android.webapi.model.video.VideoData;
 
@@ -84,6 +87,8 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_videos);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         addListeners();
@@ -129,13 +134,14 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         }
     }
 
-    private void loadVideosFromPlaylist() {
+    private void loadVideosFromPlaylist(int page) {
         Logger.d("load Videos from playlist");
         mAdapter.changeCursor(null);
         mTvEmpty.setText(R.string.latest_empty_list);
 
         VideoParamsBuilder builder = new VideoParamsBuilder();
         builder.addPlaylistId(playlistId);
+        builder.addPage(page);
         getApi().executeRequest(WebApiManager.Request.VIDEO_FROM_PLAYLIST, builder.build());
         startLoadCursors();
     }
@@ -154,19 +160,26 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         VideosCursorAdapter.LatestViewHolder holder = (VideosCursorAdapter.LatestViewHolder) view.getTag();
         if (holder.subscriptionRequired) {
             if (holder.onAir) {
-                if (!SettingsProvider.getInstance().isLoggedIn() || SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                    // Check total played live stream time
-                    Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
-                    int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
-                    if (liveStreamTime < SettingsProvider.getInstance().getLiveStreamLimit()) {
+                if (SettingsProvider.getInstance().isLoggedIn()) {
+                    if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+                        // Check total played live stream time
+                        Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
+                        int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
+                        if (liveStreamTime < SettingsProvider.getInstance().getLiveStreamLimit()) {
+                            VideoDetailActivity.startActivity(this, holder.videoId);
+                        } else {
+                            DialogHelper.showSubscriptionAlertIssue(this);
+//                            ErrorDialogFragment dialog = ErrorDialogFragment.newInstance(SettingsProvider.getInstance().getLiveStreamMessage(), null, null);
+//                            dialog.show(getSupportFragmentManager(), ErrorDialogFragment.TAG);
+                        }
+                    }
+                    else {
                         VideoDetailActivity.startActivity(this, holder.videoId);
-                    } else {
-                        ErrorDialogFragment dialog = ErrorDialogFragment.newInstance(SettingsProvider.getInstance().getLiveStreamMessage(), null, null);
-                        dialog.show(getSupportFragmentManager(), ErrorDialogFragment.TAG);
                     }
                 }
                 else {
-                    VideoDetailActivity.startActivity(this, holder.videoId);
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
                 }
             }
             else {
@@ -177,7 +190,8 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                         } else {
                             VideoDetailActivity.startActivity(this, holder.videoId);
                         }
-                    } else {
+                    }
+                    else {
                         //if it's not transcoded it is a live stream. May be we can check onAir flag
                /* if (TextUtils.isEmpty(holder.youtubePath)) {
                     DialogFragment newFragment = CustomAlertDialog.newInstance(
@@ -207,7 +221,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     @Override
     public void onResume() {
         super.onResume();
-        loadVideosFromPlaylist();
+        loadVideosFromPlaylist(1);
         IntentFilter filter = new IntentFilter(DownloadConstants.ACTION);
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(downloaderReceiver, filter);
     }
@@ -225,6 +239,20 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
             mLoader.destroyLoader(LOADER_VIDEO);
             mLoader = null;
         }
+    }
+
+    // //////////
+    // Menu
+    //
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id) {
+            case android.R.id.home:
+                super.onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     protected void startLoadCursors() {
@@ -390,20 +418,38 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
 
     @Subscribe
     public void handleRetrieveVideo(RetrieveVideoEvent event) {
-        Logger.d("handleRetrieveVideo size=" + event.getEventData().getModelData().getVideoData().size());
-        Video data = event.getEventData().getModelData();
-        if (data.getVideoData().size() > 0) {
-            if (mVideoList == null) {
-                mVideoList = new ArrayList<>();
+        List<VideoData> result = event.getEventData().getModelData().getVideoData();
+        Pagination pagination = event.getEventData().getModelData().getPagination();
+        if (result != null) {
+            Logger.d("handleRetrieveVideo size=" + result.size());
+            if (result.size() > 0) {
+                if (mVideoList == null) {
+                    mVideoList = new ArrayList<>(result);
+                }
+                else {
+                    mVideoList.addAll(result);
+                }
+
+                int i = DataHelper.insertVideos(this.getContentResolver(), result);
+                Logger.d("added " + i + " videos");
+                DataHelper.addVideosToPlaylist(this.getContentResolver(), result, playlistId);
+                int baseNumber = 0;
+                if (pagination.getCurrent() == 1) {
+                    DataHelper.clearPlaylistVideo(this.getContentResolver(), playlistId);
+                }
+                else {
+                    baseNumber = (pagination.getCurrent() - 1) * pagination.getPerPage();
+                }
+                int itemsInsertedPlaylistVideo = DataHelper.insertPlaylistVideo(this.getContentResolver(), result, playlistId, baseNumber);
+                Logger.d("handleRetrieveVideo(): PlaylistVideo inserted=" + itemsInsertedPlaylistVideo);
+
+                if (Pagination.hasNextPage(pagination)) {
+                    loadVideosFromPlaylist(Pagination.getNextPage(pagination));
+                }
             }
-            mVideoList.addAll(data.getVideoData());
-            int i = DataHelper.insertVideos(this.getContentResolver(), data.getVideoData());
-            Logger.d("added " + i + " videos");
-            DataHelper.addVideosToPlaylist(this.getContentResolver(), data.getVideoData(), playlistId);
-            DataHelper.clearPlaylistVideo(this.getContentResolver(), playlistId);
-            DataHelper.insertPlaylistVideo(this.getContentResolver(), data.getVideoData(), playlistId);
-        } else {
-            mTvEmpty.setText(R.string.latest_no_video);
+            else {
+                mTvEmpty.setText(R.string.videos_empty);
+            }
         }
     }
 

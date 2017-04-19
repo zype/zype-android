@@ -7,12 +7,13 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.20.1'
+        classpath 'io.fabric.tools:gradle:1.21.6'
     }
 }
 import java.text.SimpleDateFormat
 
 apply plugin: 'com.android.application'
+// TODO: Uncomment following line to use Fabric
 //apply plugin: 'io.fabric'
 
 repositories {
@@ -38,14 +39,17 @@ android {
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
 
     compileSdkVersion 25
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '25.0.0'
 
+    dexOptions {
+        jumboMode true
+    }
     defaultConfig {
         applicationId 'com.zype.android'
         minSdkVersion 16
         targetSdkVersion 25
         versionCode currentCodeVersion
-        versionName '1.0.0'
+        versionName '1.1.0'
         manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
                                 // TODO: Provide valid app_id and google_project_number for OneSignal
                                 onesignal_app_id               : "",
@@ -101,12 +105,12 @@ dependencies {
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.4.1'
     compile project(':CastCompanionLibrary')
 //    compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.9.1'
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
-    compile 'com.android.support:support-v4:25.1.0'
-    compile 'com.android.support:recyclerview-v7:25.1.0'
-    compile 'com.android.support:mediarouter-v7:25.1.0'
-    compile 'com.android.support:customtabs:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:mediarouter-v7:25.3.1'
+    compile 'com.android.support:customtabs:25.3.1'
 
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
@@ -116,13 +120,13 @@ dependencies {
     compile 'com.google.android.exoplayer:exoplayer:r1.5.12'
     compile 'com.onesignal:OneSignal:2.+@aar'
 
-    compile 'com.google.android.gms:play-services-gcm:10.0.1'
-    compile 'com.google.android.gms:play-services-analytics:10.0.1'
-    compile 'com.google.android.gms:play-services-location:10.0.1'
+    compile 'com.google.android.gms:play-services-gcm:10.2.1'
+    compile 'com.google.android.gms:play-services-analytics:10.2.1'
+    compile 'com.google.android.gms:play-services-location:10.2.1'
 
     // IMA SDK
     compile 'com.google.ads.interactivemedia.v3:interactivemedia:3.5.2'
-    compile 'com.google.android.gms:play-services-ads:10.0.1'
+    compile 'com.google.android.gms:play-services-ads:10.2.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

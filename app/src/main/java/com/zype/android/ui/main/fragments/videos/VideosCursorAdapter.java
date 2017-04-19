@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -112,11 +113,11 @@ public class VideosCursorAdapter extends CursorAdapter {
         } else {
             list.add(new VideosMenuItem(ITEM_FAVORITE, R.string.menu_favorite));
         }
-        if (SettingsProvider.getInstance().isDownloadsEnabled()) {
+        if (ZypeSettings.isDownloadsEnabled()) {
             if (currentProgress > -1) {
                 list.add(new VideosMenuItem(ITEM_DOWNLOAD_STOP, R.string.menu_download_stop));
             } else {
-                if (!isYoutubeVideo) {
+                if (!isYoutubeVideo && !viewHolder.onAir) {
                     if (viewHolder.isVideoDownloaded) {
                         list.add(new VideosMenuItem(ITEM_DELETE_VIDEO, R.string.menu_download_delete_video));
                     } else {
@@ -315,7 +316,7 @@ public class VideosCursorAdapter extends CursorAdapter {
         };
         viewHolder.popupButton.setOnClickListener(onClick);
         viewHolder.downloadButton.setOnClickListener(onClick);
-        if (viewHolder.isTranscoded && SettingsProvider.getInstance().isDownloadsEnabled() == true) {
+        if (viewHolder.isTranscoded && ZypeSettings.isDownloadsEnabled()) {
             viewHolder.downloadButton.setVisibility(View.VISIBLE);
         } else {
             viewHolder.downloadButton.setVisibility(View.INVISIBLE);

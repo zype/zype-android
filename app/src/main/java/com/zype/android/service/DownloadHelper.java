@@ -43,7 +43,7 @@ public class DownloadHelper {
         DataHelper.addVideoToDownloadList(context.getContentResolver(), fileId, url);
         if (NetworkStateObserver.isNetworkEnabled() && SettingsProvider.getInstance().isLogined()) {
             if (SettingsProvider.getInstance().isUserPreferenceLoadWifiOnlySet()) {
-                if (NetworkStateObserver.isWiFiEnable()) {
+                if (NetworkStateObserver.isWiFiEnable() || BuildConfig.DEBUG) {
                     if (DataHelper.isFileTranscoded(context.getContentResolver(), fileId)) {
                         DownloaderService.downloadVideo(context.getApplicationContext(), url, fileId);
                     } else {

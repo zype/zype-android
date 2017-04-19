@@ -19,7 +19,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.1'
     }
 }
 
@@ -35,7 +35,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '25.0.0'
     publishNonDefault true
 
     defaultConfig {
@@ -53,9 +53,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:mediarouter-v7:25.1.0'
-    compile 'com.google.android.gms:play-services-cast:10.0.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:mediarouter-v7:25.3.1'
+    compile 'com.google.android.gms:play-services-cast:10.2.1'
 //    compile('com.google.android.gms:play-services:7.8.0') {
 //        exclude group: 'com.google.android', module: 'support-v4'
 //    }

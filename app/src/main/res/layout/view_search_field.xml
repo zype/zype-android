@@ -2,8 +2,9 @@
 <EditText
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/search_field"
     style="@style/search_field"
+    android:id="@+id/search_field"
     android:inputType="text"
     android:imeOptions="actionSend"
-    tools:showIn="@layout/fragment_latest"/>
+    tools:showIn="@layout/fragment_latest"
+    />

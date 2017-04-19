@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
@@ -25,9 +26,9 @@ import io.fabric.sdk.android.Fabric;
  * @version 1
  *          date 6/26/15
  */
+
+
 public class ZypeApp extends Application {
-    // TODO: Provide valid id for Google Analytics
-    private static final String PROPERTY_ID = "";
     public static final double VOLUME_INCREMENT = 0.05;
     public static final int NOTIFICATION_ID = 13254;
     public static GoogleAnalytics analytics;
@@ -56,15 +57,24 @@ public class ZypeApp extends Application {
         super.onCreate();
 
         // Fabric
+        // TODO: Uncomment following line to use Fabric
 //        initFabric();
+
         // OneSignal
+        // TODO: Uncomment following line to use OneSignal
 //        OneSignal.startInit(this).init();
 
         //init external folders storage
         StorageUtils.initStorage(this);
         SettingsProvider.create(this);
         WebApiManager.create(this);
+
+        AppCompatDelegate.setDefaultNightMode(ZypeSettings.isThemeLight() ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES);
+
+        // Google Analytics
+        // TODO: Uncomment following line to use Google Analytics
 //        initGoogleAnalytics();
+
         initVideoCastManager();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
@@ -131,7 +141,7 @@ public class ZypeApp extends Application {
         analytics.setLocalDispatchPeriod(1800);
 //        analytics.enableAutoActivityReports(this);
 
-        tracker = analytics.newTracker(PROPERTY_ID);
+        tracker = analytics.newTracker(ZypeSettings.GA_TRACKING_ID);
         tracker.enableExceptionReporting(true);
         tracker.enableAdvertisingIdCollection(true);
         tracker.enableAutoActivityTracking(true);

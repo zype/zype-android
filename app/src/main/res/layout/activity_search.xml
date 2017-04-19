@@ -1,69 +1,87 @@
-<LinearLayout
-    style="@style/activity"
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context="com.zype.android.ui.search.SearchActivity"
-    android:paddingTop="8dp"
     >
-
-    <include layout="@layout/view_search_field"/>
-
-    <View
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
-        android:layout_marginBottom="8dp"
-        android:background="@color/accent_color"/>
-
-    <TabHost
-        android:id="@android:id/tabhost"
+        android:layout_height="wrap_content"
+        app:theme="@style/AppTheme.AppBarOverlay"
+        >
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/toolbar"
+            />
+    </android.support.design.widget.AppBarLayout>
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+        android:layout_height="match_parent"
+        android:id="@+id/root_view"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            tools:context="com.zype.android.ui.search.SearchActivity"
+            >
 
-            <TabWidget
-                android:id="@android:id/tabs"
-                style="@style/tab_additional">
-            </TabWidget>
+            <include layout="@layout/view_search_field"/>
 
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
+            <TabHost
+                android:id="@android:id/tabhost"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <ListView
-                    android:id="@+id/list_search"
-                    style="@style/common_list"
-                    android:visibility="visible"
-                    tools:listitem="@layout/list_item_base"/>
-
-                <TextView
-                    android:id="@+id/empty"
-                    style="@style/text.title"
+                android:layout_height="match_parent"
+                >
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="@string/search_empty_list"
-                    android:visibility="gone"/>
+                    android:orientation="vertical"
+                    >
+                    <TabWidget
+                        android:id="@android:id/tabs"
+                        style="@style/tab_additional">
+                    </TabWidget>
+                    <FrameLayout
+                        android:id="@android:id/tabcontent"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        >
+                        <ListView
+                            android:id="@+id/list_search"
+                            style="@style/common_list"
+                            android:visibility="visible"
+                            tools:listitem="@layout/list_item_base"
+                            />
+                        <TextView
+                            android:id="@+id/empty"
+                            style="@style/text.title"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text="@string/search_empty_list"
+                            android:visibility="gone"
+                            />
+                        <ProgressBar
+                            android:id="@+id/search_progress"
+                            style="?android:attr/progressBarStyleLarge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|center_horizontal"
+                            android:visibility="visible"
+                            />
+                    </FrameLayout>
+                </LinearLayout>
+            </TabHost>
 
-                <ProgressBar
-                    android:id="@+id/search_progress"
-                    style="?android:attr/progressBarStyleLarge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|center_horizontal"
-                    android:visibility="visible"/>
-            </FrameLayout>
+
         </LinearLayout>
-    </TabHost>
-
-
-</LinearLayout>
+    </FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

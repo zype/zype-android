@@ -52,7 +52,7 @@ public class PlayerParamsBuilder extends ParamsBuilder {
         return this;
     }
 
-    public PlayerParamsBuilder addApiKey() {
+    public PlayerParamsBuilder addAppKey() {
         addGetParam(APP_KEY, WebApiManager.APP_KEY);
         return this;
     }

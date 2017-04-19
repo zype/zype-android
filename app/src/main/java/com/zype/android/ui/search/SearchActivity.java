@@ -43,7 +43,9 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -79,6 +81,10 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (getIntent() != null) {
             searchString = getIntent().getStringExtra(BundleConstants.SEARCH_STRING);
@@ -153,13 +159,26 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         requestSearchResult(1, searchString);
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
-        if (SettingsProvider.getInstance().isLogined()) {
+        if (SettingsProvider.getInstance().isLoggedIn()) {
             requestConsumerData();
         }
+    }
+
+    // //////////
+    // Menu
+    //
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id) {
+            case android.R.id.home:
+                super.onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void requestConsumerData() {

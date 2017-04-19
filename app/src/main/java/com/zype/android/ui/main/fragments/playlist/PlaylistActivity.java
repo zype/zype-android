@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -45,6 +47,8 @@ public class PlaylistActivity extends BaseActivity implements ListView.OnItemCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (getIntent() != null) {
@@ -76,6 +80,20 @@ public class PlaylistActivity extends BaseActivity implements ListView.OnItemCli
     public void onPause() {
         super.onPause();
 
+    }
+
+    // //////////
+    // Menu
+    //
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id) {
+            case android.R.id.home:
+                super.onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void updateTitle() {
@@ -176,7 +194,7 @@ public class PlaylistActivity extends BaseActivity implements ListView.OnItemCli
             int i = DataHelper.insertPlaylists(this.getContentResolver(), data.getResponse());
             Logger.d("added " + i + " playlists");
         } else {
-            mTvEmpty.setText(R.string.latest_no_video);
+            mTvEmpty.setText(R.string.videos_empty);
         }
     }
 
