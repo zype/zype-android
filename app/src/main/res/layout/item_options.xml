@@ -28,11 +28,13 @@
 
         <ImageView
             android:id="@+id/options_image"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            tools:src="@drawable/icn_favorites"/>
+            android:tint="?attr/colorControlNormal"
+            tools:src="@drawable/icn_favorites"
+            />
 
         <TextView
             android:id="@+id/options_text"

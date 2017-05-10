@@ -15,7 +15,7 @@ import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
 import com.zype.android.ui.OnEpisodeItemAction;
 import com.zype.android.ui.OnLoginAction;
-import com.zype.android.ui.dialog.LatestMenuDialogFragment;
+import com.zype.android.ui.dialog.VideoMenuDialogFragment;
 import com.zype.android.utils.FileUtils;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.model.video.Thumbnail;
@@ -72,6 +72,8 @@ public class VideosCursorAdapter extends CursorAdapter {
     private int COL_YOUTUBE = -1;
     private Activity mActivity;
 
+    private boolean showDownloadOptions = false;
+
     public VideosCursorAdapter(Activity activity, int flags, OnEpisodeItemAction onEpisodeItemActionListener, OnLoginAction onLogin) {
         super(activity, null, flags);
         mOnEpisodeItemAction = onEpisodeItemActionListener;
@@ -82,7 +84,7 @@ public class VideosCursorAdapter extends CursorAdapter {
     @Override
     public View newView(final Context context, final Cursor cursor, ViewGroup parent) {
         View view;
-        final LatestViewHolder viewHolder = new LatestViewHolder();
+        final VideosViewHolder viewHolder = new VideosViewHolder();
         LayoutInflater inflater = LayoutInflater.from(context);
         view = inflater.inflate(R.layout.list_item_video, parent, false);
         viewHolder.title = ((TextView) view.findViewById(R.id.title));
@@ -104,7 +106,7 @@ public class VideosCursorAdapter extends CursorAdapter {
         return view;
     }
 
-    private List<VideosMenuItem> getListForMenu(LatestViewHolder viewHolder, boolean isYoutubeVideo) {
+    private List<VideosMenuItem> getListForMenu(VideosViewHolder viewHolder, boolean isYoutubeVideo) {
         List<VideosMenuItem> list = new ArrayList<>();
 
         int currentProgress = DownloaderService.currentProgress(viewHolder.videoId);
@@ -113,22 +115,25 @@ public class VideosCursorAdapter extends CursorAdapter {
         } else {
             list.add(new VideosMenuItem(ITEM_FAVORITE, R.string.menu_favorite));
         }
-        if (ZypeSettings.isDownloadsEnabled()) {
+        if (ZypeSettings.isDownloadsEnabled() && showDownloadOptions) {
             if (currentProgress > -1) {
                 list.add(new VideosMenuItem(ITEM_DOWNLOAD_STOP, R.string.menu_download_stop));
-            } else {
+            }
+            else {
                 if (!isYoutubeVideo && !viewHolder.onAir) {
                     if (viewHolder.isVideoDownloaded) {
                         list.add(new VideosMenuItem(ITEM_DELETE_VIDEO, R.string.menu_download_delete_video));
-                    } else {
-                        list.add(new VideosMenuItem(ITEM_DOWNLOAD_VIDEO, R.string.menu_download_video));
                     }
-
+//                    else {
+//                        list.add(new VideosMenuItem(ITEM_DOWNLOAD_VIDEO, R.string.menu_download_video));
+//                    }
+//
                     if (viewHolder.isAudioDownloaded) {
                         list.add(new VideosMenuItem(ITEM_DELETE_AUDIO, R.string.menu_download_delete_audio));
-                    } else {
-                        list.add(new VideosMenuItem(ITEM_DOWNLOAD_AUDIO, R.string.menu_download_audio));
                     }
+//                    else {
+//                        list.add(new VideosMenuItem(ITEM_DOWNLOAD_AUDIO, R.string.menu_download_audio));
+//                    }
                 }
             }
         }
@@ -167,7 +172,7 @@ public class VideosCursorAdapter extends CursorAdapter {
 
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
-        final LatestViewHolder viewHolder = (LatestViewHolder) view.getTag();
+        final VideosViewHolder viewHolder = (VideosViewHolder) view.getTag();
         if (!isColumnIndexesCalculated()) {
             calculateColumnIndexes(cursor);
         }
@@ -233,7 +238,7 @@ public class VideosCursorAdapter extends CursorAdapter {
                     ArrayList<VideosMenuItem> items = new ArrayList<>();
                     items.addAll(getListForMenu(viewHolder, isYoutubeVideo));
 
-                    final LatestMenuDialogFragment fragment = LatestMenuDialogFragment.newInstance(items);
+                    final VideoMenuDialogFragment fragment = VideoMenuDialogFragment.newInstance(items);
                     fragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -315,19 +320,19 @@ public class VideosCursorAdapter extends CursorAdapter {
             }
         };
         viewHolder.popupButton.setOnClickListener(onClick);
-        viewHolder.downloadButton.setOnClickListener(onClick);
-        if (viewHolder.isTranscoded && ZypeSettings.isDownloadsEnabled()) {
-            viewHolder.downloadButton.setVisibility(View.VISIBLE);
-        } else {
-            viewHolder.downloadButton.setVisibility(View.INVISIBLE);
-        }
+//        viewHolder.downloadButton.setOnClickListener(onClick);
+//        if (viewHolder.isTranscoded && ZypeSettings.isDownloadsEnabled()) {
+//            viewHolder.downloadButton.setVisibility(View.VISIBLE);
+//        } else {
+//            viewHolder.downloadButton.setVisibility(View.INVISIBLE);
+//        }
 
-        updateDownloadedIndicator(cursor, viewHolder);
+//        updateDownloadedIndicator(cursor, viewHolder);
         updatePlayedIndicator(cursor, viewHolder);
     }
 
 
-    private void updateDownloadedIndicator(Cursor cursor, LatestViewHolder viewHolder) {
+    private void updateDownloadedIndicator(Cursor cursor, VideosViewHolder viewHolder) {
         if (isFileDownloaded(cursor)) {
             if (!TextUtils.isEmpty(cursor.getString(COL_DOWNLOAD_AUDIO_PATH))) {
                 viewHolder.downloadButton.setImageResource(R.drawable.icn_audio);
@@ -341,7 +346,7 @@ public class VideosCursorAdapter extends CursorAdapter {
         }
     }
 
-    private void updatePlayedIndicator(Cursor cursor, LatestViewHolder viewHolder) {
+    private void updatePlayedIndicator(Cursor cursor, VideosViewHolder viewHolder) {
         if (isFileDownloaded(cursor)) {
             if (cursor.getInt(COL_VIDEO_IS_PLAY_STARTED) == 0) {
                 viewHolder.reviewIndicator.setVisibility(View.VISIBLE);
@@ -361,7 +366,7 @@ public class VideosCursorAdapter extends CursorAdapter {
         return cursor.getInt(COL_VIDEO_IS_VIDEO_DOWNLOADED) == 1 || cursor.getInt(COL_VIDEO_IS_AUDIO_DOWNLOADED) == 1;
     }
 
-    private void loadImage(final Context context, final Cursor cursor, final LatestViewHolder viewHolder) {
+    private void loadImage(final Context context, final Cursor cursor, final VideosViewHolder viewHolder) {
         final String thumbnailsString = cursor.getString(COL_VIDEO_THUMBNAILS);
         if (thumbnailsString != null) {
             Type thumbnailType = new TypeToken<List<Thumbnail>>() {
@@ -399,7 +404,11 @@ public class VideosCursorAdapter extends CursorAdapter {
         COL_YOUTUBE = cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_YOUTUBE_ID);
     }
 
-    public class LatestViewHolder {
+    public void setShowDownloadOptions(boolean show) {
+        showDownloadOptions = show;
+    }
+
+    public class VideosViewHolder {
         public boolean isFavorite;
         public ProgressBar progressBar;
         public boolean isTranscoded;

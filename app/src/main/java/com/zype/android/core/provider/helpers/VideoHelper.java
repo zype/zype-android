@@ -41,7 +41,7 @@ public class VideoHelper {
         contentValues.put(Contract.Video.COLUMN_CATEGORY, new Gson().toJson(videoData.getCategories()));
         contentValues.put(Contract.Video.COLUMN_COUNTRY, videoData.getCountry());
         contentValues.put(Contract.Video.COLUMN_CREATED_AT, videoData.getCreatedAt());
-        contentValues.put(Contract.Video.COLUMN_DESCRIPTION, videoData.getDescription());
+        contentValues.put(Contract.Video.COLUMN_DESCRIPTION, (videoData.getDescription() == null) ? "" : videoData.getDescription());
         contentValues.put(Contract.Video.COLUMN_DISCOVERY_URL, videoData.getDiscoveryUrl());
         contentValues.put(Contract.Video.COLUMN_DURATION, videoData.getDuration());
         contentValues.put(Contract.Video.COLUMN_EPISODE, videoData.getEpisode());

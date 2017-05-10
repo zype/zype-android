@@ -129,7 +129,8 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
 
     private void getPlaylists() {
         PlaylistParamsBuilder builder = new PlaylistParamsBuilder()
-                .addParentId(parentId);
+                .addParentId(parentId)
+                .addPerPage(100);
         getApi().executeRequest(WebApiManager.Request.PLAYLIST_GET, builder.build());
     }
 
@@ -251,9 +252,15 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
                 mPlaylistList = new ArrayList<>();
             }
             mPlaylistList.addAll(data.getResponse());
+            // Clear all playlists of the parent from local DB before inserting to be consistent
+            // with platform in case some palylists were deleted
+            if (event.getEventData().getModelData().getPagination().getCurrent() == 1) {
+                DataHelper.deletePlaylistsByParentId(getActivity().getContentResolver(), parentId);
+            }
             int i = DataHelper.insertPlaylists(getActivity().getContentResolver(), data.getResponse());
             Logger.d("added " + i + " playlists");
-        } else {
+        }
+        else {
             mTvEmpty.setText(R.string.videos_empty);
         }
     }

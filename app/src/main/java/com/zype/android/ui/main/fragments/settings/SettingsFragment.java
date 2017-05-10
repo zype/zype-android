@@ -26,6 +26,12 @@ import java.util.List;
 
 public class SettingsFragment extends Fragment implements ListView.OnItemClickListener {
 
+    private static final int ITEM_SETTINGS = 0;
+    private static final int ITEM_WEB = 1;
+    private static final int ITEM_FACEBOOK = 2;
+    private static final int ITEM_TWITTER = 3;
+    private static final int ITEM_INSTAGRAM = 4;
+
     private ListAdapter mAdapter;
     private Button mSigninButton;
 //    private View mSigninButtonFake;
@@ -44,11 +50,11 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         List<SettingsItem> settingsItems = new ArrayList<>();
-        settingsItems.add(new SettingsItem(getActivity(), 0, R.drawable.icn_settings, R.color.black_38, R.string.settings));
-        settingsItems.add(new SettingsItem(getActivity(), 1, R.drawable.icn_facebook, R.color.facebook_bg_color, String.format(getString(R.string.settings_facebook), getString(R.string.app_name))));
-        settingsItems.add(new SettingsItem(getActivity(), 2, R.drawable.icn_twitter, R.color.twitter_bg_color, String.format(getString(R.string.settings_twitter), getString(R.string.app_name))));
-        settingsItems.add(new SettingsItem(getActivity(), 3, String.format(getString(R.string.settings_web), getString(R.string.app_name))));
-        settingsItems.add(new SettingsItem(getActivity(), 4, String.format(getString(R.string.settings_instagram), getString(R.string.app_name))));
+        settingsItems.add(new SettingsItem(getActivity(), ITEM_SETTINGS, R.drawable.icn_settings, R.color.black_38, R.string.settings));
+        settingsItems.add(new SettingsItem(getActivity(), ITEM_WEB, String.format(getString(R.string.settings_web), getString(R.string.app_name))));
+        settingsItems.add(new SettingsItem(getActivity(), ITEM_FACEBOOK, R.drawable.icn_facebook, R.color.facebook_bg_color, String.format(getString(R.string.settings_facebook), getString(R.string.app_name))));
+        settingsItems.add(new SettingsItem(getActivity(), ITEM_TWITTER, R.drawable.icn_twitter, R.color.twitter_bg_color, String.format(getString(R.string.settings_twitter), getString(R.string.app_name))));
+        settingsItems.add(new SettingsItem(getActivity(), ITEM_INSTAGRAM, R.drawable.instagram, R.color.instagram, String.format(getString(R.string.settings_instagram), getString(R.string.app_name))));
         mAdapter = new SettingsListAdapter(getActivity(), R.layout.list_item_settings, settingsItems);
     }
 
@@ -112,26 +118,26 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         switch (position) {
-            case 0:
+            case ITEM_SETTINGS:
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
                 break;
-            case 1:
+            case ITEM_FACEBOOK:
                 if (!TextUtils.isEmpty(ZypeSettings.FACEBOOK_ID)) {
                     String facebookUrl = String.format("https://www.facebook.com/%1$s", ZypeSettings.FACEBOOK_ID);
                     AppUtils.openFacebook(getContext(), facebookUrl);
                 }
                 break;
-            case 2:
+            case ITEM_TWITTER:
                 if (!TextUtils.isEmpty(ZypeSettings.TWITTER_ID)) {
                     AppUtils.openTwitter(getContext(), ZypeSettings.TWITTER_ID, String.format("https://twitter.com/%1$s", ZypeSettings.TWITTER_ID));
                 }
                 break;
-            case 3:
+            case ITEM_WEB:
                 if (!TextUtils.isEmpty(ZypeSettings.WEB_URL)) {
                     AppUtils.openWeb(getContext(), ZypeSettings.WEB_URL);
                 }
                 break;
-            case 4:
+            case ITEM_INSTAGRAM:
                 if (!TextUtils.isEmpty(ZypeSettings.INSTAGRAM_ID)) {
                     AppUtils.openInstagram(getContext(), ZypeSettings.INSTAGRAM_ID, String.format("http://www.instagram.com/%1$s", ZypeSettings.INSTAGRAM_ID));
                 }

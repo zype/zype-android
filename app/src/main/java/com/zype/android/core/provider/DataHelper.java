@@ -49,6 +49,9 @@ public class DataHelper {
         return contentResolver.bulkInsert(uri, values);
     }
 
+    // //////////
+    // Playlist
+    //
     public static int insertPlaylists(@NonNull ContentResolver contentResolver, @NonNull List<PlaylistData> playlistList) {
         ContentValues[] values = new ContentValues[playlistList.size()];
         for (int i = 0; i < playlistList.size(); i++) {
@@ -57,6 +60,13 @@ public class DataHelper {
         }
         Uri uri = Contract.Playlist.CONTENT_URI;
         return contentResolver.bulkInsert(uri, values);
+    }
+
+    public static int deletePlaylistsByParentId(@NonNull ContentResolver contentResolver, @NonNull String parentId) {
+        String selection = Contract.Playlist.COLUMN_PARENT_ID + " = ?";
+        String[] selectionArgs = new String[] { parentId };
+        Uri uri = Contract.Playlist.CONTENT_URI;
+        return contentResolver.delete(uri, selection, selectionArgs);
     }
 
     public static int insertHighlightVideos(@NonNull ContentResolver contentResolver, @NonNull List<VideoData> videoList) {

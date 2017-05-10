@@ -97,7 +97,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        VideosCursorAdapter.LatestViewHolder holder = (VideosCursorAdapter.LatestViewHolder) view.getTag();
+        VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
         listener.onFavoriteVideoClick(holder.videoId, holder.isFavorite);
     }
 

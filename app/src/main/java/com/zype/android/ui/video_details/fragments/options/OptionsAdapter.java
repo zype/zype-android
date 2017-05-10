@@ -19,12 +19,12 @@ import java.util.List;
  *          date 6/25/15
  */
 public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHolder> {
-    private List<Options> itemList;
+    private List<Options> items;
     String fileId;
     private OptionClickListener optionClickListener;
 
     public OptionsAdapter(List<Options> objects, String fileId, OptionClickListener listener) {
-        itemList = objects;
+        items = objects;
         this.fileId = fileId;
         optionClickListener = listener;
     }
@@ -39,7 +39,7 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Options item = itemList.get(position);
+        Options item = items.get(position);
         holder.id = item.id;
         holder.tvOptionsName.setText(item.title);
         if (item.secondText != null) {
@@ -51,15 +51,23 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHold
             holder.tvOptionsText.setVisibility(View.GONE);
             holder.ivOptionsImage.setImageResource(item.drawableId);
         }
+        if (item.progress > -1) {
+            holder.progressBar.setVisibility(View.VISIBLE);
+            holder.progressBar.setProgress(item.progress);
+        }
+        else {
+            holder.progressBar.setVisibility(View.GONE);
+            holder.progressBar.setProgress(0);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return itemList.size();
+        return items.size();
     }
 
     public void changeList(List<Options> optionsList) {
-        itemList = optionsList;
+        items = optionsList;
         notifyDataSetChanged();
     }
 
@@ -89,5 +97,22 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHold
 
     interface OptionClickListener {
         void onItemClick(ViewHolder viewHolder);
+    }
+
+    public Options getItemByOptionId(int id) {
+        for (Options item : items) {
+            if (item.id == id)
+                return item;
+        }
+        return null;
+    }
+
+    public int getItemPosition(Options item) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).id == item.id) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

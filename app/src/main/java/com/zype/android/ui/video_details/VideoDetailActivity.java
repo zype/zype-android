@@ -56,12 +56,10 @@ public class VideoDetailActivity extends BaseVideoActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-        VideoDetailPagerAdapter videoDetailPagerAdapter = new VideoDetailPagerAdapter(this, getSupportFragmentManager(), mVideoId);
-
-        mViewPager = (VideoDetailPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(videoDetailPagerAdapter);
-        mTabLayout = (TabLayout) findViewById(R.id.tabs);
-        mTabLayout.setupWithViewPager(mViewPager);
+        initTabs();
+        if (ZypeSettings.isDownloadsEnabled()) {
+            getDownloadUrls(mVideoId);
+        }
     }
 
     @Override
@@ -101,6 +99,14 @@ public class VideoDetailActivity extends BaseVideoActivity {
         return getString(R.string.activity_name_episode_details);
     }
 
+    private void initTabs() {
+        VideoDetailPagerAdapter videoDetailPagerAdapter = new VideoDetailPagerAdapter(this, getSupportFragmentManager(), mVideoId);
+        mViewPager = (VideoDetailPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(videoDetailPagerAdapter);
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
+    }
+
     ////////////////////////////////////////////SUBSCRIBE
 
     @Subscribe
@@ -132,7 +138,10 @@ public class VideoDetailActivity extends BaseVideoActivity {
             url = file.getUrl();
             String fileId = event.mFileId;
             DataHelper.saveVideoUrl(getContentResolver(), fileId, url);
-        } else {
+
+            initTabs();
+        }
+        else {
 //            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for video file");
             Logger.e("Server response must contains \"mp\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
         }
@@ -148,7 +157,10 @@ public class VideoDetailActivity extends BaseVideoActivity {
             url = file.getUrl();
             String fileId = event.mFileId;
             DataHelper.saveAudioUrl(getContentResolver(), fileId, url);
-        } else {
+
+            initTabs();
+        }
+        else {
 //            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for audio file");
             Logger.e("Server response must contains \"m4a\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
         }

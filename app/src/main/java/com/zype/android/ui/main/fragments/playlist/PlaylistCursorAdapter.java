@@ -159,6 +159,7 @@ public class PlaylistCursorAdapter extends CursorAdapter {
 
     private void loadImage(final Context context, final Cursor cursor, final PlaylistViewHolder viewHolder) {
         final String thumbnailsString = cursor.getString(COL_PLAYLIST_THUMBNAILS);
+        String placeholderUrl = "https://placeholdit.imgix.net/~text?txtsize=40&txt=No%20thumbnail%20available&w=720&h=240";
         if (thumbnailsString != null) {
             Type thumbnailType = new TypeToken<List<Thumbnail>>() {
             }.getType();
@@ -167,8 +168,11 @@ public class PlaylistCursorAdapter extends CursorAdapter {
                 UiUtils.loadImage(context, thumbnails.get(1).getUrl(), 0, viewHolder.thumbnail, viewHolder.progressBar);
             }
             else {
-                viewHolder.progressBar.setVisibility(View.GONE);
+                UiUtils.loadImage(context, placeholderUrl, 0, viewHolder.thumbnail, viewHolder.progressBar);
             }
+        }
+        else {
+            UiUtils.loadImage(context, placeholderUrl, 0, viewHolder.thumbnail, viewHolder.progressBar);
         }
     }
 

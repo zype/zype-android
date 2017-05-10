@@ -79,7 +79,7 @@ public abstract class BaseFragment extends Fragment {
 
     protected abstract String getFragmentName();
 
-    protected static void updateListItem(Activity activity, View view, Intent intent, int action, String fileId, VideosCursorAdapter.LatestViewHolder viewHolder) {
+    protected static void updateListItem(Activity activity, View view, Intent intent, int action, String fileId, VideosCursorAdapter.VideosViewHolder viewHolder) {
         if (TextUtils.equals(fileId, viewHolder.videoId)) {
             String errorMessage;
             int progress;
@@ -159,13 +159,13 @@ public abstract class BaseFragment extends Fragment {
         }
     }
 
-    private static void updateListView(VideosCursorAdapter.LatestViewHolder viewHolder, int newProgress) {
+    private static void updateListView(VideosCursorAdapter.VideosViewHolder viewHolder, int newProgress) {
         viewHolder.progressBar.setVisibility(View.VISIBLE);
         viewHolder.progressBar.setProgress(newProgress);
 //        viewHolder.detailsView.setVisibility(View.GONE);
     }
 
-    private static void hideProgress(VideosCursorAdapter.LatestViewHolder viewHolder) {
+    private static void hideProgress(VideosCursorAdapter.VideosViewHolder viewHolder) {
         viewHolder.progressBar.setVisibility(View.GONE);
 //        viewHolder.detailsView.setVisibility(View.VISIBLE);
         viewHolder.progressBar.setProgress(0);

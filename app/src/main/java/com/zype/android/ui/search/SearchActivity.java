@@ -320,7 +320,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        VideosCursorAdapter.LatestViewHolder holder = (VideosCursorAdapter.LatestViewHolder) view.getTag();
+        VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
         if (holder.subscriptionRequired) {
             if (holder.onAir) {
                 if (!SettingsProvider.getInstance().isLoggedIn() || SettingsProvider.getInstance().getSubscriptionCount() <= 0) {

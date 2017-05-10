@@ -13,6 +13,7 @@ public class Options {
     int id;
     int drawableId;
     String secondText;
+    public int progress = -1;
 
     public Options(int id, String title, boolean isVideo) {
         this.id = id;

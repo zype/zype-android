@@ -36,7 +36,6 @@ import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
-import com.zype.android.ui.dialog.ErrorDialogFragment;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.main.MainActivity;
 import com.zype.android.utils.BundleConstants;
@@ -53,7 +52,6 @@ import com.zype.android.webapi.events.video.RetrieveVideoEvent;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.File;
 import com.zype.android.webapi.model.video.Pagination;
-import com.zype.android.webapi.model.video.Video;
 import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.ArrayList;
@@ -157,7 +155,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Logger.d("click video");
-        VideosCursorAdapter.LatestViewHolder holder = (VideosCursorAdapter.LatestViewHolder) view.getTag();
+        VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
         if (holder.subscriptionRequired) {
             if (holder.onAir) {
                 if (SettingsProvider.getInstance().isLoggedIn()) {
@@ -306,7 +304,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
             if (position > -1) {
                 View view = mAdapter.getViewByPosition(position, mListView);
                 if (view != null) {
-                    VideosCursorAdapter.LatestViewHolder holder = (VideosCursorAdapter.LatestViewHolder) view.getTag();
+                    VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
                     updateListItem(this, mListView, intent, action, fileId, holder);
                 }
             }
@@ -322,7 +320,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     }
 
     // Download progress
-    protected static void updateListItem(Activity activity, View view, Intent intent, int action, String fileId, VideosCursorAdapter.LatestViewHolder viewHolder) {
+    protected static void updateListItem(Activity activity, View view, Intent intent, int action, String fileId, VideosCursorAdapter.VideosViewHolder viewHolder) {
         if (TextUtils.equals(fileId, viewHolder.videoId)) {
             String errorMessage;
             int progress;
@@ -402,13 +400,13 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         }
     }
 
-    private static void updateListView(VideosCursorAdapter.LatestViewHolder viewHolder, int newProgress) {
+    private static void updateListView(VideosCursorAdapter.VideosViewHolder viewHolder, int newProgress) {
         viewHolder.progressBar.setVisibility(View.VISIBLE);
         viewHolder.progressBar.setProgress(newProgress);
 //        viewHolder.detailsView.setVisibility(View.GONE);
     }
 
-    private static void hideProgress(VideosCursorAdapter.LatestViewHolder viewHolder) {
+    private static void hideProgress(VideosCursorAdapter.VideosViewHolder viewHolder) {
         viewHolder.progressBar.setVisibility(View.GONE);
 //        viewHolder.detailsView.setVisibility(View.VISIBLE);
         viewHolder.progressBar.setProgress(0);

@@ -22,14 +22,14 @@ import java.util.ArrayList;
  *          date 10/13/15
  */
 
-public class LatestMenuDialogFragment extends DialogFragment {
+public class VideoMenuDialogFragment extends DialogFragment {
 
     ListView optionList;
     private ArrayList<VideosMenuItem> list;
     private OnItemClickListener listener;
 
-    public static LatestMenuDialogFragment newInstance(ArrayList<VideosMenuItem> items) {
-        LatestMenuDialogFragment frag = new LatestMenuDialogFragment();
+    public static VideoMenuDialogFragment newInstance(ArrayList<VideosMenuItem> items) {
+        VideoMenuDialogFragment frag = new VideoMenuDialogFragment();
         Bundle args = new Bundle();
         args.putParcelableArrayList("list", items);
         frag.setArguments(args);

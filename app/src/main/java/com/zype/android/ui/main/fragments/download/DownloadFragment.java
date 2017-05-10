@@ -4,7 +4,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.zype.android.R;
@@ -22,6 +24,13 @@ public class DownloadFragment extends AbstractTabFragment {
 
     public static DownloadFragment newInstance() {
         return new DownloadFragment();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        mAdapter.setShowDownloadOptions(true);
+        return view;
     }
 
     @Override
@@ -90,7 +99,7 @@ public class DownloadFragment extends AbstractTabFragment {
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        mListener.onDownloadedVideoClick(((VideosCursorAdapter.LatestViewHolder) view.getTag()).videoId);
+        mListener.onDownloadedVideoClick(((VideosCursorAdapter.VideosViewHolder) view.getTag()).videoId);
     }
 
     @Override

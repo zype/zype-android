@@ -40,6 +40,7 @@
     <!--TEXT-->
     <color name="textCommonColor">@android:color/black</color>
     <color name="facebook_bg_color">#3b5998</color>
+    <color name="instagram">#c13584</color>
     <color name="youtube_bg_color">#d34836</color>
     <color name="twitter_bg_color">#4099ff</color>
     <color name="semi_transparent">#aa000000</color>

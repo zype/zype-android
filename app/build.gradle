@@ -49,7 +49,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode currentCodeVersion
-        versionName '1.1.0'
+        versionName '1.2.0'
         manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
                                 // TODO: Provide valid app_id and google_project_number for OneSignal
                                 onesignal_app_id               : "",

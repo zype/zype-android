@@ -5,6 +5,7 @@ import com.zype.android.webapi.WebApiManager;
 public class PlaylistParamsBuilder extends ParamsBuilder {
 
     private static final String PAGE = "page";
+    private static final String PER_PAGE = "per_page";
     private static final String DATE_START = "published_at.gte";
     private static final String DATE_END = "published_at.lte";
     private static final String DATA_IS_ON_AIR = "on_air";
@@ -24,6 +25,11 @@ public class PlaylistParamsBuilder extends ParamsBuilder {
 
     public PlaylistParamsBuilder addPage(int page) {
         addGetParam(PAGE, String.valueOf(page));
+        return this;
+    }
+
+    public PlaylistParamsBuilder addPerPage(int number) {
+        addGetParam(PER_PAGE, String.valueOf(number));
         return this;
     }
 
