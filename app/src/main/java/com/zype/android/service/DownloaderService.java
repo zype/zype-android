@@ -185,53 +185,55 @@ public class DownloaderService extends IntentService {
             }
             connection.connect();
 
-            int fileLength = connection.getContentLength();
+            if (connection.getResponseCode() != 416) {
+                int fileLength = connection.getContentLength();
 
-            long freeBytesInternal = StorageUtils.getAppCacheStorageFreeSpace(getApplicationContext());
-            long reserved = SettingsProvider.getInstance().getReserved();
-            long limit = SettingsProvider.getInstance().getDownloadsLimitInBytes();
+                long freeBytesInternal = StorageUtils.getAppCacheStorageFreeSpace(getApplicationContext());
+                long reserved = SettingsProvider.getInstance().getReserved();
+                long limit = SettingsProvider.getInstance().getDownloadsLimitInBytes();
 
-            if (fileLength >= freeBytesInternal) {
-                sendFreeSpaceProblem(fileId, R.string.alert_dialog_message_free_space);
-                connection.disconnect();
-                progressMap.remove(fileId);
-                return false;
-            } else if (isNewFile) {
-                if (reserved + fileLength > limit) {
-                    progressMap.remove(fileId);
-                    DownloadHelper.removeFromNeedToDownload(getApplicationContext(), fileId, isVideo);
-                    sendFreeSpaceProblem(fileId, R.string.download_maxsize_exceeded);
+                if (fileLength >= freeBytesInternal) {
+                    sendFreeSpaceProblem(fileId, R.string.alert_dialog_message_free_space);
                     connection.disconnect();
-                    return false;
-                } else {
-                    SettingsProvider.getInstance().saveFileLength(fileId, fileLength);
-                    SettingsProvider.getInstance().addToReserved(fileLength);
-                }
-            }
-            sendStart(fileId, isVideo);
-
-            in = new BufferedInputStream(connection.getInputStream());
-            FileOutputStream fos = (downloaded == 0) ? new FileOutputStream(filePath) : new FileOutputStream(filePath, true);
-            bout = new BufferedOutputStream(fos, 1024);
-            byte[] data = new byte[1024];
-            int count;
-            while ((count = in.read(data, 0, 1024)) >= 0) {
-                if (cancelSet.contains(fileId)) {
-                    cancelSet.remove(fileId);
                     progressMap.remove(fileId);
-                    DownloadHelper.removeFromNeedToDownload(getApplicationContext(), fileId, isVideo);
-                    isCanceled = true;
-                    long newReserved = SettingsProvider.getInstance().getReserved() - SettingsProvider.getInstance().getFileLength(fileId);
-                    SettingsProvider.getInstance().saveToReserved(newReserved);
+                    return false;
+                } else if (isNewFile) {
+                    if (reserved + fileLength > limit) {
+                        progressMap.remove(fileId);
+                        DownloadHelper.removeFromNeedToDownload(getApplicationContext(), fileId, isVideo);
+                        sendFreeSpaceProblem(fileId, R.string.download_maxsize_exceeded);
+                        connection.disconnect();
+                        return false;
+                    } else {
+                        SettingsProvider.getInstance().saveFileLength(fileId, fileLength);
+                        SettingsProvider.getInstance().addToReserved(fileLength);
+                    }
+                }
+                sendStart(fileId, isVideo);
+
+                in = new BufferedInputStream(connection.getInputStream());
+                FileOutputStream fos = (downloaded == 0) ? new FileOutputStream(filePath) : new FileOutputStream(filePath, true);
+                bout = new BufferedOutputStream(fos, 1024);
+                byte[] data = new byte[1024];
+                int count;
+                while ((count = in.read(data, 0, 1024)) >= 0) {
+                    if (cancelSet.contains(fileId)) {
+                        cancelSet.remove(fileId);
+                        progressMap.remove(fileId);
+                        DownloadHelper.removeFromNeedToDownload(getApplicationContext(), fileId, isVideo);
+                        isCanceled = true;
+                        long newReserved = SettingsProvider.getInstance().getReserved() - SettingsProvider.getInstance().getFileLength(fileId);
+                        SettingsProvider.getInstance().saveToReserved(newReserved);
 //                    Logger.v("download cancelled= " + "newres= " + newReserved + " fl= " +
 //                            SettingsProvider.getInstance().getFileLength(fileId) + " reserved =" + SettingsProvider.getInstance().getReserved());
-                    break;
+                        break;
+                    }
+                    bout.write(data, 0, count);
+                    downloaded += count;
+                    sendProgress(fileId, downloaded, fileLength, isVideo);
                 }
-                bout.write(data, 0, count);
-                downloaded += count;
-                sendProgress(fileId, downloaded, fileLength, isVideo);
+                bout.flush();
             }
-            bout.flush();
             progressMap.remove(fileId);
             isDownloadFinishedCorrectly = true;
         } catch (SocketException e) {

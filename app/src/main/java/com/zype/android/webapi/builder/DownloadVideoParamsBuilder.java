@@ -1,6 +1,7 @@
 package com.zype.android.webapi.builder;
 
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.webapi.WebApiManager;
 
 public class DownloadVideoParamsBuilder extends ParamsBuilder {
 
@@ -9,11 +10,21 @@ public class DownloadVideoParamsBuilder extends ParamsBuilder {
 
     public DownloadVideoParamsBuilder() {
         addGetParam("download", String.valueOf(true));
-        addGetParam(ACCESS_TOKEN, SettingsProvider.getInstance().getAccessToken());
+//        addGetParam(ACCESS_TOKEN, SettingsProvider.getInstance().getAccessToken());
     }
 
     public DownloadVideoParamsBuilder addVideoId(String videoId) {
         addPathParam(VIDEO_ID, videoId);
+        return this;
+    }
+
+    public DownloadVideoParamsBuilder addAccessToken() {
+        addGetParam(ACCESS_TOKEN, SettingsProvider.getInstance().getAccessToken());
+        return this;
+    }
+
+    public DownloadVideoParamsBuilder addAppKey() {
+        addGetParam(APP_KEY, WebApiManager.APP_KEY);
         return this;
     }
 

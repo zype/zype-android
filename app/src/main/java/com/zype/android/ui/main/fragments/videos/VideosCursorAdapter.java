@@ -328,7 +328,7 @@ public class VideosCursorAdapter extends CursorAdapter {
 //        }
 
 //        updateDownloadedIndicator(cursor, viewHolder);
-        updatePlayedIndicator(cursor, viewHolder);
+//        updatePlayedIndicator(cursor, viewHolder);
     }
 
 

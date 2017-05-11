@@ -3,6 +3,7 @@ package com.zype.android.core.settings;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.zype.android.ZypeSettings;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.StorageUtils;
 import com.zype.android.webapi.WebApiManager;
@@ -22,6 +23,7 @@ import java.util.List;
 public class SettingsProvider extends CommonPreferences {
 
     public static final String DOWNLOADS_ENABLED = "DownloadsEnabled";
+    public static final String DOWNLOADS_ENABLED_FOR_GUESTS = "DownloadsEnabledForGuests";
     public static final String THEME_LIGHT = "ThemeLight";
 
     private static final HashMap<String, Object> defaultValues = new HashMap<>();
@@ -110,8 +112,9 @@ public class SettingsProvider extends CommonPreferences {
     }
 
     private static void initDefaultValues() {
-        defaultValues.put(DOWNLOADS_ENABLED, true);
-        defaultValues.put(THEME_LIGHT, true);
+        defaultValues.put(DOWNLOADS_ENABLED, ZypeSettings.DOWNLOADS_ENABLED);
+        defaultValues.put(DOWNLOADS_ENABLED_FOR_GUESTS, ZypeSettings.DOWNLOADS_ENABLED_FOR_GUESTS);
+        defaultValues.put(THEME_LIGHT, ZypeSettings.THEME_LIGHT);
     }
 
     public void logout() {
@@ -443,7 +446,7 @@ public class SettingsProvider extends CommonPreferences {
     }
 
     public int getUserPreferenceStorage() {
-        if (isLogined()) {
+        if (isLoggedIn()) {
             return mUserSettings.getUserPreferenceStorage();
         } else {
             String value = get(DEFAULT + PREF_STORAGE, "");
@@ -465,7 +468,7 @@ public class SettingsProvider extends CommonPreferences {
 
     public String getUserPreferenceMaxSize() {
         String defaultValue = get(DEFAULT + PREF_MAX_DOWNLOADS_TOTAL_SIZE, DEFAULT_MAX_UNLIMITED);
-        if (isLogined()) {
+        if (isLoggedIn()) {
             return mUserSettings.getUserPreferenceMaxSize(defaultValue);
         } else {
             return defaultValue;
@@ -501,7 +504,7 @@ public class SettingsProvider extends CommonPreferences {
 
     public boolean isUserPreferenceLoadWifiOnlySet() {
         boolean defaultValue = get(DEFAULT + DOWNLOAD_WIFI, DEFAULT_LOAD_WIFI_ONLY);
-        if (isLogined()) {
+        if (isLoggedIn()) {
             return mUserSettings.getUserPreferenceLoadWifiOnly(defaultValue);
         } else {
             return defaultValue;

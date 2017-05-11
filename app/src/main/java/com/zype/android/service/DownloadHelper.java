@@ -41,7 +41,8 @@ public class DownloadHelper {
 
     static void downloadVideo(@NonNull Context context, @NonNull String url, @NonNull String fileId) {
         DataHelper.addVideoToDownloadList(context.getContentResolver(), fileId, url);
-        if (NetworkStateObserver.isNetworkEnabled() && SettingsProvider.getInstance().isLogined()) {
+//        if (NetworkStateObserver.isNetworkEnabled() && SettingsProvider.getInstance().isLogined()) {
+        if (NetworkStateObserver.isNetworkEnabled()) {
             if (SettingsProvider.getInstance().isUserPreferenceLoadWifiOnlySet()) {
                 if (NetworkStateObserver.isWiFiEnable()
                         || BuildConfig.DEBUG) {
@@ -62,7 +63,8 @@ public class DownloadHelper {
     }
 
     static void downloadAudio(@NonNull Context context, @NonNull String url, @NonNull String fileId) {
-        if (NetworkStateObserver.isNetworkEnabled() && SettingsProvider.getInstance().isLogined()) {
+//        if (NetworkStateObserver.isNetworkEnabled() && SettingsProvider.getInstance().isLogined()) {
+        if (NetworkStateObserver.isNetworkEnabled()) {
             if (SettingsProvider.getInstance().isUserPreferenceLoadWifiOnlySet()) {
                 if (NetworkStateObserver.isWiFiEnable()
                         || BuildConfig.DEBUG) {

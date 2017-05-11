@@ -213,20 +213,36 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         }
     }
 
-    private void getAudioDownloadUrl(String episodeId) {
-        if (SettingsProvider.getInstance().getSubscriptionCount() > 0) {
-            DownloadAudioParamsBuilder playerParamsBuilder = new DownloadAudioParamsBuilder()
-                    .addAudioId(episodeId);
-            getApi().executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, playerParamsBuilder.build());
+    private void getAudioDownloadUrl(String videoId) {
+//        if (SettingsProvider.getInstance().getSubscriptionCount() > 0) {
+//            DownloadAudioParamsBuilder playerParamsBuilder = new DownloadAudioParamsBuilder()
+//                    .addAudioId(episodeId);
+        DownloadAudioParamsBuilder downloadAudioParamsBuilder = new DownloadAudioParamsBuilder();
+        if (SettingsProvider.getInstance().isLoggedIn()) {
+            downloadAudioParamsBuilder.addAccessToken();
         }
+        else {
+            downloadAudioParamsBuilder.addAppKey();
+        }
+        downloadAudioParamsBuilder.addAudioId(videoId);
+            getApi().executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, downloadAudioParamsBuilder.build());
+//        }
     }
 
-    private void getVideoDownloadUrl(String episodeId) {
-        if (SettingsProvider.getInstance().getSubscriptionCount() > 0) {
-            DownloadVideoParamsBuilder downloadVideoParamsBuilder = new DownloadVideoParamsBuilder()
-                    .addVideoId(episodeId);
-            getApi().executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, downloadVideoParamsBuilder.build());
+    private void getVideoDownloadUrl(String videoId) {
+//        if (SettingsProvider.getInstance().getSubscriptionCount() > 0) {
+//            DownloadVideoParamsBuilder downloadVideoParamsBuilder = new DownloadVideoParamsBuilder()
+//                    .addVideoId(episodeId);
+        DownloadVideoParamsBuilder downloadVideoParamsBuilder = new DownloadVideoParamsBuilder();
+        if (SettingsProvider.getInstance().isLoggedIn()) {
+            downloadVideoParamsBuilder.addAccessToken();
         }
+        else {
+            downloadVideoParamsBuilder.addAppKey();
+        }
+        downloadVideoParamsBuilder.addVideoId(videoId);
+            getApi().executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, downloadVideoParamsBuilder.build());
+//        }
     }
 
     @Nullable

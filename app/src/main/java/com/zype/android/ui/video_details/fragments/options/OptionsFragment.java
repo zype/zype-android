@@ -451,13 +451,13 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                 }
                 break;*/
             case OPTION_DOWNLOAD:
-                if (SettingsProvider.getInstance().isLoggedIn()) {
+//                if (SettingsProvider.getInstance().isLoggedIn()) {
                     showDownloadMenu();
-                }
-                else {
-                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
-                }
+//                }
+//                else {
+//                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+//                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+//                }
                 break;
             case OPTION_FAVORITES:
                 isFavorite = !isFavorite;

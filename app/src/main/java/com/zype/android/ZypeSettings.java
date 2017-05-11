@@ -29,8 +29,18 @@ public class ZypeSettings {
     public static final String TWITTER_ID = "";
     public static final String WEB_URL = "";
 
+    // App features
+    // TODO: Update app feature settings
+    public static final boolean DOWNLOADS_ENABLED = true;
+    public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
+    public static final boolean THEME_LIGHT = true;
+
     public static boolean isDownloadsEnabled() {
         return SettingsProvider.getInstance().getBoolean(SettingsProvider.DOWNLOADS_ENABLED);
+    }
+
+    public static boolean isDownloadsEnabledForGuests() {
+        return SettingsProvider.getInstance().getBoolean(SettingsProvider.DOWNLOADS_ENABLED_FOR_GUESTS);
     }
 
     public static boolean isThemeLight() {

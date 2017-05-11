@@ -4,6 +4,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.R;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
+import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
@@ -24,6 +25,7 @@ import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.Advertising;
 import com.zype.android.webapi.model.player.AdvertisingSchedule;
 import com.zype.android.webapi.model.player.File;
+import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.webapi.model.zobjects.ZobjectData;
 
 import android.app.Activity;
@@ -57,9 +59,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         initTabs();
-        if (ZypeSettings.isDownloadsEnabled()) {
-            getDownloadUrls(mVideoId);
-        }
+        updateDownloadUrls();
     }
 
     @Override
@@ -107,8 +107,22 @@ public class VideoDetailActivity extends BaseVideoActivity {
         mTabLayout.setupWithViewPager(mViewPager);
     }
 
-    ////////////////////////////////////////////SUBSCRIBE
+    // //////////
+    // Data
+    //
+    private void updateDownloadUrls() {
+        VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
+        if (!videoData.isOnAir()) {
+            if (ZypeSettings.isDownloadsEnabled()
+                    && (ZypeSettings.isDownloadsEnabledForGuests() || SettingsProvider.getInstance().isLoggedIn())) {
+                getDownloadUrls(mVideoId);
+            }
+        }
+    }
 
+    // //////////
+    // Subscribe
+    //
     @Subscribe
     public void handleFavoriteEvent(FavoriteEvent event) {
         Logger.d("FavoriteEvent");
@@ -129,8 +143,8 @@ public class VideoDetailActivity extends BaseVideoActivity {
 
     @Subscribe
     public void handleDownloadVideo(DownloadVideoEvent event) {
-        if (!ZypeSettings.isDownloadsEnabled())
-            return;
+//        if (!ZypeSettings.isDownloadsEnabled())
+//            return;
         Logger.d("handleDownloadVideo");
         File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
         String url;
@@ -149,8 +163,8 @@ public class VideoDetailActivity extends BaseVideoActivity {
 
     @Subscribe
     public void handleDownloadAudio(DownloadAudioEvent event) {
-        if (!ZypeSettings.isDownloadsEnabled())
-            return;
+//        if (!ZypeSettings.isDownloadsEnabled())
+//            return;
         File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
         String url;
         if (file != null) {
