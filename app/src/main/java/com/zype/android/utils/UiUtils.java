@@ -121,7 +121,7 @@ public class UiUtils {
         }
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, SettingsProvider.getInstance().getShareSubject());
-        String message = String.format(activity.getString(R.string.share_message), title);
+        String message = String.format(activity.getString(R.string.share_message), title, activity.getString(R.string.app_name));
         sendIntent.putExtra(Intent.EXTRA_TEXT, message);
         sendIntent.setType("text/html");
         activity.startActivity(Intent.createChooser(sendIntent, activity.getResources().getText(R.string.menu_share)));

@@ -74,3 +74,6 @@ out/
 
 # Mac OS X
 *.DS_Store
+
+# Keystore
+*.jsk

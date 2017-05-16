@@ -61,7 +61,7 @@
     <string name="option_download_audio">Audio</string>
     <string name="option_play_as_video">Video</string>
     <string name="option_play_as_audio">Audio</string>
-    <string name="share_message" formatted="false"><![CDATA[Check out this awesome clip from %s on [app_name] ]]></string>
+    <string name="share_message" formatted="false"><![CDATA[I thought you would enjoy this awesome video %1$s that I watched on %2$s ]]></string>
     <string name="share_message_html" formatted="false"><![CDATA[Check out this awesome clip from %s on <a href="[app_name]">[app_name]</a>  <img here="%s" /> ]]></string>
     <string name="my_link"><a href="http://somesite.com/">Click me!</a></string>
 

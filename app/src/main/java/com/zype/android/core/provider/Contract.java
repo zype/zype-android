@@ -10,7 +10,10 @@ import android.provider.BaseColumns;
  */
 public class Contract {
 
+    // TODO: Update 'CONTENT_AUTHORITY' with the same value as 'android:authorities' of
+    // ZypeContentProvider declaration in 'AndroidManifest.xml'
     public static final String CONTENT_AUTHORITY = "com.zype.android.provider";
+
     public static final String TABLE_NAME_VIDEO = "video";
     public static final String TABLE_NAME_FAVORITE = "favorite";
     public static final String TABLE_NAME_PLAYLIST = "playlist";

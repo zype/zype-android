@@ -97,8 +97,8 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             type = PlayerFragment.TYPE_VIDEO_WEB;
         } else if (!TextUtils.isEmpty(mVideoData.getPlayerAudioUrl())) {
             type = PlayerFragment.TYPE_AUDIO_WEB;
-        } else if (!TextUtils.isEmpty(mVideoData.getYoutubeId())) {
-            type = TYPE_YOUTUBE;
+//        } else if (!TextUtils.isEmpty(mVideoData.getYoutubeId())) {
+//            type = TYPE_YOUTUBE;
         } else {
             type = TYPE_WEB;
         }

@@ -43,19 +43,41 @@ Android Studio
 
 ## Creating new Android app based on Zype Template
 
-A step by step series of examples that tell you how to get a new app running
+Steps you need to perform to get a new app running:
 
-```
-1. In the 'build.gradle' change 'applicationId' to your app package name
-2. Change app name, launch icon and other resources
-3. In 'ZypeSettings' class change app key, authentication credentials and root playlist id to values applicable for your Zype account
-4. In 'initDefaultValues()' method of 'SettingsProvider' class update default values  for keys 'DOWNLOADS_ENABLED' and 'THEME_LIGHT' which are responsible for enabling downloads feature and switch between light and dark app theme
-5. (Optional) In 'ZypeSettings' class provide your social network ids
-6. (Optional) To use Google Analytics in your app provide your GA id in 'ZypeSettings' class and uncomment init of Google Analytics in 'ZypeApp' class
-7. (Optional) To use Fabric in your app provide your fabric api key in 'AndroidManifest.xml' and uncomment init of fabric in 'ZypeApp' class
-7. (Optional) To use OneSignal in your app uncomment init of OneSignal in 'ZypeApp' class
+### Mandatory updates
 
-```
+1. In the app level ```build.gradle``` file change ```applicationId``` to your app package name
+
+2. Change app name, launch icon, accent color and other resources to customize app appearance
+
+3. Setup content provider:
+* In the ```AndroidManifest.xml``` file find the declaration of ```ZypeContentProvider``` and change its 
+```android:authorities``` property to ```[Your applicationId].provider```
+* In the ```Contract``` class update ```CONTENT_AUTHORITY``` constant to the same value above
+
+4. API keys:
+
+    Update following constants in ```ZypeSettings``` class with values applicable to your Zype account:
+* ```APP_KEY```
+* ```CLIENT_ID```
+* ```CLIENT_SECRET```
+* ```ROOT_PLAYLIST_ID```
+
+5. Setup app features:
+
+    Update feature flags in ```ZypeSettings``` class to customize functinality and UI of your app
+* ```DOWNLOADS_ENABLED```
+* ```DOWNLOADS_ENABLED_FOR_GUESTS```
+* ```THEME_LIGHT```
+
+### Optional
+
+6. In 'ZypeSettings' class provide your social network ids
+7. To use Google Analytics in your app provide your GA id in 'ZypeSettings' class and uncomment init of Google Analytics in 'ZypeApp' class
+8. To use Fabric in your app provide your fabric api key in 'AndroidManifest.xml' and uncomment init of fabric in 'ZypeApp' class
+9. To use OneSignal in your app uncomment init of OneSignal in 'ZypeApp' class
+
 
 
 ## Built With
