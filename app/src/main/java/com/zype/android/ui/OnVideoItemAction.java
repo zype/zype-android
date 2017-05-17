@@ -5,7 +5,7 @@ package com.zype.android.ui;
  * @version 1
  *          date 8/17/15
  */
-public interface OnEpisodeItemAction {
+public interface OnVideoItemAction {
 
     void onFavoriteVideo(String videoId);
 

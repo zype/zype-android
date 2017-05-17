@@ -7,7 +7,7 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.ui.LoginActivity;
-import com.zype.android.ui.OnEpisodeItemAction;
+import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.dialog.ErrorDialogFragment;
@@ -62,7 +62,7 @@ import java.util.List;
 
 import static android.view.View.GONE;
 
-public class SearchActivity extends BaseActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnEpisodeItemAction, OnLoginAction {
+public class SearchActivity extends BaseActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnVideoItemAction, OnLoginAction {
 
     private static final String SEARCH_STRING = "SEARCH_STRING";
     private static final String SELECTED_TAB = "SELECTED_TAB";

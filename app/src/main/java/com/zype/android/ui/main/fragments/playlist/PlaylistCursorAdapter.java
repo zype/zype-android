@@ -5,7 +5,7 @@ import com.google.gson.reflect.TypeToken;
 
 import com.zype.android.R;
 import com.zype.android.core.provider.Contract;
-import com.zype.android.ui.OnEpisodeItemAction;
+import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.model.video.Thumbnail;
@@ -29,7 +29,7 @@ import java.util.List;
 public class PlaylistCursorAdapter extends CursorAdapter {
 
     private final OnLoginAction mOnLoginListener;
-    private final OnEpisodeItemAction mOnEpisodeItemAction;
+    private final OnVideoItemAction mOnVideoItemAction;
     private int COL_PLAYLIST_ID = -1;
     private int COL_PLAYLIST_TITLE = -1;
     private int COL_PLAYLIST_THUMBNAILS = -1;
@@ -38,9 +38,9 @@ public class PlaylistCursorAdapter extends CursorAdapter {
 
     private Activity mActivity;
 
-    public PlaylistCursorAdapter(Activity activity, int flags, OnEpisodeItemAction onEpisodeItemActionListener, OnLoginAction onLogin) {
+    public PlaylistCursorAdapter(Activity activity, int flags, OnVideoItemAction onVideoItemActionListener, OnLoginAction onLogin) {
         super(activity, null, flags);
-        mOnEpisodeItemAction = onEpisodeItemActionListener;
+        mOnVideoItemAction = onVideoItemActionListener;
         mOnLoginListener = onLogin;
         mActivity = activity;
     }

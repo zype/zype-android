@@ -13,7 +13,7 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
-import com.zype.android.ui.OnEpisodeItemAction;
+import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.dialog.VideoMenuDialogFragment;
 import com.zype.android.utils.FileUtils;
@@ -53,7 +53,7 @@ public class VideosCursorAdapter extends CursorAdapter {
     private static final int ITEM_DOWNLOAD_AUDIO = 6;
     private static final int ITEM_SHARE = 10;
     private final OnLoginAction mOnLoginListener;
-    private final OnEpisodeItemAction mOnEpisodeItemAction;
+    private final OnVideoItemAction mOnVideoItemAction;
     private int COL_VIDEO_ID = -1;
     private int COL_VIDEO_TITLE = -1;
     private int COL_VIDEO_EPISODE = -1;
@@ -74,9 +74,9 @@ public class VideosCursorAdapter extends CursorAdapter {
 
     private boolean showDownloadOptions = false;
 
-    public VideosCursorAdapter(Activity activity, int flags, OnEpisodeItemAction onEpisodeItemActionListener, OnLoginAction onLogin) {
+    public VideosCursorAdapter(Activity activity, int flags, OnVideoItemAction onVideoItemActionListener, OnLoginAction onLogin) {
         super(activity, null, flags);
-        mOnEpisodeItemAction = onEpisodeItemActionListener;
+        mOnVideoItemAction = onVideoItemActionListener;
         mOnLoginListener = onLogin;
         mActivity = activity;
     }
@@ -110,10 +110,13 @@ public class VideosCursorAdapter extends CursorAdapter {
         List<VideosMenuItem> list = new ArrayList<>();
 
         int currentProgress = DownloaderService.currentProgress(viewHolder.videoId);
-        if (viewHolder.isFavorite) {
-            list.add(new VideosMenuItem(ITEM_UNFAVORITE, R.string.menu_unfavorite));
-        } else {
-            list.add(new VideosMenuItem(ITEM_FAVORITE, R.string.menu_favorite));
+        if (SettingsProvider.getInstance().isLoggedIn()) {
+            if (viewHolder.isFavorite) {
+                list.add(new VideosMenuItem(ITEM_UNFAVORITE, R.string.menu_unfavorite));
+            }
+            else {
+                list.add(new VideosMenuItem(ITEM_FAVORITE, R.string.menu_favorite));
+            }
         }
         if (ZypeSettings.isDownloadsEnabled() && showDownloadOptions) {
             if (currentProgress > -1) {
@@ -233,7 +236,7 @@ public class VideosCursorAdapter extends CursorAdapter {
         View.OnClickListener onClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SettingsProvider.getInstance().isLoggedIn()) {
+//                if (SettingsProvider.getInstance().isLoggedIn()) {
                     mActivity.openContextMenu(v);
                     ArrayList<VideosMenuItem> items = new ArrayList<>();
                     items.addAll(getListForMenu(viewHolder, isYoutubeVideo));
@@ -246,22 +249,21 @@ public class VideosCursorAdapter extends CursorAdapter {
                             Tracker tracker = ZypeApp.getTracker();
                             switch (fragment.getList().get(position).getId()) {
                                 case ITEM_UNFAVORITE:
-
-                                    mOnEpisodeItemAction.onUnFavoriteVideo(viewHolder.videoId);
+                                    mOnVideoItemAction.onUnFavoriteVideo(viewHolder.videoId);
                                     event = new HitBuilders.EventBuilder()
                                             .setAction("Unfavorite")
                                             .setLabel("id=" + viewHolder.videoId)
                                             .build();
                                     break;
                                 case ITEM_FAVORITE:
-                                    mOnEpisodeItemAction.onFavoriteVideo(viewHolder.videoId);
+                                    mOnVideoItemAction.onFavoriteVideo(viewHolder.videoId);
                                     event = new HitBuilders.EventBuilder()
                                             .setAction("Favorite")
                                             .setLabel("id=" + viewHolder.videoId)
                                             .build();
                                     break;
                                 case ITEM_SHARE:
-                                    mOnEpisodeItemAction.onShareVideo(viewHolder.videoId);
+                                    mOnVideoItemAction.onShareVideo(viewHolder.videoId);
                                     event = new HitBuilders.EventBuilder()
                                             .setAction("Share")
                                             .setLabel("id=" + viewHolder.videoId)
@@ -275,14 +277,14 @@ public class VideosCursorAdapter extends CursorAdapter {
                                             .build();
                                     break;
                                 case ITEM_DOWNLOAD_AUDIO:
-                                    mOnEpisodeItemAction.onDownloadAudio(viewHolder.videoId);
+                                    mOnVideoItemAction.onDownloadAudio(viewHolder.videoId);
                                     event = new HitBuilders.EventBuilder()
                                             .setAction("Download Audio")
                                             .setLabel("id=" + viewHolder.videoId)
                                             .build();
                                     break;
                                 case ITEM_DOWNLOAD_VIDEO:
-                                    mOnEpisodeItemAction.onDownloadVideo(viewHolder.videoId);
+                                    mOnVideoItemAction.onDownloadVideo(viewHolder.videoId);
                                     event = new HitBuilders.EventBuilder()
                                             .setAction("Download Video")
                                             .setLabel("id=" + viewHolder.videoId)
@@ -314,9 +316,10 @@ public class VideosCursorAdapter extends CursorAdapter {
                         }
                     });
                     fragment.show(mActivity.getFragmentManager(), "menu");
-                } else {
-                    mOnLoginListener.onRequestLogin();
-                }
+//                }
+//                else {
+//                    mOnLoginListener.onRequestLogin();
+//                }
             }
         };
         viewHolder.popupButton.setOnClickListener(onClick);
@@ -330,7 +333,6 @@ public class VideosCursorAdapter extends CursorAdapter {
 //        updateDownloadedIndicator(cursor, viewHolder);
 //        updatePlayedIndicator(cursor, viewHolder);
     }
-
 
     private void updateDownloadedIndicator(Cursor cursor, VideosViewHolder viewHolder) {
         if (isFileDownloaded(cursor)) {

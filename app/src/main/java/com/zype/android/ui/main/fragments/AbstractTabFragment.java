@@ -1,11 +1,8 @@
 package com.zype.android.ui.main.fragments;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.AttrRes;
-import android.support.annotation.ColorInt;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
@@ -18,7 +15,7 @@ import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.zype.android.R;
-import com.zype.android.ui.OnEpisodeItemAction;
+import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.base.BaseFragment;
@@ -33,7 +30,7 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
 
     protected static final String SELECTED_TAB = "SELECTED_TAB";
     protected OnMainActivityFragmentListener mListener;
-    protected OnEpisodeItemAction mOnEpisodeItemActionListener;
+    protected OnVideoItemAction mOnVideoItemActionListener;
     protected OnLoginAction mOnLoginListener;
     protected LoaderManager mLoader;
     protected VideosCursorAdapter mAdapter;
@@ -48,7 +45,7 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        mAdapter = new VideosCursorAdapter(getActivity(), CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, mOnEpisodeItemActionListener, mOnLoginListener);
+        mAdapter = new VideosCursorAdapter(getActivity(), CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, mOnVideoItemActionListener, mOnLoginListener);
         View view = inflater.inflate(R.layout.fragment_base_tab_list, null);
         mListView = (ListView) view.findViewById(R.id.list_tab);
         mEmpty = (TextView) view.findViewById(R.id.empty);
@@ -108,7 +105,7 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
                     + " must implement OnFragmentInteractionListener");
         }
         try {
-            mOnEpisodeItemActionListener = (OnEpisodeItemAction) context;
+            mOnVideoItemActionListener = (OnVideoItemAction) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement OnEpisodeItemAction");
@@ -126,7 +123,7 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        mOnEpisodeItemActionListener = null;
+        mOnVideoItemActionListener = null;
         mOnLoginListener = null;
     }
 

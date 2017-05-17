@@ -22,7 +22,7 @@ import com.zype.android.R;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
-import com.zype.android.ui.OnEpisodeItemAction;
+import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.base.BaseFragment;
@@ -52,7 +52,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     private LoaderManager loaderManager;
     private VideosCursorAdapter adapter;
     private OnMainActivityFragmentListener listener;
-    private OnEpisodeItemAction onEpisodeItemActionListener;
+    private OnVideoItemAction onVideoItemActionListener;
     private OnLoginAction onLoginListener;
 
     private SharedPreferences.OnSharedPreferenceChangeListener prefListener;
@@ -69,7 +69,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
 
-        adapter = new VideosCursorAdapter(getActivity(), CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, onEpisodeItemActionListener, onLoginListener);
+        adapter = new VideosCursorAdapter(getActivity(), CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, onVideoItemActionListener, onLoginListener);
         View view = inflater.inflate(R.layout.fragment_favorites, null);
         listFavorites = (ListView) view.findViewById(R.id.listFavorites);
         textEmpty = (TextView) view.findViewById(R.id.empty);
@@ -117,7 +117,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
                     + " must implement OnFragmentInteractionListener");
         }
         try {
-            onEpisodeItemActionListener = (OnEpisodeItemAction) context;
+            onVideoItemActionListener = (OnVideoItemAction) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement OnEpisodeItemAction");
@@ -135,7 +135,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     public void onDetach() {
         super.onDetach();
         listener = null;
-        onEpisodeItemActionListener = null;
+        onVideoItemActionListener = null;
         onLoginListener = null;
     }
 

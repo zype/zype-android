@@ -31,7 +31,7 @@ import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadConstants;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.ui.LoginActivity;
-import com.zype.android.ui.OnEpisodeItemAction;
+import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.base.BaseActivity;
@@ -71,7 +71,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         }
     };
     private OnMainActivityFragmentListener mListener;
-    private OnEpisodeItemAction mOnEpisodeItemActionListener;
+    private OnVideoItemAction mOnVideoItemActionListener;
     private OnLoginAction mOnLoginListener;
     private TextView mTvDate;
     private ImageView mBanner;
@@ -103,7 +103,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         mListView.setOnItemClickListener(this);
         mListView.setEmptyView(findViewById(R.id.empty));
         mAdapter = new VideosCursorAdapter(this, VideosCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER,
-                mOnEpisodeItemActionListener, mOnLoginListener);
+                mOnVideoItemActionListener, mOnLoginListener);
         mListView.setAdapter(mAdapter);
         mTvEmpty = (TextView) findViewById(R.id.empty);
 
@@ -118,7 +118,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         }
 
         try {
-            mOnEpisodeItemActionListener = (OnEpisodeItemAction) this;
+            mOnVideoItemActionListener = (OnVideoItemAction) this;
         } catch (ClassCastException e) {
             throw new ClassCastException(this.toString()
                     + " must implement OnEpisodeItemAction");
@@ -148,7 +148,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     protected void onDestroy() {
         super.onDestroy();
         mListener = null;
-        mOnEpisodeItemActionListener = null;
+        mOnVideoItemActionListener = null;
         mOnLoginListener = null;
     }
 

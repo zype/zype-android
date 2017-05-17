@@ -14,7 +14,7 @@ import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
 import com.zype.android.ui.LoginActivity;
-import com.zype.android.ui.OnEpisodeItemAction;
+import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.base.BaseActivity;
@@ -46,7 +46,7 @@ import com.zype.android.webapi.model.player.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements OnMainActivityFragmentListener, OnEpisodeItemAction, OnLoginAction {
+public class MainActivity extends BaseActivity implements OnMainActivityFragmentListener, OnVideoItemAction, OnLoginAction {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
