@@ -49,8 +49,8 @@ public class SummaryFragment extends BaseFragment {
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 VideoData video = VideoHelper.objectFromCursor(cursor);
-                ((TextView) view.findViewById(R.id.episode_title)).setText(video.getTitle());
-                ((TextView) view.findViewById(R.id.episode_description)).setText(video.getDescription());
+                ((TextView) view.findViewById(R.id.textVideoTitle)).setText(video.getTitle());
+                ((TextView) view.findViewById(R.id.textVideoDescription)).setText(video.getDescription());
                 TagCloudLinkView tagCloudView = (TagCloudLinkView) view.findViewById(R.id.tag_cloud);
                //hide keywords
                /* if (video.getKeywords() != null) {

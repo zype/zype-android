@@ -58,6 +58,9 @@ public class VideoDetailActivity extends BaseVideoActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+
+        getSupportActionBar().setTitle(VideoHelper.getFullData(getContentResolver(), mVideoId).getTitle());
+
         initTabs();
         updateDownloadUrls();
     }
