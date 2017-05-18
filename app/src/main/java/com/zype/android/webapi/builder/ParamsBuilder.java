@@ -7,12 +7,11 @@ import java.util.HashMap;
 public class ParamsBuilder {
 
     public static final String APP_KEY = "app_key";
-
     public static final String POST_PARAMS = "post";
-
     public static final String PATH_PARAMS = "url";
-
     public static final String GET_PARAMS = "get";
+
+    public static final int PER_PAGE_DEFAULT = 10;
 
 //    public static final String RECEIVER_PARAMS = "receiver";
 

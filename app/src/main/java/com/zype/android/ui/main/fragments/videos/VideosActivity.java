@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
+import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
@@ -44,6 +45,7 @@ import com.zype.android.utils.ListUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.builder.ParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.download.DownloadVideoEvent;
 import com.zype.android.webapi.events.favorite.FavoriteEvent;
@@ -107,6 +109,67 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         mListView.setAdapter(mAdapter);
         mTvEmpty = (TextView) findViewById(R.id.empty);
 
+        startLoadCursors();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadVideosFromPlaylist(1);
+        IntentFilter filter = new IntentFilter(DownloadConstants.ACTION);
+        LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(downloaderReceiver, filter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this.getApplicationContext()).unregisterReceiver(downloaderReceiver);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mLoader != null) {
+            mLoader.destroyLoader(LOADER_VIDEO);
+            mLoader = null;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mListener = null;
+        mOnVideoItemActionListener = null;
+        mOnLoginListener = null;
+    }
+
+    protected String getActivityName() {
+        return getString(R.string.activity_name_videos);
+    }
+
+    // //////////
+    // Menu
+    //
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id) {
+            case android.R.id.home:
+                super.onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    // //////////
+    // UI
+    //
+    private void updateTitle() {
+        Cursor playlistCursor = CursorHelper.getPlaylistCursor(getContentResolver(), playlistId);
+        if (playlistCursor != null && playlistCursor.moveToFirst()) {
+            getSupportActionBar().setTitle(playlistCursor.getString(playlistCursor.getColumnIndex(Contract.Playlist.COLUMN_TITLE)));
+            playlistCursor.close();
+        }
     }
 
     private void addListeners() {
@@ -132,170 +195,6 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         }
     }
 
-    private void loadVideosFromPlaylist(int page) {
-        Logger.d("load Videos from playlist");
-        mAdapter.changeCursor(null);
-        mTvEmpty.setText(R.string.latest_empty_list);
-
-        VideoParamsBuilder builder = new VideoParamsBuilder();
-        builder.addPlaylistId(playlistId);
-        builder.addPage(page);
-        getApi().executeRequest(WebApiManager.Request.VIDEO_FROM_PLAYLIST, builder.build());
-        startLoadCursors();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mListener = null;
-        mOnVideoItemActionListener = null;
-        mOnLoginListener = null;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Logger.d("click video");
-        VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
-        if (holder.subscriptionRequired) {
-            if (holder.onAir) {
-                if (SettingsProvider.getInstance().isLoggedIn()) {
-                    if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                        // Check total played live stream time
-                        Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
-                        int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
-                        if (liveStreamTime < SettingsProvider.getInstance().getLiveStreamLimit()) {
-                            VideoDetailActivity.startActivity(this, holder.videoId);
-                        } else {
-                            DialogHelper.showSubscriptionAlertIssue(this);
-//                            ErrorDialogFragment dialog = ErrorDialogFragment.newInstance(SettingsProvider.getInstance().getLiveStreamMessage(), null, null);
-//                            dialog.show(getSupportFragmentManager(), ErrorDialogFragment.TAG);
-                        }
-                    }
-                    else {
-                        VideoDetailActivity.startActivity(this, holder.videoId);
-                    }
-                }
-                else {
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
-                }
-            }
-            else {
-                if (SettingsProvider.getInstance().isLoggedIn()) {
-                    if (holder.isTranscoded) {
-                        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-                            DialogHelper.showSubscriptionAlertIssue(this);
-                        } else {
-                            VideoDetailActivity.startActivity(this, holder.videoId);
-                        }
-                    }
-                    else {
-                        //if it's not transcoded it is a live stream. May be we can check onAir flag
-               /* if (TextUtils.isEmpty(holder.youtubePath)) {
-                    DialogFragment newFragment = CustomAlertDialog.newInstance(
-                            R.string.alert_dialog_title_transcoded, R.string.alert_dialog_message_transcoded);
-                    newFragment.show(this.getSupportFragmentManager(), "dialog_transcoded");
-                } else {*/
-//                    if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-//                        DialogHelper.showSubscriptionAlertIssue(this);
-//                    } else {
-//                        EpisodeDetailActivity.startActivity(this, holder.videoId);
-//                    }
-                        // }
-                        return;
-                    }
-                } else {
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
-                }
-            }
-        }
-        else {
-            VideoDetailActivity.startActivity(this, holder.videoId);
-        }
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadVideosFromPlaylist(1);
-        IntentFilter filter = new IntentFilter(DownloadConstants.ACTION);
-        LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(downloaderReceiver, filter);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this.getApplicationContext()).unregisterReceiver(downloaderReceiver);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mLoader != null) {
-            mLoader.destroyLoader(LOADER_VIDEO);
-            mLoader = null;
-        }
-    }
-
-    // //////////
-    // Menu
-    //
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch(id) {
-            case android.R.id.home:
-                super.onBackPressed();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    protected void startLoadCursors() {
-        if (mLoader == null) {
-            mLoader = getSupportLoaderManager();
-        }
-        Bundle bundle = new Bundle();
-        mLoader.restartLoader(LOADER_VIDEO, bundle, this);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//        String selection = Contract.Video.COLUMN_PLAYLISTS + " LIKE ? " ;
-//        String[] selectionArgs = new String[]{"%" + playlistId + "%"};
-//        //String[] selectionArgs = new String[]{playlistId};
-//            return new CursorLoader(
-//                    this,
-//                    Contract.Video.CONTENT_URI,
-//                    null,
-//                    selection,
-//                    selectionArgs, Contract.Video.COLUMN_PUBLISHED_AT + " DESC");
-//
-        String selection = Contract.PlaylistVideo.PLAYLIST_ID + "=?" ;
-        String[] selectionArgs = new String[] { playlistId };
-        return new CursorLoader(
-                this,
-                Contract.PlaylistVideo.CONTENT_URI,
-                null,
-                selection,
-                selectionArgs,
-                Contract.PlaylistVideo.NUMBER);
-
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        Logger.d("onLoadFinished size=" + cursor.getCount());
-        mAdapter.changeCursor(cursor);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mAdapter.changeCursor(null);
-    }
-
     private void updateItemsUI(Intent intent) {
         int action = intent.getIntExtra(DownloadConstants.ACTION_TYPE, 0);
         String fileId = intent.getStringExtra(DownloadConstants.EXTRA_FILE_ID);
@@ -308,14 +207,6 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                     updateListItem(this, mListView, intent, action, fileId, holder);
                 }
             }
-        }
-    }
-
-    private void updateTitle() {
-        Cursor playlistCursor = CursorHelper.getPlaylistCursor(getContentResolver(), playlistId);
-        if (playlistCursor != null && playlistCursor.moveToFirst()) {
-            getSupportActionBar().setTitle(playlistCursor.getString(playlistCursor.getColumnIndex(Contract.Playlist.COLUMN_TITLE)));
-            playlistCursor.close();
         }
     }
 
@@ -412,41 +303,154 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         viewHolder.progressBar.setProgress(0);
     }
 
-    //    -------------------SUBSCRIBE-------------------
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Logger.d("click video");
+        VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
+        if (holder.subscriptionRequired) {
+            if (holder.onAir) {
+                if (SettingsProvider.getInstance().isLoggedIn()) {
+                    if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+                        // Check total played live stream time
+                        Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
+                        int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
+                        if (liveStreamTime < SettingsProvider.getInstance().getLiveStreamLimit()) {
+                            VideoDetailActivity.startActivity(this, holder.videoId);
+                        } else {
+                            DialogHelper.showSubscriptionAlertIssue(this);
+//                            ErrorDialogFragment dialog = ErrorDialogFragment.newInstance(SettingsProvider.getInstance().getLiveStreamMessage(), null, null);
+//                            dialog.show(getSupportFragmentManager(), ErrorDialogFragment.TAG);
+                        }
+                    }
+                    else {
+                        VideoDetailActivity.startActivity(this, holder.videoId);
+                    }
+                }
+                else {
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+                }
+            }
+            else {
+                if (SettingsProvider.getInstance().isLoggedIn()) {
+                    if (holder.isTranscoded) {
+                        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
+                            DialogHelper.showSubscriptionAlertIssue(this);
+                        } else {
+                            VideoDetailActivity.startActivity(this, holder.videoId);
+                        }
+                    }
+                    else {
+                        //if it's not transcoded it is a live stream. May be we can check onAir flag
+               /* if (TextUtils.isEmpty(holder.youtubePath)) {
+                    DialogFragment newFragment = CustomAlertDialog.newInstance(
+                            R.string.alert_dialog_title_transcoded, R.string.alert_dialog_message_transcoded);
+                    newFragment.show(this.getSupportFragmentManager(), "dialog_transcoded");
+                } else {*/
+//                    if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
+//                        DialogHelper.showSubscriptionAlertIssue(this);
+//                    } else {
+//                        EpisodeDetailActivity.startActivity(this, holder.videoId);
+//                    }
+                        // }
+                        return;
+                    }
+                } else {
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+                }
+            }
+        }
+        else {
+            VideoDetailActivity.startActivity(this, holder.videoId);
+        }
+    }
 
+    // //////////
+    // Data
+    //
+    private void loadVideosFromPlaylist(int page) {
+        Logger.d("load Videos from playlist");
+        VideoParamsBuilder builder = new VideoParamsBuilder();
+        builder.addPlaylistId(playlistId);
+        builder.addPage(page);
+        builder.addPerPage(ParamsBuilder.PER_PAGE_DEFAULT);
+        getApi().executeRequest(WebApiManager.Request.VIDEO_FROM_PLAYLIST, builder.build());
+    }
+
+    protected void startLoadCursors() {
+        mAdapter.changeCursor(null);
+        mTvEmpty.setText(R.string.videos_loading);
+
+        if (mLoader == null) {
+            mLoader = getSupportLoaderManager();
+        }
+        Bundle bundle = new Bundle();
+        mLoader.restartLoader(LOADER_VIDEO, bundle, this);
+    }
+
+    //
+    // Loader implementation
+    //
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String selection = Contract.PlaylistVideo.PLAYLIST_ID + "=?" ;
+        String[] selectionArgs = new String[] { playlistId };
+        return new CursorLoader(
+                this,
+                Contract.PlaylistVideo.CONTENT_URI,
+                null,
+                selection,
+                selectionArgs,
+                Contract.PlaylistVideo.NUMBER);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Logger.d("onLoadFinished(): size=" + cursor.getCount());
+        if (cursor.getCount() == 0) {
+            mTvEmpty.setText(R.string.videos_empty);
+            mAdapter.changeCursor(null);
+        }
+        else {
+            mAdapter.changeCursor(cursor);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.changeCursor(null);
+    }
+
+    //
+    // Subscribe
+    //
     @Subscribe
     public void handleRetrieveVideo(RetrieveVideoEvent event) {
         List<VideoData> result = event.getEventData().getModelData().getVideoData();
         Pagination pagination = event.getEventData().getModelData().getPagination();
         if (result != null) {
-            Logger.d("handleRetrieveVideo size=" + result.size());
+            Logger.d("handleRetrieveVideo(): size=" + result.size());
             if (result.size() > 0) {
-                if (mVideoList == null) {
+                if (mVideoList == null || pagination.getCurrent() == 1) {
                     mVideoList = new ArrayList<>(result);
                 }
                 else {
                     mVideoList.addAll(result);
                 }
 
-                int i = DataHelper.insertVideos(this.getContentResolver(), result);
-                Logger.d("added " + i + " videos");
-                DataHelper.addVideosToPlaylist(this.getContentResolver(), result, playlistId);
-                int baseNumber = 0;
-                if (pagination.getCurrent() == 1) {
-                    DataHelper.clearPlaylistVideo(this.getContentResolver(), playlistId);
-                }
-                else {
-                    baseNumber = (pagination.getCurrent() - 1) * pagination.getPerPage();
-                }
-                int itemsInsertedPlaylistVideo = DataHelper.insertPlaylistVideo(this.getContentResolver(), result, playlistId, baseNumber);
-                Logger.d("handleRetrieveVideo(): PlaylistVideo inserted=" + itemsInsertedPlaylistVideo);
-
                 if (Pagination.hasNextPage(pagination)) {
                     loadVideosFromPlaylist(Pagination.getNextPage(pagination));
                 }
-            }
-            else {
-                mTvEmpty.setText(R.string.videos_empty);
+                else {
+                    int i = DataHelper.insertVideos(this.getContentResolver(), mVideoList);
+                    Logger.d("handleRetrieveVideo(): added " + i + " videos");
+                    DataHelper.addVideosToPlaylist(this.getContentResolver(), mVideoList, playlistId);
+                    DataHelper.clearPlaylistVideo(this.getContentResolver(), playlistId);
+                    int itemsInsertedPlaylistVideo = DataHelper.insertPlaylistVideo(this.getContentResolver(), mVideoList, playlistId, 0);
+                    Logger.d("handleRetrieveVideo(): PlaylistVideo inserted=" + itemsInsertedPlaylistVideo);
+                    startLoadCursors();
+                }
             }
         }
     }
@@ -465,10 +469,6 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         Logger.d("UnfavoriteEvent");
         DataHelper.setFavoriteVideo(getContentResolver(), event.getVideoId(), false);
         DataHelper.deleteFavorite(getContentResolver(), event.getVideoId());
-    }
-
-    protected String getActivityName() {
-        return getString(R.string.activity_name_videos);
     }
 
     @Subscribe

@@ -5,6 +5,7 @@ import com.zype.android.webapi.WebApiManager;
 public class VideoParamsBuilder extends ParamsBuilder {
 
     private static final String PAGE = "page";
+    private static final String PER_PAGE = "per_page";
     private static final String DATE_START = "published_at.gte";
     private static final String DATE_END = "published_at.lte";
     private static final String DATA_IS_ON_AIR = "on_air";
@@ -28,6 +29,11 @@ public class VideoParamsBuilder extends ParamsBuilder {
 
     public VideoParamsBuilder addPage(int page) {
         addGetParam(PAGE, String.valueOf(page));
+        return this;
+    }
+
+    public VideoParamsBuilder addPerPage(int perPage) {
+        addGetParam(PER_PAGE, String.valueOf(perPage));
         return this;
     }
 

@@ -14,7 +14,6 @@
     <string name="connection_error">Please, check your internet connection.</string>
     <string name="download_empty_list">Not downloads yet… save some shows now!</string>
     <string name="favorite_empty_list">You currently have no favorites.</string>
-    <string name="latest_empty_list">Gathering videos for you…</string>
     <string name="highlight_empty_list">TODO add text</string>
     <string name="search_empty_list">Sorry, we can`t find what are you looking for</string>
     <string name="error_player">There was an error initializing the YouTubePlayer (%1$s)</string>
@@ -79,6 +78,9 @@
     <string name="settings_twitter">%1$s on Twitter</string>
     <string name="settings_web">%1$s on Web</string>
     <string name="settings_instagram">%1$s on Instagram</string>
+
+    <!-- Videos -->
+    <string name="videos_loading">Gathering videos for you…</string>
 
     <!--Other-->
     <string name="instagram_title">Instagram</string>

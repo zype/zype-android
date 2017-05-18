@@ -121,7 +121,7 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
     private void updatePlaylistList() {
         Logger.d("Update Playlist List");
         mAdapter.changeCursor(null);
-        mTvEmpty.setText(R.string.latest_empty_list);
+        mTvEmpty.setText(R.string.videos_loading);
 
         getPlaylists();
         startLoadCursors();
