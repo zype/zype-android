@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<EditText
+<android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/search_field"
-    android:id="@+id/search_field"
-    android:inputType="text"
-    android:imeOptions="actionSend"
-    tools:showIn="@layout/fragment_latest"
-    />
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:id="@+id/layoutSearch"
+    >
+    <android.support.v7.widget.SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewSearch"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search"
+        android:clickable="true"
+        />
+    <EditText
+        style="@style/search_field"
+        android:id="@+id/search_field"
+        android:inputType="text"
+        android:imeOptions="actionSend"
+        tools:showIn="@layout/fragment_playlist"
+        android:visibility="gone"
+        />
+</android.support.v7.widget.CardView>
+

@@ -43,6 +43,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -77,6 +78,8 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     private TabHost tabHost;
     private int selectedTab;
 
+    private SearchView viewSearch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,29 +98,53 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         tvSearchField = (TextView) findViewById(R.id.search_field);
         tvSearchField.setText(searchString);
 
-        tvSearchField.setOnKeyListener(new View.OnKeyListener() {
+        viewSearch = (SearchView) findViewById(R.id.viewSearch);
+        viewSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                startSearch();
+                return false;
+            }
 
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN
-                        && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    startSearch();
-                    return true;
-                }
-
+            public boolean onQueryTextChange(String newText) {
                 return false;
             }
         });
-        tvSearchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        viewSearch.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    startSearch();
-                    return true;
-                }
+            public boolean onClose() {
                 return false;
             }
         });
+        viewSearch.setQuery(searchString, false);
+        viewSearch.setIconified(false);
+        viewSearch.setFocusable(false);
+        viewSearch.clearFocus();
+
+//        tvSearchField.setOnKeyListener(new View.OnKeyListener() {
+//
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                if (event.getAction() == KeyEvent.ACTION_DOWN
+//                        && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+//                    startSearch();
+//                    return true;
+//                }
+//
+//                return false;
+//            }
+//        });
+//        tvSearchField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+//                    startSearch();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
         mAdapter = new VideosCursorAdapter(this, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, this, this);
         ListView mListView = (ListView) findViewById(R.id.list_search);
         mListView.setEmptyView(findViewById(R.id.empty));
@@ -202,7 +229,8 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
             job.cancel();
             job = null;
         }
-        searchString = tvSearchField.getText().toString();
+//        searchString = tvSearchField.getText().toString();
+        searchString = viewSearch.getQuery().toString();
         requestSearchResult(1, searchString);
         startLoadCursors(selectedTab, searchString);
     }

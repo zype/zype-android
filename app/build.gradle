@@ -18,6 +18,7 @@ apply plugin: 'com.android.application'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    maven { url "https://jitpack.io" }
 }
 
 android {
@@ -46,7 +47,7 @@ android {
     }
     defaultConfig {
         applicationId 'com.zype.android'
-        minSdkVersion 16
+        minSdkVersion 15
         targetSdkVersion 25
         versionCode currentCodeVersion
         versionName '1.2.0'
@@ -108,6 +109,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:cardview-v7:25.3.1'
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support:mediarouter-v7:25.3.1'
     compile 'com.android.support:customtabs:25.3.1'
@@ -119,6 +121,10 @@ dependencies {
     compile 'com.ns-developer:tagcloudview:0.1.0'
     compile 'com.google.android.exoplayer:exoplayer:r1.5.12'
     compile 'com.onesignal:OneSignal:2.+@aar'
+
+    compile ('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
+        transitive = true;
+    }
 
     compile 'com.google.android.gms:play-services-gcm:10.2.1'
     compile 'com.google.android.gms:play-services-analytics:10.2.1'

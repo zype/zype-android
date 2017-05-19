@@ -1,3 +1,4 @@
+<!--
 <LinearLayout
     style="@style/activity"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -13,3 +14,38 @@
     <include layout="@layout/layout_playlist"/>
 
 </LinearLayout>
+-->
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    tools:context="com.zype.android.ui.main.fragments.playlist.PlaylistFragment"
+    android:id="@+id/layoutCoordinator"
+    >
+
+    <include layout="@layout/layout_playlist"/>
+
+    <io.codetail.widget.RevealFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layoutFrame"
+        >
+        <include layout="@layout/view_search_field"/>
+    </io.codetail.widget.RevealFrameLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:id="@+id/buttonSearch"
+        android:src="@drawable/ic_search_white_24dp"
+        app:fabSize="mini"
+        app:layout_anchor="@id/layoutFrame"
+        app:layout_anchorGravity="top|end|right"
+        />
+
+</android.support.design.widget.CoordinatorLayout>

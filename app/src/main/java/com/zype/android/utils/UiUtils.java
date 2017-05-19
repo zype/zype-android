@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -125,5 +126,12 @@ public class UiUtils {
         sendIntent.putExtra(Intent.EXTRA_TEXT, message);
         sendIntent.setType("text/html");
         activity.startActivity(Intent.createChooser(sendIntent, activity.getResources().getText(R.string.menu_share)));
+    }
+
+    public static void showKeyboard(Context context, View view) {
+        if (view.requestFocus()) {
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
 }
