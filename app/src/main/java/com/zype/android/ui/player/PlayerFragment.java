@@ -55,6 +55,7 @@ import com.google.android.exoplayer.util.Util;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -154,6 +155,28 @@ public class PlayerFragment extends BaseFragment implements
     private Handler handlerTimer;
     private Runnable runnableTimer;
     private Calendar liveStreamTimeStart;
+
+    public static PlayerFragment newInstance(int mediaType, String filePath, String fileId) {
+        PlayerFragment fragment = new PlayerFragment();
+        Bundle args = new Bundle();
+        args.putInt(CONTENT_TYPE_TYPE, mediaType);
+        args.putString(CONTENT_URL, filePath);
+        args.putString(CONTENT_ID_EXTRA, fileId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static PlayerFragment newInstance(int mediaType, String filePath, String adTag, boolean onAir, String fileId) {
+        PlayerFragment fragment = new PlayerFragment();
+        Bundle args = new Bundle();
+        args.putInt(CONTENT_TYPE_TYPE, mediaType);
+        args.putString(CONTENT_URL, filePath);
+        args.putString(PARAMETERS_ADD_TAG, adTag);
+        args.putBoolean(PARAMETERS_ON_AIR, onAir);
+        args.putString(CONTENT_ID_EXTRA, fileId);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -261,15 +284,42 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Logger.d("onAttach()");
+        try {
+            mListener = (OnVideoAudioListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnVideoAudioListener");
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (BuildConfig.DEBUG) {
+            Logger.d("onStart()");
+        }
+        hideNotification();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
+        if (BuildConfig.DEBUG) {
+            Logger.d("onResume()");
+        }
         mListener.onFullscreenChanged();
-        Logger.d("onResume");
         registerReceivers();
         if (player == null) {
             preparePlayer(true);
-        } else {
-            player.setBackgrounded(false);
+        }
+        else {
+            if (ZypeSettings.BACKGROUND_PLAYBACK_ENABLED) {
+                player.setBackgrounded(false);
+            }
+            player.getPlayerControl().start();
             player.setSurface(surfaceView.getHolder().getSurface());
             if (onAir && (!SettingsProvider.getInstance().isLoggedIn() || SettingsProvider.getInstance().getSubscriptionCount() <= 0)) {
                 startTimer();
@@ -291,6 +341,82 @@ public class PlayerFragment extends BaseFragment implements
         if (adsManager != null && isAdDisplayed) {
             adsManager.resume();
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (BuildConfig.DEBUG) {
+            Logger.d("onPause()");
+        }
+        if (player != null) {
+            if (ZypeSettings.BACKGROUND_PLAYBACK_ENABLED) {
+                player.setBackgrounded(true);
+            }
+            stopTimer();
+        }
+        // IMA SDK
+        if (adsManager != null && isAdDisplayed) {
+            adsManager.pause();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (BuildConfig.DEBUG) {
+            Logger.d("onStop()");
+        }
+        if (ZypeSettings.BACKGROUND_PLAYBACK_ENABLED) {
+            if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
+                showNotification(true, contentType);
+            } else {
+                showNotification(false, contentType);
+            }
+        }
+        else {
+            isNeedToSeekToLatestListenPosition= true;
+            if (player != null) {
+                player.removeListener(this);
+            }
+            stop();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (BuildConfig.DEBUG) {
+            Logger.d("onDestroy()");
+        }
+        hideNotification();
+        audioCapabilitiesReceiverUnregister();
+        releasePlayer();
+        if (callReceiver != null) {
+            try {
+                getActivity().unregisterReceiver(callReceiver);
+            } catch (IllegalArgumentException e) {
+                if (BuildConfig.DEBUG) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (mAudioManager != null)
+            mAudioManager.unregisterMediaButtonEventReceiver(
+                    mRemoteControlResponder);
+        RemoteControlReceiver.getObservable().deleteObserver(this);
+        isReceiversRegistered = false;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (BuildConfig.DEBUG) {
+            Logger.d("onDetach()");
+        }
+        audioCapabilitiesReceiverUnregister();
+        releasePlayer();
+        mListener = null;
     }
 
     private void registerReceivers() {
@@ -336,43 +462,6 @@ public class PlayerFragment extends BaseFragment implements
                 }
         }
         return position;
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Logger.d("onPause");
-        if (player != null) {
-            player.setBackgrounded(true);
-            stopTimer();
-        }
-        // IMA SDK
-        if (adsManager != null && isAdDisplayed) {
-            adsManager.pause();
-            }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Logger.d("onDestroy");
-        hideNotification();
-        audioCapabilitiesReceiverUnregister();
-        releasePlayer();
-        if (callReceiver != null) {
-            try {
-                getActivity().unregisterReceiver(callReceiver);
-            } catch (IllegalArgumentException e) {
-                if (BuildConfig.DEBUG) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (mAudioManager != null)
-            mAudioManager.unregisterMediaButtonEventReceiver(
-                    mRemoteControlResponder);
-        RemoteControlReceiver.getObservable().deleteObserver(this);
-        isReceiversRegistered = false;
     }
 
     @Override
@@ -589,10 +678,8 @@ public class PlayerFragment extends BaseFragment implements
 //        showControls();
     }
 
-
     @Override
-    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
-                                   float pixelWidthAspectRatio) {
+    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthAspectRatio) {
         if (videoFrame != null) {
 //            Toast.makeText(getContext(), "Set video size: " + width + "x" + format.height +" Codec:"+format.codecs, Toast.LENGTH_SHORT).show();
             videoFrame.setAspectRatio(
@@ -628,6 +715,9 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     private void showControls() {
+        if (BuildConfig.DEBUG) {
+            Logger.d("showControls(): mListener=" + mListener.toString());
+        }
         if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE) {
             if (mediaController != null) {
                 mediaController.show(5000);
@@ -660,28 +750,6 @@ public class PlayerFragment extends BaseFragment implements
         }
     };
 
-    public static PlayerFragment newInstance(int mediaType, String filePath, String fileId) {
-        PlayerFragment fragment = new PlayerFragment();
-        Bundle args = new Bundle();
-        args.putInt(CONTENT_TYPE_TYPE, mediaType);
-        args.putString(CONTENT_URL, filePath);
-        args.putString(CONTENT_ID_EXTRA, fileId);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    public static PlayerFragment newInstance(int mediaType, String filePath, String adTag, boolean onAir, String fileId) {
-        PlayerFragment fragment = new PlayerFragment();
-        Bundle args = new Bundle();
-        args.putInt(CONTENT_TYPE_TYPE, mediaType);
-        args.putString(CONTENT_URL, filePath);
-        args.putString(PARAMETERS_ADD_TAG, adTag);
-        args.putBoolean(PARAMETERS_ON_AIR, onAir);
-        args.putString(CONTENT_ID_EXTRA, fileId);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void seekToMillis(int ms) {
         if (player != null) {
@@ -712,42 +780,6 @@ public class PlayerFragment extends BaseFragment implements
             player.getPlayerControl().pause();
             releasePlayer();
         }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        try {
-            mListener = (OnVideoAudioListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnVideoAudioListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        audioCapabilitiesReceiverUnregister();
-        releasePlayer();
-        mListener = null;
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
-            showNotification(true, contentType);
-        } else {
-            showNotification(false, contentType);
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Logger.d("fragment onStart");
-        hideNotification();
     }
 
     @Override
@@ -903,6 +935,7 @@ public class PlayerFragment extends BaseFragment implements
 
     //
     // IMA SDK
+    //
     private void requestAds(String adTagUrl) {
         AdDisplayContainer adDisplayContainer = sdkFactory.createAdDisplayContainer();
         adDisplayContainer.setAdContainer(videoFrame);

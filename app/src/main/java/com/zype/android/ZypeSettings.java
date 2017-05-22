@@ -31,6 +31,7 @@ public class ZypeSettings {
 
     // App features
     // TODO: Update app feature settings
+    public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
     public static final boolean DOWNLOADS_ENABLED = true;
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
     public static final boolean THEME_LIGHT = true;
