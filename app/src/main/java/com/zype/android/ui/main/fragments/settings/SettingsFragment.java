@@ -123,7 +123,7 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
                 break;
             case ITEM_FACEBOOK:
                 if (!TextUtils.isEmpty(ZypeSettings.FACEBOOK_ID)) {
-                    String facebookUrl = String.format("https://www.facebook.com/%1$s", ZypeSettings.FACEBOOK_ID);
+                    String facebookUrl = String.format("https://m.facebook.com/%1$s", ZypeSettings.FACEBOOK_ID);
                     AppUtils.openFacebook(getContext(), facebookUrl);
                 }
                 break;
