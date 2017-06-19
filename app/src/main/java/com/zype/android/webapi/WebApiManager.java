@@ -17,6 +17,7 @@ import com.zype.android.ZypeApp;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.bus.EventBus;
 import com.zype.android.core.events.AuthorizationErrorEvent;
+import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.events.UnrsolvedHostErrorEvent;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.webapi.builder.AuthParamsBuilder;
@@ -371,6 +372,7 @@ public class WebApiManager {
     public class WorkerHandler extends Handler {
 
         public static final int UNAUTHORIZED = 401;
+        public static final int FORBIDDEN = 403;
         public static final int UNRESOLVED_HOST = 0;
         private static final int MSG_DO_JOB = 0;
         private Job mCurrentJob;
@@ -442,7 +444,11 @@ public class WebApiManager {
                 if (statusCode == UNAUTHORIZED) {
 //                    BaseModel model = (BaseModel) err.getBodyAs(BaseModel.class);
                     return new AuthorizationErrorEvent(job.getTicket(), job.getRequest(), err.getMessage());
-                } else if (statusCode == UNRESOLVED_HOST) {
+                }
+                else if (statusCode == FORBIDDEN) {
+                    return new ForbiddenErrorEvent(job.getTicket(), job.getRequest(), err.getMessage());
+                }
+                else if (statusCode == UNRESOLVED_HOST) {
                     if (!WebApiManager.isHaveActiveNetworkConnection(mContext)) {
                         return new UnrsolvedHostErrorEvent(job.getTicket(), job.getRequest(), mContext.getString(R.string.connection_error));
                     } else

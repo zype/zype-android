@@ -3,12 +3,14 @@ package com.zype.android.ui.video_details;
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
 import com.zype.android.ZypeSettings;
+import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
 import com.zype.android.utils.BundleConstants;
+import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
@@ -186,8 +188,15 @@ public class VideoDetailActivity extends BaseVideoActivity {
     @Subscribe
     public void handleError(ErrorEvent err) {
         Logger.e("handleError");
-        if (err.getEventData() != WebApiManager.Request.UN_FAVORITE) {
-            UiUtils.showErrorSnackbar(findViewById(R.id.root_view), err.getErrMessage());
+        if (err instanceof ForbiddenErrorEvent) {
+            if (err.getEventData() == WebApiManager.Request.PLAYER_VIDEO) {
+                DialogHelper.showSubscriptionAlertIssue(this);
+            }
+        }
+        else {
+            if (err.getEventData() != WebApiManager.Request.UN_FAVORITE) {
+                UiUtils.showErrorSnackbar(findViewById(R.id.root_view), err.getErrMessage());
+            }
         }
     }
 
