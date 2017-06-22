@@ -123,4 +123,14 @@ public class Contract {
         public static final String VIDEO_ID = "video_id";
     }
 
+    public static class AdSchedule implements BaseColumns {
+        public static final String TABLE_NAME = "ad_schedule";
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
+        public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+        public static final String ID = "ad_schedule_id";
+        public static final String OFFSET = "offset";
+        public static final String TAG = "tag";
+        public static final String VIDEO_ID = "video_id";
+    }
 }

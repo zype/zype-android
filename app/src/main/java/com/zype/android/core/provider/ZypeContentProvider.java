@@ -28,7 +28,7 @@ public class ZypeContentProvider extends ContentProvider {
     private static final int URI_MATCHER_CODE_FAVORITES = 10;
     private static final int URI_MATCHER_CODE_PLAYLISTS = 20;
     private static final int URI_MATCHER_CODE_PLAYLIST_VIDEO = 30;
-
+    private static final int URI_MATCHER_CODE_AD_SCHEDULE = 40;
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -40,6 +40,7 @@ public class ZypeContentProvider extends ContentProvider {
 
         URI_MATCHER.addURI(CONTENT_AUTHORITY, Contract.TABLE_NAME_PLAYLIST, URI_MATCHER_CODE_PLAYLISTS);
         URI_MATCHER.addURI(CONTENT_AUTHORITY, Contract.PlaylistVideo.TABLE_NAME, URI_MATCHER_CODE_PLAYLIST_VIDEO);
+        URI_MATCHER.addURI(CONTENT_AUTHORITY, Contract.AdSchedule.TABLE_NAME, URI_MATCHER_CODE_AD_SCHEDULE);
     }
 
 
@@ -100,6 +101,19 @@ public class ZypeContentProvider extends ContentProvider {
                         .getReadableDatabase()
                         .query(
                                 Contract.TABLE_NAME_VIDEO + " INNER JOIN " + Contract.PlaylistVideo.TABLE_NAME + " ON " + Contract.TABLE_NAME_VIDEO + "." + Contract.Video.COLUMN_ID + "=" + Contract.PlaylistVideo.VIDEO_ID,
+                                projection,
+                                selection,
+                                selectionArgs,
+                                null,
+                                null,
+                                sortOrder
+                        );
+                break;
+            case URI_MATCHER_CODE_AD_SCHEDULE:
+                cursor = sqLiteOpenHelper
+                        .getReadableDatabase()
+                        .query(
+                                Contract.AdSchedule.TABLE_NAME,
                                 projection,
                                 selection,
                                 selectionArgs,
@@ -271,6 +285,15 @@ public class ZypeContentProvider extends ContentProvider {
                                 selectionArgs
                         );
                 break;
+            case URI_MATCHER_CODE_AD_SCHEDULE:
+                numberOfRowsDeleted = sqLiteOpenHelper
+                        .getWritableDatabase()
+                        .delete(
+                                Contract.AdSchedule.TABLE_NAME,
+                                selection,
+                                selectionArgs
+                        );
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri + " selection=" + selection + " selectionArgs=" + Arrays.toString(selectionArgs));
         }
@@ -339,6 +362,20 @@ public class ZypeContentProvider extends ContentProvider {
                         long id = (long) cv.get(Contract.PlaylistVideo.ID);
                         int update = update(uri, cv, Contract.PlaylistVideo.PLAYLIST_ID + "=? AND " + Contract.PlaylistVideo.VIDEO_ID,
                                             new String[] { cv.getAsString(Contract.PlaylistVideo.PLAYLIST_ID), cv.getAsString(Contract.PlaylistVideo.VIDEO_ID) } );
+                        if (update < 0) {
+                            Logger.e("Update problem");
+                        }
+                    } else {
+                        numberOfRowsInserted++;
+                    }
+                }
+                break;
+            case URI_MATCHER_CODE_AD_SCHEDULE:
+                for (ContentValues cv : values) {
+                    long newID = database.insertWithOnConflict(Contract.AdSchedule.TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_IGNORE);
+                    if (newID <= 0) {
+                        long id = (long) cv.get(Contract.AdSchedule.ID);
+                        int update = update(uri, cv, Contract.AdSchedule.VIDEO_ID, new String[] { cv.getAsString(Contract.AdSchedule.VIDEO_ID) } );
                         if (update < 0) {
                             Logger.e("Update problem");
                         }

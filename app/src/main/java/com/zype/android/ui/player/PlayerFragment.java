@@ -73,6 +73,7 @@ import com.zype.android.utils.FileUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.model.player.AdvertisingSchedule;
 import com.zype.android.webapi.model.video.Thumbnail;
 import com.zype.android.webapi.model.video.VideoData;
 
@@ -101,7 +102,7 @@ public class PlayerFragment extends BaseFragment implements
     public static final String CONTENT_TYPE_TYPE = "content_type";
     public static final String CONTENT_URL = "content_url";
     public static final String CONTENT_ID_EXTRA = "content_id";
-    public static final String PARAMETERS_ADD_TAG = "AddTag";
+    public static final String PARAMETERS_AD_TAG = "AdTag";
     public static final String PARAMETERS_ON_AIR = "OnAir";
 
     private static final CookieManager defaultCookieManager;
@@ -151,6 +152,10 @@ public class PlayerFragment extends BaseFragment implements
     // Whether an ad is displayed.
     private boolean isAdDisplayed;
 
+    private List<AdvertisingSchedule> adSchedule;
+    private int nextAdIndex = -1;
+    private Runnable runnablePlaybackTime;
+
     // Limiting live stream
     private Handler handlerTimer;
     private Runnable runnableTimer;
@@ -171,7 +176,7 @@ public class PlayerFragment extends BaseFragment implements
         Bundle args = new Bundle();
         args.putInt(CONTENT_TYPE_TYPE, mediaType);
         args.putString(CONTENT_URL, filePath);
-        args.putString(PARAMETERS_ADD_TAG, adTag);
+        args.putString(PARAMETERS_AD_TAG, adTag);
         args.putBoolean(PARAMETERS_ON_AIR, onAir);
         args.putString(CONTENT_ID_EXTRA, fileId);
         fragment.setArguments(args);
@@ -189,14 +194,31 @@ public class PlayerFragment extends BaseFragment implements
             if (!TextUtils.isEmpty(fileId)) {
 //                fileId = getArguments().getString(CONTENT_ID_EXTRA);
                 mThumbnailList = DataHelper.getThumbnailList(getActivity().getContentResolver(), fileId);
+                adSchedule = VideoHelper.getAdSchedule(getActivity().getContentResolver(), fileId);
             }
-            adTag = getArguments().getString(PARAMETERS_ADD_TAG);
+            adTag = getArguments().getString(PARAMETERS_AD_TAG);
             onAir = getArguments().getBoolean(PARAMETERS_ON_AIR);
         }
 //        context = getContext();
         isNeedToSeekToLatestListenPosition = true;
         callReceiver = new CallReceiver();
         handlerTimer = new Handler();
+
+        // Listener to detect current playback time
+        runnablePlaybackTime = new Runnable() {
+            @Override
+            public void run() {
+                if (player != null) {
+                    long currentPosition = player.getCurrentPosition();
+                    if (!checkNextAd(currentPosition)) {
+                        handlerTimer.postDelayed(this, 1000);
+                    }
+                }
+                else {
+                    Logger.d("runnablePlaybackTime: Player is not ready");
+                }
+            }
+        };
     }
 
     @Override
@@ -358,6 +380,12 @@ public class PlayerFragment extends BaseFragment implements
         // IMA SDK
         if (adsManager != null && isAdDisplayed) {
             adsManager.pause();
+        }
+
+        if (handlerTimer != null) {
+            if (runnablePlaybackTime != null) {
+                handlerTimer.removeCallbacks(runnablePlaybackTime);
+            }
         }
     }
 
@@ -574,7 +602,17 @@ public class PlayerFragment extends BaseFragment implements
         player.setSurface(surfaceView.getHolder().getSurface());
         player.setPlayWhenReady(playWhenReady);
 
-        showAd();
+        if (playWhenReady && !adSchedule.isEmpty()) {
+            nextAdIndex = seekAdByPosition(DataHelper.getPlayTime(getActivity().getContentResolver(), fileId));
+            // Start playback time listener
+            if (handlerTimer != null) {
+                if (runnablePlaybackTime != null) {
+                    handlerTimer.removeCallbacks(runnablePlaybackTime);
+                }
+                handlerTimer.post(runnablePlaybackTime);
+            }
+        }
+//        showAd();
     }
 
     private void releasePlayer() {
@@ -604,9 +642,9 @@ public class PlayerFragment extends BaseFragment implements
                     mListener.audioFinished();
                 } else if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
                     //IGNORE
-                    Logger.d("ExoPlayer.STATE_READY start live");
+                    Logger.d("onStateChanged(): ExoPlayer.STATE_ENDED start live");
                 } else {
-                    Logger.e("ExoPlayer.STATE_ENDED unknown type " + contentType);
+                    Logger.e("onStateChanged(): ExoPlayer.STATE_ENDED unknown type " + contentType);
                 }
                 if (SettingsProvider.getInstance().isUserPreferenceAutoRemoveWatchedContentSet()) {
                     deleteFileBeforeExit = true;
@@ -620,9 +658,22 @@ public class PlayerFragment extends BaseFragment implements
                     }
                     player.seekTo(playerPosition);
                     isNeedToSeekToLatestListenPosition = false;
+//                    // Seek next ad to play
+//                    if (playWhenReady && nextAdIndex == -1) {
+//                        nextAdIndex = seekAdByPosition(DataHelper.getPlayTime(getActivity().getContentResolver(), fileId));
+//                    }
                 }
+//                // Start\stop playback time listener
+//                if (handlerTimer != null) {
+//                    if (runnablePlaybackTime != null) {
+//                        handlerTimer.removeCallbacks(runnablePlaybackTime);
+//                    }
+//                    if (playWhenReady) {
+//                        handlerTimer.post(runnablePlaybackTime);
+//                    }
+//                }
                 if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB) {
-                    Logger.d(String.format("ExoPlayer.STATE_READY: playWhenReady=%1$s", playWhenReady));
+                    Logger.d(String.format("onStateChanged(): ExoPlayer.STATE_READY: playWhenReady=%1$s", playWhenReady));
                     // Count play time of the live stream if user is not logged in and is not subscribed
                     if (onAir && (!SettingsProvider.getInstance().isLoggedIn() || SettingsProvider.getInstance().getSubscriptionCount() <= 0)) {
                         if (playWhenReady) {
@@ -636,14 +687,14 @@ public class PlayerFragment extends BaseFragment implements
                     mListener.audioStarted();
                 } else if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
                     //IGNORE
-                    Logger.d("ExoPlayer.STATE_READY ready live");
+                    Logger.d("onStateChanged(): ExoPlayer.STATE_READY ready live");
                 } else {
-                    Logger.e("ExoPlayer.STATE_READY unknown type " + contentType);
+                    Logger.e("onStateChanged(): ExoPlayer.STATE_READY unknown type " + contentType);
                 }
                 showControls();
                 break;
             default:
-                Logger.e("ExoPlayer.STATE_READY status:" + playbackState);
+                Logger.e("onStateChanged(): state=" + playbackState);
                 break;
         }
     }
@@ -982,7 +1033,15 @@ public class PlayerFragment extends BaseFragment implements
                 // AdEventType.CONTENT_RESUME_REQUESTED is fired when the ad is completed
                 // and you should start playing your content.
                 isAdDisplayed = false;
-                player.getPlayerControl().start();
+                // Update next ad to play
+                updateNextAd();
+                // Resume video
+                if (player != null) {
+                    player.getPlayerControl().start();
+                }
+                else {
+                    preparePlayer(true);
+                }
                 break;
             case ALL_ADS_COMPLETED:
                 if (adsManager != null) {
@@ -998,6 +1057,7 @@ public class PlayerFragment extends BaseFragment implements
     @Override
     public void onAdError(AdErrorEvent adErrorEvent) {
         Logger.e("Ad error: " + adErrorEvent.getError().getMessage());
+        updateNextAd();
         player.getPlayerControl().start();
     }
 
@@ -1012,6 +1072,43 @@ public class PlayerFragment extends BaseFragment implements
             Logger.d("adTag=" + adTag);
             requestAds(adTag);
         }
+    }
+
+    private int seekAdByPosition(long position) {
+        for (int i = 0; i < adSchedule.size(); i++) {
+            if (((int) position / 1000) * 1000 <= adSchedule.get(i).getOffset()) {
+                Logger.d("seekAdByPosition(): Next ad index: " + i + ", position=" + position);
+                return i;
+            }
+        }
+        Logger.d("seekAdByPosition(): No ads to play, position=" + position);
+        return -1;
+    }
+
+    private void updateNextAd() {
+        if (nextAdIndex + 1 < adSchedule.size()) {
+            nextAdIndex += 1;
+            if (handlerTimer != null && runnablePlaybackTime != null) {
+                handlerTimer.postDelayed(runnablePlaybackTime, 1000);
+            }
+        }
+        else {
+            nextAdIndex = -1;
+        }
+    }
+
+    private boolean checkNextAd(long position) {
+        if (nextAdIndex >= 0) {
+            if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || BuildConfig.DEBUG) {
+                Logger.d("checkNextAd(): position=" + position);
+                if (position >= adSchedule.get(nextAdIndex).getOffset()) {
+                    Logger.d("checkNextAd(): Requesting ad");
+                    requestAds(adSchedule.get(nextAdIndex).getTag());
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     //

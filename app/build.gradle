@@ -47,7 +47,7 @@ android {
     }
     defaultConfig {
         applicationId 'com.zype.android'
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode currentCodeVersion
         versionName '1.2.0'

@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.zype.android.webapi.model.player.AdvertisingSchedule;
 import com.zype.android.webapi.model.search.Segment;
 import com.zype.android.webapi.model.zobjects.ZObject;
 
@@ -182,6 +183,8 @@ public class VideoData {
     private boolean isAudioDownloaded;
     private List<ZObject> guests;
     private String adVideoTag;
+
+    public List<AdvertisingSchedule> adSchedule;
 
     public VideoData(@NonNull String id, boolean isActive, String country) {
         this.Id = id;

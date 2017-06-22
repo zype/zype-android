@@ -216,6 +216,9 @@ public class VideoDetailActivity extends BaseVideoActivity {
         Advertising advertising = event.getEventData().getModelData().getResponse().getBody().getAdvertising();
         if (advertising != null) {
             List<AdvertisingSchedule> schedule = advertising.getSchedule();
+            DataHelper.updateAdSchedule(getContentResolver(), mVideoId, schedule);
+            // TODO: Ad tags saved in separate table by 'updateAdSchedule'. Probably we don't need to keep the tag
+            // in the 'Video' table. But we do this now because the tags are the same for all ad cue points
             if (schedule != null && !schedule.isEmpty()) {
                 String adTag = advertising.getSchedule().get(0).getTag();
                 DataHelper.saveAdVideoTag(getContentResolver(), mVideoId, adTag);

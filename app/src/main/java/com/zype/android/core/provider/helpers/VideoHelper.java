@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.utils.Logger;
+import com.zype.android.webapi.model.player.AdvertisingSchedule;
 import com.zype.android.webapi.model.search.Segment;
 import com.zype.android.webapi.model.video.Category;
 import com.zype.android.webapi.model.video.Thumbnail;
@@ -175,6 +176,19 @@ public class VideoHelper {
         return videoData;
     }
 
+    public static List<AdvertisingSchedule> getAdSchedule(ContentResolver contentResolver, String videoId) {
+       List<AdvertisingSchedule> result = new ArrayList<>();
+        Cursor cursor = CursorHelper.getAdScheduleCursorByVideoId(contentResolver, videoId);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                AdvertisingSchedule item = new AdvertisingSchedule();
+                item.setOffset(cursor.getInt(cursor.getColumnIndexOrThrow(Contract.AdSchedule.OFFSET)));
+                item.setTag(cursor.getString(cursor.getColumnIndexOrThrow(Contract.AdSchedule.TAG)));
+                result.add(item);
+            }
+        }
+        return result;
+    }
 
     @Nullable
     private static VideoData getDownloadedData(ContentResolver contentResolver, String videoId) {
@@ -187,6 +201,7 @@ public class VideoHelper {
             if (cursor.moveToFirst()) {
                 videoData = VideoHelper.objectFromCursor(cursor);
                 videoData = VideoHelper.getDownloadedData(cursor, videoData);
+                videoData.adSchedule = VideoHelper.getAdSchedule(contentResolver, videoData.getId());
             } else {
                 return null;
 //            throw new IllegalStateException("DB not contains video with ID=" + videoId);

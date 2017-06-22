@@ -14,7 +14,7 @@ import com.zype.android.core.provider.Contract;
  */
 public class ZypeDatabase extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "zype.db";
 
     private static final String TYPE_TEXT = " TEXT ";
@@ -122,17 +122,29 @@ public class ZypeDatabase extends SQLiteOpenHelper {
                 + ");";
     }
 
+    private static String getCreateAdScheduleTableQuery() {
+        return "CREATE TABLE " + Contract.AdSchedule.TABLE_NAME + "("
+                + Contract.AdSchedule.ID + TYPE_INTEGER + " PRIMARY KEY " + COMMA_SEP
+                + Contract.AdSchedule.OFFSET + TYPE_INTEGER + COMMA_SEP
+                + Contract.AdSchedule.TAG + TYPE_TEXT + COMMA_SEP
+                + Contract.AdSchedule.VIDEO_ID + TYPE_TEXT
+                + ");";
+    }
+
     @Override
     public void onCreate(@NonNull SQLiteDatabase db) {
         db.execSQL(getCreateVideoTableQuery());
         db.execSQL(getCreateFavoriteTableQuery());
         db.execSQL(getCreatePlaylistTableQuery());
         db.execSQL(getCreatePlaylistVideoTableQuery());
+        db.execSQL(getCreateAdScheduleTableQuery());
     }
 
 
     @Override
     public void onUpgrade(@NonNull SQLiteDatabase db, int oldVersion, int newVersion) {
-        // no impl
+        db.execSQL(Contract.AdSchedule.DELETE_TABLE);
+        // TODO: After implementing delete all tables call 'onCreate' to upgrade all tables without duplicate the code
+        db.execSQL(getCreateAdScheduleTableQuery());
     }
 }

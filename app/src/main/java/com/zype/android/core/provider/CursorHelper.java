@@ -75,6 +75,12 @@ public class CursorHelper {
         return contentResolver.query(uri, null, Contract.Video.COLUMN_IS_FAVORITE + "=?", new String[]{String.valueOf(1)}, null);
     }
 
+    // Ads
+    public static Cursor getAdScheduleCursorByVideoId(@NonNull ContentResolver contentResolver, @NonNull final String videoId) {
+        Uri uri = Contract.AdSchedule.CONTENT_URI;
+        return contentResolver.query(uri, null, Contract.AdSchedule.VIDEO_ID + "=?", new String[] { videoId }, null);
+    }
+
     // Favorite
     public static Cursor getFavoriteCursorByVideoId(@NonNull ContentResolver contentResolver, @NonNull final String videoId) {
         Uri uri = Contract.Favorite.CONTENT_URI;

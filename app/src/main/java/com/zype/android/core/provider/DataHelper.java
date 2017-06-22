@@ -8,6 +8,7 @@ import com.zype.android.core.provider.helpers.PlaylistHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
+import com.zype.android.webapi.model.player.AdvertisingSchedule;
 import com.zype.android.webapi.model.playlist.PlaylistData;
 import com.zype.android.webapi.model.video.Thumbnail;
 import com.zype.android.webapi.model.video.VideoData;
@@ -401,6 +402,31 @@ public class DataHelper {
         ContentValues value = new ContentValues();
         value.put(Contract.Video.COLUMN_AD_VIDEO_TAG, tag);
         return contentResolver.update(uri, value, Contract.Video.COLUMN_ID + " =?", new String[]{fileId});
+    }
+
+    public static int updateAdSchedule(ContentResolver contentResolver, String videoId, List<AdvertisingSchedule> adSchedule) {
+        Uri uri = Contract.AdSchedule.CONTENT_URI;
+        // Delete current schedule
+        int resultDelete = contentResolver.delete(uri, Contract.AdSchedule.VIDEO_ID + "=?", new String[] { videoId });
+        if (resultDelete == -1) {
+            return resultDelete;
+        }
+        // Insert new records if schedule is not empty
+        if (adSchedule != null && adSchedule.size() > 0) {
+            ContentValues[] values = new ContentValues[adSchedule.size()];
+            for (int i = 0; i < adSchedule.size(); i++) {
+                ContentValues value = new ContentValues();
+                AdvertisingSchedule item = adSchedule.get(i);
+                value.put(Contract.AdSchedule.OFFSET, item.getOffset());
+                value.put(Contract.AdSchedule.TAG, item.getTag());
+                value.put(Contract.PlaylistVideo.VIDEO_ID, videoId);
+                values[i] = value;
+            }
+            return contentResolver.bulkInsert(uri, values);
+        }
+        else {
+            return 0;
+        }
     }
 
     // Favorites
