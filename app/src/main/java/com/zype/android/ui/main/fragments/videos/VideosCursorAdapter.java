@@ -140,7 +140,9 @@ public class VideosCursorAdapter extends CursorAdapter {
                 }
             }
         }
-        list.add(new VideosMenuItem(ITEM_SHARE, R.string.menu_share));
+        if (ZypeSettings.SHARE_VIDEO_ENABLED) {
+            list.add(new VideosMenuItem(ITEM_SHARE, R.string.menu_share));
+        }
         return list;
     }
 
@@ -322,7 +324,13 @@ public class VideosCursorAdapter extends CursorAdapter {
 //                }
             }
         };
-        viewHolder.popupButton.setOnClickListener(onClick);
+        if (getListForMenu(viewHolder, isYoutubeVideo).isEmpty()) {
+            viewHolder.popupButton.setVisibility(GONE);
+        }
+        else {
+            viewHolder.popupButton.setVisibility(View.VISIBLE);
+            viewHolder.popupButton.setOnClickListener(onClick);
+        }
 //        viewHolder.downloadButton.setOnClickListener(onClick);
 //        if (viewHolder.isTranscoded && ZypeSettings.isDownloadsEnabled()) {
 //            viewHolder.downloadButton.setVisibility(View.VISIBLE);

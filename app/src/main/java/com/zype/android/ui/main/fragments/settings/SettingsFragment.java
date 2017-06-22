@@ -59,14 +59,12 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
         ListView listView = (ListView) view.findViewById(R.id.list_settings);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         mSigninButton = (Button) view.findViewById(R.id.sign_in_button);
-//        mSigninButtonFake = view.findViewById(R.id.fake_sign_in_button);
         return view;
     }
 
@@ -78,6 +76,8 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
 
     private void initSignInButton() {
         if (SettingsProvider.getInstance().isLoggedIn()) {
+            mSigninButton.setText(R.string.action_sign_out);
+            mSigninButton.setVisibility(View.VISIBLE);
             mSigninButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -85,34 +85,22 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
                     initSignInButton();
                 }
             });
-            mSigninButton.setText(R.string.action_sign_out);
-        } else {
-            mSigninButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnLoginListener.onRequestLogin();
-                }
-            });
-            mSigninButton.setText(R.string.action_sign_in);
         }
-//        if (SettingsProvider.getInstance().isLogined()) {
-//            mSigninButtonFake.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mOnLoginListener.onLogout();
-//                    initSignInButton();
-//                }
-//            });
-//            mSigninButton.setText(R.string.action_sign_out);
-//        } else {
-//            mSigninButtonFake.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mOnLoginListener.onRequestLogin();
-//                }
-//            });
-//            mSigninButton.setText(R.string.action_sign_in);
-//        }
+        else {
+            mSigninButton.setText(R.string.action_sign_in);
+            if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+                mSigninButton.setVisibility(View.VISIBLE);
+                mSigninButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mOnLoginListener.onRequestLogin();
+                    }
+                });
+            }
+            else {
+                mSigninButton.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override
