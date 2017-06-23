@@ -115,6 +115,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     @Override
     public void onResume() {
         super.onResume();
+        startLoadCursors();
         loadVideosFromPlaylist(1);
         IntentFilter filter = new IntentFilter(DownloadConstants.ACTION);
         LocalBroadcastManager.getInstance(this.getApplicationContext()).registerReceiver(downloaderReceiver, filter);
@@ -443,13 +444,15 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                     loadVideosFromPlaylist(Pagination.getNextPage(pagination));
                 }
                 else {
-                    int i = DataHelper.insertVideos(this.getContentResolver(), mVideoList);
-                    Logger.d("handleRetrieveVideo(): added " + i + " videos");
+                    int videosAdded = DataHelper.insertVideos(this.getContentResolver(), mVideoList);
+                    Logger.d("handleRetrieveVideo(): added " + videosAdded + " videos");
                     DataHelper.addVideosToPlaylist(this.getContentResolver(), mVideoList, playlistId);
                     DataHelper.clearPlaylistVideo(this.getContentResolver(), playlistId);
                     int itemsInsertedPlaylistVideo = DataHelper.insertPlaylistVideo(this.getContentResolver(), mVideoList, playlistId, 0);
                     Logger.d("handleRetrieveVideo(): PlaylistVideo inserted=" + itemsInsertedPlaylistVideo);
-                    startLoadCursors();
+//                    if (videosAdded > 0) {
+//                        startLoadCursors();
+//                    }
                 }
             }
         }

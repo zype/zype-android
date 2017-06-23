@@ -139,6 +139,7 @@ public class PlayerFragment extends BaseFragment implements
     private ComponentName mRemoteControlResponder;
     private boolean isReceiversRegistered = false;
     private boolean deleteFileBeforeExit = false;
+    private boolean isControlsEnabled = true;
 
     //
     // IMA SDK
@@ -222,8 +223,7 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         mainView = inflater.inflate(R.layout.fragment_custom_player, container, false);
         mainView.setOnTouchListener(new OnTouchListener() {
@@ -493,11 +493,6 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     @Override
-    protected String getFragmentName() {
-        return "Player";
-    }
-
-    @Override
     public void onAudioCapabilitiesChanged(AudioCapabilities audioCapabilities) {
         if (player == null) {
             return;
@@ -603,13 +598,16 @@ public class PlayerFragment extends BaseFragment implements
         player.setPlayWhenReady(playWhenReady);
 
         if (playWhenReady && !adSchedule.isEmpty()) {
-            nextAdIndex = seekAdByPosition(DataHelper.getPlayTime(getActivity().getContentResolver(), fileId));
-            // Start playback time listener
-            if (handlerTimer != null) {
-                if (runnablePlaybackTime != null) {
-                    handlerTimer.removeCallbacks(runnablePlaybackTime);
+            long playTime = DataHelper.getPlayTime(getActivity().getContentResolver(), fileId);
+            nextAdIndex = seekAdByPosition(playTime);
+            if (!checkNextAd(playTime)) {
+                // Start playback time listener
+                if (handlerTimer != null) {
+                    if (runnablePlaybackTime != null) {
+                        handlerTimer.removeCallbacks(runnablePlaybackTime);
+                    }
+                    handlerTimer.post(runnablePlaybackTime);
                 }
-                handlerTimer.post(runnablePlaybackTime);
             }
         }
 //        showAd();
@@ -742,7 +740,7 @@ public class PlayerFragment extends BaseFragment implements
 
     private void toggleControlsVisibility() {
         if (mediaController != null) {
-            if (mediaController.isShowing()) {
+            if (mediaController.isShowing() || !isControlsEnabled) {
                 hideControls();
             } else {
                 showControls();
@@ -766,15 +764,16 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     private void showControls() {
-        if (BuildConfig.DEBUG) {
-            Logger.d("showControls(): mListener=" + mListener.toString());
-        }
-        if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE) {
-            if (mediaController != null) {
-                mediaController.show(5000);
+        if (mediaController != null) {
+            if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE) {
+                if (isControlsEnabled) {
+                    mediaController.show(5000);
+                }
+                else {
+                    hideControls();
+                }
             }
-        } else {
-            if (mediaController != null) {
+            else {
                 mediaController.show(0);
             }
         }
@@ -1027,6 +1026,7 @@ public class PlayerFragment extends BaseFragment implements
                 // AdEventType.CONTENT_PAUSE_REQUESTED is fired immediately before a video
                 // ad is played.
                 isAdDisplayed = true;
+                hideControls();
                 player.getPlayerControl().pause();
                 break;
             case CONTENT_RESUME_REQUESTED:
@@ -1036,8 +1036,10 @@ public class PlayerFragment extends BaseFragment implements
                 // Update next ad to play
                 updateNextAd();
                 // Resume video
+                isControlsEnabled = true;
                 if (player != null) {
                     player.getPlayerControl().start();
+                    showControls();
                 }
                 else {
                     preparePlayer(true);
@@ -1058,21 +1060,22 @@ public class PlayerFragment extends BaseFragment implements
     public void onAdError(AdErrorEvent adErrorEvent) {
         Logger.e("Ad error: " + adErrorEvent.getError().getMessage());
         updateNextAd();
+        isControlsEnabled = true;
         player.getPlayerControl().start();
     }
 
-    private void showAd() {
-        if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || BuildConfig.DEBUG) {
-            // IMA SDK test tag
-//        requestAds("https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=");
-            // Test VAST 3
-//            requestAds("https://s3.amazonaws.com/demo.jwplayer.com/advertising/assets/vast3_jw_ads.xml");
-            // Test VAST 2
-//        requestAds("http://loopme.me/api/vast/ads?appId=e18c19fa43&vast=2&campid=6029");
-            Logger.d("adTag=" + adTag);
-            requestAds(adTag);
-        }
-    }
+//    private void showAd() {
+//        if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || BuildConfig.DEBUG) {
+//            // IMA SDK test tag
+////        requestAds("https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=");
+//            // Test VAST 3
+////            requestAds("https://s3.amazonaws.com/demo.jwplayer.com/advertising/assets/vast3_jw_ads.xml");
+//            // Test VAST 2
+////        requestAds("http://loopme.me/api/vast/ads?appId=e18c19fa43&vast=2&campid=6029");
+//            Logger.d("adTag=" + adTag);
+//            requestAds(adTag);
+//        }
+//    }
 
     private int seekAdByPosition(long position) {
         for (int i = 0; i < adSchedule.size(); i++) {
@@ -1102,8 +1105,15 @@ public class PlayerFragment extends BaseFragment implements
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || BuildConfig.DEBUG) {
                 Logger.d("checkNextAd(): position=" + position);
                 if (position >= adSchedule.get(nextAdIndex).getOffset()) {
+                    // Disable media controls and pause the video
+                    isControlsEnabled = false;
+                    if (player != null) {
+                        player.getPlayerControl().pause();
+                    }
+                    // Request the ad
                     Logger.d("checkNextAd(): Requesting ad");
                     requestAds(adSchedule.get(nextAdIndex).getTag());
+                    // TODO: Probably it make sense to show progress while the ad is loading
                     return true;
                 }
             }
@@ -1157,4 +1167,13 @@ public class PlayerFragment extends BaseFragment implements
     private boolean isLiveStreamLimitHit() {
         return SettingsProvider.getInstance().getLiveStreamTime() >= SettingsProvider.getInstance().getLiveStreamLimit();
     }
+
+    //
+    //
+    @Override
+    protected String getFragmentName() {
+        return "Player";
+    }
+
+
 }

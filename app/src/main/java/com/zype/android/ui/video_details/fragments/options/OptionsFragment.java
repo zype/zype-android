@@ -314,7 +314,9 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     private List<Options> getOptionsList() {
         List<Options> list = new ArrayList<>();
         list.add(new Options(OPTION_FAVORITES, getFavoriteTitle(isFavorite), getFavoriteIcon(isFavorite)));
-        list.add(new Options(OPTION_SHARE, getString(R.string.option_share), R.drawable.icn_share));
+        if (ZypeSettings.SHARE_VIDEO_ENABLED) {
+            list.add(new Options(OPTION_SHARE, getString(R.string.option_share), R.drawable.icn_share));
+        }
         if (ZypeSettings.isDownloadsEnabled() &&
                 (isAudioDownloadUrlExists() || isVideoDownloadUrlExists())) {
             if (mListener.getCurrentFragment() != BaseVideoActivity.TYPE_YOUTUBE && !onAir) {
