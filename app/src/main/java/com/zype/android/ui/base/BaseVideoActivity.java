@@ -29,6 +29,7 @@ import com.google.android.libraries.cast.companionlibrary.cast.exceptions.Transi
 import com.google.android.libraries.cast.companionlibrary.cast.player.VideoCastController;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -424,33 +425,38 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
 
     @Override
     public void onFavorite(String videoId) {
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
-                    .addVideoId(videoId)
-                    .addAccessToken();
-            getApi().executeRequest(WebApiManager.Request.FAVORITE, builder.build());
-//            DataHelper.setFavoriteVideo(getContentResolver(), videoId, true);
+        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+            if (SettingsProvider.getInstance().isLoggedIn()) {
+                FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
+                        .addVideoId(videoId)
+                        .addAccessToken();
+                getApi().executeRequest(WebApiManager.Request.FAVORITE, builder.build());
+            } else {
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+            }
         }
         else {
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+            DataHelper.setFavoriteVideo(getContentResolver(), videoId, true);
         }
     }
 
     @Override
     public void onUnFavorite(String videoId) {
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
-                    .addPathFavoriteId(DataHelper.getFavoriteId(getContentResolver(), videoId))
-                    .addPathVideoId(videoId)
-                    .addAccessToken();
-            getApi().executeRequest(WebApiManager.Request.UN_FAVORITE, builder.build());
-//            DataHelper.setFavoriteVideo(getContentResolver(), videoId, false);
-//            DataHelper.deleteFavorite(getContentResolver(), videoId);
+        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+            if (SettingsProvider.getInstance().isLoggedIn()) {
+                FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
+                        .addPathFavoriteId(DataHelper.getFavoriteId(getContentResolver(), videoId))
+                        .addPathVideoId(videoId)
+                        .addAccessToken();
+                getApi().executeRequest(WebApiManager.Request.UN_FAVORITE, builder.build());
+            } else {
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+            }
         }
         else {
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+            DataHelper.setFavoriteVideo(getContentResolver(), videoId, false);
         }
     }
 

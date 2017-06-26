@@ -2,6 +2,7 @@ package com.zype.android.ui.search;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -419,28 +420,37 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
 
     @Override
     public void onFavoriteVideo(String videoId) {
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
-                    .addVideoId(videoId)
-                    .addAccessToken();
-            getApi().executeRequest(WebApiManager.Request.FAVORITE, builder.build());
+        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+            if (SettingsProvider.getInstance().isLoggedIn()) {
+                FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
+                        .addVideoId(videoId)
+                        .addAccessToken();
+                getApi().executeRequest(WebApiManager.Request.FAVORITE, builder.build());
+            } else {
+                onRequestLogin();
+            }
         }
         else {
-            onRequestLogin();
+            DataHelper.setFavoriteVideo(getContentResolver(), videoId, true);
         }
     }
 
     @Override
     public void onUnFavoriteVideo(String videoId) {
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
-                    .addPathFavoriteId(DataHelper.getFavoriteId(getContentResolver(), videoId))
-                    .addPathVideoId(videoId)
-                    .addAccessToken();
-            getApi().executeRequest(WebApiManager.Request.UN_FAVORITE, builder.build());
+        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+            if (SettingsProvider.getInstance().isLoggedIn()) {
+                FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
+                        .addPathFavoriteId(DataHelper.getFavoriteId(getContentResolver(), videoId))
+                        .addPathVideoId(videoId)
+                        .addAccessToken();
+                getApi().executeRequest(WebApiManager.Request.UN_FAVORITE, builder.build());
+            }
+            else {
+                onRequestLogin();
+            }
         }
         else {
-            onRequestLogin();
+            DataHelper.setFavoriteVideo(getContentResolver(), videoId, false);
         }
     }
 

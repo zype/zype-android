@@ -110,7 +110,7 @@ public class VideosCursorAdapter extends CursorAdapter {
         List<VideosMenuItem> list = new ArrayList<>();
 
         int currentProgress = DownloaderService.currentProgress(viewHolder.videoId);
-        if (SettingsProvider.getInstance().isLoggedIn()) {
+        if (SettingsProvider.getInstance().isLoggedIn() || !ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
             if (viewHolder.isFavorite) {
                 list.add(new VideosMenuItem(ITEM_UNFAVORITE, R.string.menu_unfavorite));
             }

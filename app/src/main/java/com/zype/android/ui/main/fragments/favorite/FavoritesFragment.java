@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -152,8 +153,10 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     public void onResume() {
         super.onResume();
         updateTextEmpty();
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            requestConsumerFavoriteVideo(1);
+        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+           if (SettingsProvider.getInstance().isLoggedIn()) {
+                requestConsumerFavoriteVideo(1);
+            }
         }
     }
 
@@ -178,7 +181,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     // Loader
     //
     protected void startLoadCursors() {
-        if (SettingsProvider.getInstance().isLogined()) {
+        if (SettingsProvider.getInstance().isLogined() || !ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
             if (loaderManager == null) {
                 loaderManager = getLoaderManager();
             }
