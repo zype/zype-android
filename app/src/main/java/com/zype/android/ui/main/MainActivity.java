@@ -111,9 +111,14 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
     @Override
     public void onFavoriteVideoClick(String videoId, boolean isFavorite) {
-        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-            onRequestSubscription();
-        } else {
+        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+            if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
+                onRequestSubscription();
+            } else {
+                VideoDetailActivity.startActivity(this, videoId);
+            }
+        }
+        else {
             VideoDetailActivity.startActivity(this, videoId);
         }
     }

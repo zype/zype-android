@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:tint="@color/black_38"
+            android:tint="?attr/colorControlNormal"
             tools:src="@drawable/icn_favorites"
             />
 
