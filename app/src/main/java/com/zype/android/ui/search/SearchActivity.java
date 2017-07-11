@@ -1,6 +1,10 @@
 package com.zype.android.ui.search;
 
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Billing.BillingManager;
+import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
@@ -8,8 +12,10 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.ui.LoginActivity;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
+import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.dialog.ErrorDialogFragment;
 import com.zype.android.ui.video_details.VideoDetailActivity;
@@ -64,7 +70,8 @@ import java.util.List;
 
 import static android.view.View.GONE;
 
-public class SearchActivity extends BaseActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnVideoItemAction, OnLoginAction {
+public class SearchActivity extends BaseActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>, OnVideoItemAction, OnLoginAction,
+                                                    BillingManager.BillingUpdatesListener {
 
     private static final String SEARCH_STRING = "SEARCH_STRING";
     private static final String SELECTED_TAB = "SELECTED_TAB";
@@ -185,6 +192,10 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         tabs.setVisibility(GONE);
 
         requestSearchResult(1, searchString);
+
+        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+            new BillingManager(this, this);
+        }
     }
 
     @Override
@@ -347,53 +358,6 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         hideProgress();
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
-        if (holder.subscriptionRequired) {
-            if (holder.onAir) {
-                if (!SettingsProvider.getInstance().isLoggedIn() || SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                    // Check total played live stream time
-                    Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
-                    int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
-                    if (liveStreamTime < SettingsProvider.getInstance().getLiveStreamLimit()) {
-                        VideoDetailActivity.startActivity(this, holder.videoId);
-                    } else {
-                        ErrorDialogFragment dialog = ErrorDialogFragment.newInstance(SettingsProvider.getInstance().getLiveStreamMessage(), null, null);
-                        dialog.show(getSupportFragmentManager(), ErrorDialogFragment.TAG);
-                    }
-                }
-                else {
-                    VideoDetailActivity.startActivity(this, holder.videoId);
-                }
-            }
-            else {
-                if (SettingsProvider.getInstance().isLoggedIn()) {
-                    if (holder.isTranscoded) {
-                        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-                            DialogHelper.showSubscriptionAlertIssue(this);
-                        } else {
-                            VideoDetailActivity.startActivity(this, holder.videoId);
-                        }
-                    } else {
-                        return;
-                    }
-                } else {
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
-                }
-            }
-        }
-        else {
-            VideoDetailActivity.startActivity(this, holder.videoId);
-        }
-//        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-//            onRequestSubscription();
-//        } else {
-//            EpisodeDetailActivity.startActivity(this, ((LatestCursorAdapter.LatestViewHolder) view.getTag()).videoId);
-//        }
-    }
-
     void showProgress() {
         searchProgress.setVisibility(View.VISIBLE);
     }
@@ -484,6 +448,74 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     @Override
     protected String getActivityName() {
         return getString(R.string.activity_name_search);
+    }
+
+    // //////////
+    // UI
+    //
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Logger.d("onItemClick()");
+        VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
+        if (holder.subscriptionRequired) {
+            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, holder.onAir);
+        }
+        else {
+            VideoDetailActivity.startActivity(this, holder.videoId);
+        }
+//        if (holder.subscriptionRequired) {
+//            if (holder.onAir) {
+//                if (!SettingsProvider.getInstance().isLoggedIn() || SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+//                    // Check total played live stream time
+//                    Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
+//                    int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
+//                    if (liveStreamTime < SettingsProvider.getInstance().getLiveStreamLimit()) {
+//                        VideoDetailActivity.startActivity(this, holder.videoId);
+//                    } else {
+//                        ErrorDialogFragment dialog = ErrorDialogFragment.newInstance(SettingsProvider.getInstance().getLiveStreamMessage(), null, null);
+//                        dialog.show(getSupportFragmentManager(), ErrorDialogFragment.TAG);
+//                    }
+//                }
+//                else {
+//                    VideoDetailActivity.startActivity(this, holder.videoId);
+//                }
+//            }
+//            else {
+//                if (SettingsProvider.getInstance().isLoggedIn()) {
+//                    if (holder.isTranscoded) {
+//                        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
+//                            DialogHelper.showSubscriptionAlertIssue(this);
+//                        } else {
+//                            VideoDetailActivity.startActivity(this, holder.videoId);
+//                        }
+//                    } else {
+//                        return;
+//                    }
+//                } else {
+//                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+//                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+//                }
+//            }
+//        }
+//        else {
+//            VideoDetailActivity.startActivity(this, holder.videoId);
+//        }
+    }
+
+    //
+    // 'BillinggManager' listener implementation
+    //
+    @Override
+    public void onBillingClientSetupFinished() {
+    }
+
+    @Override
+    public void onConsumeFinished(String token, @BillingClient.BillingResponse int result) {
+    }
+
+    @Override
+    public void onPurchasesUpdated(List<Purchase> purchases) {
+        SubscriptionsHelper.updateSubscriptionCount(purchases);
     }
 
     //    -------------------SUBSCRIBE-------------------

@@ -51,6 +51,7 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
     private long currentDate;
     private CardView layoutSearch;
     private SearchView viewSearch;
+    private FloatingActionButton buttonSearch;
 
     private ListView mListView;
     private PlaylistCursorAdapter mAdapter;
@@ -166,7 +167,7 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
         viewSearch.setFocusable(true);
 
         layoutSearch.setVisibility(View.INVISIBLE);
-        final FloatingActionButton buttonSearch = (FloatingActionButton) view.findViewById(R.id.buttonSearch);
+        buttonSearch = (FloatingActionButton) view.findViewById(R.id.buttonSearch);
         buttonSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -309,12 +310,19 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
     // //////////
     // UI
     //
-    private void onShowSearch() {UiUtils.showKeyboard(getActivity(), viewSearch);
+    private void onShowSearch() {
+        UiUtils.showKeyboard(getActivity(), viewSearch);
     }
 
     private void hideSearch() {
         if (animatorSearchReverse != null && layoutSearch.getVisibility() == View.VISIBLE) {
-            animatorSearchReverse.start();
+            try {
+                animatorSearchReverse.start();
+            }
+            catch (Exception e) {
+                layoutSearch.setVisibility(View.INVISIBLE);
+                buttonSearch.show();
+            }
         }
     }
 

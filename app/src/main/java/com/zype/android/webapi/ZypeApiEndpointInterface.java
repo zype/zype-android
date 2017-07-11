@@ -78,6 +78,10 @@ public interface ZypeApiEndpointInterface {
     @GET("/consumers/{consumer_id}")
     Consumer getConsumer(@Path("consumer_id") String consumerId, @QueryMap HashMap<String, String> getParams);
 
+    @FormUrlEncoded
+    @POST("/consumers/")
+    Consumer createConsumer(@QueryMap HashMap<String, String> getParams, @FieldMap HashMap<String, String> postParams);
+
     @GET("/consumers/{consumer_id}/video_favorites/")
     ConsumerFavoriteVideo getFavoriteVideoList(@Path("consumer_id") String consumerId, @QueryMap Map<String, String> getParams);
 

@@ -234,6 +234,8 @@ public class WebApiManager {
                 String favoriteId = pathParams.get(FavoriteParamsBuilder.FAVORITE_ID);
                 videoId = pathParams.get(FavoriteParamsBuilder.VIDEO_ID);
                 return new UnfavoriteEvent(ticket, new UnfavoriteResponse(mApi.setUnFavoriteVideo(SettingsProvider.getInstance().getConsumerId(), favoriteId, postParams)), videoId);
+            case CONSUMER_CREATE:
+                return new ConsumerEvent(ticket, new ConsumerResponse(mApi.createConsumer(getParams, postParams)));
             case CONSUMER_GET:
                 return new ConsumerEvent(ticket, new ConsumerResponse(mApi.getConsumer(SettingsProvider.getInstance().getAccessTokenResourceOwnerId(), getParams)));
             case CATEGORY:
@@ -301,6 +303,7 @@ public class WebApiManager {
         VIDEO_LATEST_GET,
         VIDEO_FROM_PLAYLIST,
         VIDEO_HIGHLIGHT_GET,
+        CONSUMER_CREATE,
         CONSUMER_GET,
         FAVORITE,
         UN_FAVORITE,

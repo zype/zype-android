@@ -89,19 +89,6 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
         return view;
     }
 
-    void requestConsumerFavoriteVideo(int page) {
-        ConsumerParamsBuilder builder = new ConsumerParamsBuilder()
-                .addAccessToken()
-                .addPage(page);
-        getApi().executeRequest(WebApiManager.Request.CONSUMER_FAVORITE_VIDEO_GET, builder.build());
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
-        listener.onFavoriteVideoClick(holder.videoId, holder.isFavorite);
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -177,9 +164,22 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
         }
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
+        listener.onFavoriteVideoClick(holder.videoId, holder.isFavorite);
+    }
+
     // //////////
-    // Loader
+    // Data
     //
+    void requestConsumerFavoriteVideo(int page) {
+        ConsumerParamsBuilder builder = new ConsumerParamsBuilder()
+                .addAccessToken()
+                .addPage(page);
+        getApi().executeRequest(WebApiManager.Request.CONSUMER_FAVORITE_VIDEO_GET, builder.build());
+    }
+
     protected void startLoadCursors() {
         if (SettingsProvider.getInstance().isLogined() || !ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
             if (loaderManager == null) {
@@ -189,6 +189,9 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
         }
     }
 
+    //
+    // Loader implementation
+    //
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String selection = Contract.Video.COLUMN_IS_FAVORITE + " =?";

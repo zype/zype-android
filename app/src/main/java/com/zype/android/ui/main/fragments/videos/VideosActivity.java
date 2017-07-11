@@ -22,19 +22,27 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Billing.BillingManager;
+import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadConstants;
 import com.zype.android.service.DownloadHelper;
+import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.LoginActivity;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
+import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.ui.video_details.VideoDetailActivity;
@@ -59,8 +67,8 @@ import com.zype.android.webapi.model.video.VideoData;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VideosActivity extends MainActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
-
+public class VideosActivity extends MainActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>,
+                                                        BillingManager.BillingUpdatesListener {
 
     private static final int LOADER_VIDEO = 0;
     private long currentDate;
@@ -108,6 +116,10 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                 mOnVideoItemActionListener, mOnLoginListener);
         mListView.setAdapter(mAdapter);
         mTvEmpty = (TextView) findViewById(R.id.empty);
+
+        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+            new BillingManager(this, this);
+        }
 
         startLoadCursors();
     }
@@ -306,65 +318,135 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Logger.d("click video");
+        Logger.d("onItemClick()");
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
         if (holder.subscriptionRequired) {
-            if (holder.onAir) {
-                if (SettingsProvider.getInstance().isLoggedIn()) {
-                    if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                        // Check total played live stream time
-                        Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
-                        int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
-                        if (liveStreamTime < SettingsProvider.getInstance().getLiveStreamLimit()) {
-                            VideoDetailActivity.startActivity(this, holder.videoId);
-                        } else {
-                            DialogHelper.showSubscriptionAlertIssue(this);
-//                            ErrorDialogFragment dialog = ErrorDialogFragment.newInstance(SettingsProvider.getInstance().getLiveStreamMessage(), null, null);
-//                            dialog.show(getSupportFragmentManager(), ErrorDialogFragment.TAG);
-                        }
-                    }
-                    else {
-                        VideoDetailActivity.startActivity(this, holder.videoId);
-                    }
-                }
-                else {
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
-                }
-            }
-            else {
-                if (SettingsProvider.getInstance().isLoggedIn()) {
-                    if (holder.isTranscoded) {
-                        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-                            DialogHelper.showSubscriptionAlertIssue(this);
-                        } else {
-                            VideoDetailActivity.startActivity(this, holder.videoId);
-                        }
-                    }
-                    else {
-                        //if it's not transcoded it is a live stream. May be we can check onAir flag
-               /* if (TextUtils.isEmpty(holder.youtubePath)) {
-                    DialogFragment newFragment = CustomAlertDialog.newInstance(
-                            R.string.alert_dialog_title_transcoded, R.string.alert_dialog_message_transcoded);
-                    newFragment.show(this.getSupportFragmentManager(), "dialog_transcoded");
-                } else {*/
-//                    if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-//                        DialogHelper.showSubscriptionAlertIssue(this);
-//                    } else {
-//                        EpisodeDetailActivity.startActivity(this, holder.videoId);
+            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, holder.onAir);
+//            if (holder.onAir) {
+//                if (SettingsProvider.getInstance().isLoggedIn()) {
+//                    if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+//                        // Check total played live stream time
+//                        Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
+//                        int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
+//                        if (liveStreamTime < SettingsProvider.getInstance().getLiveStreamLimit()) {
+//                            VideoDetailActivity.startActivity(this, holder.videoId);
+//                        }
+//                        else {
+//                            DialogHelper.showSubscriptionAlertIssue(this);
+//                        }
 //                    }
-                        // }
-                        return;
-                    }
-                } else {
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
-                }
-            }
+//                    else {
+//                        VideoDetailActivity.startActivity(this, holder.videoId);
+//                    }
+//                }
+//                else {
+//                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+//                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+//                }
+//            }
+//            else {
+//                if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+//                    if (SettingsProvider.getInstance().isLoggedIn()) {
+//                        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
+//                            switchToSubscriptionScreen();
+//                        }
+//                        else {
+//                            VideoDetailActivity.startActivity(this, holder.videoId);
+//                        }
+//                    }
+//                    else {
+//                        switchToIntroScreen();
+//                    }
+//                }
+//                else {
+//                    if (SettingsProvider.getInstance().isLoggedIn()) {
+//                        if (holder.isTranscoded) {
+//                            if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
+//                                DialogHelper.showSubscriptionAlertIssue(this);
+//                            }
+//                            else {
+//                                VideoDetailActivity.startActivity(this, holder.videoId);
+//                            }
+//                        }
+//                        else {
+//                            return;
+//                        }
+//                    }
+//                    else {
+//                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+//                        startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+//                    }
+//                }
+//            }
         }
         else {
             VideoDetailActivity.startActivity(this, holder.videoId);
         }
+    }
+
+//    private void checkSubscription(String videoId, boolean onAir) {
+//        if (SettingsProvider.getInstance().isLoggedIn()) {
+//            boolean liveStreamLimitExceeded = false;
+//            if (onAir) {
+//                // Check total played live stream time
+//                Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
+//                int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
+//                if (liveStreamTime >= SettingsProvider.getInstance().getLiveStreamLimit()
+//                        && SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+//                    liveStreamLimitExceeded = true;
+//                }
+//            }
+//            if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || liveStreamLimitExceeded) {
+//                if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+//                    switchToSubscriptionScreen();
+//                }
+//                else {
+//                    DialogHelper.showSubscriptionAlertIssue(this);
+//                }
+//            }
+//            else {
+//                VideoDetailActivity.startActivity(this, videoId);
+//            }
+//        }
+//        else {
+//            if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+//                switchToIntroScreen();
+//            }
+//            else {
+//                switchToLoginScreen();
+//            }
+//        }
+//    }
+
+//    private void switchToLoginScreen() {
+//        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+//        startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+//    }
+//
+//    private void switchToIntroScreen() {
+//        Intent intent = new Intent(getApplicationContext(), IntroActivity.class);
+//        startActivity(intent);
+//    }
+//
+//    private void switchToSubscriptionScreen() {
+//        Intent intent = new Intent(getApplicationContext(), SubscriptionActivity.class);
+//        startActivity(intent);
+//    }
+
+    //
+    // 'BillinggManager' listener implementation
+    //
+    @Override
+    public void onBillingClientSetupFinished() {
+    }
+
+    @Override
+    public void onConsumeFinished(String token, @BillingClient.BillingResponse int result) {
+    }
+
+    @Override
+    public void onPurchasesUpdated(List<Purchase> purchases) {
+        SubscriptionsHelper.updateSubscriptionCount(purchases);
     }
 
     // //////////

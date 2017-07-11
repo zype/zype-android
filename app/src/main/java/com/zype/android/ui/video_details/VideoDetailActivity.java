@@ -7,6 +7,8 @@ import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.NavigationHelper;
+import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
 import com.zype.android.utils.BundleConstants;
@@ -113,6 +115,10 @@ public class VideoDetailActivity extends BaseVideoActivity {
     }
 
     // //////////
+    // UI
+    //
+
+    // //////////
     // Data
     //
     private void updateDownloadUrls() {
@@ -190,7 +196,12 @@ public class VideoDetailActivity extends BaseVideoActivity {
         Logger.e("handleError");
         if (err instanceof ForbiddenErrorEvent) {
             if (err.getEventData() == WebApiManager.Request.PLAYER_VIDEO) {
-                DialogHelper.showSubscriptionAlertIssue(this);
+                if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+                    NavigationHelper.getInstance(this).switchToSubscriptionScreen();
+                }
+                else {
+                    DialogHelper.showSubscriptionAlertIssue(this);
+                }
             }
         }
         else {

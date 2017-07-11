@@ -26,6 +26,8 @@ public class SettingsProvider extends CommonPreferences {
     public static final String DOWNLOADS_ENABLED_FOR_GUESTS = "DownloadsEnabledForGuests";
     public static final String THEME_LIGHT = "ThemeLight";
 
+    public static final String IS_FIRST_LAUNCH = "IsFirstLaunch";
+
     private static final HashMap<String, Object> defaultValues = new HashMap<>();
 
     private static final String DEFAULT_STRING = "";
@@ -115,6 +117,8 @@ public class SettingsProvider extends CommonPreferences {
         defaultValues.put(DOWNLOADS_ENABLED, ZypeSettings.DOWNLOADS_ENABLED);
         defaultValues.put(DOWNLOADS_ENABLED_FOR_GUESTS, ZypeSettings.DOWNLOADS_ENABLED_FOR_GUESTS);
         defaultValues.put(THEME_LIGHT, ZypeSettings.THEME_LIGHT);
+
+        defaultValues.put(IS_FIRST_LAUNCH, true);
     }
 
     public void logout() {
@@ -618,7 +622,14 @@ public class SettingsProvider extends CommonPreferences {
         return get(LIVE_STREAM_TIME, 0);
     }
 
+    // //////////
+    // General get/set methods
+    //
     public boolean getBoolean(String key) {
         return get(key, (Boolean) defaultValues.get(key));
+    }
+
+    public void setBoolean(String key, boolean value) {
+        set(key, value);
     }
 }

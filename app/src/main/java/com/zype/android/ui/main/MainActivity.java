@@ -7,7 +7,11 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Billing.BillingManager;
+import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
@@ -15,9 +19,11 @@ import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
 import com.zype.android.ui.LoginActivity;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
+import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.main.fragments.videos.VideosActivity;
@@ -47,7 +53,8 @@ import com.zype.android.webapi.model.player.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements OnMainActivityFragmentListener, OnVideoItemAction, OnLoginAction {
+public class MainActivity extends BaseActivity implements OnMainActivityFragmentListener, OnVideoItemAction, OnLoginAction,
+                                                    BillingManager.BillingUpdatesListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +75,10 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
         SettingsParamsBuilder settingsParamsBuilder = new SettingsParamsBuilder();
         getApi().executeRequest(WebApiManager.Request.GET_SETTINGS, settingsParamsBuilder.build());
+
+        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+            new BillingManager(this, this);
+        }
     }
 
     @Override
@@ -112,9 +123,10 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     public void onFavoriteVideoClick(String videoId, boolean isFavorite) {
         if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
-            if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
+            if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
                 onRequestSubscription();
-            } else {
+            }
+            else {
                 VideoDetailActivity.startActivity(this, videoId);
             }
         }
@@ -215,7 +227,12 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
     @Override
     public void onRequestSubscription() {
-        DialogHelper.showSubscriptionAlertIssue(this);
+        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+            NavigationHelper.getInstance(this).switchToSubscriptionScreen();
+        }
+        else {
+            DialogHelper.showSubscriptionAlertIssue(this);
+        }
     }
 
     private void requestConsumerData() {
@@ -227,6 +244,30 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     protected View getBaseView() {
         return ((ViewGroup) this
                 .findViewById(R.id.root_view)).getChildAt(0);
+    }
+
+    // //////////
+    // UI
+    //
+//    private void switchToSubscriptionScreen() {
+//        Intent intent = new Intent(getApplicationContext(), SubscriptionActivity.class);
+//        startActivity(intent);
+//    }
+
+    //
+    // 'BillinggManager' listener implementation
+    //
+    @Override
+    public void onBillingClientSetupFinished() {
+    }
+
+    @Override
+    public void onConsumeFinished(String token, @BillingClient.BillingResponse int result) {
+    }
+
+    @Override
+    public void onPurchasesUpdated(List<Purchase> purchases) {
+        SubscriptionsHelper.updateSubscriptionCount(purchases);
     }
 
 //    @Override

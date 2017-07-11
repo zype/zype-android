@@ -6,7 +6,9 @@ import android.os.Handler;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.main.MainActivity;
 import com.zype.android.utils.Logger;
@@ -31,7 +33,6 @@ public class LaunchActivity extends BaseActivity {
         Logger.d("onCreate()");
         setContentView(R.layout.activity_launch);
         mJumpRunnable = new Runnable() {
-
             public void run() {
                 jump();
             }
@@ -49,24 +50,48 @@ public class LaunchActivity extends BaseActivity {
     }
 
     private void jump() {
-        if (isFinishing() || !isSettingsLoaded)
+//        if (isFinishing() || !isSettingsLoaded)
+        if (isFinishing())
             return;
         Logger.d("jump()");
         mJumpRunnable = null;
         mHandler = null;
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+            if (SettingsProvider.getInstance().getBoolean(SettingsProvider.IS_FIRST_LAUNCH)) {
+                SettingsProvider.getInstance().setBoolean(SettingsProvider.IS_FIRST_LAUNCH, false);
+                switchToIntroScreen();
+            }
+            else {
+                switchToMainScreen();
+            }
+        }
+        else {
+            switchToMainScreen();
+        }
     }
 
     private void requestLiveStreamSettings() {
         getApi().executeRequest(WebApiManager.Request.LIVE_STREAM_SETTINGS, new LiveStreamSettingsParamsBuilder().build());
     }
 
+    // //////////
+    // UI
+    //
+    private void switchToMainScreen() {
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
+    }
+
+    private void switchToIntroScreen() {
+        Intent intent = new Intent(this, IntroActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
     @Subscribe
     public void handleError(ErrorEvent err) {
         Logger.e("handleError");
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+        jump();
     }
 
     @Subscribe
