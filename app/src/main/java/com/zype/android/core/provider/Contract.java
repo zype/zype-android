@@ -3,6 +3,8 @@ package com.zype.android.core.provider;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import com.zype.android.BuildConfig;
+
 /**
  * @author vasya
  * @version 1
@@ -10,9 +12,7 @@ import android.provider.BaseColumns;
  */
 public class Contract {
 
-    // TODO: Update 'CONTENT_AUTHORITY' with the same value as 'android:authorities' of
-    // ZypeContentProvider declaration in 'AndroidManifest.xml'
-    public static final String CONTENT_AUTHORITY = "com.zype.android.sdk.provider";
+    public static final String CONTENT_AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
 
     public static final String TABLE_NAME_VIDEO = "video";
     public static final String TABLE_NAME_FAVORITE = "favorite";

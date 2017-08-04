@@ -150,7 +150,7 @@
 
         <provider
             android:name=".core.provider.ZypeContentProvider"
-            android:authorities="com.zype.android.sdk.provider"
+            android:authorities="${applicationId}.provider"
             android:enabled="true"
             android:exported="false" />
 

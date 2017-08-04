@@ -19,7 +19,7 @@ public class ZypeSettings {
     // Playlist
     // TODO: Provide your Zype root playlist id
     public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
-    // Google Analytica Tracking Id
+    // Google Analytics Tracking Id
     // TODO: To use Google Analytics provide your GA tracking id
     public static final String GA_TRACKING_ID = "";
     // Social
@@ -28,6 +28,9 @@ public class ZypeSettings {
     public static final String INSTAGRAM_ID = "";
     public static final String TWITTER_ID = "";
     public static final String WEB_URL = "";
+
+    // Template version
+    public static final String TEMPLATE_VERSION = BuildConfig.VERSION;
 
     // App features
     // TODO: Update app feature settings

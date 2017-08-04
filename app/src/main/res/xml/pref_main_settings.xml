@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 <!--
     <PreferenceCategory android:title="Content Settings">
         <SwitchPreference
@@ -19,5 +20,10 @@
             android:key="version"
             android:summary="1.0"
             android:title="@string/pref_version"/>
+        <Preference
+            android:key="ZypeTemplateVersion"
+            android:title="@string/pref_zype_template_version"
+            tools:summary="1.5"
+            />
     </PreferenceCategory>
 </PreferenceScreen>

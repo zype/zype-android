@@ -71,6 +71,7 @@ import com.zype.android.ui.video_details.fragments.video.OnVideoAudioListener;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.FileUtils;
 import com.zype.android.utils.Logger;
+import com.zype.android.utils.SpotXHelper;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.model.player.AdvertisingSchedule;
@@ -332,6 +333,9 @@ public class PlayerFragment extends BaseFragment implements
         if (BuildConfig.DEBUG) {
             Logger.d("onResume()");
         }
+        // Retrieve Advertising Id and save it in preferences
+        SpotXHelper.fetchGoogleAdvertisingId(getActivity());
+
         mListener.onFullscreenChanged();
         registerReceivers();
         if (player == null) {
@@ -1112,7 +1116,9 @@ public class PlayerFragment extends BaseFragment implements
                     }
                     // Request the ad
                     Logger.d("checkNextAd(): Requesting ad");
-                    requestAds(adSchedule.get(nextAdIndex).getTag());
+                    String adTag = SpotXHelper.addSpotXParameters(getActivity(), adSchedule.get(nextAdIndex).getTag());
+                    Logger.d("Ad tag with macros: " + adTag);
+                    requestAds(adTag);
                     // TODO: Probably it make sense to show progress while the ad is loading
                     return true;
                 }

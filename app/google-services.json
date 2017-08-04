@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:818854525960:android:53d474417028725b",
         "android_client_info": {
-          "package_name": "com.zype.android.sdk"
+          "package_name": "com.zype.android.template"
         }
       },
       "oauth_client": [

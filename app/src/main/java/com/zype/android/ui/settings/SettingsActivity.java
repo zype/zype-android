@@ -1,6 +1,7 @@
 package com.zype.android.ui.settings;
 
 import com.zype.android.R;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.FileUtils;
 import com.zype.android.utils.StorageUtils;
@@ -92,6 +93,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
+
+            Preference prefZypeTemplateVersion = findPreference("ZypeTemplateVersion");
+            prefZypeTemplateVersion.setSummary(ZypeSettings.TEMPLATE_VERSION);
         }
     }
 

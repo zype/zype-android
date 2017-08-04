@@ -24,6 +24,7 @@ public class SettingsProvider extends CommonPreferences {
 
     public static final String DOWNLOADS_ENABLED = "DownloadsEnabled";
     public static final String DOWNLOADS_ENABLED_FOR_GUESTS = "DownloadsEnabledForGuests";
+    public static final String GOOGLE_ADVERTISING_ID = "GoogleAdvertisingId";
     public static final String THEME_LIGHT = "ThemeLight";
 
     public static final String IS_FIRST_LAUNCH = "IsFirstLaunch";
@@ -632,4 +633,13 @@ public class SettingsProvider extends CommonPreferences {
     public void setBoolean(String key, boolean value) {
         set(key, value);
     }
+
+    public String getString(String key) {
+        return get(key, (String) defaultValues.get(key));
+    }
+
+    public void setString(String key, String value) {
+        set(key, value);
+    }
+
 }
