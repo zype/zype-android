@@ -51,12 +51,7 @@ Steps you need to perform to get a new app running:
 
 2. Change app name, launch icon, accent color and other resources to customize app appearance
 
-3. Setup content provider:
-* In the ```AndroidManifest.xml``` file find the declaration of ```ZypeContentProvider``` and change its 
-```android:authorities``` property to ```[Your applicationId].provider```
-* In the ```Contract``` class update ```CONTENT_AUTHORITY``` constant to the same value above
-
-4. API keys:
+3. API keys:
 
     Update following constants in ```ZypeSettings``` class with values applicable to your Zype account:
 * ```APP_KEY```
@@ -64,19 +59,23 @@ Steps you need to perform to get a new app running:
 * ```CLIENT_SECRET```
 * ```ROOT_PLAYLIST_ID```
 
-5. Setup app features:
+4. Setup app features:
 
     Update feature flags in ```ZypeSettings``` class to customize functinality and UI of your app
+* ```BACKGROUND_PLAYBACK_ENABLED```
 * ```DOWNLOADS_ENABLED```
 * ```DOWNLOADS_ENABLED_FOR_GUESTS```
+* ```NATIVE_SUBSCRIPTION_ENABLED```
+* ```SHARE_VIDEO_ENABLED```
 * ```THEME_LIGHT```
+* ```UNIVERSAL_SUBSCRIPTION_ENABLED```
 
 ### Optional
 
-6. In 'ZypeSettings' class provide your social network ids
-7. To use Google Analytics in your app provide your GA id in 'ZypeSettings' class and uncomment init of Google Analytics in 'ZypeApp' class
-8. To use Fabric in your app provide your fabric api key in 'AndroidManifest.xml' and uncomment init of fabric in 'ZypeApp' class
-9. To use OneSignal in your app uncomment init of OneSignal in 'ZypeApp' class
+5. In 'ZypeSettings' class provide your social network ids
+6. To use Google Analytics in your app provide your GA id in 'ZypeSettings' class and uncomment init of Google Analytics in 'ZypeApp' class
+7. To use Fabric in your app provide your fabric api key in 'AndroidManifest.xml' and uncomment init of fabric in 'ZypeApp' class
+8. To use OneSignal in your app uncomment init of OneSignal in 'ZypeApp' class
 
 
 
