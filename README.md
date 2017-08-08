@@ -32,13 +32,13 @@ Android Studio
 
 ## Unsupported Features
 
-- Midroll ads
 - Closed Caption Support
 - Native SVOD via In App Purchases
 
 ## Monetizations Supported
 
 - Pre-roll Ads (VAST)
+- Midroll ads
 - Universal SVOD via login
 
 ## Creating new Android app based on Zype Template

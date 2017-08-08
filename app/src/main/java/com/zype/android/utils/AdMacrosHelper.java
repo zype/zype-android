@@ -5,7 +5,6 @@ import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.text.TextUtils;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -22,41 +21,30 @@ import java.util.Map;
  * Created by Evgeny Cherkasov on 04.08.2017.
  */
 
-public class SpotXHelper {
-    private static final String APP_BUNDLE = "app[bundle]";
-    private static final String APP_DOMAIN = "app[domain]";
-    private static final String APP_ID = "app[id]";
-    private static final String APP_NAME = "app[name]";
-    private static final String DEVICE_DEVICE_TYPE = "device[devicetype]";
-    private static final String DEVICE_IFA = "device[ifa]";
-    private static final String DEVICE_MAKE = "device[make]";
-    private static final String DEVICE_MODEL = "device[model]";
-    private static final String UUID = "uuid";
-    private static final String VPI = "VPI";
+public class AdMacrosHelper {
+    private static final String APP_BUNDLE = "[app_bundle]";
+    private static final String APP_DOMAIN = "[app_domain]";
+    private static final String APP_ID = "[app_id]";
+    private static final String APP_NAME = "[app_name]";
+    private static final String DEVICE_TYPE = "[device_type]";
+    private static final String DEVICE_IFA = "[device_ifa]";
+    private static final String DEVICE_MAKE = "[device_make]";
+    private static final String DEVICE_MODEL = "[device_model]";
+    private static final String UUID = "[uuid]";
+    private static final String VPI = "[vpi]";
 
-    private static final String REPLACE_VALUE = "REPLACE_ME";
-
-    public static String addSpotXParameters(Context context, String tag) {
-        Map<String, String> spotXParameters = getSpotXParameters(context.getApplicationContext());
-        Map<String, String> queryParameters;
-        try {
-            queryParameters = getUrlQueryParameters(tag);
-        }
-        catch (MalformedURLException e) {
-            queryParameters = new HashMap<>();
-            e.printStackTrace();
-        }
-        final Uri uri = Uri.parse(tag);
-        final Uri.Builder resultUri = uri.buildUpon().clearQuery();
-        for (String paramName : queryParameters.keySet()) {
-            String value = queryParameters.get(paramName);
-            if ((value == null || value.equals(REPLACE_VALUE))
-                    && spotXParameters.containsKey(paramName)) {
-                value = Uri.encode(spotXParameters.get(paramName));
+    public static String updateAdTagParameters(Context context, String tag) {
+        Map<String, String> values = getValues(context.getApplicationContext());
+        String result = tag;
+        for (String key : values.keySet()) {
+            String value = values.get(key);
+            if (value != null) {
+                if (result.contains(key)) {
+                    result = result.replace(key, Uri.encode(value));
+                }
             }
-            resultUri.appendQueryParameter(paramName, value);
         }
-        return resultUri.build().toString();
+        return result;
     }
 
     /**
@@ -65,7 +53,7 @@ public class SpotXHelper {
      * @param context
      * @return
      */
-    private static Map<String, String> getSpotXParameters(Context context) {
+    private static Map<String, String> getValues(Context context) {
         Map<String, String> result = new HashMap<>();
         ApplicationInfo appInfo = context.getApplicationContext().getApplicationInfo();
         // App data
@@ -81,7 +69,7 @@ public class SpotXHelper {
         result.put(DEVICE_MODEL, Build.MODEL);
         // Default device type is '7' (set top box device)
         // TODO: What is the code for mobile?
-        result.put(DEVICE_DEVICE_TYPE, "7");
+        result.put(DEVICE_TYPE, "7");
         // Default VPI is 'MP4'
         result.put(VPI, "MP4");
         // UUID us the same as Advertising id
@@ -116,7 +104,7 @@ public class SpotXHelper {
 
     /**
      * Retrieve Advertising Id provided by Google Play Services and store it in app preferences
-     * Call this method before {@link #getSpotXParameters(Context)}
+     * Call this method before {@link #getValues(Context)}
      *
      * @param context
      */
