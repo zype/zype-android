@@ -26,6 +26,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             tools:text="Video description"
             />
+<!--
         <com.ns.developer.tagview.widget.TagCloudLinkView
             android:id="@+id/tag_cloud"
             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -36,5 +37,6 @@
             app:tagLayoutColor="?attr/colorAccent"
             app:tagTextColor="@android:color/white"
             app:tagTextSize="8sp"/>
+-->
     </LinearLayout>
 </ScrollView>

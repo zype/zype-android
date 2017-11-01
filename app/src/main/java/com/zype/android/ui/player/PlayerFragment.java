@@ -1054,6 +1054,7 @@ public class PlayerFragment extends BaseFragment implements
                     adsManager.destroy();
                     adsManager = null;
                 }
+                adsLoader.contentComplete();
                 break;
             default:
                 break;

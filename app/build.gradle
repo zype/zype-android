@@ -40,7 +40,7 @@ android {
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
 
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.2'
 
     dexOptions {
         jumboMode true
@@ -77,10 +77,11 @@ android {
     }
 
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
+        variant.outputs.all { output ->
             def outputNameNew = "Zype-Android" + "-" + variant.productFlavors.name + "-" + variant.buildType.name +
                     "-" + defaultConfig.versionName + "-" + getDate() + ".apk"
-            output.outputFile = new File(output.outputFile.parent, outputNameNew)
+//            outputFileName = new File(output.outputFile.parent, outputNameNew)
+            outputFileName = outputNameNew
         }
     }
 }
@@ -133,7 +134,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:10.2.1'
 
     // IMA SDK
-    compile 'com.google.ads.interactivemedia.v3:interactivemedia:3.5.2'
+    compile 'com.google.ads.interactivemedia.v3:interactivemedia:3.6.0'
     compile 'com.google.android.gms:play-services-ads:10.2.1'
 
     // In-app billing
