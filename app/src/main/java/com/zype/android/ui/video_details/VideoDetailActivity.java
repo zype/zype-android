@@ -197,7 +197,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
         if (err instanceof ForbiddenErrorEvent) {
             if (err.getEventData() == WebApiManager.Request.PLAYER_VIDEO) {
                 if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
-                    NavigationHelper.getInstance(this).switchToSubscriptionScreen();
+                    NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
                 }
                 else {
                     DialogHelper.showSubscriptionAlertIssue(this);

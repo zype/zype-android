@@ -228,7 +228,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     public void onRequestSubscription() {
         if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
-            NavigationHelper.getInstance(this).switchToSubscriptionScreen();
+            NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
         }
         else {
             DialogHelper.showSubscriptionAlertIssue(this);

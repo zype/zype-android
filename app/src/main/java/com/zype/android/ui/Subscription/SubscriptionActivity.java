@@ -117,28 +117,30 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     //
     private void getSubscriptions(List<Purchase> purchases) {
         // TODO: Use purchases to mark owned skus
-        billingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, getSkuList(), new SkuDetailsResponseListener() {
-            @Override
-            public void onSkuDetailsResponse(SkuDetails.SkuDetailsResult result) {
-                if (result.getResponseCode() != BillingClient.BillingResponse.OK) {
-                    // TODO: Handle error retrieving subscriptions list
-                }
-                else {
-                    if (result.getSkuDetailsList() != null) {
-                        List<SubscriptionItem> items = new ArrayList<>();
-                        for (SkuDetails sku : result.getSkuDetailsList()) {
-                            SubscriptionItem item = new SubscriptionItem();
-                            item.title = sku.getTitle();
-                            item.description = sku.getDescription();
-                            item.price = sku.getPriceAmountMicros() / 1000000;
-                            item.sku = sku.getSku();
-                            items.add(item);
+        billingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, SubscriptionsHelper.getSkuList(),
+                new SkuDetailsResponseListener() {
+                    @Override
+                    public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
+                        if (responseCode != BillingClient.BillingResponse.OK) {
+                            // TODO: Handle error retrieving subscriptions list
                         }
-                        adapter.setData(items);
+                        else {
+                            if (skuDetailsList != null) {
+                                List<SubscriptionItem> items = new ArrayList<>();
+                                for (SkuDetails sku : skuDetailsList) {
+                                    SubscriptionItem item = new SubscriptionItem();
+                                    item.title = sku.getTitle();
+                                    item.description = sku.getDescription();
+                                    item.price = sku.getPriceAmountMicros() / 1000000;
+                                    item.sku = sku.getSku();
+                                    items.add(item);
+                                }
+                                adapter.setData(items);
+                            }
+                        }
                     }
                 }
-            }
-        });
+        );
     }
 
     private void purchaseSubscription(SubscriptionItem item) {
@@ -150,6 +152,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     //
     @Override
     public void onBillingClientSetupFinished() {
+        Logger.d("onBillingClientSetupFinished(): ");
         getSubscriptions(null);
     }
 
@@ -227,12 +230,6 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
                 buttonContinue = (Button) view.findViewById(R.id.buttonContinue);
             }
         }
-    }
-
-    private List<String> getSkuList() {
-        List<String> result = new ArrayList<>();
-        result.add("com.zype.android.testsubscriptionmonthly");
-        return result;
     }
 
     // //////////

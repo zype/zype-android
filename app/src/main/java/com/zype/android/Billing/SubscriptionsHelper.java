@@ -1,9 +1,11 @@
 package com.zype.android.Billing;
 
 import com.android.billingclient.api.Purchase;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,14 +20,35 @@ public class SubscriptionsHelper {
      * @param purchases
      */
     public static void updateSubscriptionCount(List<Purchase> purchases) {
-        // TODO: Filter purchases on subscriptions only to set subscription count
         if (purchases != null && !purchases.isEmpty()) {
-            Logger.d("updateSubscriptionCount(): Native purchases count: " + purchases.size());
-            SettingsProvider.getInstance().saveSubscriptionCount(purchases.size());
+            int subscriptionCount = 0;
+            for (Purchase item : purchases) {
+                if (getSkuList().contains(item.getSku())) {
+                    subscriptionCount += 1;
+                }
+            }
+            Logger.d("updateSubscriptionCount(): Native purchases count: " + subscriptionCount);
+            SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
         }
         else {
             Logger.d("updateSubscriptionCount(): No native purchases");
             SettingsProvider.getInstance().saveSubscriptionCount(0);
+        }
+    }
+
+    public static List<String> getSkuList() {
+        List<String> result = new ArrayList<>();
+        result.add("com.zype.android.demo.monthly");
+        result.add("com.zype.android.demo.yearly");
+        return result;
+    }
+
+    public static boolean isUserSubscribed() {
+        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+            return (SettingsProvider.getInstance().getSubscriptionCount() > 0);
+        }
+        else {
+            return (SettingsProvider.getInstance().isLoggedIn() && SettingsProvider.getInstance().getSubscriptionCount() > 0);
         }
     }
 }

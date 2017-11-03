@@ -252,7 +252,7 @@ public class WebApiManager {
                 return new SearchEvent(ticket, new SearchResponse(mApi.getSearchVideo(getParams)));
             case PLAYER_VIDEO:
                 videoId = getParams.get(PlayerParamsBuilder.VIDEO_ID);
-                return new PlayerVideoEvent(ticket, new PlayerVideoResponse(mApi.getVideoPlayer(videoId, getParams)));
+                return new PlayerVideoEvent(ticket, new PlayerVideoResponse(mDownloadApi.getVideoPlayer(videoId, getParams)));
             case PLAYER_AUDIO:
                 videoId = getParams.get(PlayerParamsBuilder.VIDEO_ID);
                 return new PlayerAudioEvent(ticket, new PlayerAudioResponse(mApi.getAudioPlayer(videoId, getParams)));

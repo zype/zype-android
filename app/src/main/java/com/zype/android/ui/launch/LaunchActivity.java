@@ -59,7 +59,8 @@ public class LaunchActivity extends BaseActivity {
         if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
             if (SettingsProvider.getInstance().getBoolean(SettingsProvider.IS_FIRST_LAUNCH)) {
                 SettingsProvider.getInstance().setBoolean(SettingsProvider.IS_FIRST_LAUNCH, false);
-                switchToIntroScreen();
+//                switchToIntroScreen();
+                switchToMainScreen();
             }
             else {
                 switchToMainScreen();

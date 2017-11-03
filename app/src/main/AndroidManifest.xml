@@ -22,9 +22,6 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
 
-    <!-- Google in-app billing -->
-    <uses-permission android:name="com.android.vending.BILLING" />
-
     <!-- Google Analytics required permissions -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -33,7 +30,7 @@
 
     <!-- TODO: Update this permission name prefix with your 'applicationId' -->
     <permission
-        android:name="com.zype.android.permission.C2D_MESSAGE"
+        android:name="com.zype.android.template.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.zype.android.permission.C2D_MESSAGE" />

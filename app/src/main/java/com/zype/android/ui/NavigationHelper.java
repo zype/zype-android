@@ -39,35 +39,41 @@ public class NavigationHelper {
     }
 
     public void checkSubscription(Activity activity, String videoId, boolean onAir) {
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            boolean liveStreamLimitExceeded = false;
-            if (onAir) {
-                // Check total played live stream time
-                Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
-                int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
-                if (liveStreamTime >= SettingsProvider.getInstance().getLiveStreamLimit()
-                        && SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                    liveStreamLimitExceeded = true;
-                }
-            }
-            if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || liveStreamLimitExceeded) {
-                if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
-                    switchToSubscriptionScreen();
-                }
-                else {
-                    DialogHelper.showSubscriptionAlertIssue(context);
-                }
+        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+            if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+                switchToSubscriptionScreen(activity);
             }
             else {
                 VideoDetailActivity.startActivity(activity, videoId);
             }
         }
         else {
-            if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
-                switchToIntroScreen();
-            }
-            else {
-                switchToLoginScreen(activity);
+            if (SettingsProvider.getInstance().isLoggedIn()) {
+                boolean liveStreamLimitExceeded = false;
+                if (onAir) {
+                    // Check total played live stream time
+                    Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
+                    int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
+                    if (liveStreamTime >= SettingsProvider.getInstance().getLiveStreamLimit()
+                            && SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+                        liveStreamLimitExceeded = true;
+                    }
+                }
+                if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || liveStreamLimitExceeded) {
+                    if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+                        switchToSubscriptionScreen(activity);
+                    } else {
+                        DialogHelper.showSubscriptionAlertIssue(context);
+                    }
+                } else {
+                    VideoDetailActivity.startActivity(activity, videoId);
+                }
+            } else {
+                if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+                    switchToIntroScreen(activity);
+                } else {
+                    switchToLoginScreen(activity);
+                }
             }
         }
     }
@@ -77,14 +83,14 @@ public class NavigationHelper {
         activity.startActivityForResult(intent, BundleConstants.REQ_LOGIN);
     }
 
-    public void switchToIntroScreen() {
-        Intent intent = new Intent(context, IntroActivity.class);
-        context.startActivity(intent);
+    public void switchToIntroScreen(Activity activity) {
+        Intent intent = new Intent(activity, IntroActivity.class);
+        activity.startActivity(intent);
     }
 
-    public void switchToSubscriptionScreen() {
-        Intent intent = new Intent(context, SubscriptionActivity.class);
-        context.startActivity(intent);
+    public void switchToSubscriptionScreen(Activity activity) {
+        Intent intent = new Intent(activity, SubscriptionActivity.class);
+        activity.startActivity(intent);
     }
 
 }

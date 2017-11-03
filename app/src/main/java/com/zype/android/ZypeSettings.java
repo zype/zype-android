@@ -37,10 +37,10 @@ public class ZypeSettings {
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
     public static final boolean DOWNLOADS_ENABLED = true;
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
-    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
+    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = true;
     public static final boolean SHARE_VIDEO_ENABLED = false;
     public static final boolean THEME_LIGHT = true;
-    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = true;
+    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
 
     public static boolean isDownloadsEnabled() {
         return SettingsProvider.getInstance().getBoolean(SettingsProvider.DOWNLOADS_ENABLED);

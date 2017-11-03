@@ -1,6 +1,7 @@
 package com.zype.android.Billing;
 
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 
 import com.android.billingclient.api.BillingClient;
@@ -12,6 +13,7 @@ import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 
 import java.util.ArrayList;
@@ -48,7 +50,7 @@ public class BillingManager implements PurchasesUpdatedListener {
 
         mActivity = activity;
         mBillingUpdatesListener = updatesListener;
-        mBillingClient = new BillingClient.Builder(mActivity).setListener(this).build();
+        mBillingClient = BillingClient.newBuilder(mActivity).setListener(this).build();
 
         Log.d(TAG, "Starting setup.");
         // Start setup. This is asynchronous and the specified listener will be called
@@ -178,13 +180,14 @@ public class BillingManager implements PurchasesUpdatedListener {
             @Override
             public void run() {
                 // Query the purchase async
-                mBillingClient.querySkuDetailsAsync(itemType, skuList,
-                        new SkuDetailsResponseListener() {
-                            @Override
-                            public void onSkuDetailsResponse(SkuDetails.SkuDetailsResult result) {
-                                listener.onSkuDetailsResponse(result);
-                            }
-                        });
+                SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+                params.setSkusList(skuList).setType(itemType);
+                mBillingClient.querySkuDetailsAsync(params.build(), new SkuDetailsResponseListener() {
+                        @Override
+                        public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
+                            listener.onSkuDetailsResponse(responseCode, skuDetailsList);
+                        }
+                    });
             }
         };
 
@@ -207,7 +210,7 @@ public class BillingManager implements PurchasesUpdatedListener {
             @Override
             public void run() {
                 Log.d(TAG, "Launching in-app purchase flow. Replace old SKU? " + (oldSkus != null));
-                BillingFlowParams purchaseParams = new BillingFlowParams.Builder()
+                BillingFlowParams purchaseParams = BillingFlowParams.newBuilder()
                         .setSku(skuId).setType(billingType)
                         .setOldSkus(oldSkus)
                         .build();

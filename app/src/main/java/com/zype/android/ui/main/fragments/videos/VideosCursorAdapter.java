@@ -5,6 +5,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeSettings;
@@ -204,7 +205,7 @@ public class VideosCursorAdapter extends CursorAdapter {
             loadImage(context, cursor, viewHolder);
         }
         if (viewHolder.subscriptionRequired) {
-            if (SettingsProvider.getInstance().isLoggedIn() && SettingsProvider.getInstance().getSubscriptionCount() > 0) {
+            if (SubscriptionsHelper.isUserSubscribed()) {
                 viewHolder.imageLocked.setVisibility(GONE);
                 viewHolder.imageUnlocked.setVisibility(View.VISIBLE);
             }
