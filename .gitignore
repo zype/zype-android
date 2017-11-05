@@ -33,12 +33,13 @@ proguard/
 ### Gradle ###
 .gradle
 build/
+release/
 
 ### Intellij ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode
 
 ## Directory-based project format
-# .idea/
+.idea/
 # if you remove the above rule, at least ignore user-specific stuff:
 .idea/libraries
 .idea/workspace.xml
@@ -76,4 +77,8 @@ out/
 *.DS_Store
 
 # Keystore
-*.jsk
+*.jks
+
+#Other
+thumbs.db
+*.log
