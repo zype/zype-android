@@ -42,14 +42,20 @@ public class LoginActivity extends BaseActivity {
 
     //    public static final String EXTRA_AUTH_ERROR = "extra_auth_error";
 //    public static final String EXTRA_LOGOUT = "logout";
+    public final static String PARAMETERS_FORCE_LOGIN = "ForceLogin";
+
     private View mProgressView;
     private View mLoginFormView;
     private TextInputLayout emailWrapper;
     private TextInputLayout passwordWrapper;
 
+    private boolean forceLogin = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        initParameters(savedInstanceState);
 
         setContentView(R.layout.activity_login);
 
@@ -78,6 +84,25 @@ public class LoginActivity extends BaseActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        if (forceLogin) {
+            emailWrapper.getEditText().setText(SettingsProvider.getInstance().getString(SettingsProvider.CONSUMER_EMAIL));
+            passwordWrapper.getEditText().setText(SettingsProvider.getInstance().getString(SettingsProvider.CONSUMER_PASSWORD));
+            attemptLogin();
+        }
+    }
+
+    private void initParameters(Bundle savedInstanceState) {
+        Bundle args;
+        if (savedInstanceState != null) {
+            args = savedInstanceState;
+        }
+        else {
+            args = getIntent().getExtras();
+        }
+        if (args != null) {
+            forceLogin = args.getBoolean(PARAMETERS_FORCE_LOGIN);
+        }
     }
 
     public void attemptLogin() {
@@ -178,6 +203,7 @@ public class LoginActivity extends BaseActivity {
         SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
         String consumerId = data.getConsumerData().getId();
         SettingsProvider.getInstance().saveConsumerId(consumerId);
+        SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, data.getConsumerData().getEmail());
         showProgress(false);
         setResult(RESULT_OK);
         finish();

@@ -6,6 +6,7 @@ package com.zype.android.utils;
  *          date 6/25/15
  */
 public class BundleConstants {
+    public static final int REQUEST_CONSUMER = 1100;
     public static final int REQ_LOGIN = 6734;
 
     public static final String VIDEO_ID = "VIDEO_ID";

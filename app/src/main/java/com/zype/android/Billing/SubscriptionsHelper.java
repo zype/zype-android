@@ -4,6 +4,9 @@ import com.android.billingclient.api.Purchase;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
+import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.builder.BifrostParamsBuilder;
+import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,18 @@ public class SubscriptionsHelper {
         else {
             Logger.d("updateSubscriptionCount(): No native purchases");
             SettingsProvider.getInstance().saveSubscriptionCount(0);
+        }
+    }
+
+    public static void validateSubscription(List<Purchase> purchases, String subscriptionSku, WebApiManager apiManager) {
+        for (Purchase item : purchases) {
+            if (item.getSku().equals(subscriptionSku)) {
+                BifrostParamsBuilder builder = new BifrostParamsBuilder()
+                        .addPackageName(item.getPackageName())
+                        .addSubscriptionId(item.getSku())
+                        .addPurchaseToken(item.getPurchaseToken());
+                apiManager.executeRequest(WebApiManager.Request.BIFROST, builder.build());
+            }
         }
     }
 

@@ -3,13 +3,13 @@ package com.zype.android.ui.Subscription;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.billingclient.api.BillingClient;
@@ -20,17 +20,19 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
-import com.zype.android.ui.Consumer.Model.Consumer;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.Subscription.Model.SubscriptionItem;
 import com.zype.android.ui.base.BaseActivity;
-import com.zype.android.ui.main.MainActivity;
+import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.Logger;
-import com.zype.android.utils.UiUtils;
-import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.builder.ConsumerCreateParamsBuilder;
-import com.zype.android.webapi.events.ErrorEvent;
+import com.zype.android.webapi.events.bifrost.BifrostEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
+import com.zype.android.webapi.model.bifrost.Bifrost;
+import com.zype.android.webapi.model.bifrost.BifrostData;
+import com.zype.android.webapi.model.consumers.Consumer;
+import com.zype.android.webapi.model.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +44,15 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     private static final String TAG = SubscriptionActivity.class.getSimpleName();
 
     private RecyclerView listSubscriptions;
+    private FrameLayout layoutLogin;
+    private Button buttonLogin;
+    private LinearLayout layoutLoggedIn;
+    private TextView textUsername;
 
     private ProgressDialog dialogProgress;
 
     private SubscriptionsAdapter adapter;
+    private SubscriptionItem selectedSubscription = null;
 
     // In-app billing
     private BillingManager billingManager;
@@ -64,9 +71,20 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         adapter = new SubscriptionsAdapter();
         listSubscriptions.setAdapter(adapter);
 
+        layoutLogin = (FrameLayout) findViewById(R.id.layoutLogin);
+        buttonLogin = (Button) findViewById(R.id.buttonLogin);
+        buttonLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavigationHelper.getInstance(SubscriptionActivity.this).switchToLoginScreen(SubscriptionActivity.this);
+            }
+        });
+        layoutLoggedIn = (LinearLayout) findViewById(R.id.layoutLoggedIn);
+        textUsername = (TextView) findViewById(R.id.textUsername);
+
         billingManager = new BillingManager(this, this);
         hideProgress();
-        bindViews();
+        updateViews();
     }
 
     @Override
@@ -95,8 +113,31 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
 
     // //////////
     // UI
-    //
+    // 
+    private void updateViews() {
+        if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+            layoutLogin.setVisibility(View.VISIBLE);
+            if (SettingsProvider.getInstance().isLoggedIn()) {
+                buttonLogin.setVisibility(View.GONE);
+                layoutLoggedIn.setVisibility(View.VISIBLE);
+            }
+            else {
+                buttonLogin.setVisibility(View.VISIBLE);
+                layoutLoggedIn.setVisibility(View.GONE);
+            }
+        }
+        else {
+            layoutLogin.setVisibility(View.GONE);
+        }
+        bindViews();
+    }
+
     private void bindViews() {
+        if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+            if (SettingsProvider.getInstance().isLoggedIn()) {
+                textUsername.setText(SettingsProvider.getInstance().getString(SettingsProvider.CONSUMER_EMAIL));
+            }
+        }
     }
 
     private void showProgress() {
@@ -110,6 +151,38 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
 //        if (dialogProgress != null) {
 //            dialogProgress.dismiss();
 //        }
+    }
+
+    // //////////
+    // Actions
+    //
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case BundleConstants.REQUEST_CONSUMER:
+                if (resultCode == RESULT_OK) {
+                    if (selectedSubscription != null) {
+                        purchaseSubscription(selectedSubscription);
+                    }
+                    else {
+                        updateViews();
+                    }
+                }
+                break;
+            case BundleConstants.REQ_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    if (SettingsProvider.getInstance().getSubscriptionCount() > 0) {
+                        setResult(RESULT_OK);
+                        finish();
+                    }
+                    else {
+                        updateViews();
+                    }
+                }
+                break;
+        }
     }
 
     // //////////
@@ -162,8 +235,21 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
-        SubscriptionsHelper.updateSubscriptionCount(purchases);
-        if (purchases != null && !purchases.isEmpty()) {
+        boolean result = false;
+        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+            if (purchases != null && !purchases.isEmpty()) {
+                result = true;
+            }
+            SubscriptionsHelper.updateSubscriptionCount(purchases);
+        }
+        else if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+            if (purchases != null && !purchases.isEmpty()) {
+                if (selectedSubscription != null) {
+                    SubscriptionsHelper.validateSubscription(purchases, selectedSubscription.sku, getApi());
+                }
+            }
+        }
+        if (result) {
             setResult(RESULT_OK);
             finish();
         }
@@ -203,7 +289,15 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    purchaseSubscription(holder.item);
+                    selectedSubscription = holder.item;
+                    if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+                        // Create consumer before making purchase in case user is not logged in
+                        if (!SettingsProvider.getInstance().isLoggedIn()) {
+                            NavigationHelper.getInstance(SubscriptionActivity.this).switchToConsumerScreen(SubscriptionActivity.this);
+                            return;
+                        }
+                    }
+                    purchaseSubscription(selectedSubscription);
                 }
             });
         }
@@ -235,4 +329,18 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     // //////////
     // Event bus listeners
     //
+    @Subscribe
+    public void handleBifrost(BifrostEvent event) {
+        BifrostData data = event.getEventData().getModelData().data;
+        if (data.success) {
+            if (data.isValid) {
+                hideProgress();
+                setResult(RESULT_OK);
+                finish();
+            }
+            else {
+                // TODO: Show subscription not valid message
+            }
+        }
+    }
 }

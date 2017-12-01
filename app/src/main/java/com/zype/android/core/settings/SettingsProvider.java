@@ -78,6 +78,10 @@ public class SettingsProvider extends CommonPreferences {
     public static String PREF_ALL_DOWNLOADS_SIZE = "PREF_ALL_DOWNLOADS_SIZE";
     private long ONE_GIGABYTE = 1 * 1024 * 1024 * 1024;
 
+    // Consumer
+    public static final String CONSUMER_EMAIL = "ConsumerEmail";
+    public static final String CONSUMER_PASSWORD = "ConsumerPassword";
+
     // Live stream
     private static final String LIVE_STREAM_LIMIT = "LiveStreamLimit";
     private static final String LIVE_STREAM_MESSAGE = "LiveStreamMessage";

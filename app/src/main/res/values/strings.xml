@@ -101,8 +101,10 @@
     <string name="settings_instagram">%1$s on Instagram</string>
 
     <!-- Subscription -->
-    <string name="subscription_title">Select Plan</string>
+    <string name="subscription_button_login">Sign in</string>
     <string name="subscription_item_button_continue">Continue with %1$s</string>
+    <string name="subscription_logged_in">Signed in as: </string>
+    <string name="subscription_title">Select Plan</string>
 
     <!-- Videos -->
     <string name="videos_loading">Gathering videos for you…</string>

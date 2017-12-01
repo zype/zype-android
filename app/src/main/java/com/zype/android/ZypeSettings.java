@@ -37,10 +37,20 @@ public class ZypeSettings {
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
     public static final boolean DOWNLOADS_ENABLED = true;
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
-    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = true;
+    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
+    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = true;
     public static final boolean SHARE_VIDEO_ENABLED = false;
     public static final boolean THEME_LIGHT = true;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
+
+    /**
+     * Google client id and secret are required for native to universal subscription feature.
+     * They are used in request to Zype Bifrost service for verifying subscription.
+     */
+    public static final String GOOGLE_CLIENT_ID = "818854525960-e4mm2df9tfaqtg2o0li62u0rd80tt5mj.apps.googleusercontent.com";
+    public static final String GOOGLE_CLIENT_SECRET = "OfBs7XR_B_DYR1YRcO-ehVPU";
+    public static final String GOOGLE_REDIRECT_URL = "urn:ietf:wg:oauth:2.0:oob";
+
 
     public static boolean isDownloadsEnabled() {
         return SettingsProvider.getInstance().getBoolean(SettingsProvider.DOWNLOADS_ENABLED);

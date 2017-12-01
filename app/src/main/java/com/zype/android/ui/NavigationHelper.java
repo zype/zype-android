@@ -3,9 +3,11 @@ package com.zype.android.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.Consumer.ConsumerActivity;
 import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.video_details.VideoDetailActivity;
@@ -44,42 +46,72 @@ public class NavigationHelper {
                 switchToSubscriptionScreen(activity);
             }
             else {
-                VideoDetailActivity.startActivity(activity, videoId);
+                switchToVideoDetailScreen(activity, videoId);
+            }
+        }
+        else if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+            if (SettingsProvider.getInstance().isLoggedIn()) {
+                if (SettingsProvider.getInstance().getSubscriptionCount() > 0
+                        || !isLiveStreamLimitExceeded(onAir)) {
+                    switchToVideoDetailScreen(activity, videoId);
+                }
+                else {
+                    switchToSubscriptionScreen(activity);
+                }
+            }
+            else {
+                switchToSubscriptionScreen(activity);
             }
         }
         else {
             if (SettingsProvider.getInstance().isLoggedIn()) {
-                boolean liveStreamLimitExceeded = false;
-                if (onAir) {
-                    // Check total played live stream time
-                    Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
-                    int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
-                    if (liveStreamTime >= SettingsProvider.getInstance().getLiveStreamLimit()
-                            && SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                        liveStreamLimitExceeded = true;
-                    }
+                if (SettingsProvider.getInstance().getSubscriptionCount() > 0
+                        || !isLiveStreamLimitExceeded(onAir)) {
+                    switchToVideoDetailScreen(activity, videoId);
                 }
-                if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || liveStreamLimitExceeded) {
-                    if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
-                        switchToSubscriptionScreen(activity);
-                    } else {
-                        DialogHelper.showSubscriptionAlertIssue(context);
-                    }
-                } else {
-                    VideoDetailActivity.startActivity(activity, videoId);
+                else {
+                    DialogHelper.showSubscriptionAlertIssue(context);
                 }
-            } else {
-                if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
-                    switchToIntroScreen(activity);
-                } else {
-                    switchToLoginScreen(activity);
-                }
+            }
+            else {
+                switchToLoginScreen(activity);
             }
         }
     }
 
+    private boolean isLiveStreamLimitExceeded(boolean onAir) {
+        boolean result = false;
+        if (onAir) {
+            int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
+
+            Logger.d("isLiveStreamLimitExceeded(): liveStreamLimit=" + liveStreamTime);
+
+            if (liveStreamTime >= SettingsProvider.getInstance().getLiveStreamLimit()
+                    && SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+                result = true;
+            }
+        }
+        else {
+            // For non live stream limit checking doesn't make sense, so just return true;
+            result = true;
+        }
+        return result;
+    }
+
+    public void switchToConsumerScreen(Activity activity) {
+        Intent intent = new Intent(activity, ConsumerActivity.class);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_CONSUMER);
+    }
+
     public void switchToLoginScreen(Activity activity) {
+        switchToLoginScreen(activity, null);
+    }
+
+    public void switchToLoginScreen(Activity activity, Bundle extras) {
         Intent intent = new Intent(context, LoginActivity.class);
+        if (extras != null) {
+            intent.putExtras(extras);
+        }
         activity.startActivityForResult(intent, BundleConstants.REQ_LOGIN);
     }
 
@@ -91,6 +123,10 @@ public class NavigationHelper {
     public void switchToSubscriptionScreen(Activity activity) {
         Intent intent = new Intent(activity, SubscriptionActivity.class);
         activity.startActivity(intent);
+    }
+
+    public void switchToVideoDetailScreen(Activity activity, String videoId) {
+        VideoDetailActivity.startActivity(activity, videoId);
     }
 
 }
