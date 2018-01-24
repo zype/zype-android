@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<!--
     <color name="accent">#0AABF5</color>
+-->
     <color name="primary">#F5F5F5</color>
     <color name="primaryDark">#E0E0E0</color>
     <color name="background">#FAFAFA</color>
@@ -19,7 +21,9 @@
     <color name="colorPrimaryWhite">#FFFFFF</color>
     <color name="windowBackground">@color/colorPrimaryWhite</color>
     <color name="orange_text_color">#eaa824</color>
+<!--
     <color name="blue_text_color">#0AABF5</color>
+-->
     <color name="textColorPrimary">@color/colorPrimaryDark</color>
     <color name="video_background">#000000</color>
 
