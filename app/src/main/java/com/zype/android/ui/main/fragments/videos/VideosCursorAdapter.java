@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
@@ -111,7 +112,8 @@ public class VideosCursorAdapter extends CursorAdapter {
         List<VideosMenuItem> list = new ArrayList<>();
 
         int currentProgress = DownloaderService.currentProgress(viewHolder.videoId);
-        if (SettingsProvider.getInstance().isLoggedIn() || !ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+        if (SettingsProvider.getInstance().isLoggedIn()
+                || !ZypeConfiguration.isUniversalSubscriptionEnabled(mActivity)) {
             if (viewHolder.isFavorite) {
                 list.add(new VideosMenuItem(ITEM_UNFAVORITE, R.string.menu_unfavorite));
             }
@@ -205,7 +207,7 @@ public class VideosCursorAdapter extends CursorAdapter {
             loadImage(context, cursor, viewHolder);
         }
         if (viewHolder.subscriptionRequired) {
-            if (SubscriptionsHelper.isUserSubscribed()) {
+            if (SubscriptionsHelper.isUserSubscribed(mActivity)) {
                 viewHolder.imageLocked.setVisibility(GONE);
                 viewHolder.imageUnlocked.setVisibility(View.VISIBLE);
             }

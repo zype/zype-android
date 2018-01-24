@@ -6,6 +6,7 @@ import android.os.Handler;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Intro.IntroActivity;
@@ -56,7 +57,7 @@ public class LaunchActivity extends BaseActivity {
         Logger.d("jump()");
         mJumpRunnable = null;
         mHandler = null;
-        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             if (SettingsProvider.getInstance().getBoolean(SettingsProvider.IS_FIRST_LAUNCH)) {
                 SettingsProvider.getInstance().setBoolean(SettingsProvider.IS_FIRST_LAUNCH, false);
 //                switchToIntroScreen();

@@ -6,6 +6,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
@@ -193,7 +194,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
 
         requestSearchResult(1, searchString);
 
-        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             new BillingManager(this, this);
         }
     }
@@ -384,7 +385,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
 
     @Override
     public void onFavoriteVideo(String videoId) {
-        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isUniversalSubscriptionEnabled(this)) {
             if (SettingsProvider.getInstance().isLoggedIn()) {
                 FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
                         .addVideoId(videoId)
@@ -401,7 +402,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
 
     @Override
     public void onUnFavoriteVideo(String videoId) {
-        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isUniversalSubscriptionEnabled(this)) {
             if (SettingsProvider.getInstance().isLoggedIn()) {
                 FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
                         .addPathFavoriteId(DataHelper.getFavoriteId(getContentResolver(), videoId))

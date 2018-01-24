@@ -2,6 +2,7 @@ package com.zype.android.ui.video_details;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.provider.DataHelper;
@@ -196,7 +197,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
         Logger.e("handleError");
         if (err instanceof ForbiddenErrorEvent) {
             if (err.getEventData() == WebApiManager.Request.PLAYER_VIDEO) {
-                if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+                if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
                     NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
                 }
                 else {

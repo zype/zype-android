@@ -1,6 +1,9 @@
 package com.zype.android.Billing;
 
+import android.content.Context;
+
 import com.android.billingclient.api.Purchase;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
@@ -43,8 +46,8 @@ public class SubscriptionsHelper {
         return result;
     }
 
-    public static boolean isUserSubscribed() {
-        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+    public static boolean isUserSubscribed(Context context) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(context)) {
             return (SettingsProvider.getInstance().getSubscriptionCount() > 0);
         }
         else {

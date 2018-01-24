@@ -14,6 +14,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.OnLoginAction;
@@ -88,7 +89,7 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
         }
         else {
             mSigninButton.setText(R.string.action_sign_in);
-            if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+            if (ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())) {
                 mSigninButton.setVisibility(View.VISIBLE);
                 mSigninButton.setOnClickListener(new View.OnClickListener() {
                     @Override

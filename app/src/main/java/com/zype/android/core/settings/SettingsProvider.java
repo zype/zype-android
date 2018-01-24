@@ -117,7 +117,7 @@ public class SettingsProvider extends CommonPreferences {
     private static void initDefaultValues() {
         defaultValues.put(DOWNLOADS_ENABLED, ZypeSettings.DOWNLOADS_ENABLED);
         defaultValues.put(DOWNLOADS_ENABLED_FOR_GUESTS, ZypeSettings.DOWNLOADS_ENABLED_FOR_GUESTS);
-        defaultValues.put(THEME_LIGHT, ZypeSettings.THEME_LIGHT);
+//        defaultValues.put(THEME_LIGHT, ZypeSettings.THEME_LIGHT);
 
         defaultValues.put(IS_FIRST_LAUNCH, true);
     }
