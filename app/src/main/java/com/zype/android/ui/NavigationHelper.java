@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Intro.IntroActivity;
@@ -39,7 +40,7 @@ public class NavigationHelper {
     }
 
     public void checkSubscription(Activity activity, String videoId, boolean onAir) {
-        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
                 switchToSubscriptionScreen(activity);
             }
@@ -60,7 +61,7 @@ public class NavigationHelper {
                     }
                 }
                 if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || liveStreamLimitExceeded) {
-                    if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+                    if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
                         switchToSubscriptionScreen(activity);
                     } else {
                         DialogHelper.showSubscriptionAlertIssue(context);
@@ -69,7 +70,7 @@ public class NavigationHelper {
                     VideoDetailActivity.startActivity(activity, videoId);
                 }
             } else {
-                if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+                if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
                     switchToIntroScreen(activity);
                 } else {
                     switchToLoginScreen(activity);

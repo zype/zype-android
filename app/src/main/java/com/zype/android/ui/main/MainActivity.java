@@ -13,6 +13,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -76,7 +77,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
         SettingsParamsBuilder settingsParamsBuilder = new SettingsParamsBuilder();
         getApi().executeRequest(WebApiManager.Request.GET_SETTINGS, settingsParamsBuilder.build());
 
-        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             new BillingManager(this, this);
         }
     }
@@ -122,7 +123,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
     @Override
     public void onFavoriteVideoClick(String videoId, boolean isFavorite) {
-        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isUniversalSubscriptionEnabled(this)) {
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
                 onRequestSubscription();
             }
@@ -146,7 +147,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
     @Override
     public void onFavoriteVideo(String videoId) {
-        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isUniversalSubscriptionEnabled(this)) {
             if (SettingsProvider.getInstance().isLoggedIn()) {
                 FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
                         .addVideoId(videoId)
@@ -163,7 +164,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
     @Override
     public void onUnFavoriteVideo(String videoId) {
-        if (ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isUniversalSubscriptionEnabled(this)) {
             if (SettingsProvider.getInstance().isLoggedIn()) {
                 FavoriteParamsBuilder builder = new FavoriteParamsBuilder()
                         .addPathFavoriteId(DataHelper.getFavoriteId(getContentResolver(), videoId))
@@ -227,7 +228,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
     @Override
     public void onRequestSubscription() {
-        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
         }
         else {

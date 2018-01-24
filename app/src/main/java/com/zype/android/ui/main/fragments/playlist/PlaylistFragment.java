@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
@@ -66,7 +67,7 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
     private TextView mTvEmpty;
     private LoaderManager mLoader;
     private ArrayList<PlaylistData> mPlaylistList;
-    private String parentId = ZypeSettings.ROOT_PLAYLIST_ID;
+    private String parentId;
 
     public PlaylistFragment() {
         // Required empty public constructor
@@ -81,6 +82,7 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logger.d("onCreate");
+        parentId = ZypeConfiguration.getRootPlaylistId(getActivity());
     }
 
     @Override
