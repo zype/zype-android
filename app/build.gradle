@@ -146,4 +146,5 @@ dependencies {
     implementation 'com.android.billingclient:billing:1.0'
 }
 
-apply plugin: 'com.google.gms.google-services'
+// TODO: Uncomment to use In-app Purchases
+//apply plugin: 'com.google.gms.google-services'
