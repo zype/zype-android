@@ -8,6 +8,15 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class AppData {
+    @Expose
+    public String backgroundPlayback;
+
+    @Expose
+    public String downloads;
+
+    @Expose
+    public String downloadsForGuests;
+
     @SerializedName("_id")
     @Expose
     public String Id;

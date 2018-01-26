@@ -12,6 +12,9 @@ import com.zype.android.webapi.model.app.AppData;
  */
 
 public class ZypeConfiguration {
+    private static final String PREFERENCE_BACKGROUND_PLAYBACK = "ZypeBackgroundPlayback";
+    private static final String PREFERENCE_DOWNLOADS = "ZypeDownloads";
+    private static final String PREFERENCE_DOWNLOADS_FOR_GUESTS = "ZypeDownloadsForGuests";
     private static final String PREFERENCE_NATIVE_SUBSCRIPTION = "ZypeNativeSubscription";
     private static final String PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION = "ZypeNativeToUniversalSubscription";
     private static final String PREFERENCE_ROOT_PLAYLIST_ID = "ZypeRootPlaylistId";
@@ -53,12 +56,26 @@ public class ZypeConfiguration {
         if (!TextUtils.isEmpty(appData.universalTVOD)) {
             editor.putBoolean(PREFERENCE_UNIVERSAL_TVOD, Boolean.valueOf(appData.universalTVOD));
         }
+        // Features
+        if (!TextUtils.isEmpty(appData.backgroundPlayback)) {
+            editor.putBoolean(PREFERENCE_BACKGROUND_PLAYBACK, Boolean.valueOf(appData.backgroundPlayback));
+        }
+        if (!TextUtils.isEmpty(appData.downloads)) {
+            editor.putBoolean(PREFERENCE_DOWNLOADS, Boolean.valueOf(appData.downloads));
+        }
+        if (!TextUtils.isEmpty(appData.downloadsForGuests)) {
+            editor.putBoolean(PREFERENCE_DOWNLOADS_FOR_GUESTS, Boolean.valueOf(appData.downloadsForGuests));
+        }
+
         editor.apply();
     }
 
     public static void clear(Context context) {
         SharedPreferences prefs = getPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(PREFERENCE_BACKGROUND_PLAYBACK);
+        editor.remove(PREFERENCE_DOWNLOADS);
+        editor.remove(PREFERENCE_DOWNLOADS_FOR_GUESTS);
         editor.remove(PREFERENCE_NATIVE_SUBSCRIPTION);
         editor.remove(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION);
         editor.remove(PREFERENCE_ROOT_PLAYLIST_ID);
@@ -89,10 +106,16 @@ public class ZypeConfiguration {
         }
     }
 
+    public static String getTheme(Context context) {
+        return getStringPreference(PREFERENCE_THEME, ZypeSettings.THEME, context);
+    }
+
     public static String getRootPlaylistId(Context context) {
         return getStringPreference(PREFERENCE_ROOT_PLAYLIST_ID, ZypeSettings.ROOT_PLAYLIST_ID, context);
     }
 
+    // Monetization
+    //
     public static boolean isNativeSubscriptionEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_NATIVE_SUBSCRIPTION, ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED, context);
     }
@@ -105,10 +128,6 @@ public class ZypeConfiguration {
         return getBooleanPreference(PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE, ZypeSettings.SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED, context);
     }
 
-    public static String getTheme(Context context) {
-        return getStringPreference(PREFERENCE_THEME, ZypeSettings.THEME, context);
-    }
-
     public static boolean isUniversalSubscriptionEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_UNIVERSAL_SUBSCRIPTION, ZypeSettings.UNIVERSAL_SUBSCRIPTION_ENABLED, context);
     }
@@ -116,4 +135,19 @@ public class ZypeConfiguration {
     public static boolean isUniversalTVODEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_UNIVERSAL_TVOD, ZypeSettings.UNIVERSAL_TVOD, context);
     }
+
+    // Features
+    //
+    public static boolean isBackgroundPlaybackEnabled(Context context) {
+        return getBooleanPreference(PREFERENCE_BACKGROUND_PLAYBACK, ZypeSettings.BACKGROUND_PLAYBACK_ENABLED, context);
+    }
+
+    public static boolean isDownloadsEnabled(Context context) {
+        return getBooleanPreference(PREFERENCE_DOWNLOADS, ZypeSettings.DOWNLOADS_ENABLED, context);
+    }
+
+    public static boolean isDownloadsForGuestsEnabled(Context context) {
+        return getBooleanPreference(PREFERENCE_DOWNLOADS_FOR_GUESTS, ZypeSettings.DOWNLOADS_ENABLED_FOR_GUESTS, context);
+    }
+
 }

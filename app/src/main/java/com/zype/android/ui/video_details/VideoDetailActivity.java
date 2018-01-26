@@ -125,8 +125,8 @@ public class VideoDetailActivity extends BaseVideoActivity {
     private void updateDownloadUrls() {
         VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
         if (!videoData.isOnAir()) {
-            if (ZypeSettings.isDownloadsEnabled()
-                    && (ZypeSettings.isDownloadsEnabledForGuests() || SettingsProvider.getInstance().isLoggedIn())) {
+            if (ZypeConfiguration.isDownloadsEnabled(this)
+                    && (ZypeConfiguration.isDownloadsForGuestsEnabled(this) || SettingsProvider.getInstance().isLoggedIn())) {
                 getDownloadUrls(mVideoId);
             }
         }

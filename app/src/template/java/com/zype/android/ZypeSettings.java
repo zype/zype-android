@@ -6,8 +6,6 @@ import com.zype.android.core.settings.SettingsProvider;
  * Created by Evgeny Cherkasov on 18.03.2017.
  */
 
-// TODO: Provide valid app settings
-//
 public class ZypeSettings {
     // Zype app key
     public static final String APP_KEY = "<APP_KEY>";
@@ -39,31 +37,14 @@ public class ZypeSettings {
     public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("<UNIVERSAL_TVOD>");
 
     // Features
-    /*
-     *'Background playback', 'Downloads', 'Downloads for guests' and "Share video' options
-     * are not currently supported by the app builder. Update these flags if needed.
-     */
-    public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
-//    public static final boolean BACKGROUND_PLAYBACK_ENABLED = Boolean.valueOf("<BACKGROUND_PLAYBACK_ENABLED>");
-    public static final boolean DOWNLOADS_ENABLED = false;
-//    public static final boolean DOWNLOADS_ENABLED = Boolean.valueOf("<DOWNLOADS_ENABLED>");
-    public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = false;
-//    public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = Boolean.valueOf("<DOWNLOADS_ENABLED_FOR_GUESTS>");
+    public static final boolean BACKGROUND_PLAYBACK_ENABLED = Boolean.valueOf("<BACKGROUND_PLAYBACK_ENABLED>");
+    public static final boolean DOWNLOADS_ENABLED = Boolean.valueOf("<DOWNLOADS_ENABLED>");
+    public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = Boolean.valueOf("<DOWNLOADS_ENABLED_FOR_GUESTS>");
+    // TODO: 'Share video' is not currently supported by the app builder. Update these flag if needed.
     public static final boolean SHARE_VIDEO_ENABLED = false;
 //    public static final boolean SHARE_VIDEO_ENABLED = Boolean.valueOf("<SHARE_VIDEO_ENABLED>");
     public static final String THEME = "<THEME>";
 //    public static final boolean THEME_LIGHT = true;
 
-    public static boolean isDownloadsEnabled() {
-        return SettingsProvider.getInstance().getBoolean(SettingsProvider.DOWNLOADS_ENABLED);
-    }
-
-    public static boolean isDownloadsEnabledForGuests() {
-        return SettingsProvider.getInstance().getBoolean(SettingsProvider.DOWNLOADS_ENABLED_FOR_GUESTS);
-    }
-
-    public static boolean isThemeLight() {
-        return SettingsProvider.getInstance().getBoolean(SettingsProvider.THEME_LIGHT);
-    }
 }
 

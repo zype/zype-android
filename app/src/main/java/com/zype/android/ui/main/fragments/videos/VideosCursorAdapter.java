@@ -121,7 +121,7 @@ public class VideosCursorAdapter extends CursorAdapter {
                 list.add(new VideosMenuItem(ITEM_FAVORITE, R.string.menu_favorite));
             }
         }
-        if (ZypeSettings.isDownloadsEnabled() && showDownloadOptions) {
+        if (ZypeConfiguration.isDownloadsEnabled(mActivity) && showDownloadOptions) {
             if (currentProgress > -1) {
                 list.add(new VideosMenuItem(ITEM_DOWNLOAD_STOP, R.string.menu_download_stop));
             }

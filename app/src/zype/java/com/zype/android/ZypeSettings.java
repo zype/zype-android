@@ -6,8 +6,6 @@ import com.zype.android.core.settings.SettingsProvider;
  * Created by Evgeny Cherkasov on 18.03.2017.
  */
 
-// TODO: Provide valid app settings
-//
 public class ZypeSettings {
     // Zype app key
     public static final String APP_KEY = "iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l";
@@ -44,16 +42,5 @@ public class ZypeSettings {
     public static final String THEME = ZypeConfiguration.THEME_LIGHT;
 //    public static final boolean THEME_LIGHT = true;
 
-    public static boolean isDownloadsEnabled() {
-        return SettingsProvider.getInstance().getBoolean(SettingsProvider.DOWNLOADS_ENABLED);
-    }
-
-    public static boolean isDownloadsEnabledForGuests() {
-        return SettingsProvider.getInstance().getBoolean(SettingsProvider.DOWNLOADS_ENABLED_FOR_GUESTS);
-    }
-
-    public static boolean isThemeLight() {
-        return SettingsProvider.getInstance().getBoolean(SettingsProvider.THEME_LIGHT);
-    }
 }
 

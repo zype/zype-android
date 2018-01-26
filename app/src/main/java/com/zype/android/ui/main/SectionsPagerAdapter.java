@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.ui.main.fragments.download.DownloadFragment;
 import com.zype.android.ui.main.fragments.favorite.FavoritesFragment;
@@ -41,7 +42,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     }
 
     private void setDownloadsData() {
-        if (ZypeSettings.isDownloadsEnabled()){
+        if (ZypeConfiguration.isDownloadsEnabled(context)){
             imageResId = new int[] {
                     R.drawable.icn_latest,
                     R.drawable.icn_downloads,
@@ -71,7 +72,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if (ZypeSettings.isDownloadsEnabled()) {
+        if (ZypeConfiguration.isDownloadsEnabled(context)) {
             switch (position) {
                 case 0:
                     return PlaylistFragment.newInstance();
@@ -100,7 +101,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        if (ZypeSettings.isDownloadsEnabled())
+        if (ZypeConfiguration.isDownloadsEnabled(context))
             return 4;
         else
             return 3;

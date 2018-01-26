@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.settings.SettingsProvider;
@@ -36,7 +37,8 @@ public class DownloadFragment extends AbstractTabFragment {
 
     @Override
     protected void startLoadCursors(int selectedTab) {
-        if (SettingsProvider.getInstance().isLoggedIn() || ZypeSettings.isDownloadsEnabledForGuests()) {
+        if (SettingsProvider.getInstance().isLoggedIn()
+                || ZypeConfiguration.isDownloadsForGuestsEnabled(getActivity())) {
             if (mLoader == null) {
                 mLoader = getLoaderManager();
             }

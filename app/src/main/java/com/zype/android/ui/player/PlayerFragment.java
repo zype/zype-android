@@ -55,6 +55,7 @@ import com.google.android.exoplayer.util.Util;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
@@ -342,7 +343,7 @@ public class PlayerFragment extends BaseFragment implements
             preparePlayer(true);
         }
         else {
-            if (ZypeSettings.BACKGROUND_PLAYBACK_ENABLED) {
+            if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
                 player.setBackgrounded(false);
             }
             player.getPlayerControl().start();
@@ -376,7 +377,7 @@ public class PlayerFragment extends BaseFragment implements
             Logger.d("onPause()");
         }
         if (player != null) {
-            if (ZypeSettings.BACKGROUND_PLAYBACK_ENABLED) {
+            if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
                 player.setBackgrounded(true);
             }
             stopTimer();
@@ -399,7 +400,7 @@ public class PlayerFragment extends BaseFragment implements
         if (BuildConfig.DEBUG) {
             Logger.d("onStop()");
         }
-        if (ZypeSettings.BACKGROUND_PLAYBACK_ENABLED) {
+        if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
             if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
                 showNotification(true, contentType);
             } else {

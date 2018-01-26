@@ -1,6 +1,7 @@
 package com.zype.android.ui.video_details.fragments.options;
 
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
@@ -317,7 +318,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         if (ZypeSettings.SHARE_VIDEO_ENABLED) {
             list.add(new Options(OPTION_SHARE, getString(R.string.option_share), R.drawable.icn_share));
         }
-        if (ZypeSettings.isDownloadsEnabled() &&
+        if (ZypeConfiguration.isDownloadsEnabled(getActivity()) &&
                 (isAudioDownloadUrlExists() || isVideoDownloadUrlExists())) {
             if (mListener.getCurrentFragment() != BaseVideoActivity.TYPE_YOUTUBE && !onAir) {
                 list.add(new Options(OPTION_DOWNLOAD, getString(R.string.option_download), R.drawable.icn_downloads));
