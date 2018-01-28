@@ -21,9 +21,7 @@
     <color name="colorPrimaryWhite">#FFFFFF</color>
     <color name="windowBackground">@color/colorPrimaryWhite</color>
     <color name="orange_text_color">#eaa824</color>
-<!--
     <color name="blue_text_color">#0AABF5</color>
--->
     <color name="textColorPrimary">@color/colorPrimaryDark</color>
     <color name="video_background">#000000</color>
 
