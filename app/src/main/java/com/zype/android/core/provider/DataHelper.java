@@ -9,6 +9,7 @@ import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.AdvertisingSchedule;
+import com.zype.android.webapi.model.player.AnalyticsDimensions;
 import com.zype.android.webapi.model.playlist.PlaylistData;
 import com.zype.android.webapi.model.video.Thumbnail;
 import com.zype.android.webapi.model.video.VideoData;
@@ -23,6 +24,7 @@ import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author vasya
@@ -428,6 +430,38 @@ public class DataHelper {
             return 0;
         }
     }
+
+    // Beacons
+    public static Uri updateAnalytics(ContentResolver contentResolver, String beacon, AnalyticsDimensions dimensions){
+        String videoId = dimensions.getVideoId();
+
+        if (videoId != null) {
+            Uri uri = Contract.AnalyticBeacon.CONTENT_URI;
+            ContentValues value = new ContentValues();
+
+            // delete current analytics
+            int resultDelete = contentResolver.delete(uri, Contract.AnalyticBeacon.VIDEO_ID + "=?", new String[] { videoId });
+//            if (resultDelete == -1) {
+//                return null;
+//            }
+
+            String siteId = dimensions.getSiteId();
+            String playerId = dimensions.getPlayerId();
+            String device = dimensions.getDevice();
+
+            value.put(Contract.AnalyticBeacon.BEACON, beacon);
+            value.put(Contract.AnalyticBeacon.VIDEO_ID, videoId);
+
+            if (siteId != null) { value.put(Contract.AnalyticBeacon.SITE_ID, siteId); }
+            if (playerId != null) { value.put(Contract.AnalyticBeacon.PLAYER_ID, playerId); }
+            if (device != null) { value.put(Contract.AnalyticBeacon.DEVICE, device); }
+
+            return contentResolver.insert(uri, value);
+        } else {
+            return null;
+        }
+    }
+
 
     // Favorites
     public static String getFavoriteId(ContentResolver contentResolver, String videoId) {

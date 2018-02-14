@@ -93,4 +93,10 @@ public class CursorHelper {
         Uri uri = Contract.Playlist.CONTENT_URI;
         return contentResolver.query(uri, null, Contract.Playlist.COLUMN_ID + "=?", new String[] { playlistId }, null);
     }
+
+    // Beacons
+    public static Cursor getAnalyticsByVideoId(@NonNull ContentResolver contentResolver, @NonNull final String videoId) {
+        Uri uri = Contract.AnalyticBeacon.CONTENT_URI;
+        return contentResolver.query(uri, null, Contract.AnalyticBeacon.VIDEO_ID + "=?", new String[] { videoId }, null);
+    }
 }

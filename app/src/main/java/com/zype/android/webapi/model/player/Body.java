@@ -17,6 +17,9 @@ public class Body {
     @Expose
     private List<File> files = new ArrayList<>();
 
+    @Expose
+    private Analytics analytics;
+
     /**
      *
      * @return
@@ -51,5 +54,21 @@ public class Body {
      */
     public void setFiles(List<File> files) {
         this.files = files;
+    }
+
+    /**
+     * @return
+     * The analytics
+     */
+    public Analytics getAnalytics() {
+        return analytics;
+    }
+
+    /**
+     * @param analytics
+     * The analytics
+     */
+    public void setAnalytics(Analytics analytics) {
+        this.analytics = analytics;
     }
 }

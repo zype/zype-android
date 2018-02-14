@@ -29,6 +29,8 @@ public class ZypeContentProvider extends ContentProvider {
     private static final int URI_MATCHER_CODE_PLAYLISTS = 20;
     private static final int URI_MATCHER_CODE_PLAYLIST_VIDEO = 30;
     private static final int URI_MATCHER_CODE_AD_SCHEDULE = 40;
+    private static final int URI_MATCHER_CODE_ANALYTICS_BEACON = 50;
+
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -41,6 +43,7 @@ public class ZypeContentProvider extends ContentProvider {
         URI_MATCHER.addURI(CONTENT_AUTHORITY, Contract.TABLE_NAME_PLAYLIST, URI_MATCHER_CODE_PLAYLISTS);
         URI_MATCHER.addURI(CONTENT_AUTHORITY, Contract.PlaylistVideo.TABLE_NAME, URI_MATCHER_CODE_PLAYLIST_VIDEO);
         URI_MATCHER.addURI(CONTENT_AUTHORITY, Contract.AdSchedule.TABLE_NAME, URI_MATCHER_CODE_AD_SCHEDULE);
+        URI_MATCHER.addURI(CONTENT_AUTHORITY, Contract.AnalyticBeacon.TABLE_NAME, URI_MATCHER_CODE_ANALYTICS_BEACON);
     }
 
 
@@ -122,6 +125,21 @@ public class ZypeContentProvider extends ContentProvider {
                                 sortOrder
                         );
                 break;
+
+            case URI_MATCHER_CODE_ANALYTICS_BEACON:
+                cursor = sqLiteOpenHelper
+                        .getReadableDatabase()
+                        .query(
+                                Contract.AnalyticBeacon.TABLE_NAME,
+                                projection,
+                                selection,
+                                selectionArgs,
+                                null,
+                                null,
+                                sortOrder
+                        );
+
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri + " selection=" + selection + " selectionArgs=" + Arrays.toString(selectionArgs));
         }
@@ -175,6 +193,16 @@ public class ZypeContentProvider extends ContentProvider {
                                 null,
                                 values
                         );
+                break;
+            case URI_MATCHER_CODE_ANALYTICS_BEACON:
+                insertedId = sqLiteOpenHelper
+                        .getWritableDatabase()
+                        .insert(
+                                Contract.AnalyticBeacon.TABLE_NAME,
+                                null,
+                                values
+                        );
+
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri + " ContentValues=" + Logger.getObjectDump(values));
@@ -293,6 +321,16 @@ public class ZypeContentProvider extends ContentProvider {
                                 selection,
                                 selectionArgs
                         );
+                break;
+            case URI_MATCHER_CODE_ANALYTICS_BEACON:
+                numberOfRowsDeleted = sqLiteOpenHelper
+                        .getWritableDatabase()
+                        .delete(
+                                Contract.AnalyticBeacon.TABLE_NAME,
+                                selection,
+                                selectionArgs
+                        );
+
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri + " selection=" + selection + " selectionArgs=" + Arrays.toString(selectionArgs));

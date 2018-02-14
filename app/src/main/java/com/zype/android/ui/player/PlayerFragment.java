@@ -76,6 +76,7 @@ import com.zype.android.utils.AdMacrosHelper;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.model.player.AdvertisingSchedule;
+import com.zype.android.webapi.model.player.Analytics;
 import com.zype.android.webapi.model.video.Thumbnail;
 import com.zype.android.webapi.model.video.VideoData;
 
@@ -159,6 +160,9 @@ public class PlayerFragment extends BaseFragment implements
     private int nextAdIndex = -1;
     private Runnable runnablePlaybackTime;
 
+    // Analytics
+    private Analytics analytics;
+
     // Limiting live stream
     private Handler handlerTimer;
     private Runnable runnableTimer;
@@ -198,6 +202,7 @@ public class PlayerFragment extends BaseFragment implements
 //                fileId = getArguments().getString(CONTENT_ID_EXTRA);
                 mThumbnailList = DataHelper.getThumbnailList(getActivity().getContentResolver(), fileId);
                 adSchedule = VideoHelper.getAdSchedule(getActivity().getContentResolver(), fileId);
+                analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
             }
             adTag = getArguments().getString(PARAMETERS_AD_TAG);
             onAir = getArguments().getBoolean(PARAMETERS_ON_AIR);

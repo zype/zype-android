@@ -29,6 +29,8 @@ import com.zype.android.webapi.events.zobject.ZObjectEvent;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.Advertising;
 import com.zype.android.webapi.model.player.AdvertisingSchedule;
+import com.zype.android.webapi.model.player.Analytics;
+import com.zype.android.webapi.model.player.AnalyticsDimensions;
 import com.zype.android.webapi.model.player.File;
 import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.webapi.model.zobjects.ZobjectData;
@@ -44,6 +46,7 @@ import android.view.WindowManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class VideoDetailActivity extends BaseVideoActivity {
 
@@ -226,6 +229,8 @@ public class VideoDetailActivity extends BaseVideoActivity {
         String url = event.getEventData().getModelData().getResponse().getBody().getFiles().get(0).getUrl();
         DataHelper.saveVideoPlayerLink(getContentResolver(), mVideoId, url);
         Advertising advertising = event.getEventData().getModelData().getResponse().getBody().getAdvertising();
+        Analytics analytics = event.getEventData().getModelData().getResponse().getBody().getAnalytics();
+
         if (advertising != null) {
             List<AdvertisingSchedule> schedule = advertising.getSchedule();
             DataHelper.updateAdSchedule(getContentResolver(), mVideoId, schedule);
@@ -236,6 +241,16 @@ public class VideoDetailActivity extends BaseVideoActivity {
                 DataHelper.saveAdVideoTag(getContentResolver(), mVideoId, adTag);
             }
         }
+
+        if (analytics != null) {
+            String beacon = analytics.getBeacon();
+            AnalyticsDimensions dimensions = analytics.getDimensions();
+
+            if (beacon != null && dimensions != null) {
+                DataHelper.updateAnalytics(getContentResolver(), beacon, dimensions);
+            }
+        }
+
         mType = PlayerFragment.TYPE_VIDEO_WEB;
         changeFragment(isChromecastConntected());
     }
