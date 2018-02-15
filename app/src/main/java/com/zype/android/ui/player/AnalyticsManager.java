@@ -9,7 +9,7 @@ import com.zype.android.webapi.model.player.AnalyticsDimensions;
 import java.util.Dictionary;
 
 /**
- * Created by azheng on 2/12/18.
+ * Created by Andy Zheng on 2/12/18.
  */
 
 public class AnalyticsManager {
@@ -24,9 +24,7 @@ public class AnalyticsManager {
     }
 
     public void trackPlay(Context context, CustomPlayer player, String configPath, String url, Map<String, String> dimensions) {
-        if (exoPlayerLoader == null) {
-            exoPlayerLoader = new AkamaiExoPlayerLoader(context, configPath, true);
-        }
+        exoPlayerLoader = new AkamaiExoPlayerLoader(context, configPath, true);
 
         for (Map.Entry<String, String> dimension: dimensions.entrySet() ) {
             String key = dimension.getKey();
@@ -47,7 +45,7 @@ public class AnalyticsManager {
     public void trackStop() {
         if (exoPlayerLoader != null) {
             exoPlayerLoader.releaseLoader();
-//            exoPlayerLoader = null;
+            exoPlayerLoader = null;
         }
     }
 }
