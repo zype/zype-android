@@ -4,6 +4,7 @@ import java.util.Map;
 import android.content.Context;
 import com.akamai.android.exoplayerloader.AkamaiExoPlayerLoader;
 import com.google.android.exoplayer.ExoPlayer;
+import com.zype.android.webapi.model.player.AnalyticsDimensions;
 
 import java.util.Dictionary;
 
@@ -22,7 +23,7 @@ public class AnalyticsManager {
     private AnalyticsManager() {
     }
 
-    public void trackPlay(Context context, ExoPlayer player, String configPath, String url, Map<String, String> dimensions) {
+    public void trackPlay(Context context, CustomPlayer player, String configPath, String url, Map<String, String> dimensions) {
         if (exoPlayerLoader == null) {
             exoPlayerLoader = new AkamaiExoPlayerLoader(context, configPath, true);
         }
@@ -34,7 +35,7 @@ public class AnalyticsManager {
             exoPlayerLoader.setData(key, value);
         }
 
-        exoPlayerLoader.initializeLoader(player, url);
+        exoPlayerLoader.initializeLoader(player.getPlayer(), url);
     }
 
     public void seekTo() {
@@ -46,6 +47,7 @@ public class AnalyticsManager {
     public void trackStop() {
         if (exoPlayerLoader != null) {
             exoPlayerLoader.releaseLoader();
+//            exoPlayerLoader = null;
         }
     }
 }

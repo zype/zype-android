@@ -199,6 +199,7 @@ public class VideoHelper {
         Cursor cursor = CursorHelper.getAnalyticsByVideoId(contentResolver, videoId);
 
         if (cursor != null) {
+            cursor.moveToFirst();
             String beacon = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.BEACON));
             result.setBeacon(beacon);
 

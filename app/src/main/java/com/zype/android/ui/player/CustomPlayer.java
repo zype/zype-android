@@ -203,6 +203,8 @@ public class CustomPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
 //        player.setSelectedTrack(TYPE_TEXT, TRACK_DISABLED);
     }
 
+    public ExoPlayer getPlayer() { return player; }
+
     public PlayerControl getPlayerControl() {
         return playerControl;
     }
