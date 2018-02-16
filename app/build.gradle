@@ -50,7 +50,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode currentCodeVersion
-        versionName '1.6.0'
+        versionName '1.6.1'
         buildConfigField "String", "VERSION", "\"$versionName\""
         manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
                                 // TODO: Provide valid app_id and google_project_number for OneSignal
@@ -112,7 +112,7 @@ dependencies {
     }
     androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.4.1'
     implementation project(':CastCompanionLibrary')
-    //    compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.9.1'
+//    compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.9.1'
     implementation 'com.android.support:appcompat-v7:25.3.1'
     implementation 'com.android.support:design:25.3.1'
     implementation 'com.android.support:support-v4:25.3.1'
@@ -120,6 +120,7 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:25.3.1'
     implementation 'com.android.support:mediarouter-v7:25.3.1'
     implementation 'com.android.support:customtabs:25.3.1'
+
     implementation 'com.squareup.retrofit:retrofit:1.9.0'
     implementation 'com.squareup.okhttp:okhttp:2.5.0'
     implementation 'com.squareup:otto:1.3.8'
@@ -127,18 +128,23 @@ dependencies {
     implementation 'com.ns-developer:tagcloudview:0.1.0'
     implementation 'com.google.android.exoplayer:exoplayer:r1.5.12'
     implementation 'com.onesignal:OneSignal:2.+@aar'
+
     implementation('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
         transitive = true;
     }
+
     implementation 'com.google.android.gms:play-services-gcm:10.2.1'
     implementation 'com.google.android.gms:play-services-analytics:10.2.1'
     implementation 'com.google.android.gms:play-services-location:10.2.1'
     implementation 'com.google.android.gms:play-services-cast:10.2.1'
+
     // IMA SDK
     implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.6.0'
     implementation 'com.google.android.gms:play-services-ads:10.2.1'
+
     // In-app billing
     implementation 'com.android.billingclient:billing:1.0'
+
     implementation files('libs/libAkamaiExoPlayerLoader.jar')
     implementation files('libs/libAndroidMediaAnalytics.jar')
 }
