@@ -50,7 +50,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 25
         versionCode currentCodeVersion
-        versionName '1.6.0'
+        versionName '1.6.1'
         buildConfigField "String", "VERSION", "\"$versionName\""
         manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
                                 // TODO: Provide valid app_id and google_project_number for OneSignal
@@ -129,7 +129,7 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:r1.5.12'
     implementation 'com.onesignal:OneSignal:2.+@aar'
 
-    implementation ('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
+    implementation('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
         transitive = true;
     }
 
@@ -144,6 +144,9 @@ dependencies {
 
     // In-app billing
     implementation 'com.android.billingclient:billing:1.0'
+
+    implementation files('libs/libAkamaiExoPlayerLoader.jar')
+    implementation files('libs/libAndroidMediaAnalytics.jar')
 }
 
 // TODO: Uncomment to use In-app Purchases

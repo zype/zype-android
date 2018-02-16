@@ -76,6 +76,8 @@ import com.zype.android.utils.AdMacrosHelper;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.model.player.AdvertisingSchedule;
+import com.zype.android.webapi.model.player.Analytics;
+import com.zype.android.webapi.model.player.AnalyticsDimensions;
 import com.zype.android.webapi.model.video.Thumbnail;
 import com.zype.android.webapi.model.video.VideoData;
 
@@ -85,7 +87,9 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -159,6 +163,9 @@ public class PlayerFragment extends BaseFragment implements
     private int nextAdIndex = -1;
     private Runnable runnablePlaybackTime;
 
+    // Analytics
+    private Analytics analytics;
+
     // Limiting live stream
     private Handler handlerTimer;
     private Runnable runnableTimer;
@@ -198,6 +205,7 @@ public class PlayerFragment extends BaseFragment implements
 //                fileId = getArguments().getString(CONTENT_ID_EXTRA);
                 mThumbnailList = DataHelper.getThumbnailList(getActivity().getContentResolver(), fileId);
                 adSchedule = VideoHelper.getAdSchedule(getActivity().getContentResolver(), fileId);
+                analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
             }
             adTag = getArguments().getString(PARAMETERS_AD_TAG);
             onAir = getArguments().getBoolean(PARAMETERS_ON_AIR);
@@ -340,12 +348,17 @@ public class PlayerFragment extends BaseFragment implements
         mListener.onFullscreenChanged();
         registerReceivers();
         if (player == null) {
+            analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
             preparePlayer(true);
         }
         else {
             if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
                 player.setBackgrounded(false);
             }
+
+            analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
+            attachPlayerToAnalyticsManager();
+
             player.getPlayerControl().start();
             player.setSurface(surfaceView.getHolder().getSurface());
             if (onAir && (!SettingsProvider.getInstance().isLoggedIn() || SettingsProvider.getInstance().getSubscriptionCount() <= 0)) {
@@ -535,6 +548,8 @@ public class PlayerFragment extends BaseFragment implements
             mediaController.setMediaPlayer(player.getPlayerControl());
             mediaController.setEnabled(true);
 
+            attachPlayerToAnalyticsManager();
+
             player.setInternalErrorListener(new CustomPlayer.InternalErrorListener() {
                 @Override
                 public void onRendererInitializationError(Exception e) {
@@ -625,6 +640,10 @@ public class PlayerFragment extends BaseFragment implements
                 mListener.saveCurrentTimeStamp(player.getCurrentPosition());
             }
 //            player.getPlayerControl().pause();
+
+            AnalyticsManager manager = AnalyticsManager.getInstance();
+            manager.trackStop();
+
             player.release();
             player = null;
             videoFrame = null;
@@ -638,6 +657,9 @@ public class PlayerFragment extends BaseFragment implements
     public void onStateChanged(boolean playWhenReady, int playbackState) {
         switch (playbackState) {
             case ExoPlayer.STATE_ENDED:
+                AnalyticsManager manager = AnalyticsManager.getInstance();
+                manager.trackStop();
+
                 showControls();
                 if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB) {
                     mListener.videoFinished();
@@ -824,6 +846,7 @@ public class PlayerFragment extends BaseFragment implements
     @Override
     public void play() {
         if (player != null) {
+            attachPlayerToAnalyticsManager();
             player.getPlayerControl().start();
         }
     }
@@ -1183,5 +1206,38 @@ public class PlayerFragment extends BaseFragment implements
         return "Player";
     }
 
+    //
+    // Analytics
+    //
+    private void attachPlayerToAnalyticsManager(){
+        if (player != null && analytics != null){
+            VideoData video = VideoHelper.getVideo(getActivity().getContentResolver(), fileId);
+            AnalyticsDimensions dimensions = analytics.getDimensions();
+
+            Context context = getActivity().getApplicationContext();
+            String beacon = analytics.getBeacon();
+            String videoUrl = video.getPlayerVideoUrl();
+
+            Map<String, String> customDimensions = getCustomDimensions(video, dimensions);
+
+            AnalyticsManager manager = AnalyticsManager.getInstance();
+            manager.trackPlay(context, player, beacon, videoUrl, customDimensions);
+        }
+    }
+
+    private Map<String, String> getCustomDimensions(VideoData video, AnalyticsDimensions dimensions) {
+        Map<String, String> customDimensions = new HashMap<String, String>();
+
+        String videoId, playerId, siteId, device, title, consumerId;
+
+        if ((videoId = dimensions.getVideoId()) != null) { customDimensions.put("videoId", videoId); }
+        if ((playerId = dimensions.getPlayerId()) != null) { customDimensions.put("playerId", playerId); }
+        if ((siteId = dimensions.getSiteId()) != null) { customDimensions.put("siteId", siteId); }
+        if ((device = dimensions.getDevice()) != null) { customDimensions.put("device", device); }
+        if ((title = video.getTitle()) != null) { customDimensions.put("title", title); }
+        if ((consumerId = SettingsProvider.getInstance().getConsumerId()) != null) { customDimensions.put("consumerId", consumerId); }
+
+        return customDimensions;
+    }
 
 }

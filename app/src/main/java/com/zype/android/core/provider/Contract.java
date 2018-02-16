@@ -133,4 +133,18 @@ public class Contract {
         public static final String TAG = "tag";
         public static final String VIDEO_ID = "video_id";
     }
+
+    public static class AnalyticBeacon implements BaseColumns {
+        public static final String TABLE_NAME = "analytic_beacon";
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
+        public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+        public static final String ID = "beacon_id";
+        public static final String BEACON = "beacon";
+
+        public static final String VIDEO_ID = "video_id";
+        public static final String SITE_ID = "site_id";
+        public static final String PLAYER_ID = "player_id";
+        public static final String DEVICE = "device";
+    }
 }

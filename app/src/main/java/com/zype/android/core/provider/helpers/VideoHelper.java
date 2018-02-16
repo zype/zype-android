@@ -7,6 +7,8 @@ import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.model.player.AdvertisingSchedule;
+import com.zype.android.webapi.model.player.Analytics;
+import com.zype.android.webapi.model.player.AnalyticsDimensions;
 import com.zype.android.webapi.model.search.Segment;
 import com.zype.android.webapi.model.video.Category;
 import com.zype.android.webapi.model.video.Thumbnail;
@@ -24,7 +26,9 @@ import android.text.TextUtils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author vasya
@@ -187,6 +191,32 @@ public class VideoHelper {
                 result.add(item);
             }
         }
+        return result;
+    }
+
+    public static Analytics getAnalytics(ContentResolver contentResolver, String videoId) {
+        Analytics result = new Analytics();
+        Cursor cursor = CursorHelper.getAnalyticsByVideoId(contentResolver, videoId);
+
+        if (cursor != null) {
+            cursor.moveToFirst();
+            String beacon = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.BEACON));
+            result.setBeacon(beacon);
+
+            AnalyticsDimensions dimensions = new AnalyticsDimensions();
+
+            String siteId = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.SITE_ID));
+            String playerId = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.PLAYER_ID));
+            String device = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.DEVICE));
+
+            if (videoId != null) { dimensions.setVideoId(videoId); }
+            if (siteId != null) { dimensions.setSiteId(siteId); }
+            if (playerId != null) { dimensions.setPlayerId(playerId); }
+            if (device != null) { dimensions.setDevice(device); }
+
+            result.setDimensions(dimensions);
+        }
+
         return result;
     }
 

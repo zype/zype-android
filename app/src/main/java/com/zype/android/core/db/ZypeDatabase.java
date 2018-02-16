@@ -131,6 +131,17 @@ public class ZypeDatabase extends SQLiteOpenHelper {
                 + ");";
     }
 
+    private static String getCreateAnalyticsBeaconTableQuery() {
+        return "CREATE TABLE " + Contract.AnalyticBeacon.TABLE_NAME + "("
+                + Contract.AnalyticBeacon.ID + TYPE_INTEGER + " PRIMARY KEY " + COMMA_SEP
+                + Contract.AnalyticBeacon.BEACON + TYPE_TEXT + COMMA_SEP
+                + Contract.AnalyticBeacon.VIDEO_ID + TYPE_TEXT + COMMA_SEP
+                + Contract.AnalyticBeacon.SITE_ID + TYPE_TEXT + COMMA_SEP
+                + Contract.AnalyticBeacon.PLAYER_ID + TYPE_TEXT + COMMA_SEP
+                + Contract.AnalyticBeacon.DEVICE + TYPE_TEXT
+                + ");";
+    }
+
     @Override
     public void onCreate(@NonNull SQLiteDatabase db) {
         db.execSQL(getCreateVideoTableQuery());
@@ -138,13 +149,16 @@ public class ZypeDatabase extends SQLiteOpenHelper {
         db.execSQL(getCreatePlaylistTableQuery());
         db.execSQL(getCreatePlaylistVideoTableQuery());
         db.execSQL(getCreateAdScheduleTableQuery());
+        db.execSQL(getCreateAnalyticsBeaconTableQuery());
     }
 
 
     @Override
     public void onUpgrade(@NonNull SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(Contract.AdSchedule.DELETE_TABLE);
+        db.execSQL(Contract.AnalyticBeacon.DELETE_TABLE);
         // TODO: After implementing delete all tables call 'onCreate' to upgrade all tables without duplicate the code
         db.execSQL(getCreateAdScheduleTableQuery());
+        db.execSQL(getCreateAnalyticsBeaconTableQuery());
     }
 }

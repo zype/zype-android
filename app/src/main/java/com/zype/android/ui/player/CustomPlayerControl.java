@@ -19,6 +19,9 @@ public class CustomPlayerControl extends PlayerControl {
 
     @Override
     public void seekTo(int timeMillis) {
+        AnalyticsManager manager = AnalyticsManager.getInstance();
+        manager.seekTo();
+
         callback.seekEvent(timeMillis);
         super.seekTo(timeMillis);
     }
