@@ -1206,6 +1206,9 @@ public class PlayerFragment extends BaseFragment implements
         return "Player";
     }
 
+    //
+    // Analytics
+    //
     private void attachPlayerToAnalyticsManager(){
         if (player != null && analytics != null){
             VideoData video = VideoHelper.getVideo(getActivity().getContentResolver(), fileId);

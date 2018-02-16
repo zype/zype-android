@@ -2,9 +2,6 @@ package com.zype.android.webapi.model.player;
 
 import com.google.gson.annotations.Expose;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by Andy Zheng on 2/13/18.
  */

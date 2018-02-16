@@ -24,7 +24,6 @@ import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author vasya
@@ -441,9 +440,6 @@ public class DataHelper {
 
             // delete current analytics
             int resultDelete = contentResolver.delete(uri, Contract.AnalyticBeacon.VIDEO_ID + "=?", new String[] { videoId });
-//            if (resultDelete == -1) {
-//                return null;
-//            }
 
             String siteId = dimensions.getSiteId();
             String playerId = dimensions.getPlayerId();
