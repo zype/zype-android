@@ -39,8 +39,7 @@ public class ZypeSettings {
     public static final boolean DOWNLOADS_ENABLED = false;
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = false;
     public static final boolean SHARE_VIDEO_ENABLED = false;
-    public static final String THEME = ZypeConfiguration.THEME_LIGHT;
-//    public static final boolean THEME_LIGHT = true;
 
+    public static final String THEME = ZypeConfiguration.THEME_LIGHT;
 }
 

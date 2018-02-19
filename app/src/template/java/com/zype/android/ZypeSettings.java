@@ -43,8 +43,14 @@ public class ZypeSettings {
     // TODO: 'Share video' is not currently supported by the app builder. Update these flag if needed.
     public static final boolean SHARE_VIDEO_ENABLED = false;
 //    public static final boolean SHARE_VIDEO_ENABLED = Boolean.valueOf("<SHARE_VIDEO_ENABLED>");
+
+    /**
+     * Theme of the app.
+     * Use following constants for the theme:
+     * @see ZypeConfiguration#THEME_LIGHT
+     * @see ZypeConfiguration#THEME_DARK
+     */
     public static final String THEME = "<THEME>";
-//    public static final boolean THEME_LIGHT = true;
 
 }
 

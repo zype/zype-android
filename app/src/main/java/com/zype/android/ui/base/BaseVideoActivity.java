@@ -373,12 +373,12 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
+//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//        if (newConfig.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+//            params.height = (int) getResources().getDimension(R.dimen.episode_video_height);
+//        }
+//        findViewById(R.id.video_container).setLayoutParams(params);
         super.onConfigurationChanged(newConfig);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        if (newConfig.orientation != Configuration.ORIENTATION_LANDSCAPE) {
-            params.height = (int) getResources().getDimension(R.dimen.episode_video_height);
-        }
-        findViewById(R.id.video_container).setLayoutParams(params);
     }
 
     @Override
