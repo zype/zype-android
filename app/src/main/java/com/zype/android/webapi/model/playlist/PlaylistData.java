@@ -62,6 +62,10 @@ public class PlaylistData {
     @Expose
     private List<Thumbnail> thumbnails = new ArrayList<>();
 
+    @Nullable
+    @Expose
+    private List<Image> images = new ArrayList<>();
+
     /**
      *
      * @return
@@ -270,5 +274,19 @@ public class PlaylistData {
      */
     public void setThumbnails(@Nullable List<Thumbnail> thumbnails) {
         this.thumbnails = thumbnails;
+    }
+
+    /**
+     * @return The playlist images
+     */
+    public List<Image> getImages() {
+        return images;
+    }
+
+    /**
+     * @param images The playlist images
+     */
+    public void setImages(@Nullable List<Image> images) {
+        this.images = images;
     }
 }
