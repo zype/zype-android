@@ -138,11 +138,11 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
     @Override
     public void onDownloadedVideoClick(String videoId) {
-        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-            onRequestSubscription();
-        } else {
+//        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
+//            onRequestSubscription();
+//        } else {
             VideoDetailActivity.startActivity(this, videoId);
-        }
+//        }
     }
 
     @Override
