@@ -110,6 +110,7 @@ public class Contract {
         public static final String COLUMN_UPDATED_AT = "updated_at";
         public static final String COLUMN_PRIORITY = "priority";
         public static final String COLUMN_PLAYLIST_ITEM_COUNT = "playlist_item_count";
+        public static final String COLUMN_IMAGES = "images";
 
     }
 
