@@ -176,7 +176,10 @@ public class PlaylistCursorAdapter extends CursorAdapter {
 
             if (images.size() > 0) {
                 for (Image image: images) {
-                    if (image.getTitle().equals(PLAYLIST_THUMBNAIL_TITLE)) playlistMobileThumbnail = image;
+                    if (image.getTitle().equals(PLAYLIST_THUMBNAIL_TITLE)) {
+                        playlistMobileThumbnail = image;
+                        break;
+                    }
                 }
             }
         }
