@@ -199,22 +199,31 @@ public class VideoHelper {
         Cursor cursor = CursorHelper.getAnalyticsByVideoId(contentResolver, videoId);
 
         if (cursor != null) {
-            cursor.moveToFirst();
-            String beacon = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.BEACON));
-            result.setBeacon(beacon);
+            if (cursor.moveToFirst()) {
+                String beacon = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.BEACON));
+                result.setBeacon(beacon);
 
-            AnalyticsDimensions dimensions = new AnalyticsDimensions();
+                AnalyticsDimensions dimensions = new AnalyticsDimensions();
 
-            String siteId = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.SITE_ID));
-            String playerId = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.PLAYER_ID));
-            String device = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.DEVICE));
+                String siteId = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.SITE_ID));
+                String playerId = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.PLAYER_ID));
+                String device = cursor.getString(cursor.getColumnIndexOrThrow(Contract.AnalyticBeacon.DEVICE));
 
-            if (videoId != null) { dimensions.setVideoId(videoId); }
-            if (siteId != null) { dimensions.setSiteId(siteId); }
-            if (playerId != null) { dimensions.setPlayerId(playerId); }
-            if (device != null) { dimensions.setDevice(device); }
+                if (videoId != null) {
+                    dimensions.setVideoId(videoId);
+                }
+                if (siteId != null) {
+                    dimensions.setSiteId(siteId);
+                }
+                if (playerId != null) {
+                    dimensions.setPlayerId(playerId);
+                }
+                if (device != null) {
+                    dimensions.setDevice(device);
+                }
 
-            result.setDimensions(dimensions);
+                result.setDimensions(dimensions);
+            }
         }
 
         return result;
