@@ -20,6 +20,10 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:paddingStart="20dp"
+        android:paddingRight="48dp"
+        android:paddingEnd="48dp"
         android:ellipsize="end"
         android:maxLines="3"
         tools:text="Playlist Title"
@@ -29,7 +33,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textColor="#ffffff"
-        android:paddingLeft="20dp" />
+        />
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
