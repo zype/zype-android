@@ -8,6 +8,7 @@ import com.zype.android.core.provider.Contract;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.utils.UiUtils;
+import com.zype.android.webapi.model.playlist.Image;
 import com.zype.android.webapi.model.video.Thumbnail;
 
 import android.app.Activity;
@@ -35,6 +36,10 @@ public class PlaylistCursorAdapter extends CursorAdapter {
     private int COL_PLAYLIST_THUMBNAILS = -1;
     private int COL_PLAYLIST_PARENT_ID = -1;
     private int COL_PLAYLIST_ITEM_COUNT = -1;
+    private int COL_PLAYLIST_IMAGES = -1;
+
+    // Title of playlist thumbnail
+    private String PLAYLIST_THUMBNAIL_TITLE = "mobile";
 
     private Activity mActivity;
 
@@ -159,11 +164,34 @@ public class PlaylistCursorAdapter extends CursorAdapter {
 
     private void loadImage(final Context context, final Cursor cursor, final PlaylistViewHolder viewHolder) {
         final String thumbnailsString = cursor.getString(COL_PLAYLIST_THUMBNAILS);
+        final String imagesString = cursor.getString(COL_PLAYLIST_IMAGES);
+
         String placeholderUrl = "https://placeholdit.imgix.net/~text?txtsize=40&txt=No%20thumbnail%20available&w=720&h=240";
-        if (thumbnailsString != null) {
+
+        // Find playlist thumbnail
+        Image playlistMobileThumbnail = null;
+        if (imagesString != null) {
+            Type imageType = new TypeToken<List<Image>>(){}.getType();
+            List<Image> images = (new Gson().fromJson(imagesString, imageType));
+
+            if (images.size() > 0) {
+                for (Image image: images) {
+                    if (image.getTitle().equals(PLAYLIST_THUMBNAIL_TITLE)) {
+                        playlistMobileThumbnail = image;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (playlistMobileThumbnail != null) {
+            UiUtils.loadImage(context, playlistMobileThumbnail.getUrl(), 0, viewHolder.thumbnail, viewHolder.progressBar);
+        }
+        else if (thumbnailsString != null) {
             Type thumbnailType = new TypeToken<List<Thumbnail>>() {
             }.getType();
             List<Thumbnail> thumbnails = (new Gson().fromJson(thumbnailsString, thumbnailType));
+
             if (thumbnails.size() > 0) {
                 UiUtils.loadImage(context, thumbnails.get(1).getUrl(), 0, viewHolder.thumbnail, viewHolder.progressBar);
             }
@@ -186,6 +214,7 @@ public class PlaylistCursorAdapter extends CursorAdapter {
         COL_PLAYLIST_THUMBNAILS = cursor.getColumnIndexOrThrow(Contract.Playlist.COLUMN_THUMBNAILS);
         COL_PLAYLIST_PARENT_ID = cursor.getColumnIndexOrThrow(Contract.Playlist.COLUMN_PARENT_ID);
         COL_PLAYLIST_ITEM_COUNT = cursor.getColumnIndexOrThrow(Contract.Playlist.COLUMN_PLAYLIST_ITEM_COUNT);
+        COL_PLAYLIST_IMAGES = cursor.getColumnIndexOrThrow(Contract.Playlist.COLUMN_IMAGES);
     }
 
     public class PlaylistViewHolder {

@@ -109,7 +109,8 @@ public class ZypeDatabase extends SQLiteOpenHelper {
                 + Contract.Playlist.COLUMN_UPDATED_AT + TYPE_TEXT + COMMA_SEP
                 + Contract.Playlist.COLUMN_PRIORITY + TYPE_INTEGER + COMMA_SEP
                 + Contract.Playlist.COLUMN_PLAYLIST_ITEM_COUNT + TYPE_INTEGER + COMMA_SEP
-                + Contract.Playlist.COLUMN_THUMBNAILS + TYPE_TEXT
+                + Contract.Playlist.COLUMN_THUMBNAILS + TYPE_TEXT + COMMA_SEP
+                + Contract.Playlist.COLUMN_IMAGES + TYPE_TEXT
                 + ");";
     }
 
