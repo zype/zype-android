@@ -24,9 +24,6 @@ public class ZypeSettings {
     public static final String TWITTER_ID = "";
     public static final String WEB_URL = "";
 
-    // Template version
-    public static final String TEMPLATE_VERSION = BuildConfig.VERSION;
-
     // Monetization
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = false;

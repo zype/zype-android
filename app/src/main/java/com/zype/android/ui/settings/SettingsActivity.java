@@ -1,5 +1,6 @@
 package com.zype.android.ui.settings;
 
+import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
@@ -95,7 +96,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
 
             Preference prefZypeTemplateVersion = findPreference("ZypeTemplateVersion");
-            prefZypeTemplateVersion.setSummary(ZypeSettings.TEMPLATE_VERSION);
+            prefZypeTemplateVersion.setSummary(BuildConfig.ZYPE_TEMPLATE_VERSION);
         }
     }
 
