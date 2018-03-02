@@ -25,6 +25,7 @@ import com.google.android.exoplayer.dash.DashChunkSource;
 import com.google.android.exoplayer.drm.StreamingDrmSessionManager;
 import com.google.android.exoplayer.hls.HlsSampleSource;
 import com.google.android.exoplayer.text.Cue;
+import com.google.android.exoplayer.text.TextRenderer;
 import com.google.android.exoplayer.upstream.BandwidthMeter;
 import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.util.PlayerControl;
@@ -32,6 +33,7 @@ import com.zype.android.ZypeApp;
 import com.zype.android.utils.Logger;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -44,7 +46,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class CustomPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventListener,
         HlsSampleSource.EventListener, DefaultBandwidthMeter.EventListener,
         MediaCodecVideoTrackRenderer.EventListener, MediaCodecAudioTrackRenderer.EventListener,
-        StreamingDrmSessionManager.EventListener, DashChunkSource.EventListener
+        StreamingDrmSessionManager.EventListener, DashChunkSource.EventListener,
+        TextRenderer
 {
 
     private Context mContext;
@@ -155,10 +158,10 @@ public class CustomPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
     public static final int TRACK_DISABLED = ExoPlayer.TRACK_DISABLED;
     public static final int TRACK_DEFAULT = ExoPlayer.TRACK_DEFAULT;
 
-    public static final int RENDERER_COUNT = 2;
+    public static final int RENDERER_COUNT = 3;
     public static final int TYPE_VIDEO = 0;
     public static final int TYPE_AUDIO = 1;
-//    public static final int TYPE_TEXT = 2;
+    public static final int TYPE_TEXT = 2;
 //    public static final int TYPE_METADATA = 3;
 
     private static final int RENDERER_BUILDING_STATE_IDLE = 1;
@@ -184,7 +187,7 @@ public class CustomPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
     private BandwidthMeter bandwidthMeter;
     private boolean backgrounded;
 
-    //    private CaptionListener captionListener;
+    private CaptionListener captionListener;
 //    private Id3MetadataListener id3MetadataListener;
     private InternalErrorListener internalErrorListener;
     private InfoListener infoListener;
@@ -225,10 +228,10 @@ public class CustomPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
         infoListener = listener;
     }
 
-//    public void setCaptionListener(CaptionListener listener) {
-//        captionListener = listener;
-//    }
-//
+    public void setCaptionListener(CaptionListener listener) {
+        captionListener = listener;
+    }
+
 //    public void setMetadataListener(Id3MetadataListener listener) {
 //        id3MetadataListener = listener;
 //    }
@@ -261,9 +264,9 @@ public class CustomPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
 
     public void setSelectedTrack(int type, int index) {
         player.setSelectedTrack(type, index);
-//        if (type == TYPE_TEXT && index < 0 && captionListener != null) {
-//            captionListener.onCues(Collections.<Cue>emptyList());
-//        }
+        if (type == TYPE_TEXT && index < 0 && captionListener != null) {
+            captionListener.onCues(Collections.<Cue>emptyList());
+        }
     }
 
     public boolean getBackgrounded() {
@@ -540,13 +543,13 @@ public class CustomPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
         }
     }
 
-//    @Override
-//    public void onCues(List<Cue> cues) {
-//        if (captionListener != null && getSelectedTrack(TYPE_TEXT) != TRACK_DISABLED) {
-//            captionListener.onCues(cues);
-//        }
-//    }
-//
+    @Override
+    public void onCues(List<Cue> cues) {
+        if (captionListener != null && getSelectedTrack(TYPE_TEXT) != TRACK_DISABLED) {
+            captionListener.onCues(cues);
+        }
+    }
+
 //    @Override
 //    public void onMetadata(Map<String, Object> metadata) {
 //        if (id3MetadataListener != null && getSelectedTrack(TYPE_METADATA) != TRACK_DISABLED) {

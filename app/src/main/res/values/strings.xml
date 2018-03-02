@@ -74,6 +74,9 @@
     <string name="download_maxsize_exceeded">Max Downloads folder size exceeded. Please сheck Download Preferences in Settings menu.</string>
     <string name="title_activity_playlist">Back</string>
 
+    <!-- Closed captions -->
+    <string name="subtitles_dialog_empty">Closed captions are not available for this video</string>
+
     <!-- Consumer -->
     <string name="consumer_create_form_description">Fill out your email address and create a password. Use this login to gain access to our content on other devices.</string>
     <string name="consumer_create_form_subtitle">Create your login to unlock your content</string>
@@ -95,6 +98,9 @@
     <string name="intro_button_login">Log in</string>
     <string name="intro_button_trial">Start Free Trial</string>
 
+    <!-- Player -->
+    <string name="menu_player_closed_captions">Closed captions</string>
+
     <!--Settings-->
     <string name="settings">Settings</string>
     <string name="settings_facebook">%1$s on Facebook</string>
@@ -112,4 +118,6 @@
     <!--Other-->
     <string name="instagram_title">Instagram</string>
     <string name="web_title">Web</string>
+
+    <string name="button_ok">OK</string>
 </resources>

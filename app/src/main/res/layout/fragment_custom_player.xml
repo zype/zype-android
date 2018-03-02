@@ -19,6 +19,12 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"/>
 
+        <com.google.android.exoplayer.text.SubtitleLayout
+            android:id="@+id/subtitles"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
         <ImageView
             android:id="@+id/thumbnailView"
             android:layout_width="match_parent"

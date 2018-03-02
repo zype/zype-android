@@ -29,6 +29,10 @@ public class SettingsProvider extends CommonPreferences {
 
     public static final String IS_FIRST_LAUNCH = "IsFirstLaunch";
 
+    // Closed captions
+    public static final String CLOSED_CAPTIONS_ENABLED = "ClosedCaptionsEnabled";
+    public static final String SELECTED_CLOSED_CAPTIONS_TRACK = "SelectedClosedCaptionsTrack";
+
     private static final HashMap<String, Object> defaultValues = new HashMap<>();
 
     private static final String DEFAULT_STRING = "";
@@ -120,6 +124,8 @@ public class SettingsProvider extends CommonPreferences {
 //        defaultValues.put(THEME_LIGHT, ZypeSettings.THEME_LIGHT);
 
         defaultValues.put(IS_FIRST_LAUNCH, true);
+
+        defaultValues.put(CLOSED_CAPTIONS_ENABLED, false);
     }
 
     public void logout() {

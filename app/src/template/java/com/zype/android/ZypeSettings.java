@@ -1,7 +1,5 @@
 package com.zype.android;
 
-import com.zype.android.core.settings.SettingsProvider;
-
 /**
  * Created by Evgeny Cherkasov on 18.03.2017.
  */

@@ -1,5 +1,6 @@
 package com.zype.android.ui.player;
 
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -21,6 +22,9 @@ import android.text.TextUtils;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
@@ -29,6 +33,7 @@ import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.accessibility.CaptioningManager;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.Toast;
@@ -46,11 +51,15 @@ import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
 import com.google.android.exoplayer.AspectRatioFrameLayout;
 import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.MediaCodecTrackRenderer;
+import com.google.android.exoplayer.MediaFormat;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
 import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.drm.UnsupportedDrmException;
 import com.google.android.exoplayer.extractor.mp4.Mp4Extractor;
+import com.google.android.exoplayer.text.CaptionStyleCompat;
+import com.google.android.exoplayer.text.Cue;
+import com.google.android.exoplayer.text.SubtitleLayout;
 import com.google.android.exoplayer.util.Util;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
@@ -66,6 +75,7 @@ import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.chromecast.LivePlayerActivity;
 import com.zype.android.ui.dialog.ErrorDialogFragment;
+import com.zype.android.ui.dialog.SubtitlesDialogFragment;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.video_details.fragments.video.MediaControlInterface;
 import com.zype.android.ui.video_details.fragments.video.OnVideoAudioListener;
@@ -85,6 +95,7 @@ import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -96,7 +107,7 @@ import java.util.Observer;
 
 public class PlayerFragment extends BaseFragment implements
         CustomPlayer.Listener, AudioCapabilitiesReceiver.Listener, MediaControlInterface, Observer,
-        AdEvent.AdEventListener, AdErrorEvent.AdErrorListener {
+        AdEvent.AdEventListener, AdErrorEvent.AdErrorListener, CustomPlayer.CaptionListener {
 
     public static final int TYPE_AUDIO_LOCAL = 1;
     public static final int TYPE_AUDIO_WEB = 2;
@@ -124,6 +135,7 @@ public class PlayerFragment extends BaseFragment implements
     private AspectRatioFrameLayout videoFrame;
     private CustomPlayer player;
     private SurfaceView surfaceView;
+    private SubtitleLayout subtitleLayout;
 
     private boolean playerNeedsPrepare;
 
@@ -215,6 +227,12 @@ public class PlayerFragment extends BaseFragment implements
         callReceiver = new CallReceiver();
         handlerTimer = new Handler();
 
+        // Get saved closed captions state
+        ccEnabled = SettingsProvider.getInstance().getBoolean(SettingsProvider.CLOSED_CAPTIONS_ENABLED);
+        if (ccEnabled) {
+            ccTrack = SettingsProvider.getInstance().getString(SettingsProvider.SELECTED_CLOSED_CAPTIONS_TRACK);
+        }
+
         // Listener to detect current playback time
         runnablePlaybackTime = new Runnable() {
             @Override
@@ -259,8 +277,12 @@ public class PlayerFragment extends BaseFragment implements
         });
 
         videoFrame = (AspectRatioFrameLayout) mainView.findViewById(R.id.video_frame);
+
         surfaceView = (SurfaceView) mainView.findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(surfaceCallback);
+
+        subtitleLayout = (SubtitleLayout) mainView.findViewById(R.id.subtitles);
+
         thumbnailView = (ImageView) mainView.findViewById(R.id.thumbnailView);
         if (contentType == TYPE_AUDIO_WEB || contentType == TYPE_AUDIO_LOCAL) {
             thumbnailView.setVisibility(View.VISIBLE);
@@ -302,6 +324,8 @@ public class PlayerFragment extends BaseFragment implements
                 adsManager.init();
             }
         });
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -344,6 +368,8 @@ public class PlayerFragment extends BaseFragment implements
         }
         // Retrieve Advertising Id and save it in preferences
         AdMacrosHelper.fetchGoogleAdvertisingId(getActivity());
+
+        configureSubtitleView();
 
         mListener.onFullscreenChanged();
         registerReceivers();
@@ -465,6 +491,47 @@ public class PlayerFragment extends BaseFragment implements
         mListener = null;
     }
 
+    // //////////
+    // Menu
+    //
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.player, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem itemCC = menu.findItem(R.id.menuClosedCaptions);
+        if (ccEnabled) {
+            itemCC.setIcon(R.drawable.ic_closed_caption_black_24dp);
+            itemCC.setChecked(true);
+        }
+        else {
+            itemCC.setIcon(null);
+            itemCC.setChecked(false);
+        }
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuClosedCaptions:
+                if (ccEnabled) {
+                    ccEnabled = false;
+                    SettingsProvider.getInstance().setBoolean(SettingsProvider.CLOSED_CAPTIONS_ENABLED, ccEnabled);
+                    updateClosedCaptionsTrack();
+                    getActivity().invalidateOptionsMenu();
+                }
+                else {
+                    showClosedCaptionsDialog();
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void registerReceivers() {
         if (!isReceiversRegistered) {
             IntentFilter filter = new IntentFilter();
@@ -542,6 +609,7 @@ public class PlayerFragment extends BaseFragment implements
         if (player == null) {
             player = new CustomPlayer(getActivity().getApplicationContext(), getRendererBuilder());
             player.addListener(this);
+            player.setCaptionListener(this);
             playerNeedsPrepare = true;
             mediaController = new MediaController(getContext());
             mediaController.setAnchorView(mainView);
@@ -630,7 +698,6 @@ public class PlayerFragment extends BaseFragment implements
                 }
             }
         }
-//        showAd();
     }
 
     private void releasePlayer() {
@@ -697,6 +764,9 @@ public class PlayerFragment extends BaseFragment implements
 //                        handlerTimer.post(runnablePlaybackTime);
 //                    }
 //                }
+
+                updateClosedCaptionsTrack();
+
                 if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB) {
                     Logger.d(String.format("onStateChanged(): ExoPlayer.STATE_READY: playWhenReady=%1$s", playWhenReady));
                     // Count play time of the live stream if user is not logged in and is not subscribed
@@ -1238,6 +1308,106 @@ public class PlayerFragment extends BaseFragment implements
         if ((consumerId = SettingsProvider.getInstance().getConsumerId()) != null) { customDimensions.put("consumerId", consumerId); }
 
         return customDimensions;
+    }
+
+    //
+    // Closed captions
+    //
+    private boolean ccEnabled;
+    private String ccTrack;
+
+    // 'CaptionListener' implementation
+    @Override
+    public void onCues(List<Cue> cues) {
+        subtitleLayout.setCues(cues);
+    }
+
+    private void configureSubtitleView() {
+        CaptionStyleCompat style;
+        float fontScale;
+        if (Util.SDK_INT >= 19) {
+            style = getUserCaptionStyleV19();
+            fontScale = getUserCaptionFontScaleV19();
+        }
+        else {
+            style = CaptionStyleCompat.DEFAULT;
+            fontScale = 1.0f;
+        }
+        subtitleLayout.setStyle(style);
+        subtitleLayout.setFractionalTextSize(SubtitleLayout.DEFAULT_TEXT_SIZE_FRACTION * fontScale);
+    }
+
+    @TargetApi(19)
+    private float getUserCaptionFontScaleV19() {
+        CaptioningManager captioningManager = (CaptioningManager) getActivity().getSystemService(Context.CAPTIONING_SERVICE);
+        return captioningManager.getFontScale();
+    }
+
+    @TargetApi(19)
+    private CaptionStyleCompat getUserCaptionStyleV19() {
+        CaptioningManager captioningManager = (CaptioningManager) getActivity().getSystemService(Context.CAPTIONING_SERVICE);
+        return CaptionStyleCompat.createFromCaptionStyle(captioningManager.getUserStyle());
+    }
+
+    private void updateClosedCaptionsTrack() {
+        if (ccEnabled) {
+            player.setSelectedTrack(CustomPlayer.TYPE_TEXT, getClosedCaptionsTrackIndex(ccTrack));
+        }
+        else {
+            player.setSelectedTrack(CustomPlayer.TYPE_TEXT, CustomPlayer.TRACK_DISABLED);
+        }
+    }
+
+    private int getClosedCaptionsTrackIndex(String track) {
+        int result = -1;
+        if (player != null) {
+            int type = CustomPlayer.TYPE_TEXT;
+            if (TextUtils.isEmpty(track)) {
+                if (player.getTrackCount(type) > 0) {
+                    result = 0;
+                }
+            }
+            else {
+                for (int i = 0; i < player.getTrackCount(type); i++) {
+                    MediaFormat mediaFormat = player.getTrackFormat(type, i);
+                    if (track.equalsIgnoreCase(mediaFormat.trackId)) {
+                        result = i;
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    private void showClosedCaptionsDialog() {
+        if (player == null) {
+            return;
+        }
+        // Get CC tracks
+        final List<CharSequence> tracks = new ArrayList<>();
+        for (int i = 0; i < player.getTrackCount(CustomPlayer.TYPE_TEXT); i++) {
+            MediaFormat mediaFormat = player.getTrackFormat(CustomPlayer.TYPE_TEXT, i);
+            tracks.add(mediaFormat.trackId);
+        }
+
+        // Show selection dialog
+        SubtitlesDialogFragment.createAndShowSubtitlesDialogFragment(getActivity(),
+                "Select track",
+                tracks.toArray(new CharSequence[tracks.size()]),
+                getClosedCaptionsTrackIndex(SettingsProvider.getInstance().getString(SettingsProvider.SELECTED_CLOSED_CAPTIONS_TRACK)),
+                new SubtitlesDialogFragment.ISubtitlesDialogListener() {
+                    @Override
+                    public void onItemSelected(SubtitlesDialogFragment dialog, int selectedItem) {
+                        ccEnabled = true;
+                        SettingsProvider.getInstance().setBoolean(SettingsProvider.CLOSED_CAPTIONS_ENABLED, ccEnabled);
+                        ccTrack = tracks.get(selectedItem).toString();
+                        SettingsProvider.getInstance().setString(SettingsProvider.SELECTED_CLOSED_CAPTIONS_TRACK, ccTrack);
+                        updateClosedCaptionsTrack();
+                        getActivity().invalidateOptionsMenu();
+                        dialog.dismiss();
+                    }
+                });
     }
 
 }
