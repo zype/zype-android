@@ -38,7 +38,7 @@ android {
     }
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
-    def zypeTemplateVersion = "1.7.0"
+    def zypeTemplateVersion = "1.8.0"
 
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
@@ -47,15 +47,10 @@ android {
         jumboMode true
     }
     defaultConfig {
-        applicationId 'com.zype.android.template'
         minSdkVersion 16
         targetSdkVersion 25
         versionCode currentCodeVersion
         buildConfigField "String", "ZYPE_TEMPLATE_VERSION", "\"${zypeTemplateVersion}\""
-        manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
-                                // TODO: Provide valid app_id and google_project_number for OneSignal
-                                onesignal_app_id               : "",
-                                onesignal_google_project_number: ""]
     }
 
     buildTypes {
@@ -77,17 +72,25 @@ android {
     productFlavors {
         zype {
             versionName zypeTemplateVersion
+            applicationId 'com.zype.android.template'
+            manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
+                                    onesignal_app_id               : "",
+                                    onesignal_google_project_number: ""]
         }
         template {
             versionName '1.0.0'
             applicationId "<APPLICATION_ID>"
+            manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
+                                    // TODO: Provide valid app_id and google_project_number for OneSignal
+                                    onesignal_app_id               : "",
+                                    onesignal_google_project_number: ""]
         }
     }
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
             def outputNameNew = "Zype-Android" + "-" + variant.productFlavors.name + "-" + variant.buildType.name +
-                    "-" + defaultConfig.versionName + "-" + getDate() + ".apk"
+                    "-" + variant.productFlavors.versionName + "-" + getDate() + ".apk"
             outputFileName = outputNameNew
         }
     }

@@ -32,7 +32,7 @@
         android:name="${applicationId}.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.zype.android.permission.C2D_MESSAGE" />
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
 
     <application
         android:name=".ZypeApp"
@@ -76,7 +76,9 @@
             android:label="@string/title_activity_episode_detail"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.main.MainActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
+            >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zype.android.ui.main.MainActivity" />
@@ -212,7 +214,9 @@
             android:name=".ui.main.fragments.playlist.PlaylistActivity"
             android:label="@string/title_activity_playlist"
             />
-        <activity android:name=".ui.main.fragments.videos.VideosActivity" />
+        <activity android:name=".ui.main.fragments.videos.VideosActivity"
+            android:theme="@style/AppTheme"
+            />
         <activity
             android:name=".ui.Intro.IntroActivity"
             />
