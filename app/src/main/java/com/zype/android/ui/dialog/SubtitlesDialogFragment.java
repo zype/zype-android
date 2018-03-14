@@ -54,6 +54,10 @@ public class SubtitlesDialogFragment extends DialogFragment {
      */
     private ISubtitlesDialogListener mDialogListener;
 
+    private static final String EXTRA_TITLE = "ExtraTitle";
+    private static final String EXTRA_ITEMS = "ExtraItems";
+    private static final String EXTRA_SELECTED_ITEM = "ExtraSelectedItem";
+
     /**
      * Create and show alert dialog fragment.
      *
@@ -69,10 +73,11 @@ public class SubtitlesDialogFragment extends DialogFragment {
                                                             int selectedItem,
                                                             ISubtitlesDialogListener listener) {
 
-        SubtitlesDialogFragment dialog = new SubtitlesDialogFragment(title,
-                items,
-                selectedItem,
-                listener);
+        SubtitlesDialogFragment dialog = SubtitlesDialogFragment.newInstance(title, items, selectedItem);
+        dialog.mTitle = dialog.getArguments().getString(EXTRA_TITLE);
+        dialog.items = dialog.getArguments().getCharSequenceArray(EXTRA_ITEMS);
+        dialog.selectedItem = dialog.getArguments().getInt(EXTRA_SELECTED_ITEM);
+        dialog.mDialogListener = listener;
         FragmentManager fragmentManager = activity.getFragmentManager();
         dialog.setCancelable(true);
         dialog.show(fragmentManager, TAG);
@@ -82,26 +87,23 @@ public class SubtitlesDialogFragment extends DialogFragment {
      * Default constructor.
      */
     public SubtitlesDialogFragment() {
-
     }
 
     /**
-     * Constructor.
+     * Creates new dialog instance
      *
      * @param title                Dialog title.
      * @param items                List of tracks to select.
      * @param selectedItem         Selected track
-     * @param listener             Dialog listener reference.
      */
-    public SubtitlesDialogFragment(String title,
-                                   CharSequence[] items,
-                                   int selectedItem,
-                                   ISubtitlesDialogListener listener) {
-
-        mTitle = title;
-        this.items = items;
-        this.selectedItem = selectedItem;
-        mDialogListener = listener;
+    public static SubtitlesDialogFragment newInstance(String title, CharSequence[] items, int selectedItem) {
+        SubtitlesDialogFragment fragment = new SubtitlesDialogFragment();
+        Bundle args = new Bundle();
+        args.putString(EXTRA_TITLE, title);
+        args.putCharSequenceArray(EXTRA_ITEMS, items);
+        args.putInt(EXTRA_SELECTED_ITEM, selectedItem);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     /**
@@ -132,5 +134,14 @@ public class SubtitlesDialogFragment extends DialogFragment {
         }
         Dialog result = builder.create();
         return result;
+    }
+
+    /**
+     * Set listener
+     *
+     * @param listener             Dialog listener reference.
+     */
+    public void setListener(ISubtitlesDialogListener listener) {
+        this.mDialogListener = listener;
     }
 }
