@@ -37,4 +37,18 @@ public class DialogHelper {
         AlertDialog alert = alertDialog.create();
         alert.show();
     }
+
+    public static void showEntitlementAlert(final Context context, String message) {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setTitle(context.getString(R.string.entitlement_dialog_error_title));
+        alertDialog.setMessage(message);
+        alertDialog.setPositiveButton(context.getString(R.string.dialog_button_ok), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = alertDialog.create();
+        alert.show();
+    }
+
 }

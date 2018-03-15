@@ -54,19 +54,27 @@ import com.zype.android.utils.ListUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.builder.EntitlementParamsBuilder;
+import com.zype.android.webapi.builder.EntitlementsParamsBuilder;
 import com.zype.android.webapi.builder.ParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
+import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.download.DownloadVideoEvent;
+import com.zype.android.webapi.events.entitlements.VideoEntitlementEvent;
 import com.zype.android.webapi.events.favorite.FavoriteEvent;
 import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
 import com.zype.android.webapi.events.video.RetrieveVideoEvent;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
+import com.zype.android.webapi.model.entitlements.VideoEntitlement;
 import com.zype.android.webapi.model.player.File;
 import com.zype.android.webapi.model.video.Pagination;
 import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import retrofit.RetrofitError;
 
 public class VideosActivity extends MainActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>,
                                                         BillingManager.BillingUpdatesListener {
@@ -321,6 +329,21 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Logger.d("onItemClick()");
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
+
+        if (ZypeConfiguration.isUniversalTVODEnabled(this) && holder.purchaseRequired) {
+            if (holder.isEntitled) {
+                VideoDetailActivity.startActivity(this, holder.videoId);
+            }
+            else {
+                if (SettingsProvider.getInstance().isLoggedIn()) {
+                    requestEntitled(holder.videoId);
+                }
+                else {
+                    NavigationHelper.getInstance(this).switchToLoginScreen(this);
+                }
+            }
+            return;
+        }
         if (holder.subscriptionRequired) {
             NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, holder.onAir);
 
@@ -402,8 +425,15 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         mAdapter.changeCursor(null);
     }
 
-    //
-    // Subscribe
+    private void requestEntitled(String videoId) {
+        EntitlementParamsBuilder builder = new EntitlementParamsBuilder()
+                .addAccessToken()
+                .addVideoId(videoId);
+        getApi().executeRequest(WebApiManager.Request.CHECK_VIDEO_ENTITLEMENT, builder.build());
+    }
+
+    // //////////
+    // Subscriptions
     //
     @Subscribe
     public void handleRetrieveVideo(RetrieveVideoEvent event) {
@@ -469,4 +499,24 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         }
     }
 
+    @Subscribe
+    public void handleVideoEntitlementEvent(VideoEntitlementEvent event) {
+        Logger.d("handleVideoEntitlementEvent()");
+        Bundle requestOptions = event.getOptions();
+        HashMap<String, String> pathParams = (HashMap<String, String>) requestOptions.getSerializable(ParamsBuilder.PATH_PARAMS);
+        String videoId = pathParams.get(EntitlementParamsBuilder.VIDEO_ID);
+        VideoDetailActivity.startActivity(this, videoId);
+    }
+
+    @Subscribe
+    public void handleError(ErrorEvent event) {
+        Logger.e("handleError()");
+        if (event.getEventData() == WebApiManager.Request.CHECK_VIDEO_ENTITLEMENT) {
+            RetrofitError error = event.getError();
+            if (error != null) {
+                VideoEntitlement response = (VideoEntitlement) event.getError().getBodyAs(VideoEntitlement.class);
+                DialogHelper.showEntitlementAlert(this, response.message);
+            }
+        }
+    }
 }

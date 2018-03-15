@@ -13,7 +13,6 @@ import android.util.Log;
 import com.squareup.okhttp.OkHttpClient;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
-import com.zype.android.ZypeApp;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.bus.EventBus;
 import com.zype.android.core.events.AuthorizationErrorEvent;
@@ -23,6 +22,7 @@ import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.webapi.builder.AuthParamsBuilder;
 import com.zype.android.webapi.builder.DownloadAudioParamsBuilder;
 import com.zype.android.webapi.builder.DownloadVideoParamsBuilder;
+import com.zype.android.webapi.builder.EntitlementParamsBuilder;
 import com.zype.android.webapi.builder.FavoriteParamsBuilder;
 import com.zype.android.webapi.builder.ParamsBuilder;
 import com.zype.android.webapi.builder.PlayerParamsBuilder;
@@ -38,6 +38,8 @@ import com.zype.android.webapi.events.consumer.ConsumerEvent;
 import com.zype.android.webapi.events.consumer.ConsumerFavoriteVideoEvent;
 import com.zype.android.webapi.events.download.DownloadAudioEvent;
 import com.zype.android.webapi.events.download.DownloadVideoEvent;
+import com.zype.android.webapi.events.entitlements.VideoEntitlementEvent;
+import com.zype.android.webapi.events.entitlements.VideoEntitlementsEvent;
 import com.zype.android.webapi.events.favorite.FavoriteEvent;
 import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
 import com.zype.android.webapi.events.onair.OnAirAudioEvent;
@@ -61,6 +63,8 @@ import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoResponse;
 import com.zype.android.webapi.model.consumers.ConsumerResponse;
 import com.zype.android.webapi.model.download.DownloadAudioResponse;
 import com.zype.android.webapi.model.download.DownloadVideoResponse;
+import com.zype.android.webapi.model.entitlements.VideoEntitlementResponse;
+import com.zype.android.webapi.model.entitlements.VideoEntitlementsResponse;
 import com.zype.android.webapi.model.favorite.FavoriteResponse;
 import com.zype.android.webapi.model.favorite.UnfavoriteResponse;
 import com.zype.android.webapi.model.onair.OnAirAudioResponse;
@@ -281,6 +285,11 @@ public class WebApiManager {
                 } else {
                     throw new IllegalStateException("VideoParamsBuilder.PLAYLIST_ID can not be null");
                 }
+            case CHECK_VIDEO_ENTITLEMENT:
+                videoId = pathParams.get(EntitlementParamsBuilder.VIDEO_ID);
+                return new VideoEntitlementEvent(ticket, args, new VideoEntitlementResponse(mApi.checkVideoEntitlement(videoId, getParams)));
+            case VIDEO_ENTITLEMENTS:
+                return new VideoEntitlementsEvent(ticket, new VideoEntitlementsResponse(mApi.getVideoEntitlements(getParams)));
             default:
                 throw new RuntimeException("Unknown request:" + request);
         }
@@ -322,7 +331,9 @@ public class WebApiManager {
         ON_AIR,
         PLAYER_ON_AIR_VIDEO,
         PLAYER_ON_AIR_AUDIO,
-        PLAYLIST_GET
+        PLAYLIST_GET,
+        CHECK_VIDEO_ENTITLEMENT,
+        VIDEO_ENTITLEMENTS
     }
 
     private static class CustomRequestInterceptor implements RequestInterceptor {
@@ -428,7 +439,7 @@ public class WebApiManager {
             try {
                 DataEvent data = executeJob(job);
                 if (data == null) {
-                    return new ErrorEvent(job.getTicket(), job.getRequest(), mContext.getString(R.string.GENERIC_ERROR));
+                    return new ErrorEvent(job.getTicket(), job.getRequest(), mContext.getString(R.string.GENERIC_ERROR), null);
                 }
 
                 // Handling refresh token event on the same thread that all request are made on. This way we no the refresh will be complete before making any other calls
@@ -458,7 +469,7 @@ public class WebApiManager {
                         return new UnrsolvedHostErrorEvent(job.getTicket(), job.getRequest(), err.getMessage());
                 } else {
                     Log.d(TAG, "Request failed: " + job.getRequest(), err.getCause());
-                    return new ErrorEvent(job.getTicket(), job.getRequest(), "(" + statusCode + ") " + mContext.getString(R.string.GENERIC_ERROR));
+                    return new ErrorEvent(job.getTicket(), job.getRequest(), "(" + statusCode + ") " + mContext.getString(R.string.GENERIC_ERROR), err);
                 }
             }
         }

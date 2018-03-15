@@ -25,8 +25,9 @@ public class Contract {
 
     public static class Video implements BaseColumns {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME_VIDEO).build();
-
         public static final String TABLE = TABLE_NAME_VIDEO;
+        public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE;
+
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_ACTIVE = "active";
         public static final String COLUMN_AD_VIDEO_TAG = "ad_video_tag";
@@ -83,6 +84,10 @@ public class Contract {
         public static final String COLUMN_VIDEO_ZOBJECTS = "video_zobject";
         public static final String COLUMN_ZOBJECT_IDS = "zobjectIds";
         public static final String COLUMN_SEGMENTS = "segments";
+
+        public static final String ENTITLEMENT_UPDATED_AT = "EntitlementUpdatedAt";
+        public static final String IS_ENTITLED = "IsEntitled";
+        public static final String PURCHASE_REQUIRED = "PurchaseRequired";
     }
 
     public static class Favorite implements BaseColumns {

@@ -77,6 +77,8 @@ public class VideoHelper {
         contentValues.put(Contract.Video.COLUMN_ZOBJECT_IDS, new Gson().toJson(videoData.getZobjectIds()));
         contentValues.put(Contract.Video.COLUMN_SEGMENTS, new Gson().toJson(videoData.getSegments()));
 
+        contentValues.put(Contract.Video.PURCHASE_REQUIRED, videoData.isPurchaseRequired() ? 1 : 0);
+
         return contentValues;
     }
 
@@ -163,6 +165,9 @@ public class VideoHelper {
             }.getType();
             video.setSegments(gson.<List<Segment>>fromJson(cursor.getString(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_SEGMENTS)), segmentType));
         }
+
+        video.setPurchaseRequired(cursor.getInt(cursor.getColumnIndex(Contract.Video.PURCHASE_REQUIRED)) == 1);
+
         return video;
     }
 
@@ -312,4 +317,18 @@ public class VideoHelper {
             contentResolver.update(uri, value, Contract.Video.COLUMN_ID + " =?", new String[]{favoritesList.get(i).getId()});
         }
     }
+
+    public static int setEntitlement(@NonNull ContentResolver contentResolver, String videoId, boolean isEntitled, String entitlementUpdatedAt) {
+        Uri uri = Contract.Video.CONTENT_URI;
+        ContentValues values = new ContentValues();
+        values.put(Contract.Video.IS_ENTITLED, isEntitled ? 1 : 0);
+        values.put(Contract.Video.ENTITLEMENT_UPDATED_AT, entitlementUpdatedAt);
+        if (TextUtils.isEmpty(videoId)) {
+            return contentResolver.update(uri, values, null, null);
+        }
+        else {
+            return contentResolver.update(uri, values, Contract.Video.COLUMN_ID + " =?", new String[] { videoId } );
+        }
+    }
+
 }

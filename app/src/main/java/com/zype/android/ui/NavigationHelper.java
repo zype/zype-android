@@ -63,16 +63,20 @@ public class NavigationHelper {
                 if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || liveStreamLimitExceeded) {
                     if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
                         switchToSubscriptionScreen(activity);
-                    } else {
-                        DialogHelper.showSubscriptionAlertIssue(context);
                     }
-                } else {
+                    else {
+                        DialogHelper.showSubscriptionAlertIssue(activity);
+                    }
+                }
+                else {
                     VideoDetailActivity.startActivity(activity, videoId);
                 }
-            } else {
+            }
+            else {
                 if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
                     switchToIntroScreen(activity);
-                } else {
+                }
+                else {
                     switchToLoginScreen(activity);
                 }
             }

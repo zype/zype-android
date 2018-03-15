@@ -8,8 +8,8 @@
     <string name="title_activity_highlight_detail">Back</string>
 
     <string name="title_tab_latest">latest</string>
-    <string name="title_tab_download">downloads</string>
-    <string name="title_tab_favorite">favorites</string>
+    <string name="title_tab_downloads">downloads</string>
+    <string name="title_tab_favorites">favorites</string>
     <string name="title_tab_highlight">highlight</string>
     <string name="title_tab_home">home</string>
     <string name="GENERIC_ERROR">Something went wrong. Please, try again.</string>
@@ -97,6 +97,15 @@
     <string name="intro_button_browse">Browse</string>
     <string name="intro_button_login">Log in</string>
     <string name="intro_button_trial">Start Free Trial</string>
+
+    <!-- Main -->
+    <string name="main_tab_my_library">My library</string>
+
+    <!-- My library -->
+    <string name="my_library_error_empty">You have not purchased any videos.\n
+        Any videos you purchase will automatically appear in your library.</string>
+    <string name="my_library_sign_in">Please sign in to see\nMy library videos</string>
+    <string name="entitlement_dialog_error_title">Error</string>
 
     <!-- Player -->
     <string name="menu_player_closed_captions">Closed captions</string>

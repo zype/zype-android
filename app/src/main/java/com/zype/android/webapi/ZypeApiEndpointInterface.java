@@ -6,6 +6,8 @@ import com.zype.android.webapi.model.auth.TokenInfo;
 import com.zype.android.webapi.model.category.Categories;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideo;
+import com.zype.android.webapi.model.entitlements.VideoEntitlement;
+import com.zype.android.webapi.model.entitlements.VideoEntitlements;
 import com.zype.android.webapi.model.favorite.DeleteFavorite;
 import com.zype.android.webapi.model.favorite.FavoriteVideo;
 import com.zype.android.webapi.model.onair.OnAirAudioResponseData;
@@ -91,6 +93,13 @@ public interface ZypeApiEndpointInterface {
 
     @DELETE("/consumers/{consumer_id}/video_favorites/{favorite_id}/")
     DeleteFavorite setUnFavoriteVideo(@Path("consumer_id") String consumerId, @Path("favorite_id") String favoriteId, @QueryMap HashMap<String, String> postParams);
+
+    // Video entitlements
+    @GET("/videos/{video_id}/entitled/")
+    VideoEntitlement checkVideoEntitlement(@Path("video_id") String videoId, @QueryMap HashMap<String, String> getParams);
+
+    @GET("/consumer/videos/")
+    VideoEntitlements getVideoEntitlements(@QueryMap HashMap<String, String> getParams);
 
     @GET("/embed/{video_id}")
     PlayerVideoData getVideoPlayer(@Path("video_id") String videoId, @QueryMap Map<String, String> getParams);

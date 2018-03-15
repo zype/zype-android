@@ -85,6 +85,11 @@ public class VideoData {
     @Expose
     private String publishedAt;
 
+    @Nullable
+    @SerializedName("purchase_required")
+    @Expose
+    private boolean purchaseRequired;
+
     @Expose
     private int rating;
 
@@ -819,5 +824,12 @@ public class VideoData {
         this.adVideoTag = adVideoTag;
     }
 
+    @Nullable
+    public boolean isPurchaseRequired() {
+        return purchaseRequired;
+    }
 
+    public void setPurchaseRequired(@Nullable boolean purchaseRequired) {
+        this.purchaseRequired = purchaseRequired;
+    }
 }

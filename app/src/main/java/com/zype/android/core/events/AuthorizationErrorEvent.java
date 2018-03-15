@@ -9,7 +9,7 @@ public class AuthorizationErrorEvent extends ErrorEvent {
 //    private final ErrorCode mCode;
 
     public AuthorizationErrorEvent(RequestTicket ticket, WebApiManager.Request type, String errMsg) {
-        super(ticket, type, errMsg);
+        super(ticket, type, errMsg, null);
 //        mCode = code;
     }
 

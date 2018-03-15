@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 public class VideoDetailActivity extends BaseVideoActivity {
+    public static final String TAG = VideoDetailActivity.class.getSimpleName();
 
     private VideoDetailPager mViewPager;
     private TabLayout mTabLayout;
@@ -115,7 +116,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
 
     @Override
     protected String getActivityName() {
-        return getString(R.string.activity_name_episode_details);
+        return TAG;
     }
 
     private void initTabs() {

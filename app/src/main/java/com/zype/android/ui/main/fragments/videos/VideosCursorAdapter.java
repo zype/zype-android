@@ -202,12 +202,14 @@ public class VideosCursorAdapter extends CursorAdapter {
 //            viewHolder.episodeView.setVisibility(View.VISIBLE);
 //            viewHolder.episode.setText(cursor.getString(COL_VIDEO_EPISODE));
 //        }
+        viewHolder.isEntitled = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.IS_ENTITLED)) == 1;
+        viewHolder.purchaseRequired = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.PURCHASE_REQUIRED)) == 1;
 
         if (cursor.getString(COL_VIDEO_THUMBNAILS) != null) {
             loadImage(context, cursor, viewHolder);
         }
         if (viewHolder.subscriptionRequired) {
-            if (SubscriptionsHelper.isUserSubscribed(mActivity)) {
+            if (hasPermissionToPlayVideo(viewHolder)) {
                 viewHolder.imageLocked.setVisibility(GONE);
                 viewHolder.imageUnlocked.setVisibility(View.VISIBLE);
             }
@@ -421,6 +423,20 @@ public class VideosCursorAdapter extends CursorAdapter {
         showDownloadOptions = show;
     }
 
+    private boolean hasPermissionToPlayVideo(VideosViewHolder holder) {
+        if (ZypeConfiguration.isUniversalTVODEnabled(mContext) && holder.purchaseRequired) {
+            if (holder.isEntitled) {
+                return true;
+            }
+        }
+        if (holder.subscriptionRequired) {
+            if (SubscriptionsHelper.isUserSubscribed(mActivity)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public class VideosViewHolder {
         public boolean isFavorite;
         public ProgressBar progressBar;
@@ -439,6 +455,9 @@ public class VideosCursorAdapter extends CursorAdapter {
         public boolean isAudioDownloaded;
         public boolean onAir;
         public boolean subscriptionRequired;
+        public boolean isEntitled;
+        public boolean purchaseRequired;
+
         ImageView downloadButton;
         String videoPath;
         String youtubePath;

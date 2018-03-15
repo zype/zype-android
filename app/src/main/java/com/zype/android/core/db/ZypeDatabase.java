@@ -14,7 +14,7 @@ import com.zype.android.core.provider.Contract;
  */
 public class ZypeDatabase extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "zype.db";
 
     private static final String TYPE_TEXT = " TEXT ";
@@ -84,7 +84,10 @@ public class ZypeDatabase extends SQLiteOpenHelper {
                 + Contract.Video.COLUMN_CRUNCHYROLL_ID + TYPE_TEXT + COMMA_SEP
                 + Contract.Video.COLUMN_VIDEO_ZOBJECTS + TYPE_TEXT + COMMA_SEP
                 + Contract.Video.COLUMN_ZOBJECT_IDS + TYPE_TEXT + COMMA_SEP
-                + Contract.Video.COLUMN_SEGMENTS + TYPE_TEXT
+                + Contract.Video.COLUMN_SEGMENTS + TYPE_TEXT + COMMA_SEP
+                + Contract.Video.ENTITLEMENT_UPDATED_AT + TYPE_TEXT + COMMA_SEP
+                + Contract.Video.IS_ENTITLED + TYPE_INTEGER + COMMA_SEP
+                + Contract.Video.PURCHASE_REQUIRED + TYPE_TEXT
                 + ");";
     }
 
@@ -156,9 +159,11 @@ public class ZypeDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(@NonNull SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL(Contract.Video.DELETE_TABLE);
         db.execSQL(Contract.AdSchedule.DELETE_TABLE);
         db.execSQL(Contract.AnalyticBeacon.DELETE_TABLE);
         // TODO: After implementing delete all tables call 'onCreate' to upgrade all tables without duplicate the code
+        db.execSQL(getCreateVideoTableQuery());
         db.execSQL(getCreateAdScheduleTableQuery());
         db.execSQL(getCreateAnalyticsBeaconTableQuery());
     }
