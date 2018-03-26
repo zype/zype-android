@@ -44,7 +44,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mApi.unsubscribe(mEventsHandler);
-//        ZypeApp.get(this).refWatcher().watch(this);
     }
 
     @Override
@@ -68,14 +67,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         BusProvider.getBus().unregister(mNetworkEventHandler);
         NetworkStateObserver.getInstance().unregister(this);
     }
-
-    //    protected boolean isWiFiConnectionEnable() {
-//        return NetworkStateObserver.isWiFiEnable();
-//    }
-//
-//    protected boolean isNetworkConnectionEnabled() {
-//        return NetworkStateObserver.isnNetworkEnabled();
-//    }
 
     protected void handleAuthorizationError(AuthorizationErrorEvent event) {
 //        mApi.cancelPendingRequests(true);

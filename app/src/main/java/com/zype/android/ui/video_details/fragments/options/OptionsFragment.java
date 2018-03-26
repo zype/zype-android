@@ -303,15 +303,6 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         }
     }
 
-//    public void updateListView(int newProgress) {
-//        View convertView = mOptionList.getChildAt(2);
-//        if (convertView != null) {
-//            ProgressBar bar = (ProgressBar) convertView.findViewById(R.id.progressBar);
-//            bar.setVisibility(View.VISIBLE);
-//            bar.setProgress(newProgress);
-//        }
-//    }
-
     private List<Options> getOptionsList() {
         List<Options> list = new ArrayList<>();
         list.add(new Options(OPTION_FAVORITES, getFavoriteTitle(isFavorite), getFavoriteIcon(isFavorite)));
@@ -422,45 +413,8 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     public void onItemClick(OptionsAdapter.ViewHolder holder) {
         ArrayList<String> items = new ArrayList<>();
         switch (holder.id) {
-            /*case 0:
-                items.add(getString(R.string.option_play_as_video));
-                items.add(getString(R.string.option_play_as_audio));
-                if (((BaseVideoActivity) getActivity()).isChromecastConntected()) {
-                    DialogFragment newFragment = CustomAlertDialog.newInstance(
-                            R.string.alert_dialog_title_transcoded, R.string.alert_dialog_message_transcoded);
-                    newFragment.show(getActivity().getSupportFragmentManager(), "dialog_transcoded");
-                } else {
-                    AlertDialog.Builder builder = CustomAlertDialog.getListDialog(getString(R.string.option_play_as), items, mContext, new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            switch (which) {
-                                case 0:
-                                    playAsVideo = true;
-                                    mListener.onShowVideo();
-                                    break;
-                                case 1:
-                                    playAsVideo = false;
-                                    mListener.onShowAudio();
-                                    break;
-                            }
-                            mAdapter.changeList(getOptionsList());
-                        }
-                    });
-                    android.support.v7.app.AlertDialog dialog = builder.create();
-                    dialog.setCanceledOnTouchOutside(true);
-                    dialog.show();
-                }
-                break;*/
             case OPTION_DOWNLOAD:
-//                if (SettingsProvider.getInstance().isLoggedIn()) {
-                    showDownloadMenu();
-//                }
-//                else {
-//                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-//                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
-//                }
+                showDownloadMenu();
                 break;
             case OPTION_FAVORITES:
                 isFavorite = !isFavorite;
@@ -476,14 +430,6 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                 break;
         }
     }
-
-//    private void hideProgress() {
-//        View convertView = mOptionList.getChildAt(2);
-//        if (convertView != null) {
-//            ProgressBar bar = (ProgressBar) convertView.findViewById(R.id.progressBar);
-//            bar.setVisibility(View.GONE);
-//        }
-//    }
 
     @Override
     protected String getFragmentName() {

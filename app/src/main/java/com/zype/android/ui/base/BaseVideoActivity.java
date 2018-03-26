@@ -216,9 +216,6 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     private void getAudioDownloadUrl(String videoId) {
-//        if (SettingsProvider.getInstance().getSubscriptionCount() > 0) {
-//            DownloadAudioParamsBuilder playerParamsBuilder = new DownloadAudioParamsBuilder()
-//                    .addAudioId(episodeId);
         DownloadAudioParamsBuilder downloadAudioParamsBuilder = new DownloadAudioParamsBuilder();
         if (SettingsProvider.getInstance().isLoggedIn()) {
             downloadAudioParamsBuilder.addAccessToken();
@@ -228,13 +225,9 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         }
         downloadAudioParamsBuilder.addAudioId(videoId);
             getApi().executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, downloadAudioParamsBuilder.build());
-//        }
     }
 
     private void getVideoDownloadUrl(String videoId) {
-//        if (SettingsProvider.getInstance().getSubscriptionCount() > 0) {
-//            DownloadVideoParamsBuilder downloadVideoParamsBuilder = new DownloadVideoParamsBuilder()
-//                    .addVideoId(episodeId);
         DownloadVideoParamsBuilder downloadVideoParamsBuilder = new DownloadVideoParamsBuilder();
         if (SettingsProvider.getInstance().isLoggedIn()) {
             downloadVideoParamsBuilder.addAccessToken();
@@ -244,7 +237,6 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         }
         downloadVideoParamsBuilder.addVideoId(videoId);
             getApi().executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, downloadVideoParamsBuilder.build());
-//        }
     }
 
     @Nullable
@@ -306,11 +298,6 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             mInterface.stop();
         }
         FragmentManager fragmentManager = getSupportFragmentManager();
-//        Fragment playerFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PLAYER);
-//        if (playerFragment instanceof PlayerFragment) {
-//            ((PlayerFragment) playerFragment).setNeedStartBgService(false);
-//        }
-
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         mInterface = (MediaControlInterface) fragment;
         if (mInterface == null) {
@@ -330,13 +317,6 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         }
         playerParamsBuilder.addVideoId(videoId);
         getApi().executeRequest(WebApiManager.Request.PLAYER_VIDEO, playerParamsBuilder.build());
-
-        //do not load guests
-        /*ZObjectParamsBuilder zObjectParamsBuilder = new ZObjectParamsBuilder()
-                .addVideoId(videoId)
-                .addType(ZObjectParamsBuilder.TYPE_GUEST);
-        getApi().executeRequest(WebApiManager.Request.Z_OBJECT, zObjectParamsBuilder.build());*/
-
     }
 
     protected void requestAudioUrl(String audioId) {
@@ -507,17 +487,6 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     public int getCurrentFragment() {
         return mType;
     }
-
-//    CHROMECAST
-
-//    @Override
-//    public List<ZobjectData> getZObjectList() {
-//        return zObjectList;
-//    }
-//
-//    protected void initVideoCastManager() {
-//
-//    }
 
     private MediaInfo getLocalMediaInfo(int type, @Nullable VideoData videoData) {
         String url = getNetworkUrl(type, videoData);

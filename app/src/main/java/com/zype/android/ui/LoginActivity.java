@@ -40,8 +40,6 @@ import com.zype.android.webapi.model.consumers.Consumer;
 
 public class LoginActivity extends BaseActivity {
 
-    //    public static final String EXTRA_AUTH_ERROR = "extra_auth_error";
-//    public static final String EXTRA_LOGOUT = "logout";
     private View mProgressView;
     private View mLoginFormView;
     private TextInputLayout emailWrapper;

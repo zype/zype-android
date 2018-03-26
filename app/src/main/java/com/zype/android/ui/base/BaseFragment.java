@@ -63,12 +63,6 @@ public abstract class BaseFragment extends Fragment {
         }
     }
 
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        ZypeApp.get(getActivity()).refWatcher().watch(this);
-//    }
-
     public void onSaveInstanceState(Bundle outState) {
         onSaveInstanceState = true;
     }
@@ -162,12 +156,10 @@ public abstract class BaseFragment extends Fragment {
     private static void updateListView(VideosCursorAdapter.VideosViewHolder viewHolder, int newProgress) {
         viewHolder.progressBar.setVisibility(View.VISIBLE);
         viewHolder.progressBar.setProgress(newProgress);
-//        viewHolder.detailsView.setVisibility(View.GONE);
     }
 
     private static void hideProgress(VideosCursorAdapter.VideosViewHolder viewHolder) {
         viewHolder.progressBar.setVisibility(View.GONE);
-//        viewHolder.detailsView.setVisibility(View.VISIBLE);
         viewHolder.progressBar.setProgress(0);
     }
 }

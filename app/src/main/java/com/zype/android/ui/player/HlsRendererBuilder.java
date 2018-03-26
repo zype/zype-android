@@ -1,16 +1,12 @@
 package com.zype.android.ui.player;
 
 
-import com.google.android.exoplayer.C;
 import com.google.android.exoplayer.DefaultLoadControl;
 import com.google.android.exoplayer.LoadControl;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecSelector;
 import com.google.android.exoplayer.MediaCodecUtil.DecoderQueryException;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
-import com.google.android.exoplayer.MediaFormat;
-import com.google.android.exoplayer.SampleSource;
-import com.google.android.exoplayer.SingleSampleSource;
 import com.google.android.exoplayer.TrackRenderer;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.chunk.VideoFormatSelectorUtil;
@@ -28,13 +24,11 @@ import com.google.android.exoplayer.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer.upstream.DefaultUriDataSource;
 import com.google.android.exoplayer.util.ManifestFetcher;
 import com.google.android.exoplayer.util.ManifestFetcher.ManifestCallback;
-import com.google.android.exoplayer.util.MimeTypes;
 
 
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaCodec;
-import android.net.Uri;
 import android.os.Handler;
 
 
@@ -157,8 +151,6 @@ public class HlsRendererBuilder implements CustomPlayer.RendererBuilder {
             }
 
             DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-//            HlsChunkSource chunkSource = new HlsChunkSource(dataSource, url, manifest, bandwidthMeter,
-//                    variantIndices, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
             HlsChunkSource chunkSource = new HlsChunkSource(true, dataSource, manifest,
                     DefaultHlsTrackSelector.newDefaultInstance(context), bandwidthMeter,
                     timestampAdjusterProvider);

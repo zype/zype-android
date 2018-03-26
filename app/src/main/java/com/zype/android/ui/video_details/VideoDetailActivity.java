@@ -3,13 +3,11 @@ package com.zype.android.ui.video_details;
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
 import com.zype.android.utils.BundleConstants;
@@ -48,7 +46,6 @@ import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class VideoDetailActivity extends BaseVideoActivity {
     public static final String TAG = VideoDetailActivity.class.getSimpleName();
@@ -158,17 +155,13 @@ public class VideoDetailActivity extends BaseVideoActivity {
 
     @Subscribe
     public void handleUnfavoriteEvent(UnfavoriteEvent event) {
-//        throw new IllegalStateException("UnfavoriteEvent check this method. This method does not work before this moment");
         Logger.d("UnfavoriteEvent");
         DataHelper.setFavoriteVideo(getContentResolver(), event.getVideoId(), false);
         DataHelper.deleteFavorite(getContentResolver(), event.getVideoId());
-//        DataHelper.setFavoriteVideo(getContentResolver(), event.getEventData().getEventData().getResponse().getVideoId(), false);
     }
 
     @Subscribe
     public void handleDownloadVideo(DownloadVideoEvent event) {
-//        if (!ZypeSettings.isDownloadsEnabled())
-//            return;
         Logger.d("handleDownloadVideo");
         File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
         String url;
@@ -180,15 +173,12 @@ public class VideoDetailActivity extends BaseVideoActivity {
             initTabs();
         }
         else {
-//            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for video file");
             Logger.e("Server response must contains \"mp\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
         }
     }
 
     @Subscribe
     public void handleDownloadAudio(DownloadAudioEvent event) {
-//        if (!ZypeSettings.isDownloadsEnabled())
-//            return;
         File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
         String url;
         if (file != null) {
@@ -199,7 +189,6 @@ public class VideoDetailActivity extends BaseVideoActivity {
             initTabs();
         }
         else {
-//            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for audio file");
             Logger.e("Server response must contains \"m4a\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
         }
     }
