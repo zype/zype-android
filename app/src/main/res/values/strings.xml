@@ -76,6 +76,7 @@
 
     <!-- Closed captions -->
     <string name="subtitles_dialog_empty">Closed captions are not available for this video</string>
+    <string name="subtitles_off">Turn off</string>
 
     <!-- Consumer -->
     <string name="consumer_create_form_description">Fill out your email address and create a password. Use this login to gain access to our content on other devices.</string>

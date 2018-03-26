@@ -107,7 +107,8 @@ import java.util.Observer;
 
 public class PlayerFragment extends BaseFragment implements
         CustomPlayer.Listener, AudioCapabilitiesReceiver.Listener, MediaControlInterface, Observer,
-        AdEvent.AdEventListener, AdErrorEvent.AdErrorListener, CustomPlayer.CaptionListener {
+        AdEvent.AdEventListener, AdErrorEvent.AdErrorListener, CustomPlayer.CaptionListener,
+        PlayerControlView.IClosedCaptionsListener {
 
     public static final int TYPE_AUDIO_LOCAL = 1;
     public static final int TYPE_AUDIO_WEB = 2;
@@ -131,7 +132,8 @@ public class PlayerFragment extends BaseFragment implements
         defaultCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
     }
 
-    private MediaController mediaController;
+//    private MediaController mediaController;
+    private PlayerControlView mediaController;
     private AspectRatioFrameLayout videoFrame;
     private CustomPlayer player;
     private SurfaceView surfaceView;
@@ -214,7 +216,6 @@ public class PlayerFragment extends BaseFragment implements
             contentType = getArguments().getInt(CONTENT_TYPE_TYPE, BaseVideoActivity.TYPE_UNKNOWN);
             fileId = getArguments().getString(CONTENT_ID_EXTRA);
             if (!TextUtils.isEmpty(fileId)) {
-//                fileId = getArguments().getString(CONTENT_ID_EXTRA);
                 mThumbnailList = DataHelper.getThumbnailList(getActivity().getContentResolver(), fileId);
                 adSchedule = VideoHelper.getAdSchedule(getActivity().getContentResolver(), fileId);
                 analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
@@ -222,7 +223,6 @@ public class PlayerFragment extends BaseFragment implements
             adTag = getArguments().getString(PARAMETERS_AD_TAG);
             onAir = getArguments().getBoolean(PARAMETERS_ON_AIR);
         }
-//        context = getContext();
         isNeedToSeekToLatestListenPosition = true;
         callReceiver = new CallReceiver();
         handlerTimer = new Handler();
@@ -496,38 +496,38 @@ public class PlayerFragment extends BaseFragment implements
     //
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.player, menu);
+//        inflater.inflate(R.menu.player, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem itemCC = menu.findItem(R.id.menuClosedCaptions);
-        if (ccEnabled) {
-            itemCC.setIcon(R.drawable.ic_closed_caption_black_24dp);
-            itemCC.setChecked(true);
-        }
-        else {
-            itemCC.setIcon(null);
-            itemCC.setChecked(false);
-        }
+//        MenuItem itemCC = menu.findItem(R.id.menuClosedCaptions);
+//        if (ccEnabled) {
+//            itemCC.setIcon(R.drawable.ic_closed_caption_black_24dp);
+//            itemCC.setChecked(true);
+//        }
+//        else {
+//            itemCC.setIcon(null);
+//            itemCC.setChecked(false);
+//        }
         super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menuClosedCaptions:
-                if (ccEnabled) {
-                    ccEnabled = false;
-                    SettingsProvider.getInstance().setBoolean(SettingsProvider.CLOSED_CAPTIONS_ENABLED, ccEnabled);
-                    updateClosedCaptionsTrack();
-                    getActivity().invalidateOptionsMenu();
-                }
-                else {
-                    showClosedCaptionsDialog();
-                }
-                break;
+//            case R.id.menuClosedCaptions:
+//                if (ccEnabled) {
+//                    ccEnabled = false;
+//                    SettingsProvider.getInstance().setBoolean(SettingsProvider.CLOSED_CAPTIONS_ENABLED, ccEnabled);
+//                    updateClosedCaptionsTrack();
+//                    getActivity().invalidateOptionsMenu();
+//                }
+//                else {
+//                    showClosedCaptionsDialog();
+//                }
+//                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -611,10 +611,12 @@ public class PlayerFragment extends BaseFragment implements
             player.addListener(this);
             player.setCaptionListener(this);
             playerNeedsPrepare = true;
-            mediaController = new MediaController(getContext());
+//            mediaController = new MediaController(getContext());
+            mediaController = new PlayerControlView(getContext());
             mediaController.setAnchorView(mainView);
             mediaController.setMediaPlayer(player.getPlayerControl());
             mediaController.setEnabled(true);
+            mediaController.setClosedCaptionsListener(this);
 
             attachPlayerToAnalyticsManager();
 
@@ -706,7 +708,6 @@ public class PlayerFragment extends BaseFragment implements
             if (player.getPlaybackState() != ExoPlayer.STATE_ENDED) {
                 mListener.saveCurrentTimeStamp(player.getCurrentPosition());
             }
-//            player.getPlayerControl().pause();
 
             AnalyticsManager manager = AnalyticsManager.getInstance();
             manager.trackStop();
@@ -750,20 +751,7 @@ public class PlayerFragment extends BaseFragment implements
                     }
                     player.seekTo(playerPosition);
                     isNeedToSeekToLatestListenPosition = false;
-//                    // Seek next ad to play
-//                    if (playWhenReady && nextAdIndex == -1) {
-//                        nextAdIndex = seekAdByPosition(DataHelper.getPlayTime(getActivity().getContentResolver(), fileId));
-//                    }
                 }
-//                // Start\stop playback time listener
-//                if (handlerTimer != null) {
-//                    if (runnablePlaybackTime != null) {
-//                        handlerTimer.removeCallbacks(runnablePlaybackTime);
-//                    }
-//                    if (playWhenReady) {
-//                        handlerTimer.post(runnablePlaybackTime);
-//                    }
-//                }
 
                 updateClosedCaptionsTrack();
 
@@ -821,15 +809,12 @@ public class PlayerFragment extends BaseFragment implements
             Toast.makeText(getContext(), stringId, Toast.LENGTH_LONG).show();
         }
         playerNeedsPrepare = true;
-//        showControls();
     }
 
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthAspectRatio) {
         if (videoFrame != null) {
-//            Toast.makeText(getContext(), "Set video size: " + width + "x" + format.height +" Codec:"+format.codecs, Toast.LENGTH_SHORT).show();
-            videoFrame.setAspectRatio(
-                    height == 0 ? 1 : (width * pixelWidthAspectRatio) / height);
+            videoFrame.setAspectRatio(height == 0 ? 1 : (width * pixelWidthAspectRatio) / height);
         }
     }
 
@@ -1322,6 +1307,12 @@ public class PlayerFragment extends BaseFragment implements
         subtitleLayout.setCues(cues);
     }
 
+    // 'PlayerControlView.IClosedCaptionsListener' implementation
+    @Override
+    public void onClickClosedCaptions() {
+        showClosedCaptionsDialog();
+    }
+
     private void configureSubtitleView() {
         CaptionStyleCompat style;
         float fontScale;
@@ -1390,18 +1381,32 @@ public class PlayerFragment extends BaseFragment implements
             MediaFormat mediaFormat = player.getTrackFormat(CustomPlayer.TYPE_TEXT, i);
             tracks.add(mediaFormat.trackId);
         }
+        tracks.add(getString(R.string.subtitles_off));
+        int selectedIndex;
+        if (ccEnabled) {
+            selectedIndex = getClosedCaptionsTrackIndex(SettingsProvider.getInstance().getString(SettingsProvider.SELECTED_CLOSED_CAPTIONS_TRACK));
+        }
+        else {
+            selectedIndex = tracks.size() - 1;
+        }
 
         // Show selection dialog
         SubtitlesDialogFragment.createAndShowSubtitlesDialogFragment(getActivity(),
                 "Select track",
                 tracks.toArray(new CharSequence[tracks.size()]),
-                getClosedCaptionsTrackIndex(SettingsProvider.getInstance().getString(SettingsProvider.SELECTED_CLOSED_CAPTIONS_TRACK)),
+                selectedIndex,
                 new SubtitlesDialogFragment.ISubtitlesDialogListener() {
                     @Override
                     public void onItemSelected(SubtitlesDialogFragment dialog, int selectedItem) {
-                        ccEnabled = true;
+                        if (selectedItem == tracks.size() - 1) {
+                            ccEnabled = false;
+                            ccTrack = "";
+                        }
+                        else {
+                            ccEnabled = true;
+                            ccTrack = tracks.get(selectedItem).toString();
+                        }
                         SettingsProvider.getInstance().setBoolean(SettingsProvider.CLOSED_CAPTIONS_ENABLED, ccEnabled);
-                        ccTrack = tracks.get(selectedItem).toString();
                         SettingsProvider.getInstance().setString(SettingsProvider.SELECTED_CLOSED_CAPTIONS_TRACK, ccTrack);
                         updateClosedCaptionsTrack();
                         getActivity().invalidateOptionsMenu();
