@@ -13,13 +13,9 @@ public class ParamsBuilder {
 
     public static final int PER_PAGE_DEFAULT = 10;
 
-//    public static final String RECEIVER_PARAMS = "receiver";
-
     private HashMap<String, String> mPostParams;
     private HashMap<String, String> mPathParams;
     private HashMap<String, String> mGetParams;
-
-//    private Parcelable mReceiver;
 
     public ParamsBuilder() {
         mPostParams = new HashMap<>();
@@ -42,17 +38,11 @@ public class ParamsBuilder {
         return this;
     }
 
-//    public ParamsBuilder addReceiver(Parcelable receiver) {
-//        mReceiver = receiver;
-//        return this;
-//    }
-
     public Bundle build() {
         Bundle bundle = new Bundle();
         bundle.putSerializable(POST_PARAMS, mPostParams);
         bundle.putSerializable(PATH_PARAMS, mPathParams);
         bundle.putSerializable(GET_PARAMS, mGetParams);
-//        bundle.putParcelable(RECEIVER_PARAMS, mReceiver);
         return bundle;
     }
 }

@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -102,44 +103,156 @@ public class AdMacrosHelper {
         return queryParams;
     }
 
+    public interface IDeviceIdListener {
+        void onDeviceId(String deviceId);
+    }
+
+    public static void fetchDeviceId(final Context context, final IDeviceIdListener listener) {
+        if (listener == null) {
+            throw new IllegalArgumentException("getDeviceId(): 'listener' must be not null");
+        }
+        // If we have device id stored in preferences already, just return it
+        String deviceId = SettingsProvider.getInstance().getString(SettingsProvider.GOOGLE_ADVERTISING_ID);
+        if (!TextUtils.isEmpty(deviceId)) {
+            listener.onDeviceId(deviceId);
+        }
+        else {
+            // Try to retrieve Google advertising id as device id
+            GoogleAdvertisingIdTask task = new GoogleAdvertisingIdTask(context,
+                    new GoogleAdvertisingIdTask.IGoogleAdvertisingIdListener() {
+                        @Override
+                        public void onSuccess(String advertId) {
+                            // Save retrieved advertising id in preferences and return it
+                            if (!TextUtils.isEmpty(advertId)) {
+                                SettingsProvider.getInstance().setString(SettingsProvider.GOOGLE_ADVERTISING_ID, advertId);
+                                listener.onDeviceId(advertId);
+                            }
+                            // Generate UUID as device id
+                            else {
+                                listener.onDeviceId(createDeviceIdAsUUID());
+                            }
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            listener.onDeviceId(createDeviceIdAsUUID());
+                        }
+                    });
+            task.execute();
+        }
+
+    }
+
+    private static String createDeviceIdAsUUID() {
+        return java.util.UUID.randomUUID().toString();
+    }
+
+//    /**
+//     * Retrieve Advertising Id provided by Google Play Services and store it in app preferences
+//     * Call this method before {@link #getValues(Context)}
+//     *
+//     * @param context
+//     */
+//    public static void fetchGoogleAdvertisingId(final Context context, final IDeviceIdListener listener) {
+//        GoogleAdvertisingIdTask task = new GoogleAdvertisingIdTask(context)
+//        new AsyncTask<Void, Void, String>() {
+//            @Override
+//            protected String doInBackground(Void... params) {
+//                AdvertisingIdClient.Info idInfo = null;
+//                try {
+//                    idInfo = AdvertisingIdClient.getAdvertisingIdInfo(context.getApplicationContext());
+//                }
+//                catch (GooglePlayServicesNotAvailableException e) {
+//                    e.printStackTrace();
+//                    if (listener != null) {
+//                        listener.onError(e);
+//                    }
+//                }
+//                catch (GooglePlayServicesRepairableException e) {
+//                    e.printStackTrace();
+//                    if (listener != null) {
+//                        listener.onError(e);
+//                    }
+//                }
+//                catch (IOException e) {
+//                    e.printStackTrace();
+//                    if (listener != null) {
+//                        listener.onError(e);
+//                    }
+//                }
+//                String advertId = null;
+//                try{
+//                    advertId = idInfo.getId();
+//                }
+//                catch (NullPointerException e){
+//                    e.printStackTrace();
+//                    if (listener != null) {
+//                        listener.onError(e);
+//                    }
+//                }
+//                return advertId;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(String advertId) {
+//                SettingsProvider.getInstance().setString(SettingsProvider.GOOGLE_ADVERTISING_ID, advertId);
+//                if (listener != null) {
+//                    listener.onDeviceId(advertId);
+//                }
+//            }
+//
+//        }.execute();
+//    }
+
     /**
-     * Retrieve Advertising Id provided by Google Play Services and store it in app preferences
-     * Call this method before {@link #getValues(Context)}
-     *
-     * @param context
+     * Retrieve Advertising Id provided by Google Play Services
      */
-    public static void fetchGoogleAdvertisingId(final Context context) {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... params) {
-                AdvertisingIdClient.Info idInfo = null;
-                try {
-                    idInfo = AdvertisingIdClient.getAdvertisingIdInfo(context.getApplicationContext());
-                }
-                catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                }
-                catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-                String advertId = null;
-                try{
-                    advertId = idInfo.getId();
-                }
-                catch (NullPointerException e){
-                    e.printStackTrace();
-                }
-                return advertId;
-            }
+    private static class GoogleAdvertisingIdTask extends AsyncTask<Void, Void, String> {
+        private Context context;
+        private IGoogleAdvertisingIdListener listener;
 
-            @Override
-            protected void onPostExecute(String advertId) {
-                SettingsProvider.getInstance().setString(SettingsProvider.GOOGLE_ADVERTISING_ID, advertId);
-            }
+        public interface IGoogleAdvertisingIdListener {
+            void onSuccess(String advertId);
+            void onError(Exception e);
+        }
 
-        }.execute();
+        public GoogleAdvertisingIdTask(Context context, IGoogleAdvertisingIdListener listener) {
+            this.context = context;
+            this.listener = listener;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            AdvertisingIdClient.Info idInfo = null;
+            try {
+                idInfo = AdvertisingIdClient.getAdvertisingIdInfo(context.getApplicationContext());
+            }
+            catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+                listener.onError(e);
+            }
+            catch (GooglePlayServicesRepairableException e) {
+                e.printStackTrace();
+                listener.onError(e);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+                listener.onError(e);
+            }
+            String advertId = null;
+            try{
+                advertId = idInfo.getId();
+            }
+            catch (NullPointerException e){
+                e.printStackTrace();
+                listener.onError(e);
+            }
+            return advertId;
+        }
+
+        @Override
+        protected void onPostExecute(String advertId) {
+            listener.onSuccess(advertId);
+        }
     }
 }

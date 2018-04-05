@@ -13,6 +13,8 @@ import com.zype.android.webapi.model.app.AppData;
 
 public class ZypeConfiguration {
     private static final String PREFERENCE_BACKGROUND_PLAYBACK = "ZypeBackgroundPlayback";
+    private static final String PREFERENCE_DEVICE_LINKING = "ZypeDeviceLinking";
+    private static final String PREFERENCE_DEVICE_LINKING_URL = "ZypeDeviceLinkingUrl";
     private static final String PREFERENCE_DOWNLOADS = "ZypeDownloads";
     private static final String PREFERENCE_DOWNLOADS_FOR_GUESTS = "ZypeDownloadsForGuests";
     private static final String PREFERENCE_NATIVE_SUBSCRIPTION = "ZypeNativeSubscription";
@@ -74,6 +76,8 @@ public class ZypeConfiguration {
         SharedPreferences prefs = getPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove(PREFERENCE_BACKGROUND_PLAYBACK);
+        editor.remove(PREFERENCE_DEVICE_LINKING);
+        editor.remove(PREFERENCE_DEVICE_LINKING_URL);
         editor.remove(PREFERENCE_DOWNLOADS);
         editor.remove(PREFERENCE_DOWNLOADS_FOR_GUESTS);
         editor.remove(PREFERENCE_NATIVE_SUBSCRIPTION);
@@ -140,6 +144,14 @@ public class ZypeConfiguration {
     //
     public static boolean isBackgroundPlaybackEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_BACKGROUND_PLAYBACK, ZypeSettings.BACKGROUND_PLAYBACK_ENABLED, context);
+    }
+
+    public static boolean isDeviceLinkingEnabled(Context context) {
+        return getBooleanPreference(PREFERENCE_DEVICE_LINKING, ZypeSettings.DEVICE_LINKING, context);
+    }
+
+    public static String getDeviceLinkingUrl(Context context) {
+        return getStringPreference(PREFERENCE_DEVICE_LINKING_URL, ZypeSettings.DEVICE_LINKING_URL, context);
     }
 
     public static boolean isDownloadsEnabled(Context context) {

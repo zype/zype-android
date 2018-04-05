@@ -99,6 +99,14 @@
     <string name="intro_button_login">Log in</string>
     <string name="intro_button_trial">Start Free Trial</string>
 
+    <!-- Login -->
+    <string name="login_button_device_linked">Continue</string>
+    <string name="login_button_email">Sign in with email</string>
+    <string name="login_button_link_device">Link device</string>
+    <string name="login_device_linking_url">From your computer or mobile device visit:</string>
+    <string name="login_error_device_id">Error get device id</string>
+    <string name="login_pin">Enter Pin:</string>
+
     <!-- Main -->
     <string name="main_tab_my_library">My library</string>
 

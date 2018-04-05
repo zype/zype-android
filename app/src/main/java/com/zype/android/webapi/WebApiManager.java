@@ -42,6 +42,7 @@ import com.zype.android.webapi.events.entitlements.VideoEntitlementEvent;
 import com.zype.android.webapi.events.entitlements.VideoEntitlementsEvent;
 import com.zype.android.webapi.events.favorite.FavoriteEvent;
 import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
+import com.zype.android.webapi.events.linking.DevicePinEvent;
 import com.zype.android.webapi.events.onair.OnAirAudioEvent;
 import com.zype.android.webapi.events.onair.OnAirEvent;
 import com.zype.android.webapi.events.onair.OnAirVideoEvent;
@@ -67,6 +68,7 @@ import com.zype.android.webapi.model.entitlements.VideoEntitlementResponse;
 import com.zype.android.webapi.model.entitlements.VideoEntitlementsResponse;
 import com.zype.android.webapi.model.favorite.FavoriteResponse;
 import com.zype.android.webapi.model.favorite.UnfavoriteResponse;
+import com.zype.android.webapi.model.linking.DevicePinResponse;
 import com.zype.android.webapi.model.onair.OnAirAudioResponse;
 import com.zype.android.webapi.model.onair.OnAirResponse;
 import com.zype.android.webapi.model.onair.OnAirVideoResponse;
@@ -242,6 +244,10 @@ public class WebApiManager {
                 return new ConsumerEvent(ticket, new ConsumerResponse(mApi.createConsumer(getParams, postParams)));
             case CONSUMER_GET:
                 return new ConsumerEvent(ticket, new ConsumerResponse(mApi.getConsumer(SettingsProvider.getInstance().getAccessTokenResourceOwnerId(), getParams)));
+            case DEVICE_PIN_CREATE:
+                return new DevicePinEvent(ticket, args, new DevicePinResponse(mApi.createDevicePin(getParams, "")));
+            case DEVICE_PIN_GET:
+                return new DevicePinEvent(ticket, args, new DevicePinResponse(mApi.getDevicePin(getParams)));
             case CATEGORY:
                 return new CategoryEvent(ticket, new CategoryResponse(mApi.getCategory(getParams)));
             case Z_OBJECT:
@@ -314,6 +320,8 @@ public class WebApiManager {
         VIDEO_HIGHLIGHT_GET,
         CONSUMER_CREATE,
         CONSUMER_GET,
+        DEVICE_PIN_CREATE,
+        DEVICE_PIN_GET,
         FAVORITE,
         UN_FAVORITE,
         CONSUMER_FAVORITE_VIDEO_GET,

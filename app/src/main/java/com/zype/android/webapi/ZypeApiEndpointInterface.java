@@ -10,6 +10,7 @@ import com.zype.android.webapi.model.entitlements.VideoEntitlement;
 import com.zype.android.webapi.model.entitlements.VideoEntitlements;
 import com.zype.android.webapi.model.favorite.DeleteFavorite;
 import com.zype.android.webapi.model.favorite.FavoriteVideo;
+import com.zype.android.webapi.model.linking.DevicePin;
 import com.zype.android.webapi.model.onair.OnAirAudioResponseData;
 import com.zype.android.webapi.model.onair.OnAirData;
 import com.zype.android.webapi.model.onair.OnAirVideoResponseData;
@@ -26,6 +27,7 @@ import com.zype.android.webapi.model.zobjects.ZObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
@@ -93,6 +95,13 @@ public interface ZypeApiEndpointInterface {
 
     @DELETE("/consumers/{consumer_id}/video_favorites/{favorite_id}/")
     DeleteFavorite setUnFavoriteVideo(@Path("consumer_id") String consumerId, @Path("favorite_id") String favoriteId, @QueryMap HashMap<String, String> postParams);
+
+    // Device linking
+    @GET("/pin/status/")
+    DevicePin getDevicePin(@QueryMap HashMap<String, String> queryParams);
+
+    @POST("/pin/acquire/")
+    DevicePin createDevicePin(@QueryMap HashMap<String, String> queryParams, @Body String emptyBody);
 
     // Video entitlements
     @GET("/videos/{video_id}/entitled/")

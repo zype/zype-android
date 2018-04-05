@@ -366,8 +366,13 @@ public class PlayerFragment extends BaseFragment implements
         if (BuildConfig.DEBUG) {
             Logger.d("onResume()");
         }
-        // Retrieve Advertising Id and save it in preferences
-        AdMacrosHelper.fetchGoogleAdvertisingId(getActivity());
+        // Retrieve device id
+        AdMacrosHelper.fetchDeviceId(getActivity(), new AdMacrosHelper.IDeviceIdListener() {
+            @Override
+            public void onDeviceId(String deviceId) {
+                Logger.d("onDeviceId(): deviceId=" + deviceId);
+            }
+        });
 
         configureSubtitleView();
 

@@ -31,6 +31,8 @@ public class ZypeSettings {
 
     // Features
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
+    public static final boolean DEVICE_LINKING = true;
+    public static final String DEVICE_LINKING_URL = "https://www.zype.com";
     public static final boolean DOWNLOADS_ENABLED = true;
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
     public static final boolean SHARE_VIDEO_ENABLED = false;

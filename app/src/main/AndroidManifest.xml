@@ -109,11 +109,21 @@
                 android:value="com.zype.android.ui.main.MainActivity" />
         </activity>
         -->
+<!--
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateVisible" />
+            android:windowSoftInputMode="adjustResize|stateVisible"
+            android:theme="@style/AppTheme"
+            />
+-->
+        <activity
+            android:name=".ui.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
+            />
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -135,7 +145,8 @@
             android:label="@string/title_activity_web"
             android:parentActivityName=".ui.video_details.VideoDetailActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zype.android.ui.video_details.VideoDetailActivity" />

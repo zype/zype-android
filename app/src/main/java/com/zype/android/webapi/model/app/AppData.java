@@ -12,6 +12,12 @@ public class AppData {
     public String backgroundPlayback;
 
     @Expose
+    public String deviceLinking;
+
+    @Expose
+    public String deviceLinkingUrl;
+
+    @Expose
     public String downloads;
 
     @Expose
