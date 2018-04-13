@@ -80,7 +80,7 @@ public class ExtractorRendererBuilder implements CustomPlayer.RendererBuilder {
         // Build the video and audio renderers.
         DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(player.getMainHandler(),
                 null);
-        DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
+        DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent, true);
         ExtractorSampleSource sampleSource = new ExtractorSampleSource(uri, dataSource, allocator,
                 BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE);
         MediaCodecVideoTrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(context,

@@ -198,7 +198,8 @@ public class VideoDetailActivity extends BaseVideoActivity {
         Logger.e("handleError");
         if (err instanceof ForbiddenErrorEvent) {
             if (err.getEventData() == WebApiManager.Request.PLAYER_VIDEO) {
-                if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+                if (ZypeConfiguration.isNativeSubscriptionEnabled(this)
+                        && VideoHelper.getFullData(getContentResolver(), mVideoId).isSubscriptionRequired()) {
                     NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
                 }
                 else {

@@ -97,7 +97,8 @@ public class HlsRendererBuilder implements CustomPlayer.RendererBuilder {
             this.url = url;
             this.player = player;
             HlsPlaylistParser parser = new HlsPlaylistParser();
-            playlistFetcher = new ManifestFetcher<>(url, new DefaultUriDataSource(context, userAgent),
+            playlistFetcher = new ManifestFetcher<>(url,
+                    new DefaultUriDataSource(context, null, userAgent, true),
                     parser);
         }
 
@@ -117,8 +118,6 @@ public class HlsRendererBuilder implements CustomPlayer.RendererBuilder {
             if (canceled) {
                 return;
             }
-
-
             player.onRenderersError(e);
         }
 
@@ -150,7 +149,7 @@ public class HlsRendererBuilder implements CustomPlayer.RendererBuilder {
                 }
             }
 
-            DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
+            DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent, true);
             HlsChunkSource chunkSource = new HlsChunkSource(true, dataSource, manifest,
                     DefaultHlsTrackSelector.newDefaultInstance(context), bandwidthMeter,
                     timestampAdjusterProvider);
@@ -170,7 +169,7 @@ public class HlsRendererBuilder implements CustomPlayer.RendererBuilder {
             }
             TrackRenderer textRenderer = null;
             if (preferWebvtt) {
-                DataSource textDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
+                DataSource textDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent, true);
                 HlsChunkSource textChunkSource = new HlsChunkSource(false, textDataSource, manifest,
                         DefaultHlsTrackSelector.newSubtitleInstance(), bandwidthMeter,
                         timestampAdjusterProvider);

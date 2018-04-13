@@ -346,7 +346,6 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         }
         if (holder.subscriptionRequired) {
             NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, holder.onAir);
-
         }
         else {
             VideoDetailActivity.startActivity(this, holder.videoId);
