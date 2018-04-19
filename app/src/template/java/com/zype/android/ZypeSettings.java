@@ -39,6 +39,9 @@ public class ZypeSettings {
     public static final boolean SHARE_VIDEO_ENABLED = false;
 //    public static final boolean SHARE_VIDEO_ENABLED = Boolean.valueOf("<SHARE_VIDEO_ENABLED>");
 
+    public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
+    public static final String DEVICE_LINKING_URL = "<DEVICE_LINKING_URL>";
+
     /**
      * Theme of the app.
      * Use following constants for the theme:
