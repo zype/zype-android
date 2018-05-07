@@ -601,7 +601,11 @@ public class PlayerFragment extends BaseFragment implements
             case TYPE_VIDEO_LIVE:
             case TYPE_AUDIO_WEB:
             case TYPE_AUDIO_LIVE:
-                return new HlsRendererBuilder(getContext(), userAgent, contentUri);
+                if (contentUri.contains(".mp4")) {
+                    return new ExtractorRendererBuilder(getContext(), userAgent, Uri.parse(contentUri), new Mp4Extractor());
+                } else {
+                    return new HlsRendererBuilder(getContext(), userAgent, contentUri);
+                }
             case TYPE_VIDEO_LOCAL:
             case TYPE_AUDIO_LOCAL:
                 return new ExtractorRendererBuilder(getContext(), userAgent, Uri.parse(contentUri), new Mp4Extractor());
