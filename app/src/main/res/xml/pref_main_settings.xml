@@ -12,7 +12,8 @@
             android:title="@string/pref_download_preferences"/>
     </PreferenceCategory>
 -->
-    <PreferenceCategory android:title="Player">
+    <PreferenceCategory
+        android:title="@string/pref_category_video_playback">
         <SwitchPreference
             android:key="AutoplayEnabled"
             android:title="@string/pref_player_autoplay_enabled"

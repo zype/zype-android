@@ -14,5 +14,6 @@
     <string name="pref_storage">Storage</string>
     <string name="pref_zype_template_version">Base Version</string>
 
-    <string name="pref_player_autoplay_enabled">Autoplay playlist videos</string>
+    <string name="pref_category_video_playback">Video Playback</string>
+    <string name="pref_player_autoplay_enabled">Autoplay Videos</string>
 </resources>
