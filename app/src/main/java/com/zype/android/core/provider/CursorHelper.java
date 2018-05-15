@@ -94,6 +94,14 @@ public class CursorHelper {
         return contentResolver.query(uri, null, Contract.Playlist.COLUMN_ID + "=?", new String[] { playlistId }, null);
     }
 
+    // Videos
+    public static Cursor getPlaylistVideosCursor(@NonNull ContentResolver contentResolver, @NonNull final String playlistId) {
+        Uri uri = Contract.PlaylistVideo.CONTENT_URI;
+        String selection = Contract.PlaylistVideo.PLAYLIST_ID + "=?" ;
+        String[] selectionArgs = new String[] { playlistId };
+        return contentResolver.query(uri, null, selection, selectionArgs, Contract.PlaylistVideo.NUMBER);
+    }
+
     // Beacons
     public static Cursor getAnalyticsByVideoId(@NonNull ContentResolver contentResolver, @NonNull final String videoId) {
         Uri uri = Contract.AnalyticBeacon.CONTENT_URI;

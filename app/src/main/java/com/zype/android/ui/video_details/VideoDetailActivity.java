@@ -53,24 +53,28 @@ public class VideoDetailActivity extends BaseVideoActivity {
     private VideoDetailPager mViewPager;
     private TabLayout mTabLayout;
 
-
-    public static void startActivity(Activity activity, String videoId) {
+    public static void startActivity(Activity activity, String videoId, String playlistId) {
         Intent intent = new Intent(activity, VideoDetailActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(BundleConstants.VIDEO_ID, videoId);
+        bundle.putString(BundleConstants.PLAYLIST_ID, playlistId);
         intent.putExtras(bundle);
         activity.startActivity(intent);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Logger.d("onCreate()");
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-
-        getSupportActionBar().setTitle(VideoHelper.getFullData(getContentResolver(), mVideoId).getTitle());
-
-        initTabs();
+        initUI();
         updateDownloadUrls();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Logger.d("onNewIntent()");
+        super.onNewIntent(intent);
+        initUI();
     }
 
     @Override
@@ -116,17 +120,19 @@ public class VideoDetailActivity extends BaseVideoActivity {
         return TAG;
     }
 
-    private void initTabs() {
+    // //////////
+    // UI
+    //
+    private void initUI() {
+
+        getSupportActionBar().setTitle(VideoHelper.getFullData(getContentResolver(), mVideoId).getTitle());
+
         VideoDetailPagerAdapter videoDetailPagerAdapter = new VideoDetailPagerAdapter(this, getSupportFragmentManager(), mVideoId);
         mViewPager = (VideoDetailPager) findViewById(R.id.pager);
         mViewPager.setAdapter(videoDetailPagerAdapter);
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(mViewPager);
     }
-
-    // //////////
-    // UI
-    //
 
     // //////////
     // Data
@@ -170,7 +176,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
             String fileId = event.mFileId;
             DataHelper.saveVideoUrl(getContentResolver(), fileId, url);
 
-            initTabs();
+            initUI();
         }
         else {
             Logger.e("Server response must contains \"mp\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
@@ -186,7 +192,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
             String fileId = event.mFileId;
             DataHelper.saveAudioUrl(getContentResolver(), fileId, url);
 
-            initTabs();
+            initUI();
         }
         else {
             Logger.e("Server response must contains \"m4a\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));

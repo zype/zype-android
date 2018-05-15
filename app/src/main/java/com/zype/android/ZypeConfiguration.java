@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
+import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.webapi.model.app.AppData;
 
 /**
@@ -142,6 +143,10 @@ public class ZypeConfiguration {
 
     // Features
     //
+    public static boolean autoplayEnabled(Context context) {
+        return getBooleanPreference(SettingsProvider.AUTOPLAY_ENABLED, true, context);
+    }
+
     public static boolean isBackgroundPlaybackEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_BACKGROUND_PLAYBACK, ZypeSettings.BACKGROUND_PLAYBACK_ENABLED, context);
     }

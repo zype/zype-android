@@ -12,6 +12,13 @@
             android:title="@string/pref_download_preferences"/>
     </PreferenceCategory>
 -->
+    <PreferenceCategory android:title="Player">
+        <SwitchPreference
+            android:key="AutoplayEnabled"
+            android:title="@string/pref_player_autoplay_enabled"
+            android:defaultValue="true"
+            />
+    </PreferenceCategory>
     <PreferenceCategory android:title="About">
          <Preference
             android:key="terms"

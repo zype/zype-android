@@ -39,13 +39,13 @@ public class NavigationHelper {
         return instance;
     }
 
-    public void checkSubscription(Activity activity, String videoId, boolean onAir) {
+    public void checkSubscription(Activity activity, String videoId, String playlistId, boolean onAir) {
         if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
                 switchToSubscriptionScreen(activity);
             }
             else {
-                VideoDetailActivity.startActivity(activity, videoId);
+                VideoDetailActivity.startActivity(activity, videoId, playlistId);
             }
         }
         else {
@@ -69,7 +69,7 @@ public class NavigationHelper {
                     }
                 }
                 else {
-                    VideoDetailActivity.startActivity(activity, videoId);
+                    VideoDetailActivity.startActivity(activity, videoId, playlistId);
                 }
             }
             else {

@@ -3,6 +3,7 @@ package com.zype.android.ui.video_details;
 import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.zype.android.R;
 import com.zype.android.ui.base.BaseFragment;
@@ -14,7 +15,7 @@ import com.zype.android.ui.video_details.fragments.summary.SummaryFragment;
  * @version 1
  *          date 7/7/15
  */
-public class VideoDetailPagerAdapter extends FragmentPagerAdapter {
+public class VideoDetailPagerAdapter extends FragmentStatePagerAdapter {
 
     private Context mContext;
     private String videoId;
@@ -54,4 +55,8 @@ public class VideoDetailPagerAdapter extends FragmentPagerAdapter {
         return mContext.getString(stringResId[position]);
     }
 
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
 }

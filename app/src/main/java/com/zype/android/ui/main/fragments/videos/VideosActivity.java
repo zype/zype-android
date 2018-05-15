@@ -332,7 +332,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
 
         if (ZypeConfiguration.isUniversalTVODEnabled(this) && holder.purchaseRequired) {
             if (holder.isEntitled) {
-                VideoDetailActivity.startActivity(this, holder.videoId);
+                VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
             }
             else {
                 if (SettingsProvider.getInstance().isLoggedIn()) {
@@ -345,10 +345,10 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
             return;
         }
         if (holder.subscriptionRequired) {
-            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, holder.onAir);
+            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, playlistId, holder.onAir);
         }
         else {
-            VideoDetailActivity.startActivity(this, holder.videoId);
+            VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
         }
     }
 
@@ -504,7 +504,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         Bundle requestOptions = event.getOptions();
         HashMap<String, String> pathParams = (HashMap<String, String>) requestOptions.getSerializable(ParamsBuilder.PATH_PARAMS);
         String videoId = pathParams.get(EntitlementParamsBuilder.VIDEO_ID);
-        VideoDetailActivity.startActivity(this, videoId);
+        VideoDetailActivity.startActivity(this, videoId, playlistId);
     }
 
     @Subscribe

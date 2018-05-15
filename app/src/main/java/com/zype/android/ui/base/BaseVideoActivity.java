@@ -31,13 +31,16 @@ import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
+import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.core.provider.DataHelper;
+import com.zype.android.core.provider.helpers.PlaylistHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.ui.LoginActivity;
 import com.zype.android.ui.chromecast.ChromecastCheckStatusFragment;
 import com.zype.android.ui.chromecast.ChromecastFragment;
+import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
 import com.zype.android.ui.video_details.fragments.video.MediaControlInterface;
 import com.zype.android.ui.video_details.fragments.video.OnVideoAudioListener;
@@ -71,6 +74,8 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     protected ActionBar mActionBar;
     private VideoCastManager mCastManager;
     private VideoCastConsumerImpl mCastConsumer;
+
+    private String playlistId;
 
     View baseView;
 
@@ -157,29 +162,21 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        if (getIntent() != null && getIntent().hasExtra(BundleConstants.VIDEO_ID) && !TextUtils.isEmpty(getIntent().getStringExtra(BundleConstants.VIDEO_ID))) {
-            mVideoId = getIntent().getStringExtra(BundleConstants.VIDEO_ID);
-            mType = getIntent().getIntExtra(BundleConstants.VIDEO_TYPE, TYPE_UNKNOWN);
-            if (mType == PlayerFragment.TYPE_VIDEO_LIVE) {
-                requestLiveVideoUrl(mVideoId);
-            } else if (mType == PlayerFragment.TYPE_AUDIO_LIVE) {
-                requestLiveAudioUrl(mVideoId);
-            }
-            if (mType == TYPE_UNKNOWN) {
-                mType = getMediaType(VideoHelper.getFullData(getContentResolver(), mVideoId));
-            }
-//            getDownloadUrls(mVideoId);
-        } else {
-            mType = TYPE_WEB;
-            Logger.e("VideoId is empty !!");// но тут должен быть путь
-        }
-        if (mType == TYPE_WEB) {
-            requestVideoUrl(mVideoId);
-        }
+        initVideo();
         //Block ChromeCast
         if (isShowChromeCastMenu()) {
             initVideoCastManager();
         }
+        if (mType != TYPE_WEB && mType != PlayerFragment.TYPE_VIDEO_LIVE && mType != PlayerFragment.TYPE_AUDIO_LIVE) {
+            changeFragment(isChromecastConntected());
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        initVideo();
         if (mType != TYPE_WEB && mType != PlayerFragment.TYPE_VIDEO_LIVE && mType != PlayerFragment.TYPE_AUDIO_LIVE) {
             changeFragment(isChromecastConntected());
         }
@@ -381,6 +378,14 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     public void videoFinished() {
         DataHelper.setVideoPlayed(getContentResolver(), mVideoId);
         DataHelper.setPlayTime(getContentResolver(), mVideoId, 0);
+
+        // Jump to next video when Autoplay feature is enabled
+        if (ZypeConfiguration.autoplayEnabled(this)) {
+            Logger.d("videoFinished(): Autoplay next video");
+            String nextVideoId = PlaylistHelper.getNextVideoId(mVideoId,
+                    CursorHelper.getPlaylistVideosCursor(getContentResolver(), playlistId));
+            VideoDetailActivity.startActivity(this, nextVideoId, playlistId);
+        }
     }
 
     @Override
@@ -687,6 +692,29 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         VideoCastManager.getInstance().setCastControllerImmersive(true);
         mCastManager = VideoCastManager.getInstance();
         setupCastListener();
+    }
+
+    private void initVideo() {
+        if (getIntent() != null && getIntent().hasExtra(BundleConstants.VIDEO_ID) && !TextUtils.isEmpty(getIntent().getStringExtra(BundleConstants.VIDEO_ID))) {
+            playlistId = getIntent().getStringExtra(BundleConstants.PLAYLIST_ID);
+            mVideoId = getIntent().getStringExtra(BundleConstants.VIDEO_ID);
+            mType = getIntent().getIntExtra(BundleConstants.VIDEO_TYPE, TYPE_UNKNOWN);
+            if (mType == PlayerFragment.TYPE_VIDEO_LIVE) {
+                requestLiveVideoUrl(mVideoId);
+            } else if (mType == PlayerFragment.TYPE_AUDIO_LIVE) {
+                requestLiveAudioUrl(mVideoId);
+            }
+            if (mType == TYPE_UNKNOWN) {
+                mType = getMediaType(VideoHelper.getFullData(getContentResolver(), mVideoId));
+            }
+//            getDownloadUrls(mVideoId);
+        } else {
+            mType = TYPE_WEB;
+            Logger.e("VideoId is empty !!");// но тут должен быть путь
+        }
+        if (mType == TYPE_WEB) {
+            requestVideoUrl(mVideoId);
+        }
     }
 
 //    @Override

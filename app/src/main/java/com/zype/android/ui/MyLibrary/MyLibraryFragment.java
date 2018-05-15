@@ -226,7 +226,7 @@ public class MyLibraryFragment extends BaseFragment implements ListView.OnItemCl
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
-        VideoDetailActivity.startActivity(getActivity(), holder.videoId);
+        VideoDetailActivity.startActivity(getActivity(), holder.videoId, null);
     }
 
     // //////////

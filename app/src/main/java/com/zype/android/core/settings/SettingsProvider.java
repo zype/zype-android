@@ -22,6 +22,7 @@ import java.util.List;
 
 public class SettingsProvider extends CommonPreferences {
 
+    public static final String AUTOPLAY_ENABLED = "AutoplayEnabled";
     public static final String DOWNLOADS_ENABLED = "DownloadsEnabled";
     public static final String DOWNLOADS_ENABLED_FOR_GUESTS = "DownloadsEnabledForGuests";
     public static final String GOOGLE_ADVERTISING_ID = "GoogleAdvertisingId";

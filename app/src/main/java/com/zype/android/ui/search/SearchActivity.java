@@ -459,10 +459,10 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         Logger.d("onItemClick()");
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
         if (holder.subscriptionRequired) {
-            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, holder.onAir);
+            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, null, holder.onAir);
         }
         else {
-            VideoDetailActivity.startActivity(this, holder.videoId);
+            VideoDetailActivity.startActivity(this, holder.videoId, null);
         }
 //        if (holder.subscriptionRequired) {
 //            if (holder.onAir) {

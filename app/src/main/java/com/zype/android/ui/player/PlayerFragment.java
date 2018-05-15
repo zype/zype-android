@@ -735,7 +735,9 @@ public class PlayerFragment extends BaseFragment implements
 
                 showControls();
                 if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB) {
-                    mListener.videoFinished();
+                    if (playWhenReady) {
+                        mListener.videoFinished();
+                    }
                 } else if (contentType == TYPE_AUDIO_LOCAL || contentType == TYPE_AUDIO_WEB) {
                     mListener.audioFinished();
                 } else if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
