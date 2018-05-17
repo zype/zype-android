@@ -30,11 +30,42 @@
             android:orientation="vertical"
             >
             <FrameLayout
-                android:id="@+id/video_container"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/episode_video_height"
-                android:background="@color/video_background"
-                />
+                android:id="@+id/layoutVideo"
+                >
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/video_container"
+                    android:background="@color/video_background"
+                    />
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:id="@+id/progress"
+                    />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/layoutImage"
+                    android:visibility="gone"
+                    >
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/imageVideo"
+                        />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|top"
+                        android:layout_margin="8dp"
+                        android:src="@drawable/icon_locked"
+                        />
+                </FrameLayout>
+            </FrameLayout>
             <android.support.design.widget.TabLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

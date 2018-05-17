@@ -73,12 +73,7 @@ public class NavigationHelper {
                 }
             }
             else {
-                if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
-                    switchToIntroScreen(activity);
-                }
-                else {
-                    switchToLoginScreen(activity);
-                }
+                switchToLoginScreen(activity);
             }
         }
     }

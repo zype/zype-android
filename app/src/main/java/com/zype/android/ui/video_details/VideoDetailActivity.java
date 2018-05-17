@@ -1,12 +1,16 @@
 package com.zype.android.ui.video_details;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
@@ -30,20 +34,27 @@ import com.zype.android.webapi.model.player.AdvertisingSchedule;
 import com.zype.android.webapi.model.player.Analytics;
 import com.zype.android.webapi.model.player.AnalyticsDimensions;
 import com.zype.android.webapi.model.player.File;
+import com.zype.android.webapi.model.video.Thumbnail;
 import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.webapi.model.zobjects.ZobjectData;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.QuickContactBadge;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +63,9 @@ public class VideoDetailActivity extends BaseVideoActivity {
 
     private VideoDetailPager mViewPager;
     private TabLayout mTabLayout;
+
+    private FrameLayout layoutImage;
+    private ImageView imageVideo;
 
     public static void startActivity(Activity activity, String videoId, String playlistId) {
         Intent intent = new Intent(activity, VideoDetailActivity.class);
@@ -99,7 +113,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
             mViewPager.setVisibility(View.GONE);
             mActionBar.hide();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            findViewById(R.id.video_container).setLayoutParams(params);
+            findViewById(R.id.layoutVideo).setLayoutParams(params);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         }
@@ -109,7 +123,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
             mActionBar.show();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             params.height = (int) getResources().getDimension(R.dimen.episode_video_height);
-            findViewById(R.id.video_container).setLayoutParams(params);
+            findViewById(R.id.layoutVideo).setLayoutParams(params);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         }
@@ -132,6 +146,47 @@ public class VideoDetailActivity extends BaseVideoActivity {
         mViewPager.setAdapter(videoDetailPagerAdapter);
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(mViewPager);
+
+        layoutImage = (FrameLayout) findViewById(R.id.layoutImage);
+        imageVideo = (ImageView) findViewById(R.id.imageVideo);
+        imageVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHelper.showLoginAlert(VideoDetailActivity.this);
+            }
+        });
+    }
+
+    private void showVideoThumbnail() {
+        VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
+        List<Thumbnail> thumbnails = videoData.getThumbnails();
+        layoutImage.setVisibility(View.VISIBLE);
+        if (thumbnails.size() > 0) {
+            UiUtils.loadImage(this, thumbnails.get(1).getUrl(), R.drawable.placeholder_video, imageVideo, getVideoProgressBar());
+        }
+        else {
+            imageVideo.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.placeholder_video));
+        }
+    }
+
+    private void hideVideoThumbnail() {
+        layoutImage.setVisibility(View.GONE);
+    }
+
+    // //////////
+    // Actions
+    //
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case BundleConstants.REQ_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    hideVideoThumbnail();
+                    AutoplayHelper.playNextVideo(this, mVideoId, playlistId);
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     // //////////
@@ -204,14 +259,25 @@ public class VideoDetailActivity extends BaseVideoActivity {
         Logger.e("handleError");
         if (err instanceof ForbiddenErrorEvent) {
             if (err.getEventData() == WebApiManager.Request.PLAYER_VIDEO) {
-                if (ZypeConfiguration.isNativeSubscriptionEnabled(this)
-                        && VideoHelper.getFullData(getContentResolver(), mVideoId).isSubscriptionRequired()) {
-                    NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
-                }
-                else {
-                    DialogHelper.showSubscriptionAlertIssue(this);
+                hideProgress();
+                if (VideoHelper.getFullData(getContentResolver(), mVideoId).isSubscriptionRequired()) {
+                    if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+                        NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
+                    }
+                    else {
+                        if (SettingsProvider.getInstance().isLoggedIn()) {
+                            DialogHelper.showSubscriptionAlertIssue(this);
+                        }
+                        else {
+                            showVideoThumbnail();
+                            DialogHelper.showLoginAlert(this);
+                        }
+                    }
                 }
             }
+        }
+        else if (err instanceof AuthorizationErrorEvent) {
+            // TODO: Handle 401 error
         }
         else {
             if (err.getEventData() != WebApiManager.Request.UN_FAVORITE) {
@@ -258,6 +324,7 @@ public class VideoDetailActivity extends BaseVideoActivity {
 
         mType = PlayerFragment.TYPE_VIDEO_WEB;
         changeFragment(isChromecastConntected());
+        hideProgress();
     }
 
     @Subscribe

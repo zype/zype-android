@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.cast.ApplicationMetadata;
 import com.google.android.gms.cast.MediaInfo;
@@ -37,6 +38,7 @@ import com.zype.android.core.provider.helpers.PlaylistHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
+import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.LoginActivity;
 import com.zype.android.ui.chromecast.ChromecastCheckStatusFragment;
 import com.zype.android.ui.chromecast.ChromecastFragment;
@@ -75,9 +77,11 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     private VideoCastManager mCastManager;
     private VideoCastConsumerImpl mCastConsumer;
 
-    private String playlistId;
+    protected String playlistId;
+    private static boolean autoplay = false;
 
     View baseView;
+    private ProgressBar progressBar;
 
     // LIVE URLS
     protected String liveVideoUrlToPlay = "";
@@ -113,7 +117,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     private static Fragment getVideoFragment(String filePath, String adTag, boolean onAir, String fileId) {
-        return PlayerFragment.newInstance(PlayerFragment.TYPE_VIDEO_WEB, filePath, adTag, onAir, fileId);
+        return PlayerFragment.newInstance(PlayerFragment.TYPE_VIDEO_WEB, filePath, adTag, onAir, fileId, autoplay);
     }
 
     private static Fragment getVideoLocalFragment(String filePath, String fileId) {
@@ -162,6 +166,8 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
+        progressBar = (ProgressBar) baseView.findViewById(R.id.progress);
+
         initVideo();
         //Block ChromeCast
         if (isShowChromeCastMenu()) {
@@ -176,6 +182,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        autoplay = true;
         initVideo();
         if (mType != TYPE_WEB && mType != PlayerFragment.TYPE_VIDEO_LIVE && mType != PlayerFragment.TYPE_AUDIO_LIVE) {
             changeFragment(isChromecastConntected());
@@ -305,6 +312,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     protected void requestVideoUrl(String videoId) {
+        showProgress();
         PlayerParamsBuilder playerParamsBuilder = new PlayerParamsBuilder();
         if (SettingsProvider.getInstance().isLoggedIn()) {
             playerParamsBuilder.addAccessToken();
@@ -371,6 +379,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
 
     @Override
     public void videoStarted() {
+        hideProgress();
         DataHelper.setVideoPlaying(getContentResolver(), mVideoId);
     }
 
@@ -382,9 +391,10 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         // Jump to next video when Autoplay feature is enabled
         if (ZypeConfiguration.autoplayEnabled(this)) {
             Logger.d("videoFinished(): Autoplay next video");
-            String nextVideoId = PlaylistHelper.getNextVideoId(mVideoId,
-                    CursorHelper.getPlaylistVideosCursor(getContentResolver(), playlistId));
-            VideoDetailActivity.startActivity(this, nextVideoId, playlistId);
+            hideVideoLayout();
+            showProgress();
+            autoplay = true;
+            AutoplayHelper.playNextVideo(this, mVideoId, playlistId);
         }
     }
 
@@ -731,4 +741,26 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
 //            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 //        }
 //    }
+
+    // //////////
+    // UI
+    //
+    protected void showProgress() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    protected void hideProgress() {
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    public ProgressBar getVideoProgressBar() {
+        return progressBar;
+    }
+
+    protected void hideVideoLayout() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PLAYER);
+        fragmentManager.beginTransaction().hide(fragment).commit();
+    }
+
 }

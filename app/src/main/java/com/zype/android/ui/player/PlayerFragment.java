@@ -121,6 +121,7 @@ public class PlayerFragment extends BaseFragment implements
     public static final String CONTENT_URL = "content_url";
     public static final String CONTENT_ID_EXTRA = "content_id";
     public static final String PARAMETERS_AD_TAG = "AdTag";
+    public static final String PARAMETERS_AUTOPLAY = "Autoplay";
     public static final String PARAMETERS_ON_AIR = "OnAir";
 
     private static final CookieManager defaultCookieManager;
@@ -161,6 +162,8 @@ public class PlayerFragment extends BaseFragment implements
     private boolean deleteFileBeforeExit = false;
     private boolean isControlsEnabled = true;
 
+    private boolean autoplay = false;
+
     //
     // IMA SDK
     //
@@ -195,7 +198,7 @@ public class PlayerFragment extends BaseFragment implements
         return fragment;
     }
 
-    public static PlayerFragment newInstance(int mediaType, String filePath, String adTag, boolean onAir, String fileId) {
+    public static PlayerFragment newInstance(int mediaType, String filePath, String adTag, boolean onAir, String fileId, boolean autoplay) {
         PlayerFragment fragment = new PlayerFragment();
         Bundle args = new Bundle();
         args.putInt(CONTENT_TYPE_TYPE, mediaType);
@@ -203,6 +206,7 @@ public class PlayerFragment extends BaseFragment implements
         args.putString(PARAMETERS_AD_TAG, adTag);
         args.putBoolean(PARAMETERS_ON_AIR, onAir);
         args.putString(CONTENT_ID_EXTRA, fileId);
+        args.putBoolean(PARAMETERS_AUTOPLAY, autoplay);
         fragment.setArguments(args);
         return fragment;
     }
@@ -220,10 +224,11 @@ public class PlayerFragment extends BaseFragment implements
                 adSchedule = VideoHelper.getAdSchedule(getActivity().getContentResolver(), fileId);
                 analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
             }
+            autoplay = getArguments().getBoolean(PARAMETERS_AUTOPLAY);
             adTag = getArguments().getString(PARAMETERS_AD_TAG);
             onAir = getArguments().getBoolean(PARAMETERS_ON_AIR);
         }
-        isNeedToSeekToLatestListenPosition = true;
+        isNeedToSeekToLatestListenPosition = true && !autoplay;
         callReceiver = new CallReceiver();
         handlerTimer = new Handler();
 
