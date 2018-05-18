@@ -12,6 +12,7 @@ import android.widget.MediaController;
 
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.core.settings.SettingsProvider;
 
 /**
  * Created by Evgeny Cherkasov on 22.03.2018.
@@ -54,7 +55,8 @@ public class PlayerControlView extends MediaController {
         frameParams.gravity = Gravity.RIGHT|Gravity.CENTER_VERTICAL;
 
         ViewGroup rootView = ((ViewGroup) ((ViewGroup) getChildAt(0)).getChildAt(0));
-        if (ZypeConfiguration.autoplayEnabled(view.getContext())) {
+        if (ZypeConfiguration.autoplayEnabled(view.getContext())
+                && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
             View viewNext = makeNextView();
             rootView.addView(viewNext, frameParams);
             View viewPrevious = makePreviousView();

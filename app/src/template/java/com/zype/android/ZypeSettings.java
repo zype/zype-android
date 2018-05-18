@@ -32,6 +32,7 @@ public class ZypeSettings {
     public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("<UNIVERSAL_TVOD>");
 
     // Features
+    public static final boolean AUTOPLAY = Boolean.valueOf("<AUTOPLAY>");
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = Boolean.valueOf("<BACKGROUND_PLAYBACK_ENABLED>");
     public static final boolean DOWNLOADS_ENABLED = Boolean.valueOf("<DOWNLOADS_ENABLED>");
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = Boolean.valueOf("<DOWNLOADS_ENABLED_FOR_GUESTS>");

@@ -30,6 +30,7 @@ public class ZypeSettings {
     public static final boolean UNIVERSAL_TVOD = false;
 
     // Features
+    public static final boolean AUTOPLAY = true;
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
     public static final boolean DEVICE_LINKING = true;
     public static final String DEVICE_LINKING_URL = "https://www.zype.com";

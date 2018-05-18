@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 <!--
     <PreferenceCategory android:title="Content Settings">
         <SwitchPreference
@@ -13,9 +15,11 @@
     </PreferenceCategory>
 -->
     <PreferenceCategory
-        android:title="@string/pref_category_video_playback">
+        android:key="CategoryVideoPlayback"
+        android:title="@string/pref_category_video_playback"
+        >
         <SwitchPreference
-            android:key="AutoplayEnabled"
+            android:key="Autoplay"
             android:title="@string/pref_player_autoplay_enabled"
             android:defaultValue="true"
             />

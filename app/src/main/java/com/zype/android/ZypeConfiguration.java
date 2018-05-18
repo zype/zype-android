@@ -13,6 +13,7 @@ import com.zype.android.webapi.model.app.AppData;
  */
 
 public class ZypeConfiguration {
+    private static final String PREFERENCE_AUTOPLAY = "ZypeAutoplay";
     private static final String PREFERENCE_BACKGROUND_PLAYBACK = "ZypeBackgroundPlayback";
     private static final String PREFERENCE_DEVICE_LINKING = "ZypeDeviceLinking";
     private static final String PREFERENCE_DEVICE_LINKING_URL = "ZypeDeviceLinkingUrl";
@@ -60,6 +61,9 @@ public class ZypeConfiguration {
             editor.putBoolean(PREFERENCE_UNIVERSAL_TVOD, Boolean.valueOf(appData.universalTVOD));
         }
         // Features
+        if (!TextUtils.isEmpty(appData.autoplay)) {
+            editor.putBoolean(PREFERENCE_AUTOPLAY, Boolean.valueOf(appData.autoplay));
+        }
         if (!TextUtils.isEmpty(appData.backgroundPlayback)) {
             editor.putBoolean(PREFERENCE_BACKGROUND_PLAYBACK, Boolean.valueOf(appData.backgroundPlayback));
         }
@@ -76,18 +80,19 @@ public class ZypeConfiguration {
     public static void clear(Context context) {
         SharedPreferences prefs = getPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.remove(PREFERENCE_BACKGROUND_PLAYBACK);
-        editor.remove(PREFERENCE_DEVICE_LINKING);
-        editor.remove(PREFERENCE_DEVICE_LINKING_URL);
-        editor.remove(PREFERENCE_DOWNLOADS);
-        editor.remove(PREFERENCE_DOWNLOADS_FOR_GUESTS);
-        editor.remove(PREFERENCE_NATIVE_SUBSCRIPTION);
-        editor.remove(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION);
-        editor.remove(PREFERENCE_ROOT_PLAYLIST_ID);
-        editor.remove(PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE);
-        editor.remove(PREFERENCE_THEME);
-        editor.remove(PREFERENCE_UNIVERSAL_SUBSCRIPTION);
-        editor.remove(PREFERENCE_UNIVERSAL_TVOD);
+        editor.clear();
+//        editor.remove(PREFERENCE_BACKGROUND_PLAYBACK);
+//        editor.remove(PREFERENCE_DEVICE_LINKING);
+//        editor.remove(PREFERENCE_DEVICE_LINKING_URL);
+//        editor.remove(PREFERENCE_DOWNLOADS);
+//        editor.remove(PREFERENCE_DOWNLOADS_FOR_GUESTS);
+//        editor.remove(PREFERENCE_NATIVE_SUBSCRIPTION);
+//        editor.remove(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION);
+//        editor.remove(PREFERENCE_ROOT_PLAYLIST_ID);
+//        editor.remove(PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE);
+//        editor.remove(PREFERENCE_THEME);
+//        editor.remove(PREFERENCE_UNIVERSAL_SUBSCRIPTION);
+//        editor.remove(PREFERENCE_UNIVERSAL_TVOD);
         editor.apply();
     }
 
@@ -144,7 +149,7 @@ public class ZypeConfiguration {
     // Features
     //
     public static boolean autoplayEnabled(Context context) {
-        return getBooleanPreference(SettingsProvider.AUTOPLAY_ENABLED, true, context);
+        return getBooleanPreference(PREFERENCE_AUTOPLAY, ZypeSettings.AUTOPLAY, context);
     }
 
     public static boolean isBackgroundPlaybackEnabled(Context context) {

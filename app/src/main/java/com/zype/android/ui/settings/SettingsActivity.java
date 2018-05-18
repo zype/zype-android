@@ -2,6 +2,7 @@ package com.zype.android.ui.settings;
 
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.FileUtils;
@@ -13,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 import android.view.MenuItem;
@@ -93,6 +95,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 versionPreference.setSummary(version);
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
+            }
+
+            PreferenceCategory categoryVideoPlayback = (PreferenceCategory) findPreference("CategoryVideoPlayback");
+            if (!ZypeConfiguration.autoplayEnabled(getActivity())) {
+                Preference preferenceAutoplay = findPreference(SettingsProvider.AUTOPLAY);
+                categoryVideoPlayback.removePreference(preferenceAutoplay);
+            }
+            if (categoryVideoPlayback.getPreferenceCount() == 0) {
+                getPreferenceScreen().removePreference(categoryVideoPlayback);
             }
 
             Preference prefZypeTemplateVersion = findPreference("ZypeTemplateVersion");

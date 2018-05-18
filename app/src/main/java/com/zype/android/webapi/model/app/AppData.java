@@ -9,6 +9,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class AppData {
     @Expose
+    public String autoplay;
+
+    @Expose
     public String backgroundPlayback;
 
     @Expose

@@ -389,7 +389,8 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         DataHelper.setPlayTime(getContentResolver(), mVideoId, 0);
 
         // Jump to next video when Autoplay feature is enabled
-        if (ZypeConfiguration.autoplayEnabled(this)) {
+        if (ZypeConfiguration.autoplayEnabled(this)
+                && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
             Logger.d("videoFinished(): Autoplay next video");
             hideVideoLayout();
             showProgress();
