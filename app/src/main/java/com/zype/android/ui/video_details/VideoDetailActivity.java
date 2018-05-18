@@ -11,6 +11,7 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Helpers.AutoplayHelper;
+import com.zype.android.ui.Helpers.IPlaylistVideos;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
@@ -58,7 +59,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VideoDetailActivity extends BaseVideoActivity {
+public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistVideos {
     public static final String TAG = VideoDetailActivity.class.getSimpleName();
 
     private VideoDetailPager mViewPager;
@@ -182,11 +183,30 @@ public class VideoDetailActivity extends BaseVideoActivity {
             case BundleConstants.REQ_LOGIN:
                 if (resultCode == RESULT_OK) {
                     hideVideoThumbnail();
-                    AutoplayHelper.playNextVideo(this, mVideoId, playlistId);
+                    VideoDetailActivity.startActivity(this, mVideoId, playlistId);
                 }
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    //
+    // 'IPlaylistVideos' implementation
+    //
+    @Override
+    public void onNext() {
+        hideVideoLayout();
+        showProgress();
+        autoplay = true;
+        AutoplayHelper.playNextVideo(this, mVideoId, playlistId);
+    }
+
+    @Override
+    public void onPrevious() {
+        hideVideoLayout();
+        showProgress();
+        autoplay = true;
+        AutoplayHelper.playPreviousVideo(this, mVideoId, playlistId);
     }
 
     // //////////

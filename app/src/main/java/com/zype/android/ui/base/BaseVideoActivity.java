@@ -78,7 +78,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     private VideoCastConsumerImpl mCastConsumer;
 
     protected String playlistId;
-    private static boolean autoplay = false;
+    protected static boolean autoplay = false;
 
     View baseView;
     private ProgressBar progressBar;

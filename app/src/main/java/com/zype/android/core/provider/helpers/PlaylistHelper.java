@@ -33,22 +33,43 @@ public class PlaylistHelper {
         return contentValues;
     }
 
-    public static String getNextVideoId(String currentVideoId, Cursor playlistCursor) {
+    public static String getNextVideoId(String currentVideoId, Cursor playlistVideosCursor) {
         String result = null;
         boolean nextVideoFound = false;
-        if (playlistCursor != null) {
-            if (playlistCursor.moveToFirst()) {
+        if (playlistVideosCursor != null) {
+            if (playlistVideosCursor.moveToFirst()) {
                 do {
                     if (nextVideoFound) {
-                        result = playlistCursor.getString(playlistCursor.getColumnIndex(Contract.PlaylistVideo.VIDEO_ID));
+                        result = playlistVideosCursor.getString(playlistVideosCursor.getColumnIndex(Contract.PlaylistVideo.VIDEO_ID));
                         break;
                     }
-                    if (playlistCursor.getString(playlistCursor.getColumnIndex(Contract.PlaylistVideo.VIDEO_ID)).equals(currentVideoId)) {
+                    if (playlistVideosCursor.getString(playlistVideosCursor.getColumnIndex(Contract.PlaylistVideo.VIDEO_ID)).equals(currentVideoId)) {
                         nextVideoFound = true;
                     }
-                } while (playlistCursor.moveToNext());
+                } while (playlistVideosCursor.moveToNext());
             }
-            playlistCursor.close();
+            playlistVideosCursor.close();
+        }
+        return result;
+    }
+
+    public static String getPreviousVideoId(String currentVideoId, Cursor playlistVideosCursor) {
+        String result = null;
+        String previousVideoId = null;
+        if (playlistVideosCursor != null) {
+            if (playlistVideosCursor.moveToFirst()) {
+                do {
+                    String videoId = playlistVideosCursor.getString(playlistVideosCursor.getColumnIndex(Contract.PlaylistVideo.VIDEO_ID));
+                    if (!videoId.equals(currentVideoId)) {
+                        previousVideoId = videoId;
+                    }
+                    else {
+                        result = previousVideoId;
+                        break;
+                    }
+                } while (playlistVideosCursor.moveToNext());
+            }
+            playlistVideosCursor.close();
         }
         return result;
     }
