@@ -22,6 +22,7 @@ import java.util.List;
 
 public class SettingsProvider extends CommonPreferences {
 
+    public static final String AUTOPLAY = "Autoplay";
     public static final String DOWNLOADS_ENABLED = "DownloadsEnabled";
     public static final String DOWNLOADS_ENABLED_FOR_GUESTS = "DownloadsEnabledForGuests";
     public static final String GOOGLE_ADVERTISING_ID = "GoogleAdvertisingId";
@@ -119,6 +120,7 @@ public class SettingsProvider extends CommonPreferences {
     }
 
     private static void initDefaultValues() {
+        defaultValues.put(AUTOPLAY, true);
         defaultValues.put(DOWNLOADS_ENABLED, ZypeSettings.DOWNLOADS_ENABLED);
         defaultValues.put(DOWNLOADS_ENABLED_FOR_GUESTS, ZypeSettings.DOWNLOADS_ENABLED_FOR_GUESTS);
 //        defaultValues.put(THEME_LIGHT, ZypeSettings.THEME_LIGHT);

@@ -95,7 +95,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
         if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
             onRequestSubscription();
         } else {
-            VideoDetailActivity.startActivity(this, videoId);
+            VideoDetailActivity.startActivity(this, videoId, null);
         }
     }
 
@@ -128,11 +128,11 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
                 onRequestSubscription();
             }
             else {
-                VideoDetailActivity.startActivity(this, videoId);
+                VideoDetailActivity.startActivity(this, videoId, null);
             }
         }
         else {
-            VideoDetailActivity.startActivity(this, videoId);
+            VideoDetailActivity.startActivity(this, videoId, null);
         }
     }
 
@@ -141,7 +141,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 //        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
 //            onRequestSubscription();
 //        } else {
-            VideoDetailActivity.startActivity(this, videoId);
+            VideoDetailActivity.startActivity(this, videoId, null);
 //        }
     }
 

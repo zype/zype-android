@@ -2,7 +2,9 @@ package com.zype.android.utils;
 
 import com.zype.android.R;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.NavigationHelper;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -43,6 +45,26 @@ public class DialogHelper {
         alertDialog.setTitle(context.getString(R.string.entitlement_dialog_error_title));
         alertDialog.setMessage(message);
         alertDialog.setPositiveButton(context.getString(R.string.dialog_button_ok), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = alertDialog.create();
+        alert.show();
+    }
+
+    public static void showLoginAlert(final Activity activity) {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+        alertDialog.setTitle(activity.getString(R.string.dialog_login_title));
+        alertDialog.setMessage(activity.getString(R.string.dialog_login_message));
+        alertDialog.setPositiveButton(activity.getString(R.string.dialog_login_button_login), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                NavigationHelper.getInstance(activity).switchToLoginScreen(activity);
+                dialog.dismiss();
+            }
+        });
+        alertDialog.setNegativeButton(activity.getString(R.string.dialog_button_cancel), new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }

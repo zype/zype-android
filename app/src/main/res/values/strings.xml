@@ -69,7 +69,6 @@
     <string name="dialog_subscribe_title">Please Subscribe</string>
     <string name="dialog_subscribe_message">Please subscribe to get full access to the video!</string>
     <string name="dialog_button_ok">OK</string>
-    <string name="dialog_button_cancel">Cancel</string>
 
     <string name="download_maxsize_exceeded">Max Downloads folder size exceeded. Please сheck Download Preferences in Settings menu.</string>
     <string name="title_activity_playlist">Back</string>
@@ -93,6 +92,12 @@
     <string name="consumer_password_error_empty">Enter password</string>
     <string name="consumer_progress_create">Creating login…</string>
     <string name="consumer_title_create">Create login</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_button_cancel">Cancel</string>
+    <string name="dialog_login_title">Sign In Required</string>
+    <string name="dialog_login_message">You do not have access to this video. Please sign in with your account to watch this video.</string>
+    <string name="dialog_login_button_login">Sign in</string>
 
     <!-- Intro -->
     <string name="intro_button_browse">Browse</string>

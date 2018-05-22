@@ -35,7 +35,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.accessibility.CaptioningManager;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.Toast;
 
 import com.google.ads.interactivemedia.v3.api.AdDisplayContainer;
@@ -65,12 +64,13 @@ import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.receiver.PhoneCallReceiver;
 import com.zype.android.receiver.RemoteControlReceiver;
+import com.zype.android.ui.Helpers.AutoplayHelper;
+import com.zype.android.ui.Helpers.IPlaylistVideos;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.chromecast.LivePlayerActivity;
@@ -108,7 +108,7 @@ import java.util.Observer;
 public class PlayerFragment extends BaseFragment implements
         CustomPlayer.Listener, AudioCapabilitiesReceiver.Listener, MediaControlInterface, Observer,
         AdEvent.AdEventListener, AdErrorEvent.AdErrorListener, CustomPlayer.CaptionListener,
-        PlayerControlView.IClosedCaptionsListener {
+        PlayerControlView.IPlayerControlListener {
 
     public static final int TYPE_AUDIO_LOCAL = 1;
     public static final int TYPE_AUDIO_WEB = 2;
@@ -121,6 +121,7 @@ public class PlayerFragment extends BaseFragment implements
     public static final String CONTENT_URL = "content_url";
     public static final String CONTENT_ID_EXTRA = "content_id";
     public static final String PARAMETERS_AD_TAG = "AdTag";
+    public static final String PARAMETERS_AUTOPLAY = "Autoplay";
     public static final String PARAMETERS_ON_AIR = "OnAir";
 
     private static final CookieManager defaultCookieManager;
@@ -161,6 +162,8 @@ public class PlayerFragment extends BaseFragment implements
     private boolean deleteFileBeforeExit = false;
     private boolean isControlsEnabled = true;
 
+    private boolean autoplay = false;
+
     //
     // IMA SDK
     //
@@ -195,7 +198,7 @@ public class PlayerFragment extends BaseFragment implements
         return fragment;
     }
 
-    public static PlayerFragment newInstance(int mediaType, String filePath, String adTag, boolean onAir, String fileId) {
+    public static PlayerFragment newInstance(int mediaType, String filePath, String adTag, boolean onAir, String fileId, boolean autoplay) {
         PlayerFragment fragment = new PlayerFragment();
         Bundle args = new Bundle();
         args.putInt(CONTENT_TYPE_TYPE, mediaType);
@@ -203,6 +206,7 @@ public class PlayerFragment extends BaseFragment implements
         args.putString(PARAMETERS_AD_TAG, adTag);
         args.putBoolean(PARAMETERS_ON_AIR, onAir);
         args.putString(CONTENT_ID_EXTRA, fileId);
+        args.putBoolean(PARAMETERS_AUTOPLAY, autoplay);
         fragment.setArguments(args);
         return fragment;
     }
@@ -220,10 +224,11 @@ public class PlayerFragment extends BaseFragment implements
                 adSchedule = VideoHelper.getAdSchedule(getActivity().getContentResolver(), fileId);
                 analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
             }
+            autoplay = getArguments().getBoolean(PARAMETERS_AUTOPLAY);
             adTag = getArguments().getString(PARAMETERS_AD_TAG);
             onAir = getArguments().getBoolean(PARAMETERS_ON_AIR);
         }
-        isNeedToSeekToLatestListenPosition = true;
+        isNeedToSeekToLatestListenPosition = true && !autoplay;
         callReceiver = new CallReceiver();
         handlerTimer = new Handler();
 
@@ -625,7 +630,7 @@ public class PlayerFragment extends BaseFragment implements
             mediaController.setAnchorView(mainView);
             mediaController.setMediaPlayer(player.getPlayerControl());
             mediaController.setEnabled(true);
-            mediaController.setClosedCaptionsListener(this);
+            mediaController.setPlayerControlListener(this);
 
             attachPlayerToAnalyticsManager();
 
@@ -739,7 +744,9 @@ public class PlayerFragment extends BaseFragment implements
 
                 showControls();
                 if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB) {
-                    mListener.videoFinished();
+                    if (playWhenReady) {
+                        mListener.videoFinished();
+                    }
                 } else if (contentType == TYPE_AUDIO_LOCAL || contentType == TYPE_AUDIO_WEB) {
                     mListener.audioFinished();
                 } else if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
@@ -1304,6 +1311,26 @@ public class PlayerFragment extends BaseFragment implements
         return customDimensions;
     }
 
+
+    //
+    // 'PlayerControlView.IPlayerControlListener' implementation
+    //
+    @Override
+    public void onNext() {
+        ((IPlaylistVideos) getActivity()).onNext();
+    }
+
+    @Override
+    public void onPrevious() {
+        ((IPlaylistVideos) getActivity()).onPrevious();
+    }
+
+    @Override
+    public void onClickClosedCaptions() {
+        showClosedCaptionsDialog();
+    }
+
+
     //
     // Closed captions
     //
@@ -1314,12 +1341,6 @@ public class PlayerFragment extends BaseFragment implements
     @Override
     public void onCues(List<Cue> cues) {
         subtitleLayout.setCues(cues);
-    }
-
-    // 'PlayerControlView.IClosedCaptionsListener' implementation
-    @Override
-    public void onClickClosedCaptions() {
-        showClosedCaptionsDialog();
     }
 
     private void configureSubtitleView() {

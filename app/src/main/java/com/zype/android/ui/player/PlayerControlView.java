@@ -5,11 +5,14 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.MediaController;
 
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
+import com.zype.android.core.settings.SettingsProvider;
 
 /**
  * Created by Evgeny Cherkasov on 22.03.2018.
@@ -20,9 +23,11 @@ public class PlayerControlView extends MediaController {
     private ImageButton buttonCC;
 
     private Context context;
-    private IClosedCaptionsListener listenerCC = null;
+    private IPlayerControlListener listenerPlayerControl = null;
 
-    public interface IClosedCaptionsListener {
+    public interface IPlayerControlListener {
+        void onNext();
+        void onPrevious();
         void onClickClosedCaptions();
     }
 
@@ -49,8 +54,16 @@ public class PlayerControlView extends MediaController {
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         frameParams.gravity = Gravity.RIGHT|Gravity.CENTER_VERTICAL;
 
+        ViewGroup rootView = ((ViewGroup) ((ViewGroup) getChildAt(0)).getChildAt(0));
+        if (ZypeConfiguration.autoplayEnabled(view.getContext())
+                && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
+            View viewNext = makeNextView();
+            rootView.addView(viewNext, frameParams);
+            View viewPrevious = makePreviousView();
+            rootView.addView(viewPrevious, 0, frameParams);
+        }
         View viewCC = makeClosedCaptionsView();
-        ((ViewGroup) ((ViewGroup) getChildAt(0)).getChildAt(0)).addView(viewCC, frameParams);
+        rootView.addView(viewCC, frameParams);
     }
 
     private View makeClosedCaptionsView() {
@@ -59,16 +72,44 @@ public class PlayerControlView extends MediaController {
         buttonCC.setBackground(null);
         buttonCC.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if (listenerCC != null) {
-                    listenerCC.onClickClosedCaptions();
+                if (listenerPlayerControl != null) {
+                    listenerPlayerControl.onClickClosedCaptions();
                 }
             }
         });
         return buttonCC;
     }
 
-    public void setClosedCaptionsListener(IClosedCaptionsListener listener) {
-        this.listenerCC = listener;
+    private View makeNextView() {
+        ImageButton buttonNext = new ImageButton(context);
+        buttonNext.setImageResource(R.drawable.baseline_skip_next_white_24);
+        buttonNext.setBackground(null);
+        buttonNext.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if (listenerPlayerControl != null) {
+                    listenerPlayerControl.onNext();
+                }
+            }
+        });
+        return buttonNext;
+    }
+
+    private View makePreviousView() {
+        ImageButton buttonPrevious = new ImageButton(context);
+        buttonPrevious.setImageResource(R.drawable.baseline_skip_previous_white_24);
+        buttonPrevious.setBackground(null);
+        buttonPrevious.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if (listenerPlayerControl != null) {
+                    listenerPlayerControl.onPrevious();
+                }
+            }
+        });
+        return buttonPrevious;
+    }
+
+    public void setPlayerControlListener(IPlayerControlListener listener) {
+        this.listenerPlayerControl = listener;
     }
 
     public void showCC() {
