@@ -7,7 +7,6 @@ import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -16,9 +15,7 @@ import com.zype.android.ui.LoginActivity;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
-import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseActivity;
-import com.zype.android.ui.dialog.ErrorDialogFragment;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.main.fragments.videos.VideosCursorAdapter;
 import com.zype.android.utils.BundleConstants;
@@ -53,11 +50,9 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -375,7 +370,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     @Override
     public void onRequestLogin() {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+        startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
     }
 
     @Override
@@ -494,7 +489,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
 //                    }
 //                } else {
 //                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-//                    startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+//                    startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
 //                }
 //            }
 //        }

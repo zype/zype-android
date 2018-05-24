@@ -1,8 +1,7 @@
 package com.zype.android.ui.video_details;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;
@@ -16,7 +15,6 @@ import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
 import com.zype.android.utils.BundleConstants;
-import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
@@ -40,9 +38,7 @@ import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.webapi.model.zobjects.ZobjectData;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -53,14 +49,14 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.QuickContactBadge;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistVideos {
     public static final String TAG = VideoDetailActivity.class.getSimpleName();
+
+    public static final String EXTRA_AUTOPLAY = "Autoplay";
 
     private VideoDetailPager mViewPager;
     private TabLayout mTabLayout;
@@ -90,6 +86,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         Logger.d("onNewIntent()");
         super.onNewIntent(intent);
         initUI();
+        checkVideoAuthorization();
     }
 
     @Override
@@ -153,7 +150,13 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         imageVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogHelper.showLoginAlert(VideoDetailActivity.this);
+                if (!AuthHelper.isVideoAuthorized(VideoDetailActivity.this, mVideoId)) {
+                    NavigationHelper.getInstance(VideoDetailActivity.this)
+                            .handleNotAuthorizedVideo(VideoDetailActivity.this, mVideoId);
+                }
+                else {
+                    requestVideoUrl(mVideoId);
+                }
             }
         });
     }
@@ -180,12 +183,18 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            case BundleConstants.REQ_LOGIN:
+            case BundleConstants.REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     hideVideoThumbnail();
                     VideoDetailActivity.startActivity(this, mVideoId, playlistId);
                 }
-                break;
+                return;
+            case BundleConstants.REQUEST_SUBSCRIPTION:
+                if (resultCode == RESULT_OK) {
+                    hideVideoThumbnail();
+                    VideoDetailActivity.startActivity(this, mVideoId, playlistId);
+                }
+                return;
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -219,6 +228,13 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                     && (ZypeConfiguration.isDownloadsForGuestsEnabled(this) || SettingsProvider.getInstance().isLoggedIn())) {
                 getDownloadUrls(mVideoId);
             }
+        }
+    }
+
+    private void checkVideoAuthorization() {
+        if (!AuthHelper.isVideoAuthorized(this, mVideoId)) {
+            showVideoThumbnail();
+            NavigationHelper.getInstance(this).handleNotAuthorizedVideo(this, mVideoId);
         }
     }
 
@@ -280,20 +296,22 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         if (err instanceof ForbiddenErrorEvent) {
             if (err.getEventData() == WebApiManager.Request.PLAYER_VIDEO) {
                 hideProgress();
-                if (VideoHelper.getFullData(getContentResolver(), mVideoId).isSubscriptionRequired()) {
-                    if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
-                        NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
-                    }
-                    else {
-                        if (SettingsProvider.getInstance().isLoggedIn()) {
-                            DialogHelper.showSubscriptionAlertIssue(this);
-                        }
-                        else {
-                            showVideoThumbnail();
-                            DialogHelper.showLoginAlert(this);
-                        }
-                    }
-                }
+//                if (VideoHelper.getFullData(getContentResolver(), mVideoId).isSubscriptionRequired()) {
+//                    if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+//                        NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
+//                    }
+//                    else {
+//                        if (SettingsProvider.getInstance().isLoggedIn()) {
+//                            DialogHelper.showSubscriptionAlertIssue(this);
+//                        }
+//                        else {
+//                            showVideoThumbnail();
+//                            DialogHelper.showLoginAlert(this);
+//                        }
+//                    }
+//                }
+                showVideoThumbnail();
+                UiUtils.showErrorIndefiniteSnackbar(findViewById(R.id.root_view), err.getErrMessage());
             }
         }
         else if (err instanceof AuthorizationErrorEvent) {

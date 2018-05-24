@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.cast.ApplicationMetadata;
@@ -28,13 +27,11 @@ import com.google.android.libraries.cast.companionlibrary.cast.callbacks.VideoCa
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.NoConnectionException;
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.google.android.libraries.cast.companionlibrary.cast.player.VideoCastController;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
-import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.core.provider.DataHelper;
-import com.zype.android.core.provider.helpers.PlaylistHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
@@ -42,7 +39,6 @@ import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.LoginActivity;
 import com.zype.android.ui.chromecast.ChromecastCheckStatusFragment;
 import com.zype.android.ui.chromecast.ChromecastFragment;
-import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
 import com.zype.android.ui.video_details.fragments.video.MediaControlInterface;
 import com.zype.android.ui.video_details.fragments.video.OnVideoAudioListener;
@@ -425,7 +421,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
                 getApi().executeRequest(WebApiManager.Request.FAVORITE, builder.build());
             } else {
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+                startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
             }
         }
         else {
@@ -444,7 +440,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
                 getApi().executeRequest(WebApiManager.Request.UN_FAVORITE, builder.build());
             } else {
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+                startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
             }
         }
         else {
@@ -724,7 +720,9 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             Logger.e("VideoId is empty !!");// но тут должен быть путь
         }
         if (mType == TYPE_WEB) {
-            requestVideoUrl(mVideoId);
+            if (AuthHelper.isVideoAuthorized(this, mVideoId)) {
+                requestVideoUrl(mVideoId);
+            }
         }
     }
 

@@ -88,6 +88,17 @@ public class UiUtils {
         snackbar.show();
     }
 
+    public static void showErrorIndefiniteSnackbar(@Nullable final View view, @NonNull final String text) {
+        if (view == null) {
+            return;
+        }
+        Snackbar snackbar = Snackbar.make(view, text, Snackbar.LENGTH_INDEFINITE);
+
+        View snackView = snackbar.getView();
+        snackView.setBackgroundColor(view.getContext().getResources().getColor(R.color.snackbar_error));
+        snackbar.show();
+    }
+
     public static void showPositiveSnackbar(View view, String text) {
         if (view == null) {
             return;

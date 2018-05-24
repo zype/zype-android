@@ -11,6 +11,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.ResponseBody;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeSettings;
@@ -56,6 +57,7 @@ import com.zype.android.webapi.events.settings.SettingsEvent;
 import com.zype.android.webapi.events.video.RetrieveHighLightVideoEvent;
 import com.zype.android.webapi.events.video.RetrieveVideoEvent;
 import com.zype.android.webapi.events.zobject.ZObjectEvent;
+import com.zype.android.webapi.model.ErrorBody;
 import com.zype.android.webapi.model.auth.AccessTokenInfoResponse;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
@@ -82,6 +84,8 @@ import com.zype.android.webapi.model.settings.SettingsResponse;
 import com.zype.android.webapi.model.video.VideoResponse;
 import com.zype.android.webapi.model.zobjects.ZObjectResponse;
 
+import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.HashMap;
@@ -90,6 +94,7 @@ import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.OkClient;
+import retrofit.client.Response;
 
 /**
  * @author vasya
@@ -461,14 +466,16 @@ public class WebApiManager {
 //                } else {
 //                    return data;
 //                }
-            } catch (RetrofitError err) {
+            }
+            catch (RetrofitError err) {
                 int statusCode = (err.getResponse() != null) ? err.getResponse().getStatus() : UNRESOLVED_HOST;
+                ErrorBody errorBody = parseError(err);
                 if (statusCode == UNAUTHORIZED) {
 //                    BaseModel model = (BaseModel) err.getBodyAs(BaseModel.class);
                     return new AuthorizationErrorEvent(job.getTicket(), job.getRequest(), err.getMessage());
                 }
                 else if (statusCode == FORBIDDEN) {
-                    return new ForbiddenErrorEvent(job.getTicket(), job.getRequest(), err.getMessage());
+                    return new ForbiddenErrorEvent(job.getTicket(), job.getRequest(), errorBody.message);
                 }
                 else if (statusCode == UNRESOLVED_HOST) {
                     if (!WebApiManager.isHaveActiveNetworkConnection(mContext)) {
@@ -500,5 +507,14 @@ public class WebApiManager {
         if (ni == null)
             return false;
         return ni.isConnectedOrConnecting();
+    }
+
+    private ErrorBody parseError(RetrofitError error) {
+        ErrorBody result = (ErrorBody) error.getBodyAs(ErrorBody.class);
+        if (result == null) {
+            result = new ErrorBody();
+            result.message = error.getMessage();
+        }
+        return result;
     }
 }

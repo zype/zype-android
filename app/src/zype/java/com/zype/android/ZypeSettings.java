@@ -23,7 +23,7 @@ public class ZypeSettings {
     public static final String WEB_URL = "";
 
     // Monetization
-    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
+    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = true;
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = true;

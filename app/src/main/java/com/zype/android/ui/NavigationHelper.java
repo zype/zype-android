@@ -3,9 +3,10 @@ package com.zype.android.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
+import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
@@ -13,6 +14,7 @@ import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
+import com.zype.android.webapi.model.video.VideoData;
 
 /**
  * Created by Evgeny Cherkasov on 11.07.2017.
@@ -80,7 +82,7 @@ public class NavigationHelper {
 
     public void switchToLoginScreen(Activity activity) {
         Intent intent = new Intent(context, LoginActivity.class);
-        activity.startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
     }
 
     public void switchToIntroScreen(Activity activity) {
@@ -90,7 +92,39 @@ public class NavigationHelper {
 
     public void switchToSubscriptionScreen(Activity activity) {
         Intent intent = new Intent(activity, SubscriptionActivity.class);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_SUBSCRIPTION);
+    }
+
+    public void switchToVideoDetailsScreen(Activity activity, String videoId, String playlistId, boolean autoplay) {
+        Intent intent = new Intent(activity, VideoDetailActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(BundleConstants.VIDEO_ID, videoId);
+        bundle.putString(BundleConstants.PLAYLIST_ID, playlistId);
+        bundle.putBoolean(VideoDetailActivity.EXTRA_AUTOPLAY, autoplay);
+        intent.putExtras(bundle);
         activity.startActivity(intent);
     }
 
+    //
+    public void handleNotAuthorizedVideo(Activity activity, String videoId) {
+        VideoData videoData = VideoHelper.getFullData(activity.getContentResolver(), videoId);
+        if (videoData == null) {
+            Logger.e("Error get video data, videoId=" + videoId);
+            return;
+        }
+        if (videoData.isSubscriptionRequired()) {
+            if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
+                NavigationHelper.getInstance(activity).switchToSubscriptionScreen(activity);
+            }
+            else {
+                if (SettingsProvider.getInstance().isLoggedIn()) {
+                    DialogHelper.showSubscriptionAlertIssue(activity);
+                }
+                else {
+                    DialogHelper.showLoginAlert(activity);
+                }
+            }
+        }
+
+    }
 }

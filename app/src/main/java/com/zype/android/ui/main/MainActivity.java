@@ -14,7 +14,6 @@ import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
@@ -24,7 +23,6 @@ import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
-import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.main.fragments.videos.VideosActivity;
@@ -223,7 +221,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     public void onRequestLogin() {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivityForResult(intent, BundleConstants.REQ_LOGIN);
+        startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
     }
 
     @Override

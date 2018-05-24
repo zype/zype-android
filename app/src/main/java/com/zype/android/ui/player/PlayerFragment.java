@@ -371,6 +371,11 @@ public class PlayerFragment extends BaseFragment implements
         if (BuildConfig.DEBUG) {
             Logger.d("onResume()");
         }
+
+        if (isHidden()) {
+            return;
+        }
+
         // Retrieve device id
         AdMacrosHelper.fetchDeviceId(getActivity(), new AdMacrosHelper.IDeviceIdListener() {
             @Override
@@ -425,6 +430,7 @@ public class PlayerFragment extends BaseFragment implements
         if (BuildConfig.DEBUG) {
             Logger.d("onPause()");
         }
+        hideControls();
         if (player != null) {
             if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
                 player.setBackgrounded(true);
