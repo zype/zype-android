@@ -39,7 +39,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -70,7 +70,7 @@ import android.widget.TextView;
  * {@link com.google.android.libraries.cast.companionlibrary.cast.player.MediaAuthService} and will
  * register a listener to handle the result.
  */
-public class VideoCastControllerActivity extends ActionBarActivity implements
+public class VideoCastControllerActivity extends AppCompatActivity implements
         VideoCastController {
 
     private static final String TAG = LogUtils

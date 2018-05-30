@@ -78,6 +78,8 @@ An example of fully functional app that is using a Zype sandbox account.
 
    `<UNIVERSAL_TVOD>`
 
+   `<AUTOPLAY>`
+   
    `<BACKGROUND_PLAYBACK_ENABLED>`
 
    `<DOWNLOADS_ENABLED>`

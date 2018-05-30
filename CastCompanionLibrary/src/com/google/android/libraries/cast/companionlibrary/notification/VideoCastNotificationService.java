@@ -44,7 +44,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 
 /**
  * A service to provide status bar Notifications when we are casting. For JB+ versions, notification
@@ -321,7 +321,7 @@ public class VideoCastNotificationService extends Service {
                 .addAction(R.drawable.ic_notification_disconnect_24dp,
                         getString(R.string.ccl_disconnect),
                         stopPendingIntent)
-                .setStyle(new NotificationCompat.MediaStyle()
+                .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
                         .setShowActionsInCompactView(0, 1)
                         .setMediaSession(mCastManager.getMediaSessionCompatToken()))
                 .setOngoing(true)
