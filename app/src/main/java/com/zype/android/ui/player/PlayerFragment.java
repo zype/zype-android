@@ -458,7 +458,8 @@ public class PlayerFragment extends BaseFragment implements
         if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
             if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
                 showNotification(true, contentType);
-            } else {
+            }
+            else {
                 showNotification(false, contentType);
             }
         }

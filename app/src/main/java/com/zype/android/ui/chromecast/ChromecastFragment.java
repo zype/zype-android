@@ -76,12 +76,15 @@ public class ChromecastFragment extends BaseFragment
     private OnVideoAudioListener mListener;
 
 
-    public static ChromecastFragment newInstance(MediaInfo mediaInfo, String videoID) {
+    public static ChromecastFragment newInstance(MediaInfo mediaInfo, String videoID, boolean autoplay) {
         Bundle args = new Bundle();
         args.putString(ARG_VIDEO_ID, videoID);
         if (mediaInfo != null) {
             Bundle wrapperMediaInfo = Utils.mediaInfoToBundle(mediaInfo);
             args.putBundle(VideoCastManager.EXTRA_MEDIA, wrapperMediaInfo);
+        }
+        if (autoplay) {
+            args.putBoolean(VideoCastManager.EXTRA_SHOULD_START, true);
         }
         ChromecastFragment fragment = new ChromecastFragment();
         fragment.setArguments(args);
@@ -373,14 +376,14 @@ public class ChromecastFragment extends BaseFragment
 //                } else {
 //                    mSkipPrevious.setVisibility(View.INVISIBLE);
 //                }
-//                break;
-//            case VideoCastController.NEXT_PREV_VISIBILITY_POLICY_ALWAYS:
+                break;
+            case VideoCastController.NEXT_PREV_VISIBILITY_POLICY_ALWAYS:
 //                mSkipNext.setVisibility(View.VISIBLE);
 //                mSkipNext.setEnabled(true);
 //                mSkipPrevious.setVisibility(View.VISIBLE);
 //                mSkipPrevious.setEnabled(true);
-//                break;
-//            case VideoCastController.NEXT_PREV_VISIBILITY_POLICY_DISABLED:
+                break;
+            case VideoCastController.NEXT_PREV_VISIBILITY_POLICY_DISABLED:
 //                if (nextAvailable) {
 //                    mSkipNext.setVisibility(View.VISIBLE);
 //                    mSkipNext.setEnabled(true);
@@ -503,7 +506,9 @@ public class ChromecastFragment extends BaseFragment
 
     @Override
     public void closeActivity() {
-
+        if (mListener != null) {
+            mListener.videoFinished();
+        }
     }
 
     @Override // from VideoCastController

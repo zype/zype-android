@@ -249,7 +249,7 @@ public class DataHelper {
     }
 
     public static int setPlayTime(ContentResolver contentResolver, String fileId, long position) {
-        Logger.i("TIME: save playing time:" + position + " ID:" + fileId);
+        Logger.i("setPlayTime(): position=" + position);
         Uri uri = Contract.Video.CONTENT_URI;
         ContentValues value = new ContentValues();
         value.put(Contract.Video.COLUMN_PLAY_TIME, position);

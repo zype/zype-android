@@ -147,7 +147,8 @@ public class VideoCastControllerFragment  extends Fragment implements
             }
             MediaInfo info = Utils.bundleToMediaInfo(mediaWrapper);
             int startPoint = extras.getInt(VideoCastManager.EXTRA_START_POINT, 0);
-            onReady(info, shouldStartPlayback && explicitStartActivity, startPoint, customData);
+//            onReady(info, shouldStartPlayback && explicitStartActivity, startPoint, customData);
+            onReady(info, shouldStartPlayback, startPoint, customData);
         }
     }
 
@@ -355,6 +356,18 @@ public class VideoCastControllerFragment  extends Fragment implements
     public void onDestroy() {
         LOGD(TAG, "onDestroy()");
         stopTrickplayTimer();
+
+        try {
+            mCastManager.pause();
+        } catch (CastException e) {
+            e.printStackTrace();
+        } catch (TransientNetworkDisconnectionException e) {
+            e.printStackTrace();
+        } catch (NoConnectionException e) {
+            e.printStackTrace();
+        }
+        mPlaybackState = MediaStatus.PLAYER_STATE_BUFFERING;
+
         cleanup();
         super.onDestroy();
     }
@@ -375,7 +388,7 @@ public class VideoCastControllerFragment  extends Fragment implements
                         || (mCastManager.getPlaybackStatus() == MediaStatus.PLAYER_STATE_IDLE
                         && mCastManager.getIdleReason() == MediaStatus.IDLE_REASON_FINISHED);
                 if (shouldFinish && !mIsFresh) {
-                    mCastController.closeActivity();
+//                    mCastController.closeActivity();
                     return;
                 }
             }
@@ -778,7 +791,7 @@ public class VideoCastControllerFragment  extends Fragment implements
             if (statusCode == RemoteMediaPlayer.STATUS_FAILED
                     || statusCode == RemoteMediaPlayer.STATUS_TIMED_OUT) {
                 Utils.showToast(getActivity(), resourceId);
-                mCastController.closeActivity();
+//                mCastController.closeActivity();
             }
         }
 

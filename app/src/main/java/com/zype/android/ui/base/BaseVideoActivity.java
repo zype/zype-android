@@ -248,9 +248,10 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             MediaInfo localMediaInfo = getLocalMediaInfo(mType, videoData);
             MediaInfo remoteMediaInfo = getRemoteMediaInfo(mCastManager);
             if (localMediaInfo != null && remoteMediaInfo != null
-                    && localMediaInfo.getContentId().equalsIgnoreCase(remoteMediaInfo.getContentId())) {
-                fragment = ChromecastFragment.newInstance(getLocalMediaInfo(mType, videoData), mVideoId);
-            } else {
+                    && (localMediaInfo.getContentId().equalsIgnoreCase(remoteMediaInfo.getContentId()) || autoplay)) {
+                fragment = ChromecastFragment.newInstance(getLocalMediaInfo(mType, videoData), mVideoId, autoplay);
+            }
+            else {
                 fragment = ChromecastCheckStatusFragment.newInstance(localMediaInfo, mVideoId);
             }
         } else {
@@ -290,6 +291,9 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         Fragment fragment = getFragment(isChromeCastConnected, mVideoId);
         if (fragment != null) {
             showFragment(fragment);
+            if (isChromeCastConnected) {
+                hideProgress();
+            }
         }
     }
 
@@ -669,6 +673,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        autoplay = false;
 //        FragmentManager fragmentManager = getSupportFragmentManager();
 //        Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PLAYER);
 //        if (fragment instanceof PlayerFragment) {
