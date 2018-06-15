@@ -234,7 +234,7 @@ public class WebApiManager {
                 String token = getParams.get(AuthParamsBuilder.ACCESS_TOKEN);
                 return new AccessTokenInfoEvent(ticket, new AccessTokenInfoResponse(mApi.getTokenInfo(token)));
             case VIDEO_LATEST_GET:
-                return new RetrieveVideoEvent(ticket, new VideoResponse(mApi.getVideoList(getParams)));
+                return new RetrieveVideoEvent(ticket, new VideoResponse(mApi.getVideoList(getParams)), null);
             case VIDEO_HIGHLIGHT_GET:
                 return new RetrieveHighLightVideoEvent(ticket, new VideoResponse(mApi.getVideoList(getParams)));
             case CONSUMER_FAVORITE_VIDEO_GET:
@@ -292,7 +292,7 @@ public class WebApiManager {
             case VIDEO_FROM_PLAYLIST:
                 if (pathParams.containsKey(VideoParamsBuilder.PLAYLIST_ID)) {
                     playlistId = pathParams.get(VideoParamsBuilder.PLAYLIST_ID);
-                    return new RetrieveVideoEvent(ticket, new VideoResponse(mApi.getVideosFromPlaylist(playlistId, getParams)));
+                    return new RetrieveVideoEvent(ticket, new VideoResponse(mApi.getVideosFromPlaylist(playlistId, getParams)), playlistId);
                 } else {
                     throw new IllegalStateException("VideoParamsBuilder.PLAYLIST_ID can not be null");
                 }

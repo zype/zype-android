@@ -42,7 +42,9 @@ public class UiUtils {
         Picasso.with(context).load(imgUrl).into(img);
     }
 
-    public static void loadImage(@Nullable final Context context, @Nullable final String imgUrl, final int placeholderRes, @Nullable final ImageView img, final ProgressBar progressBar) {
+    public static void loadImage(@Nullable final Context context, @Nullable final String imgUrl,
+                                 final int placeholderRes, @Nullable final ImageView img,
+                                 @Nullable final ProgressBar progressBar) {
         if (context == null) {
             Logger.e("Context is null");
             return;
@@ -55,20 +57,26 @@ public class UiUtils {
             Logger.e("Image holder is empty");
             return;
         }
-        if (progressBar == null) {
-            Logger.e("Progress bar is empty");
-            return;
+
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
         }
-        progressBar.setVisibility(View.VISIBLE);
+        else {
+            Logger.w("loadImage(): Progress bar is empty");
+        }
         Callback callback = new Callback() {
             @Override
             public void onSuccess() {
-                progressBar.setVisibility(View.GONE);
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public void onError() {
-                progressBar.setVisibility(View.GONE);
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
                 if (placeholderRes > 0) {
                     img.setImageDrawable(ContextCompat.getDrawable(context, placeholderRes));
                 }

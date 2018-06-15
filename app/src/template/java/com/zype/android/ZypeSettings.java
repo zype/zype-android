@@ -34,14 +34,14 @@ public class ZypeSettings {
     // Features
     public static final boolean AUTOPLAY = Boolean.valueOf("<AUTOPLAY>");
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = Boolean.valueOf("<BACKGROUND_PLAYBACK_ENABLED>");
+    public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
+    public static final String DEVICE_LINKING_URL = "<DEVICE_LINKING_URL>";
     public static final boolean DOWNLOADS_ENABLED = Boolean.valueOf("<DOWNLOADS_ENABLED>");
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = Boolean.valueOf("<DOWNLOADS_ENABLED_FOR_GUESTS>");
+    public static final boolean PLAYLIST_GALLERY_VIEW = Boolean.valueOf("<PLAYLIST_GALLERY_VIEW>");
     // TODO: 'Share video' is not currently supported by the app builder. Update these flag if needed.
     public static final boolean SHARE_VIDEO_ENABLED = false;
 //    public static final boolean SHARE_VIDEO_ENABLED = Boolean.valueOf("<SHARE_VIDEO_ENABLED>");
-
-    public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
-    public static final String DEVICE_LINKING_URL = "<DEVICE_LINKING_URL>";
 
     /**
      * Theme of the app.

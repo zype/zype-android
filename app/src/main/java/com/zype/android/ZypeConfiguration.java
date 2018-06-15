@@ -21,6 +21,7 @@ public class ZypeConfiguration {
     private static final String PREFERENCE_DOWNLOADS_FOR_GUESTS = "ZypeDownloadsForGuests";
     private static final String PREFERENCE_NATIVE_SUBSCRIPTION = "ZypeNativeSubscription";
     private static final String PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION = "ZypeNativeToUniversalSubscription";
+    private static final String PREFERENCE_PLAYLIST_GALLERY_VIEW = "ZypePlaylistGalleryView";
     private static final String PREFERENCE_ROOT_PLAYLIST_ID = "ZypeRootPlaylistId";
     private static final String PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE = "ZypeSubscribeToWatchAdFree";
     private static final String PREFERENCE_THEME = "ZypeTheme";
@@ -172,4 +173,7 @@ public class ZypeConfiguration {
         return getBooleanPreference(PREFERENCE_DOWNLOADS_FOR_GUESTS, ZypeSettings.DOWNLOADS_ENABLED_FOR_GUESTS, context);
     }
 
+    public static boolean playlistGalleryView(Context context) {
+        return getBooleanPreference(PREFERENCE_PLAYLIST_GALLERY_VIEW, ZypeSettings.PLAYLIST_GALLERY_VIEW, context);
+    }
 }

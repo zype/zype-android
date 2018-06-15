@@ -1,0 +1,46 @@
+package com.zype.android.Db;
+
+import android.app.Application;
+import android.arch.persistence.db.SupportSQLiteDatabase;
+import android.arch.persistence.room.Database;
+import android.arch.persistence.room.Room;
+import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.migration.Migration;
+import android.content.Context;
+
+import com.zype.android.Db.Entity.Playlist;
+import com.zype.android.Db.Entity.PlaylistVideo;
+import com.zype.android.Db.Entity.Video;
+
+/**
+ * Created by Evgeny Cherkasov on 13.06.2018
+ */
+
+@Database(entities = {Playlist.class, PlaylistVideo.class, Video.class},
+            version = 6)
+public abstract class ZypeDb extends RoomDatabase {
+    public abstract ZypeDao zypeDao();
+
+    private static ZypeDb INSTANCE;
+
+    public static ZypeDb getDatabase(final Application application) {
+        if (INSTANCE == null) {
+            synchronized (ZypeDb.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = Room
+                            .databaseBuilder(application, ZypeDb.class, "zype.db")
+                            .addMigrations(MIGRATION_5_6)
+                            .allowMainThreadQueries()
+                            .build();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+        }
+    };
+}

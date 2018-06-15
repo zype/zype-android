@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.ui.Gallery.GalleryFragment;
 import com.zype.android.ui.MyLibrary.MyLibraryFragment;
 import com.zype.android.ui.main.fragments.download.DownloadFragment;
 import com.zype.android.ui.main.fragments.favorite.FavoritesFragment;
@@ -73,7 +74,12 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (tabs.get(position).id) {
             case TAB_ID_HOME:
-                return PlaylistFragment.newInstance();
+                if (ZypeConfiguration.playlistGalleryView(context)) {
+                    return GalleryFragment.newInstance(ZypeConfiguration.getRootPlaylistId(context));
+                }
+                else {
+                    return PlaylistFragment.newInstance();
+                }
             case TAB_ID_DOWNLOADS:
                 return DownloadFragment.newInstance();
             case TAB_ID_FAVORITES:
