@@ -22,10 +22,12 @@ public class AuthHelper {
     public static boolean isVideoAuthorized(Context context, String videoId) {
         boolean result = true;
 
+        // TODO: Refactor to use Room for retrieving video
         VideoData videoData = VideoHelper.getFullData(context.getContentResolver(), videoId);
         if (videoData == null) {
             return false;
         }
+        // TODO: Add checking for video entitlement if TVOD is turned on
         if (videoData.isSubscriptionRequired()) {
             if (ZypeConfiguration.isNativeSubscriptionEnabled(context)) {
                 if (SubscriptionHelper.hasSubscription()) {
@@ -37,15 +39,15 @@ public class AuthHelper {
             }
             else if (ZypeConfiguration.isUniversalSubscriptionEnabled(context)) {
                 if (isLoggedIn()) {
-                    return false;
-                }
-                else {
                     if (SubscriptionHelper.hasSubscription()) {
                         return true;
                     }
                     else {
                         return false;
                     }
+                }
+                else {
+                    return false;
                 }
             }
             else {

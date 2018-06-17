@@ -23,6 +23,13 @@
             android:id="@+id/imageThumbnail"
             tools:src="@drawable/outline_play_circle_filled_white_white_48"
             />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:id="@+id/imageLocked"
+            android:src="@drawable/outline_lock_white_18"
+            />
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

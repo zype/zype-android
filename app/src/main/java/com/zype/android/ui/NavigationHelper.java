@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -116,13 +117,16 @@ public class NavigationHelper {
             if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
                 NavigationHelper.getInstance(activity).switchToSubscriptionScreen(activity);
             }
-            else {
-                if (SettingsProvider.getInstance().isLoggedIn()) {
+            else if (ZypeConfiguration.isUniversalSubscriptionEnabled(activity)) {
+                if (AuthHelper.isLoggedIn()) {
                     DialogHelper.showSubscriptionAlertIssue(activity);
                 }
                 else {
                     DialogHelper.showLoginAlert(activity);
                 }
+            }
+            else {
+
             }
         }
 
