@@ -49,6 +49,7 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 27
+        multiDexEnabled true
         versionCode currentCodeVersion
         buildConfigField "String", "ZYPE_TEMPLATE_VERSION", "\"${zypeTemplateVersion}\""
 
@@ -118,6 +119,8 @@ public def store(File to, Properties properties) {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    implementation 'com.android.support:multidex:1.0.3'
 
     // Android Architecture Components
 
