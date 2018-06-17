@@ -23,6 +23,7 @@ import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
+import com.zype.android.ui.Widget.CustomViewPager;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.main.fragments.videos.VideosActivity;
@@ -62,11 +63,14 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
 
-        ViewPager mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        CustomViewPager viewPager = findViewById(R.id.pager);
+        viewPager.setAdapter(mSectionsPagerAdapter);
+        if (ZypeConfiguration.playlistGalleryView(this)) {
+            viewPager.setSwipeEnabled(false);
+        }
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.setupWithViewPager(viewPager);
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             TabLayout.Tab tab = tabLayout.getTabAt(i);
             tab.setCustomView(mSectionsPagerAdapter.getTabView(i));
