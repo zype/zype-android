@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -56,7 +57,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
     @Override
     public void onBindViewHolder(final GalleryRowItemsAdapter.ViewHolder holder, int position) {
         holder.item = items.get(position);
-        holder.textTitle.setText(holder.item.getTitle());
+        updateTitle(holder);
         loadThumbnail(holder);
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,12 +125,14 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
     static class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public PlaylistItem item;
+        public FrameLayout layoutTitle;
         public TextView textTitle;
         public ImageView imageThumbnail;
 
         public ViewHolder(View view) {
             super(view);
             this.view = view;
+            layoutTitle = view.findViewById(R.id.layoutTitle);
             textTitle = view.findViewById(R.id.textTitle);
             imageThumbnail = view.findViewById(R.id.imageThumbnail);
         }
@@ -142,10 +145,12 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                 Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
                 List<Thumbnail> thumbnails = new Gson().fromJson(video.thumbnails, thumbnailType);
                 if (thumbnails.size() > 0) {
-                    UiUtils.loadImage(holder.view.getContext(), thumbnails.get(1).getUrl(), R.drawable.placeholder_video, holder.imageThumbnail, null);
+                    UiUtils.loadImage(holder.view.getContext(), thumbnails.get(1).getUrl(),
+                            R.drawable.outline_play_circle_filled_white_white_48, holder.imageThumbnail, null);
                 }
                 else {
-                    holder.imageThumbnail.setImageDrawable(ContextCompat.getDrawable(holder.view.getContext(), R.drawable.placeholder_video));
+                    holder.imageThumbnail.setImageDrawable(ContextCompat.getDrawable(holder.view.getContext(),
+                            R.drawable.outline_play_circle_filled_white_white_48));
                 }
             }
         }
@@ -155,12 +160,24 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                 Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
                 List<Thumbnail> thumbnails = new Gson().fromJson(playlist.thumbnails, thumbnailType);
                 if (thumbnails.size() > 0) {
-                    UiUtils.loadImage(holder.view.getContext(), thumbnails.get(1).getUrl(), R.drawable.placeholder_playlist, holder.imageThumbnail, null);
+                    UiUtils.loadImage(holder.view.getContext(), thumbnails.get(1).getUrl(),
+                            R.drawable.outline_video_library_white_48, holder.imageThumbnail, null);
                 }
                 else {
-                    holder.imageThumbnail.setImageDrawable(ContextCompat.getDrawable(holder.view.getContext(), R.drawable.placeholder_playlist));
+                    holder.imageThumbnail.setImageDrawable(ContextCompat.getDrawable(holder.view.getContext(),
+                            R.drawable.outline_video_library_white_48));
                 }
             }
+        }
+    }
+
+    private void updateTitle(ViewHolder holder) {
+        if (ZypeConfiguration.playlistGalleryItemTitles(holder.view.getContext())) {
+            holder.layoutTitle.setVisibility(View.VISIBLE);
+            holder.textTitle.setText(holder.item.getTitle());
+        }
+        else {
+            holder.layoutTitle.setVisibility(View.GONE);
         }
     }
 

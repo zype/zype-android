@@ -1,25 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:padding="4dp"
     >
-    <ImageView
+    <android.support.v7.widget.CardView
         android:layout_width="160dp"
         android:layout_height="90dp"
-        android:id="@+id/imageThumbnail"
-        />
-    <TextView
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_margin="4dp"
-        android:id="@+id/textTitle"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:ellipsize="end"
-        android:maxLines="1"
-        tools:text="Title"
-        />
-</FrameLayout>
+        card_view:cardElevation="0dp"
+        card_view:cardCornerRadius="2dp"
+        card_view:cardBackgroundColor="@color/black_12"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:id="@+id/imageThumbnail"
+            tools:src="@drawable/outline_play_circle_filled_white_white_48"
+            />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/layoutTitle"
+            android:background="@color/black_12"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="4dp"
+                android:id="@+id/textTitle"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textColor="@color/white"
+                android:textStyle="bold|italic"
+                android:fontFamily="sans-serif-condensed"
+                android:ellipsize="end"
+                android:maxLines="2"
+                tools:text="Title"
+                />
+        </FrameLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>
