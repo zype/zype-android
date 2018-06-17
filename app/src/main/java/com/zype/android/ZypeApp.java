@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.crashlytics.android.Crashlytics;
@@ -28,7 +29,7 @@ import io.fabric.sdk.android.Fabric;
  */
 
 
-public class ZypeApp extends Application {
+public class ZypeApp extends MultiDexApplication {
     public static final double VOLUME_INCREMENT = 0.05;
     public static final int NOTIFICATION_ID = 13254;
     public static GoogleAnalytics analytics;

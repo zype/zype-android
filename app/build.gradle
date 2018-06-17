@@ -38,7 +38,7 @@ android {
     }
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
-    def zypeTemplateVersion = "1.10.1"
+    def zypeTemplateVersion = "1.10.2"
 
     compileSdkVersion 27
     buildToolsVersion '27.0.3'
@@ -49,6 +49,7 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 27
+        multiDexEnabled true
         versionCode currentCodeVersion
         buildConfigField "String", "ZYPE_TEMPLATE_VERSION", "\"${zypeTemplateVersion}\""
     }
@@ -112,6 +113,9 @@ public def store(File to, Properties properties) {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    implementation 'com.android.support:multidex:1.0.3'
+
     implementation('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
