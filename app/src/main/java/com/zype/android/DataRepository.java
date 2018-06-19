@@ -47,6 +47,10 @@ public class DataRepository {
         return db.zypeDao().getPlaylistsSync(parentId);
     }
 
+    public Playlist getPlaylistSync(String playlistId) {
+        return db.zypeDao().getPlaylistSync(playlistId);
+    }
+
     public void insertPlaylists(List<Playlist> playlists) {
         db.zypeDao().insertPlaylists(playlists);
     }

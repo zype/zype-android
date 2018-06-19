@@ -18,50 +18,72 @@ public class ZobjectData {
     @SerializedName("_id")
     @Expose
     private String Id;
+
     @Expose
     private Boolean active;
+
     @SerializedName("created_at")
     @Expose
     private String createdAt;
+
     @Expose
     private String description;
+
     @Expose
     private String facebook;
+
     @SerializedName("friendly_title")
     @Expose
     private String friendlyTitle;
+
     @Expose
     private String message;
+
     @Expose
     private List<Object> keywords = new ArrayList<>();
+
     @Expose
     private List<Picture> pictures = new ArrayList<>();
+
     @SerializedName("short_bio")
     @Expose
     private String shortBio;
+
     @SerializedName("site_id")
     @Expose
     private String siteId;
+
     @Expose
     private String title;
+
     @Expose
     private String time;
+
     @Expose
     private String twitter;
+
     @SerializedName("updated_at")
     @Expose
     private String updatedAt;
+
     @SerializedName("video_ids")
     @Expose
     private List<String> videoIds = new ArrayList<>();
+
     @Expose
     private String youtube;
+
     @SerializedName("zobject_type_id")
     @Expose
     private String zobjectTypeId;
+
     @SerializedName("zobject_type_title")
     @Expose
     private String zobjectTypeTitle;
+
+    @SerializedName("playlistid")
+    @Expose
+    public String playlistId;
 
     /**
      *

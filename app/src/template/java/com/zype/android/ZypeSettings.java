@@ -39,6 +39,7 @@ public class ZypeSettings {
     public static final boolean DOWNLOADS_ENABLED = Boolean.valueOf("<DOWNLOADS_ENABLED>");
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = Boolean.valueOf("<DOWNLOADS_ENABLED_FOR_GUESTS>");
     public static final boolean PLAYLIST_GALLERY_VIEW = Boolean.valueOf("<PLAYLIST_GALLERY_VIEW>");
+    public static final boolean PLAYLIST_GALLERY_HERO_IMAGES = Boolean.valueOf("<PLAYLIST_GALLERY_HERO_IMAGES>");
     public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = Boolean.valueOf("<PLAYLIST_GALLERY_ITEM_TITLES>");
     // TODO: 'Share video' is not currently supported by the app builder. Update these flag if needed.
     public static final boolean SHARE_VIDEO_ENABLED = false;

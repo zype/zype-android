@@ -11,6 +11,8 @@ import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
+import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
+import com.zype.android.ui.main.fragments.videos.VideosActivity;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
@@ -102,6 +104,22 @@ public class NavigationHelper {
         bundle.putString(BundleConstants.VIDEO_ID, videoId);
         bundle.putString(BundleConstants.PLAYLIST_ID, playlistId);
         bundle.putBoolean(VideoDetailActivity.EXTRA_AUTOPLAY, autoplay);
+        intent.putExtras(bundle);
+        activity.startActivity(intent);
+    }
+
+    public void switchToPlaylistScreen(Activity activity, String playlistId) {
+        Intent intent = new Intent(activity, PlaylistActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(BundleConstants.PARENT_ID, playlistId);
+        intent.putExtras(bundle);
+        activity.startActivity(intent);
+    }
+
+    public void switchToPlaylistVideosScreen(Activity activity, String playlistId) {
+        Intent intent = new Intent(activity, VideosActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(BundleConstants.PARENT_ID, playlistId);
         intent.putExtras(bundle);
         activity.startActivity(intent);
     }

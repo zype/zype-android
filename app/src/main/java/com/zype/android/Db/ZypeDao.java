@@ -30,6 +30,9 @@ public interface ZypeDao {
     @Query("SELECT * FROM playlist WHERE playlist.parent_id = :parentPlaylistId ORDER BY playlist.priority")
     public List<Playlist> getPlaylistsSync(String parentPlaylistId);
 
+    @Query("SELECT * FROM playlist WHERE playlist._id = :playlistId LIMIT 1")
+    public Playlist getPlaylistSync(String playlistId);
+
     @Insert(onConflict = REPLACE)
     public void insertPlaylists(List<Playlist> playlists);
 

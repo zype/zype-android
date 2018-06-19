@@ -9,12 +9,8 @@ public class ZObjectParamsBuilder extends ParamsBuilder {
     public static final String TYPE_GUEST = "guest";
     public static final String TYPE_NOTIFICATIONS = "notifications";
     public static final String TYPE_CONTENT = "content";
+    public static final String TYPE_TOP_PLAYLISTS = "top_playlists";
     public static final String VIDEO_ID = "video_id";
-
-//    public ZObjectParamsBuilder addAppKey() {
-//        addGetParam(API_KEY, WebApiManager.API_KEY);
-//        return this;
-//    }
 
     public ZObjectParamsBuilder addType(String type) {
         addGetParam(ZOBJECT_TYPE, type);
@@ -29,15 +25,4 @@ public class ZObjectParamsBuilder extends ParamsBuilder {
     public ZObjectParamsBuilder() {
         addGetParam(APP_KEY, WebApiManager.APP_KEY);
     }
-
-//    public ZObjectParamsBuilder addDateLimit(String startDate, String endDate) {
-//        addGetParam(DATE_START, startDate);
-//        addGetParam(DATE_END, endDate);
-//        return this;
-//    }
-//
-//    public ZObjectParamsBuilder addOnAir(boolean isOnAir) {
-//        addGetParam(DATA_IS_ON_AIR, String.valueOf(isOnAir));
-//        return this;
-//    }
 }

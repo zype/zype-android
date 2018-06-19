@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +17,9 @@ import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ui.Gallery.Model.GalleryRow;
+import com.zype.android.ui.Gallery.Model.HeroImage;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.PlaylistParamsBuilder;
@@ -38,10 +41,14 @@ public class GalleryFragment extends Fragment {
 
     private static final String ARG_PARENT_PLAYLIST_ID = "ParentPlaylistId";
 
+    private HeroImagesViewModel modelHeroImages;
     private GalleryViewModel model;
     private String parentPlaylistId;
 
+    private HeroImagesPagerAdapter adapterHeroImages;
     private GalleryRowsAdapter adapter;
+
+    ViewPager pagerHeroImages;
 
     public static GalleryFragment newInstance(String parentPlaylistId) {
         GalleryFragment fragment = new GalleryFragment();
@@ -62,6 +69,15 @@ public class GalleryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_gallery, container, false);
 
+        pagerHeroImages = rootView.findViewById(R.id.pagerHeroImages);
+        if (ZypeConfiguration.playlistGalleryHeroImages(getActivity())) {
+            adapterHeroImages = new HeroImagesPagerAdapter(getActivity().getSupportFragmentManager());
+            pagerHeroImages.setAdapter(adapterHeroImages);
+        }
+        else {
+            pagerHeroImages.setVisibility(View.GONE);
+        }
+
         RecyclerView listGallery = rootView.findViewById(R.id.listGallery);
         adapter = new GalleryRowsAdapter();
         listGallery.setAdapter(adapter);
@@ -75,6 +91,23 @@ public class GalleryFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        if (ZypeConfiguration.playlistGalleryHeroImages(getActivity())) {
+            modelHeroImages = ViewModelProviders.of(getActivity()).get(HeroImagesViewModel.class);
+            modelHeroImages.getHeroImages().observe(this, new Observer<List<HeroImage>>() {
+                @Override
+                public void onChanged(@Nullable List<HeroImage> heroImages) {
+                    modelHeroImages.stopTimer();
+                    adapterHeroImages.setData(heroImages);
+                    modelHeroImages.startTimer(0).observe(GalleryFragment.this, new Observer<Integer>() {
+                        @Override
+                        public void onChanged(Integer page) {
+                            pagerHeroImages.setCurrentItem(page);
+                        }
+                    });
+                }
+            });
+        }
 
         model = ViewModelProviders.of(getActivity()).get(GalleryViewModel.class);
         model.getGalleryRows(parentPlaylistId).observe(this, new Observer<List<GalleryRow>>() {

@@ -72,9 +72,9 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                NavigationHelper navigationHelper = NavigationHelper.getInstance(holder.view.getContext());
                 if (holder.item instanceof Video) {
                     Video video = (Video) holder.item;
-                    NavigationHelper navigationHelper = NavigationHelper.getInstance(holder.view.getContext());
                     if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
                         navigationHelper.switchToVideoDetailsScreen((Activity) holder.view.getContext(), video.id,
                                         playlistId, true);
@@ -115,18 +115,9 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                 else if (holder.item instanceof Playlist) {
                     Playlist playlist = (Playlist) holder.item;
                     if (playlist.playlistItemCount > 0) {
-                        Intent intent = new Intent(holder.view.getContext().getApplicationContext(), VideosActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString(BundleConstants.PARENT_ID, playlist.id);
-                        intent.putExtras(bundle);
-                        holder.view.getContext().startActivity(intent);
-                    }
+                        navigationHelper.switchToPlaylistVideosScreen((Activity) holder.view.getContext(), playlist.id);                    }
                     else {
-                        Intent intent = new Intent(holder.view.getContext().getApplicationContext(), PlaylistActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString(BundleConstants.PARENT_ID, playlist.id);
-                        intent.putExtras(bundle);
-                        holder.view.getContext().startActivity(intent);
+                        navigationHelper.switchToPlaylistScreen((Activity) holder.view.getContext(), playlist.id);
                     }
                 }
             }
