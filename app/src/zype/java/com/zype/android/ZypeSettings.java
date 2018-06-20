@@ -42,5 +42,16 @@ public class ZypeSettings {
     public static final boolean SHARE_VIDEO_ENABLED = false;
 
     public static final String THEME = ZypeConfiguration.THEME_LIGHT;
+
+    /**
+     * Google client id and secret are required for native to universal subscription feature.
+     * They are used in request to Zype Bifrost service for verifying subscription.
+     */
+    public static final String GOOGLE_CLIENT_ID = "818854525960-e4mm2df9tfaqtg2o0li62u0rd80tt5mj.apps.googleusercontent.com";
+    public static final String GOOGLE_CLIENT_SECRET = "OfBs7XR_B_DYR1YRcO-ehVPU";
+    public static final String GOOGLE_REDIRECT_URL = "urn:ietf:wg:oauth:2.0:oob";
+
+
+
 }
 

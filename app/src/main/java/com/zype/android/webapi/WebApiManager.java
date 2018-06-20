@@ -34,6 +34,7 @@ import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.auth.AccessTokenInfoEvent;
 import com.zype.android.webapi.events.auth.RefreshAccessTokenEvent;
 import com.zype.android.webapi.events.auth.RetrieveAccessTokenEvent;
+import com.zype.android.webapi.events.bifrost.BifrostEvent;
 import com.zype.android.webapi.events.category.CategoryEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
 import com.zype.android.webapi.events.consumer.ConsumerFavoriteVideoEvent;
@@ -61,6 +62,7 @@ import com.zype.android.webapi.model.ErrorBody;
 import com.zype.android.webapi.model.auth.AccessTokenInfoResponse;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
+import com.zype.android.webapi.model.bifrost.BifrostResponse;
 import com.zype.android.webapi.model.category.CategoryResponse;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoResponse;
 import com.zype.android.webapi.model.consumers.ConsumerResponse;
@@ -230,6 +232,8 @@ public class WebApiManager {
                 return new RefreshAccessTokenEvent(ticket, new RefreshAccessToken(mApi.authRefreshAccessToken(postParams)));
             case AUTH_RETRIEVE_ACCESS_TOKEN:
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
+            case BIFROST:
+                return new BifrostEvent(ticket, new BifrostResponse(mApi.verifySubscription(getParams, postParams)));
             case TOKEN_INFO:
                 String token = getParams.get(AuthParamsBuilder.ACCESS_TOKEN);
                 return new AccessTokenInfoEvent(ticket, new AccessTokenInfoResponse(mApi.getTokenInfo(token)));
@@ -319,6 +323,7 @@ public class WebApiManager {
     public enum Request {
         AUTH_REFRESH_ACCESS_TOKEN,
         AUTH_RETRIEVE_ACCESS_TOKEN,
+        BIFROST,
         TOKEN_INFO,
         VIDEO_LATEST_GET,
         VIDEO_FROM_PLAYLIST,

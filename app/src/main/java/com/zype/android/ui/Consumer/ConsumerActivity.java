@@ -21,6 +21,7 @@ import com.zype.android.R;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Consumer.Model.Consumer;
 import com.zype.android.ui.LoginActivity;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.main.MainActivity;
@@ -31,6 +32,9 @@ import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.ConsumerCreateParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
+import com.zype.android.webapi.model.consumers.ConsumerData;
+
+import static com.zype.android.utils.BundleConstants.REQ_LOGIN;
 
 /**
  * Created by Evgeny Cherkasov on 27.06.2017.
@@ -155,6 +159,22 @@ public class ConsumerActivity extends BaseActivity {
         }
     }
 
+    // //////////
+    // Actions
+    //
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQ_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    setResult(RESULT_OK);
+                    finish();
+                }
+                break;
+        }
+    }
+
     private void switchToSubscriptionScreen() {
         // TODO: Change to Subcription activity
         Intent intent = new Intent(this, SubscriptionActivity.class);
@@ -217,7 +237,7 @@ public class ConsumerActivity extends BaseActivity {
     }
 
     private void updateConsumer() {
-        Consumer consumer = getViewModel();
+        consumer = getViewModel();
         if (validate(consumer)) {
             requestCreateConsumer(consumer);
         }
@@ -241,11 +261,14 @@ public class ConsumerActivity extends BaseActivity {
     public void handleConsumer(ConsumerEvent event) {
         Logger.d("handleConsumer()");
         hideProgress();
-        com.zype.android.webapi.model.consumers.Consumer data = event.getEventData().getModelData();
-        int subscriptionCount = data.getConsumerData().getSubscriptionCount();
-        SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
+        ConsumerData data = event.getEventData().getModelData().getConsumerData();
+        SettingsProvider.getInstance().saveSubscriptionCount(data.getSubscriptionCount());
+        SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, consumer.email);
+        SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_PASSWORD, consumer.password);
 
-        switchToSubscriptionScreen();
+        Bundle extras = new Bundle();
+        extras.putBoolean(LoginActivity.PARAMETERS_FORCE_LOGIN, true);
+        NavigationHelper.getInstance(ConsumerActivity.this).switchToLoginScreen(ConsumerActivity.this, extras);
     }
 
     @Subscribe

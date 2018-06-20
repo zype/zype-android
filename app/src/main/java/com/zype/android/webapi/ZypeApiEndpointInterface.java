@@ -1,5 +1,6 @@
 package com.zype.android.webapi;
 
+import com.zype.android.webapi.model.bifrost.Bifrost;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
 import com.zype.android.webapi.model.auth.TokenInfo;
@@ -54,6 +55,10 @@ public interface ZypeApiEndpointInterface {
 
     @GET("/oauth/token/info/")
     TokenInfo getTokenInfo(@Query("access_token") String accessToken);
+
+    @FormUrlEncoded
+    @POST("https://bifrost.zype.com/api/v1/subscribe")
+    Bifrost verifySubscription(@QueryMap HashMap<String, String> getParams, @FieldMap HashMap<String, String> postParams);
 
     @GET("/videos/")
     Video getVideo(@Query("id") String id, @Query("api_key") String apiKey);

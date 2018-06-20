@@ -6,6 +6,7 @@ package com.zype.android.utils;
  *          date 6/25/15
  */
 public class BundleConstants {
+    public static final int REQUEST_CONSUMER = 6600;
     public static final int REQUEST_LOGIN = 6700;
     public static final int REQUEST_SUBSCRIPTION = 6800;
 
