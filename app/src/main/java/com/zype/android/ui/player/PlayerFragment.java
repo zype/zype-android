@@ -1132,7 +1132,9 @@ public class PlayerFragment extends BaseFragment implements
                 // ad is played.
                 isAdDisplayed = true;
                 hideControls();
-                player.getPlayerControl().pause();
+                if (player != null) {
+                    player.getPlayerControl().pause();
+                }
                 break;
             case CONTENT_RESUME_REQUESTED:
                 // AdEventType.CONTENT_RESUME_REQUESTED is fired when the ad is completed

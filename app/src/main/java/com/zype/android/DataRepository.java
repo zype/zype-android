@@ -68,6 +68,10 @@ public class DataRepository {
         db.zypeDao().deletePlaylistVideos(playlistId);
     }
 
+    public Video getVideoSync(String videoId) {
+        return db.zypeDao().getVideoSync(videoId);
+    }
+
     public void insertVideos(List<Video> videos) {
         db.zypeDao().insertVideos(videos);
     }

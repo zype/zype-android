@@ -1,7 +1,10 @@
 package com.zype.android.Auth;
 
+import android.app.Application;
 import android.content.Context;
 
+import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -23,12 +26,16 @@ public class AuthHelper {
         boolean result = true;
 
         // TODO: Refactor to use Room for retrieving video
-        VideoData videoData = VideoHelper.getFullData(context.getContentResolver(), videoId);
-        if (videoData == null) {
+//        VideoData videoData = VideoHelper.getFullData(context.getContentResolver(), videoId);
+//        if (videoData == null) {
+//            return false;
+//        }
+        Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
+        if (video == null) {
             return false;
         }
         // TODO: Add checking for video entitlement if TVOD is turned on
-        if (videoData.isSubscriptionRequired()) {
+        if (Integer.valueOf(video.subscriptionRequired) == 1) {
             if (ZypeConfiguration.isNativeSubscriptionEnabled(context)) {
                 if (SubscriptionHelper.hasSubscription()) {
                     return true;

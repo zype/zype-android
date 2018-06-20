@@ -52,7 +52,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         mApi.subscribe(this);
         BusProvider.getBus().register(mNetworkEventHandler);
         NetworkStateObserver.getInstance().register(this);
-        DownloadHelper.checkDownloadTasks(getApplicationContext());
+//        DownloadHelper.checkDownloadTasks(getApplicationContext());
         Tracker t = ZypeApp.getTracker();
         if (t != null) {
             t.setScreenName(getActivityName());

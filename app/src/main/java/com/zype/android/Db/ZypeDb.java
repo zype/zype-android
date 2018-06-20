@@ -8,6 +8,9 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 
+import com.zype.android.Db.Entity.AdSchedule;
+import com.zype.android.Db.Entity.AnalyticBeacon;
+import com.zype.android.Db.Entity.FavoriteVideo;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
@@ -16,7 +19,7 @@ import com.zype.android.Db.Entity.Video;
  * Created by Evgeny Cherkasov on 13.06.2018
  */
 
-@Database(entities = {Playlist.class, PlaylistVideo.class, Video.class},
+@Database(entities = {AdSchedule.class, AnalyticBeacon.class, FavoriteVideo.class, Playlist.class, PlaylistVideo.class, Video.class},
             version = 6)
 public abstract class ZypeDb extends RoomDatabase {
     public abstract ZypeDao zypeDao();

@@ -45,6 +45,9 @@ public interface ZypeDao {
     @Query("DELETE FROM playlist_video WHERE playlist_video.playlist_id = :playlistId")
     public void deletePlaylistVideos(String playlistId);
 
+    @Query("SELECT * FROM video WHERE video._id = :videoId LIMIT 1")
+    public Video getVideoSync(String videoId);
+
     @Insert(onConflict = REPLACE)
     public void insertVideos(List<Video> videos);
 

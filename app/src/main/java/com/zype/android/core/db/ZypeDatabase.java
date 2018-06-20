@@ -28,7 +28,7 @@ public class ZypeDatabase extends SQLiteOpenHelper {
 
     @NonNull
     private static String getCreateVideoTableQuery() {
-        return "CREATE TABLE " + Contract.Video.TABLE + "("
+        return "CREATE TABLE IF NOT EXISTS " + Contract.Video.TABLE + "("
                 + Contract.Video.COLUMN_ID + TYPE_TEXT + NOT_NULL + " PRIMARY KEY " + COMMA_SEP
                 + Contract.Video.COLUMN_ACTIVE + TYPE_INTEGER + NOT_NULL + COMMA_SEP
                 + Contract.Video.COLUMN_AD_VIDEO_TAG + TYPE_TEXT + COMMA_SEP
@@ -92,7 +92,7 @@ public class ZypeDatabase extends SQLiteOpenHelper {
     }
 
     private static String getCreateFavoriteTableQuery() {
-        return "CREATE TABLE " + Contract.Favorite.TABLE + "("
+        return "CREATE TABLE IF NOT EXISTS " + Contract.Favorite.TABLE + "("
                 + Contract.Favorite.COLUMN_ID + TYPE_TEXT + NOT_NULL + " PRIMARY KEY " + COMMA_SEP
                 + Contract.Favorite.COLUMN_CONSUMER_ID + TYPE_TEXT + COMMA_SEP
                 + Contract.Favorite.COLUMN_CREATED_AT + TYPE_TEXT + COMMA_SEP
@@ -103,7 +103,7 @@ public class ZypeDatabase extends SQLiteOpenHelper {
     }
 
     private static String getCreatePlaylistTableQuery() {
-        return "CREATE TABLE " + Contract.Playlist.TABLE + "("
+        return "CREATE TABLE IF NOT EXISTS " + Contract.Playlist.TABLE + "("
                 + Contract.Playlist.COLUMN_ID + TYPE_TEXT + NOT_NULL + " PRIMARY KEY " + COMMA_SEP
                 + Contract.Playlist.COLUMN_TITLE + TYPE_TEXT + COMMA_SEP
                 + Contract.Playlist.COLUMN_PARENT_ID + TYPE_TEXT + COMMA_SEP
@@ -118,7 +118,7 @@ public class ZypeDatabase extends SQLiteOpenHelper {
     }
 
     private static String getCreatePlaylistVideoTableQuery() {
-        return "CREATE TABLE " + Contract.PlaylistVideo.TABLE_NAME + "("
+        return "CREATE TABLE IF NOT EXISTS " + Contract.PlaylistVideo.TABLE_NAME + "("
                 + Contract.PlaylistVideo.ID + TYPE_INTEGER + " PRIMARY KEY " + COMMA_SEP
                 + Contract.PlaylistVideo.NUMBER + TYPE_INTEGER + COMMA_SEP
                 + Contract.PlaylistVideo.PLAYLIST_ID + TYPE_TEXT + COMMA_SEP
@@ -127,7 +127,7 @@ public class ZypeDatabase extends SQLiteOpenHelper {
     }
 
     private static String getCreateAdScheduleTableQuery() {
-        return "CREATE TABLE " + Contract.AdSchedule.TABLE_NAME + "("
+        return "CREATE TABLE IF NOT EXISTS " + Contract.AdSchedule.TABLE_NAME + "("
                 + Contract.AdSchedule.ID + TYPE_INTEGER + " PRIMARY KEY " + COMMA_SEP
                 + Contract.AdSchedule.OFFSET + TYPE_INTEGER + COMMA_SEP
                 + Contract.AdSchedule.TAG + TYPE_TEXT + COMMA_SEP
@@ -136,7 +136,7 @@ public class ZypeDatabase extends SQLiteOpenHelper {
     }
 
     private static String getCreateAnalyticsBeaconTableQuery() {
-        return "CREATE TABLE " + Contract.AnalyticBeacon.TABLE_NAME + "("
+        return "CREATE TABLE IF NOT EXISTS " + Contract.AnalyticBeacon.TABLE_NAME + "("
                 + Contract.AnalyticBeacon.ID + TYPE_INTEGER + " PRIMARY KEY " + COMMA_SEP
                 + Contract.AnalyticBeacon.BEACON + TYPE_TEXT + COMMA_SEP
                 + Contract.AnalyticBeacon.VIDEO_ID + TYPE_TEXT + COMMA_SEP
