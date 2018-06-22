@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.BuildConfig;
@@ -330,26 +331,33 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         Logger.d("onItemClick()");
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
 
-        if (ZypeConfiguration.isUniversalTVODEnabled(this) && holder.purchaseRequired) {
-            if (holder.isEntitled) {
-                VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
-            }
-            else {
-                if (SettingsProvider.getInstance().isLoggedIn()) {
-                    requestEntitled(holder.videoId);
-                }
-                else {
-                    NavigationHelper.getInstance(this).switchToLoginScreen(this);
-                }
-            }
-            return;
-        }
-        if (holder.subscriptionRequired) {
-            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, playlistId, holder.onAir);
+        NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
+        if (AuthHelper.isVideoAuthorized(this, holder.videoId)) {
+            navigationHelper.switchToVideoDetailsScreen(this, holder.videoId, playlistId, false);
         }
         else {
-            VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
+            navigationHelper.handleNotAuthorizedVideo(this, holder.videoId);
         }
+//        if (ZypeConfiguration.isUniversalTVODEnabled(this) && holder.purchaseRequired) {
+//            if (holder.isEntitled) {
+//                VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
+//            }
+//            else {
+//                if (SettingsProvider.getInstance().isLoggedIn()) {
+//                    requestEntitled(holder.videoId);
+//                }
+//                else {
+//                    NavigationHelper.getInstance(this).switchToLoginScreen(this);
+//                }
+//            }
+//            return;
+//        }
+//        if (holder.subscriptionRequired) {
+//            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, playlistId, holder.onAir);
+//        }
+//        else {
+//            VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
+//        }
     }
 
     //

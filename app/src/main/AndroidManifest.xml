@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.zype.android"
-    >
+    package="com.zype.android">
 
     <supports-screens
         android:anyDensity="true"
@@ -78,8 +76,7 @@
             android:label="@string/title_activity_episode_detail"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.main.MainActivity"
-            android:theme="@style/AppTheme"
-            >
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zype.android.ui.main.MainActivity" />
@@ -110,7 +107,7 @@
                 android:value="com.zype.android.ui.main.MainActivity" />
         </activity>
         -->
-<!--
+        <!--
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
@@ -118,13 +115,12 @@
             android:windowSoftInputMode="adjustResize|stateVisible"
             android:theme="@style/AppTheme"
             />
--->
+        -->
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -146,8 +142,7 @@
             android:label="@string/title_activity_web"
             android:parentActivityName=".ui.video_details.VideoDetailActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            >
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zype.android.ui.video_details.VideoDetailActivity" />
@@ -224,22 +219,19 @@
 
         <activity
             android:name=".ui.main.fragments.playlist.PlaylistActivity"
-            android:label="@string/title_activity_playlist"
-            />
-        <activity android:name=".ui.main.fragments.videos.VideosActivity"
-            android:theme="@style/AppTheme"
-            />
+            android:label="@string/title_activity_playlist" />
         <activity
-            android:name=".ui.Intro.IntroActivity"
-            />
+            android:name=".ui.main.fragments.videos.VideosActivity"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".ui.Intro.IntroActivity" />
         <activity
             android:name=".ui.Consumer.ConsumerActivity"
-            android:theme="@style/AppThemeWithActionBar"
-            />
+            android:theme="@style/AppThemeWithActionBar" />
         <activity
             android:name=".ui.Subscription.SubscriptionActivity"
-            android:theme="@style/AppThemeWithActionBar"
-            />
+            android:theme="@style/AppThemeWithActionBar" />
+        <activity android:name=".ui.Auth.SubscribeOrLoginActivity"
+            android:theme="@style/AppThemeWithActionBar" />
     </application>
 
 </manifest>

@@ -1,5 +1,5 @@
 <resources>
-<!--
+    <!--
     <string name="app_name">Zype</string>
 -->
     <string name="action_settings">Settings</string>
@@ -78,26 +78,30 @@
     <string name="subtitles_off">Turn off</string>
 
     <!-- Consumer -->
-    <string name="consumer_create_form_description">Fill out your email address and create a password. Use this login to gain access to our content on other devices.</string>
-    <string name="consumer_create_form_subtitle">Create your login to unlock your content</string>
+    <string name="consumer_create_form_description">Enter a valid email and password. Account credentials will allow access on all devices.</string>
+    <string name="consumer_create_form_subtitle">Create your account</string>
     <string name="consumer_create_sign_in">Already have an account? Sign in</string>
     <string name="consumer_create_sign_in_link">Sign in</string>
-    <string name="consumer_create_terms">By clicking Create my login, you agree to our Terms of Service and Privacy</string>
+    <string name="consumer_create_terms">By clicking Create Account, you agree to our Terms of Service and Privacy</string>
     <string name="consumer_create_terms_link">Terms of Service and Privacy</string>
-    <string name="consumer_button_update">Create Login</string>
+    <string name="consumer_button_update">Create Account</string>
     <string name="consumer_email">Email</string>
     <string name="consumer_email_error_empty">Email is required</string>
     <string name="consumer_email_error_invalid">Enter valid email</string>
     <string name="consumer_password">Password</string>
     <string name="consumer_password_error_empty">Enter password</string>
     <string name="consumer_progress_create">Creating login…</string>
-    <string name="consumer_title_create">Create login</string>
+    <string name="consumer_title_create">Create Account</string>
 
     <!-- Dialogs -->
     <string name="dialog_button_cancel">Cancel</string>
     <string name="dialog_login_title">Sign In Required</string>
     <string name="dialog_login_message">You do not have access to this video. Please sign in with your account to watch this video.</string>
     <string name="dialog_login_button_login">Sign in</string>
+
+    <!--General-->
+    <string name="button_sign_in">Sign in</string>
+    <string name="button_ok">OK</string>
 
     <!-- Intro -->
     <string name="intro_button_browse">Browse</string>
@@ -137,6 +141,8 @@
     <string name="subscription_logged_in">Signed in as: </string>
     <string name="subscription_title">Select Plan</string>
 
+    <string name="subscribe_or_login_button_subscribe_now">Subscribe Now</string>
+
     <!-- Videos -->
     <string name="videos_loading">Gathering videos for you…</string>
 
@@ -144,5 +150,6 @@
     <string name="instagram_title">Instagram</string>
     <string name="web_title">Web</string>
 
-    <string name="button_ok">OK</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

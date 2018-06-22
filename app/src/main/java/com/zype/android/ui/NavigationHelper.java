@@ -1,14 +1,18 @@
 package com.zype.android.ui;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.Auth.SubscribeOrLoginActivity;
 import com.zype.android.ui.Consumer.ConsumerActivity;
 import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
@@ -156,16 +160,21 @@ public class NavigationHelper {
         activity.startActivity(intent);
     }
 
+    public void switchToSubscribeOrLoginScreen(Activity activity) {
+        Intent intent = new Intent(activity, SubscribeOrLoginActivity.class);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_SUBSCRIBE_OR_LOGIN);
+    }
+
     //
     public void handleNotAuthorizedVideo(Activity activity, String videoId) {
-        VideoData videoData = VideoHelper.getFullData(activity.getContentResolver(), videoId);
-        if (videoData == null) {
-            Logger.e("Error get video data, videoId=" + videoId);
+        Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
+        if (video == null) {
+            Logger.e("handleNotAuthorizedVideo(): Error get video, videoId=" + videoId);
             return;
         }
-        if (videoData.isSubscriptionRequired()) {
+        if (Integer.valueOf(video.subscriptionRequired) == 1) {
             if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
-                NavigationHelper.getInstance(activity).switchToSubscriptionScreen(activity);
+                switchToSubscriptionScreen(activity);
             }
             else if (ZypeConfiguration.isUniversalSubscriptionEnabled(activity)) {
                 if (AuthHelper.isLoggedIn()) {
@@ -175,10 +184,12 @@ public class NavigationHelper {
                     DialogHelper.showLoginAlert(activity);
                 }
             }
+            else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
+                switchToSubscribeOrLoginScreen(activity);
+            }
             else {
-
+                Logger.e("handleNotAuthorizedVideo(): Failed to handle not authorized video, videoId=" + videoId);
             }
         }
-
     }
 }

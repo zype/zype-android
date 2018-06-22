@@ -171,7 +171,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
                     }
                 }
                 break;
-            case BundleConstants.REQ_LOGIN:
+            case BundleConstants.REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     if (SettingsProvider.getInstance().getSubscriptionCount() > 0) {
                         setResult(RESULT_OK);

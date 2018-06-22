@@ -34,7 +34,7 @@ import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
 import com.zype.android.webapi.model.consumers.ConsumerData;
 
-import static com.zype.android.utils.BundleConstants.REQ_LOGIN;
+import static com.zype.android.utils.BundleConstants.REQUEST_LOGIN;
 
 /**
  * Created by Evgeny Cherkasov on 27.06.2017.
@@ -166,7 +166,7 @@ public class ConsumerActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case REQ_LOGIN:
+            case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     setResult(RESULT_OK);
                     finish();
