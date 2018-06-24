@@ -16,6 +16,7 @@ import com.google.android.gms.analytics.Tracker;
 import com.onesignal.OneSignal;
 import com.google.android.gms.cast.CastMediaControlIntent;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
+import com.zype.android.Billing.MarketplaceGateway;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.StorageUtils;
 import com.zype.android.webapi.WebApiManager;
@@ -38,6 +39,8 @@ public class ZypeApp extends MultiDexApplication {
     public static boolean isLiveTest = false;
     // Monitors Memory Leaks
 //    private RefWatcher refWatcher;
+
+    public static MarketplaceGateway marketplaceGateway;
 
     @NonNull
     public static ZypeApp get(@NonNull Context context) {
@@ -114,6 +117,13 @@ public class ZypeApp extends MultiDexApplication {
                 mNotificationManager.cancel(ZypeApp.NOTIFICATION_ID);
             }
         });
+
+        // Setup marketplace connect
+        if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
+            marketplaceGateway = new MarketplaceGateway(this, ZypeConfiguration.getAppKey(),
+                    ZypeConfiguration.getPlanIds());
+            marketplaceGateway.setup();
+        }
     }
 
     private void initFabric() {

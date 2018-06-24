@@ -1,8 +1,10 @@
 package com.zype.android.ui.Subscription;
 
 import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,10 +20,14 @@ import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
+import com.zype.android.Billing.Subscription;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.Gallery.HeroImagesViewModel;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.Subscription.Model.SubscriptionItem;
 import com.zype.android.ui.base.BaseActivity;
@@ -36,6 +42,7 @@ import com.zype.android.webapi.model.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Evgeny Cherkasov on 27.06.2017.
@@ -52,7 +59,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     private ProgressDialog dialogProgress;
 
     private SubscriptionsAdapter adapter;
-    private SubscriptionItem selectedSubscription = null;
+    private Subscription selectedSubscription = null;
 
     // In-app billing
     private BillingManager billingManager;
@@ -67,20 +74,27 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
 
         initParameters(savedInstanceState);
 
-        listSubscriptions = (RecyclerView) findViewById(R.id.listSubscriptions);
+        listSubscriptions = findViewById(R.id.listSubscriptions);
         adapter = new SubscriptionsAdapter();
         listSubscriptions.setAdapter(adapter);
 
-        layoutLogin = (FrameLayout) findViewById(R.id.layoutLogin);
-        buttonLogin = (Button) findViewById(R.id.buttonLogin);
+        layoutLogin = findViewById(R.id.layoutLogin);
+        buttonLogin = findViewById(R.id.buttonLogin);
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavigationHelper.getInstance(SubscriptionActivity.this).switchToLoginScreen(SubscriptionActivity.this);
             }
         });
-        layoutLoggedIn = (LinearLayout) findViewById(R.id.layoutLoggedIn);
-        textUsername = (TextView) findViewById(R.id.textUsername);
+        layoutLoggedIn = findViewById(R.id.layoutLoggedIn);
+        textUsername = findViewById(R.id.textUsername);
+
+        ZypeApp.marketplaceGateway.getSubscriptions().observe(this, new Observer<Map<String, Subscription>>() {
+            @Override
+            public void onChanged(@Nullable Map<String, Subscription> subscriptions) {
+                adapter.setData((List<Subscription>) subscriptions.values());
+            }
+        });
 
         billingManager = new BillingManager(this, this);
         hideProgress();
@@ -115,29 +129,29 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     // UI
     // 
     private void updateViews() {
-        if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
-            layoutLogin.setVisibility(View.VISIBLE);
-            if (SettingsProvider.getInstance().isLoggedIn()) {
-                buttonLogin.setVisibility(View.GONE);
-                layoutLoggedIn.setVisibility(View.VISIBLE);
-            }
-            else {
-                buttonLogin.setVisibility(View.VISIBLE);
-                layoutLoggedIn.setVisibility(View.GONE);
-            }
-        }
-        else {
-            layoutLogin.setVisibility(View.GONE);
-        }
+//        if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+//            layoutLogin.setVisibility(View.VISIBLE);
+//            if (SettingsProvider.getInstance().isLoggedIn()) {
+//                buttonLogin.setVisibility(View.GONE);
+//                layoutLoggedIn.setVisibility(View.VISIBLE);
+//            }
+//            else {
+//                buttonLogin.setVisibility(View.VISIBLE);
+//                layoutLoggedIn.setVisibility(View.GONE);
+//            }
+//        }
+//        else {
+//            layoutLogin.setVisibility(View.GONE);
+//        }
         bindViews();
     }
 
     private void bindViews() {
-        if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
-            if (SettingsProvider.getInstance().isLoggedIn()) {
-                textUsername.setText(SettingsProvider.getInstance().getString(SettingsProvider.CONSUMER_EMAIL));
-            }
-        }
+//        if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+//            if (SettingsProvider.getInstance().isLoggedIn()) {
+//                textUsername.setText(SettingsProvider.getInstance().getString(SettingsProvider.CONSUMER_EMAIL));
+//            }
+//        }
     }
 
     private void showProgress() {
@@ -188,36 +202,36 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     // //////////
     // In-app billing
     //
-    private void getSubscriptions(List<Purchase> purchases) {
-        // TODO: Use purchases to mark owned skus
-        billingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, SubscriptionsHelper.getSkuList(),
-                new SkuDetailsResponseListener() {
-                    @Override
-                    public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
-                        if (responseCode != BillingClient.BillingResponse.OK) {
-                            // TODO: Handle error retrieving subscriptions list
-                        }
-                        else {
-                            if (skuDetailsList != null) {
-                                List<SubscriptionItem> items = new ArrayList<>();
-                                for (SkuDetails sku : skuDetailsList) {
-                                    SubscriptionItem item = new SubscriptionItem();
-                                    item.title = sku.getTitle();
-                                    item.description = sku.getDescription();
-                                    item.price = sku.getPriceAmountMicros() / 1000000;
-                                    item.sku = sku.getSku();
-                                    items.add(item);
-                                }
-                                adapter.setData(items);
-                            }
-                        }
-                    }
-                }
-        );
-    }
+//    private void getSubscriptions(List<Purchase> purchases) {
+//        // TODO: Use purchases to mark owned skus
+//        billingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, SubscriptionsHelper.getSkuList(),
+//                new SkuDetailsResponseListener() {
+//                    @Override
+//                    public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
+//                        if (responseCode != BillingClient.BillingResponse.OK) {
+//                            // TODO: Handle error retrieving subscriptions list
+//                        }
+//                        else {
+//                            if (skuDetailsList != null) {
+//                                List<SubscriptionItem> items = new ArrayList<>();
+//                                for (SkuDetails sku : skuDetailsList) {
+//                                    SubscriptionItem item = new SubscriptionItem();
+//                                    item.title = sku.getTitle();
+//                                    item.description = sku.getDescription();
+//                                    item.price = sku.getPriceAmountMicros() / 1000000;
+//                                    item.sku = sku.getSku();
+//                                    items.add(item);
+//                                }
+//                                adapter.setData(items);
+//                            }
+//                        }
+//                    }
+//                }
+//        );
+//    }
 
-    private void purchaseSubscription(SubscriptionItem item) {
-        billingManager.initiatePurchaseFlow(item.sku, BillingClient.SkuType.SUBS);
+    private void purchaseSubscription(Subscription item) {
+        billingManager.initiatePurchaseFlow(this, item.getMarketplace().getSku(), BillingClient.SkuType.SUBS);
     }
 
     //
@@ -226,7 +240,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     @Override
     public void onBillingClientSetupFinished() {
         Logger.d("onBillingClientSetupFinished(): ");
-        getSubscriptions(null);
+//        getSubscriptions(null);
     }
 
     @Override
@@ -236,17 +250,18 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
         boolean result = false;
-        if (ZypeSettings.NATIVE_SUBSCRIPTION_ENABLED) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             if (purchases != null && !purchases.isEmpty()) {
                 result = true;
             }
             SubscriptionsHelper.updateSubscriptionCount(purchases);
         }
-        else if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+        else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
             if (purchases != null && !purchases.isEmpty()) {
-                if (selectedSubscription != null) {
-                    SubscriptionsHelper.validateSubscription(purchases, selectedSubscription.sku, getApi());
-                }
+                // TODO: Change validation request
+//                if (selectedSubscription != null) {
+//                    SubscriptionsHelper.validateSubscription(purchases, selectedSubscription.sku, getApi());
+//                }
             }
         }
         if (result) {
@@ -254,7 +269,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             finish();
         }
         else {
-            getSubscriptions(purchases);
+//            getSubscriptions(purchases);
         }
     }
 
@@ -262,13 +277,13 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     // Data
     //
     public class SubscriptionsAdapter extends RecyclerView.Adapter<SubscriptionsAdapter.ViewHolder> {
-        private List<SubscriptionItem> items;
+        private List<Subscription> items;
 
         public SubscriptionsAdapter() {
             items = new ArrayList<>();
         }
 
-        public void setData(List<SubscriptionItem> items) {
+        public void setData(List<Subscription> items) {
             this.items = items;
             notifyDataSetChanged();
         }
@@ -282,21 +297,21 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.item = items.get(position);
-            holder.textTitle.setText(holder.item.title);
-            holder.textPrice.setText(String.valueOf(holder.item.price));
-            holder.textDescription.setText(holder.item.description);
-            holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.title));
+            holder.textTitle.setText(holder.item.getMarketplace().getTitle());
+            holder.textPrice.setText(String.valueOf(holder.item.getMarketplace().getPrice()));
+            holder.textDescription.setText(holder.item.getMarketplace().getDescription());
+            holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.getMarketplace().getTitle()));
             holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     selectedSubscription = holder.item;
-                    if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
-                        // Create consumer before making purchase in case user is not logged in
-                        if (!SettingsProvider.getInstance().isLoggedIn()) {
-                            NavigationHelper.getInstance(SubscriptionActivity.this).switchToConsumerScreen(SubscriptionActivity.this);
-                            return;
-                        }
-                    }
+//                    if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
+//                        // Create consumer before making purchase in case user is not logged in
+//                        if (!SettingsProvider.getInstance().isLoggedIn()) {
+//                            NavigationHelper.getInstance(SubscriptionActivity.this).switchToConsumerScreen(SubscriptionActivity.this);
+//                            return;
+//                        }
+//                    }
                     purchaseSubscription(selectedSubscription);
                 }
             });
@@ -309,7 +324,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
 
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View view;
-            public SubscriptionItem item;
+            public Subscription item;
             public TextView textTitle;
             public TextView textPrice;
             public TextView textDescription;

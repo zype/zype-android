@@ -8,6 +8,10 @@ import android.text.TextUtils;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.webapi.model.app.AppData;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by Evgeny Cherkasov on 23.01.2018.
  */
@@ -119,6 +123,10 @@ public class ZypeConfiguration {
         }
     }
 
+    public static String getAppKey() {
+        return ZypeSettings.APP_KEY;
+    }
+
     public static String getTheme(Context context) {
         return getStringPreference(PREFERENCE_THEME, ZypeSettings.THEME, context);
     }
@@ -135,6 +143,10 @@ public class ZypeConfiguration {
 
     public static boolean isNativeToUniversalSubscriptionEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION, ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED, context);
+    }
+
+    public static List<String> getPlanIds() {
+        return Arrays.asList(ZypeSettings.PLAN_IDS);
     }
 
     public static boolean isSubscribeToWatchAdFreeEnabled(Context context) {

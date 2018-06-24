@@ -15,6 +15,7 @@ import com.zype.android.webapi.model.linking.DevicePin;
 import com.zype.android.webapi.model.onair.OnAirAudioResponseData;
 import com.zype.android.webapi.model.onair.OnAirData;
 import com.zype.android.webapi.model.onair.OnAirVideoResponseData;
+import com.zype.android.webapi.model.plan.Plan;
 import com.zype.android.webapi.model.player.PlayerAudioData;
 import com.zype.android.webapi.model.player.PlayerVideoData;
 import com.zype.android.webapi.model.playlist.Playlist;
@@ -107,6 +108,10 @@ public interface ZypeApiEndpointInterface {
 
     @POST("/pin/acquire/")
     DevicePin createDevicePin(@QueryMap HashMap<String, String> queryParams, @Body String emptyBody);
+
+    // Plans
+    @GET("/plans/{plan_id}")
+    Plan getPlan(@Path("plan_id") String planId, @QueryMap HashMap<String, String> getParams);
 
     // Video entitlements
     @GET("/videos/{video_id}/entitled/")

@@ -25,6 +25,7 @@ public class ZypeSettings {
     // Monetization
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = true;
+    public static final String[] PLAN_IDS = new String[] { "5a26c2445d3c19152e003f70" };
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final boolean UNIVERSAL_TVOD = false;

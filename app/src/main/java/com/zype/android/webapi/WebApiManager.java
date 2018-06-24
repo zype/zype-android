@@ -26,6 +26,7 @@ import com.zype.android.webapi.builder.DownloadVideoParamsBuilder;
 import com.zype.android.webapi.builder.EntitlementParamsBuilder;
 import com.zype.android.webapi.builder.FavoriteParamsBuilder;
 import com.zype.android.webapi.builder.ParamsBuilder;
+import com.zype.android.webapi.builder.PlanParamsBuilder;
 import com.zype.android.webapi.builder.PlayerParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.BaseEvent;
@@ -48,6 +49,7 @@ import com.zype.android.webapi.events.linking.DevicePinEvent;
 import com.zype.android.webapi.events.onair.OnAirAudioEvent;
 import com.zype.android.webapi.events.onair.OnAirEvent;
 import com.zype.android.webapi.events.onair.OnAirVideoEvent;
+import com.zype.android.webapi.events.plan.PlanEvent;
 import com.zype.android.webapi.events.player.PlayerAudioEvent;
 import com.zype.android.webapi.events.player.PlayerVideoEvent;
 import com.zype.android.webapi.events.playlist.PlaylistEvent;
@@ -76,6 +78,7 @@ import com.zype.android.webapi.model.linking.DevicePinResponse;
 import com.zype.android.webapi.model.onair.OnAirAudioResponse;
 import com.zype.android.webapi.model.onair.OnAirResponse;
 import com.zype.android.webapi.model.onair.OnAirVideoResponse;
+import com.zype.android.webapi.model.plan.PlanResponse;
 import com.zype.android.webapi.model.player.PlayerAudioResponse;
 import com.zype.android.webapi.model.player.PlayerVideoResponse;
 import com.zype.android.webapi.model.playlist.PlaylistResponse;
@@ -234,6 +237,9 @@ public class WebApiManager {
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
             case BIFROST:
                 return new BifrostEvent(ticket, new BifrostResponse(mApi.verifySubscription(getParams, postParams)));
+            case PLAN:
+                String planId = pathParams.get(PlanParamsBuilder.PLAN_ID);
+                return new PlanEvent(ticket, new PlanResponse(mApi.getPlan(planId, getParams)));
             case TOKEN_INFO:
                 String token = getParams.get(AuthParamsBuilder.ACCESS_TOKEN);
                 return new AccessTokenInfoEvent(ticket, new AccessTokenInfoResponse(mApi.getTokenInfo(token)));
@@ -324,6 +330,7 @@ public class WebApiManager {
         AUTH_REFRESH_ACCESS_TOKEN,
         AUTH_RETRIEVE_ACCESS_TOKEN,
         BIFROST,
+        PLAN,
         TOKEN_INFO,
         VIDEO_LATEST_GET,
         VIDEO_FROM_PLAYLIST,
