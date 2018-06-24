@@ -90,7 +90,7 @@
     <string name="consumer_email_error_invalid">Enter valid email</string>
     <string name="consumer_password">Password</string>
     <string name="consumer_password_error_empty">Enter password</string>
-    <string name="consumer_progress_create">Creating login…</string>
+    <string name="consumer_progress_create">Creating account…</string>
     <string name="consumer_title_create">Create Account</string>
 
     <!-- Dialogs -->

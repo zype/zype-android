@@ -92,7 +92,13 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         ZypeApp.marketplaceGateway.getSubscriptions().observe(this, new Observer<Map<String, Subscription>>() {
             @Override
             public void onChanged(@Nullable Map<String, Subscription> subscriptions) {
-                adapter.setData((List<Subscription>) subscriptions.values());
+                List<Subscription> subscriptionList = new ArrayList<>();
+                for (Map.Entry<String, Subscription> entry : subscriptions.entrySet()) {
+                    if (entry.getValue().getMarketplace() != null) {
+                        subscriptionList.add(entry.getValue());
+                    }
+                }
+                adapter.setData(subscriptionList);
             }
         });
 
@@ -258,10 +264,9 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         }
         else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
             if (purchases != null && !purchases.isEmpty()) {
-                // TODO: Change validation request
-//                if (selectedSubscription != null) {
-//                    SubscriptionsHelper.validateSubscription(purchases, selectedSubscription.sku, getApi());
-//                }
+                if (selectedSubscription != null) {
+                    SubscriptionsHelper.validateSubscription(purchases, selectedSubscription.getMarketplace().getSku(), getApi());
+                }
             }
         }
         if (result) {
@@ -297,14 +302,15 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.item = items.get(position);
-            holder.textTitle.setText(holder.item.getMarketplace().getTitle());
-            holder.textPrice.setText(String.valueOf(holder.item.getMarketplace().getPrice()));
-            holder.textDescription.setText(holder.item.getMarketplace().getDescription());
-            holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.getMarketplace().getTitle()));
-            holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    selectedSubscription = holder.item;
+            if (holder.item.getMarketplace() != null) {
+                holder.textTitle.setText(holder.item.getMarketplace().getTitle());
+                holder.textPrice.setText(String.valueOf(holder.item.getMarketplace().getPrice()));
+                holder.textDescription.setText(holder.item.getMarketplace().getDescription());
+                holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.getMarketplace().getTitle()));
+                holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        selectedSubscription = holder.item;
 //                    if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
 //                        // Create consumer before making purchase in case user is not logged in
 //                        if (!SettingsProvider.getInstance().isLoggedIn()) {
@@ -312,9 +318,10 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
 //                            return;
 //                        }
 //                    }
-                    purchaseSubscription(selectedSubscription);
-                }
-            });
+                        purchaseSubscription(selectedSubscription);
+                    }
+                });
+            }
         }
 
         @Override

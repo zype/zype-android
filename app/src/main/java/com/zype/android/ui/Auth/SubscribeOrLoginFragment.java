@@ -48,37 +48,4 @@ public class SubscribeOrLoginFragment extends Fragment {
 
         return rootView;
     }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_CONSUMER:
-                if (resultCode == RESULT_OK) {
-                    NavigationHelper.getInstance(getActivity()).switchToSubscriptionScreen(getActivity());
-                }
-                else {
-                    onCancel();
-                }
-                break;
-            case REQUEST_LOGIN:
-                if (resultCode == RESULT_OK) {
-
-                }
-                else {
-                    onCancel();
-                }
-            case REQUEST_SUBSCRIPTION:
-                if (resultCode == RESULT_OK) {
-
-                }
-                else {
-                    onCancel();
-                }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void onCancel() {
-        getActivity().finish();
-    }
 }

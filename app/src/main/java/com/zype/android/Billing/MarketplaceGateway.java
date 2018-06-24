@@ -15,6 +15,7 @@ import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.zype.android.utils.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,10 +93,19 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
     }
 
     public LiveData<Map<String, Subscription>> getSubscriptions() {
-        if (subscriptionsLiveData == null) {
+        if (subscriptionsLiveData == null || !setupCompleted()) {
             setup();
         }
         return subscriptionsLiveData;
+    }
+
+    private boolean setupCompleted() {
+        for (Map.Entry<String, Subscription> entry : subscriptionsLiveData.getValue().entrySet()) {
+            if (entry.getValue().getZypePlan() == null || entry.getValue().getMarketplace() == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     //

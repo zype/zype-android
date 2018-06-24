@@ -185,7 +185,12 @@ public class NavigationHelper {
                 }
             }
             else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
-                switchToSubscribeOrLoginScreen(activity);
+                if (AuthHelper.isLoggedIn()) {
+                    switchToSubscriptionScreen(activity);
+                }
+                else {
+                    switchToSubscribeOrLoginScreen(activity);
+                }
             }
             else {
                 Logger.e("handleNotAuthorizedVideo(): Failed to handle not authorized video, videoId=" + videoId);
