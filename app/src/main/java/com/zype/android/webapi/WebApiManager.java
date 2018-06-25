@@ -10,6 +10,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.ResponseBody;
 import com.zype.android.BuildConfig;
@@ -65,6 +67,7 @@ import com.zype.android.webapi.model.auth.AccessTokenInfoResponse;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
 import com.zype.android.webapi.model.bifrost.BifrostResponse;
+import com.zype.android.webapi.model.bifrost.MarketplaceBody;
 import com.zype.android.webapi.model.category.CategoryResponse;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoResponse;
 import com.zype.android.webapi.model.consumers.ConsumerResponse;
@@ -120,6 +123,7 @@ public class WebApiManager {
     private final ZypeApiEndpointInterface mLoginApi;
     private final ZypeApiEndpointInterface mDownloadApi;
     private final ZypeApiEndpointInterface mCookieApi;
+    private final ZypeApiEndpointInterface marketplaceConnectApi;
     private final Context mContext;
     private EventBus mBus;
     private WorkerHandler mHandler;
@@ -170,6 +174,14 @@ public class WebApiManager {
                 .setClient(new OkClient(okHttpClient))
                 .build();
         mCookieApi = cookieRestAdapter.create(ZypeApiEndpointInterface.class);
+
+        RestAdapter marketplaceConnectRestAdapter = new RestAdapter.Builder()
+                .setEndpoint("https://mkt.zype.com")
+                .setRequestInterceptor(new CustomRequestInterceptor())
+                .setLogLevel(logLevel)
+                .setClient(new OkClient(okHttpClient))
+                .build();
+        marketplaceConnectApi = marketplaceConnectRestAdapter.create(ZypeApiEndpointInterface.class);
 
         mContext = contextArg;
 
@@ -236,7 +248,12 @@ public class WebApiManager {
             case AUTH_RETRIEVE_ACCESS_TOKEN:
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
             case BIFROST:
-                return new BifrostEvent(ticket, new BifrostResponse(mApi.verifySubscription(getParams, postParams)));
+                MarketplaceBody body = new MarketplaceBody();
+                body.consumerId = postParams.get("consumer_id");
+                body.consumerToken = postParams.get("consumer_token");
+                body.receipt = postParams.get("receipt");
+                body.planId = postParams.get("plan_id");
+                return new BifrostEvent(ticket, new BifrostResponse(marketplaceConnectApi.verifySubscription(body)));
             case PLAN:
                 String planId = pathParams.get(PlanParamsBuilder.PLAN_ID);
                 return new PlanEvent(ticket, new PlanResponse(mApi.getPlan(planId, getParams)));

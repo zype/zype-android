@@ -8,9 +8,11 @@ import com.zype.android.core.settings.SettingsProvider;
  */
 
 public class BifrostParamsBuilder extends ParamsBuilder {
+    public static final String CONSUMER_ID = "consumer_id";
+    public static final String CONSUMER_TOKEN = "consumer_token";
     public static final String PACKAGE_NAME = "packageName";
-    public static final String SUBSCRIPTION_ID = "subscriptionId";
-    public static final String PURCHASE_TOKEN = "purchaseToken";
+    public static final String PLAN_ID = "plan_id";
+    public static final String RECEIPT = "receipt";
 
     private static final String CLIENT_ID = "client_id";
     private static final String CLIENT_SECRET = "client_secret";
@@ -20,23 +22,34 @@ public class BifrostParamsBuilder extends ParamsBuilder {
 
     public BifrostParamsBuilder() {
         super();
-        addAccessToken();
-        addClientId();
-        addClientSecret();
-        addRedirectUri();
+//        addAccessToken();
+//        addClientId();
+//        addClientSecret();
+//        addRedirectUri();
     }
+
+    public BifrostParamsBuilder addConsumerId(String consumerId) {
+        addPostParam(CONSUMER_ID, consumerId);
+        return this;
+    }
+
+    public BifrostParamsBuilder addConsumerToken(String consumerToken) {
+        addPostParam(CONSUMER_TOKEN, consumerToken);
+        return this;
+    }
+
     public BifrostParamsBuilder addPackageName(String packageName) {
         addPostParam(PACKAGE_NAME, packageName);
         return this;
     }
 
-    public BifrostParamsBuilder addSubscriptionId(String subscriptionId) {
-        addPostParam(SUBSCRIPTION_ID, subscriptionId);
+    public BifrostParamsBuilder addPlanId(String planId) {
+        addPostParam(PLAN_ID, planId);
         return this;
     }
 
     public BifrostParamsBuilder addPurchaseToken(String purchaseToken) {
-        addPostParam(PURCHASE_TOKEN, purchaseToken);
+        addPostParam(RECEIPT, purchaseToken);
         return this;
     }
 
@@ -59,4 +72,6 @@ public class BifrostParamsBuilder extends ParamsBuilder {
         addGetParam(ACCESS_TOKEN, SettingsProvider.getInstance().getAccessToken());
         return this;
     }
+
+
 }

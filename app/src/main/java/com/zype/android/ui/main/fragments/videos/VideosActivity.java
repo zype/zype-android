@@ -127,7 +127,8 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         mListView.setAdapter(mAdapter);
         mTvEmpty = (TextView) findViewById(R.id.empty);
 
-        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)
+                || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
             new BillingManager(this, this);
         }
 

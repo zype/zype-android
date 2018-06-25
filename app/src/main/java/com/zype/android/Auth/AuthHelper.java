@@ -56,6 +56,14 @@ public class AuthHelper {
                     return false;
                 }
             }
+            else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(context)) {
+                if (SubscriptionHelper.hasSubscription()) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
             else if (ZypeConfiguration.isUniversalSubscriptionEnabled(context)) {
                 if (isLoggedIn()) {
                     if (SubscriptionHelper.hasSubscription()) {

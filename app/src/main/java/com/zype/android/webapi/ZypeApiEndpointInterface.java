@@ -4,6 +4,7 @@ import com.zype.android.webapi.model.bifrost.Bifrost;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
 import com.zype.android.webapi.model.auth.TokenInfo;
+import com.zype.android.webapi.model.bifrost.MarketplaceBody;
 import com.zype.android.webapi.model.category.Categories;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideo;
@@ -57,10 +58,6 @@ public interface ZypeApiEndpointInterface {
     @GET("/oauth/token/info/")
     TokenInfo getTokenInfo(@Query("access_token") String accessToken);
 
-    @FormUrlEncoded
-    @POST("https://bifrost.zype.com/api/v1/subscribe")
-    Bifrost verifySubscription(@QueryMap HashMap<String, String> getParams, @FieldMap HashMap<String, String> postParams);
-
     @GET("/videos/")
     Video getVideo(@Query("id") String id, @Query("api_key") String apiKey);
 
@@ -108,6 +105,10 @@ public interface ZypeApiEndpointInterface {
 
     @POST("/pin/acquire/")
     DevicePin createDevicePin(@QueryMap HashMap<String, String> queryParams, @Body String emptyBody);
+
+    // Marketplace Connect
+    @POST("/v1/googleplay/")
+    Bifrost verifySubscription(@Body MarketplaceBody body);
 
     // Plans
     @GET("/plans/{plan_id}")

@@ -12,12 +12,11 @@ import java.util.List;
 
 public class BifrostData {
     @Expose
-    public boolean success;
-
-    @SerializedName("is_valid")
-    @Expose
-    public boolean isValid;
+    public String type;
 
     @Expose
-    public boolean expired;
+    public boolean id;
+
+//    @Expose
+//    public Attributes attributes;
 }

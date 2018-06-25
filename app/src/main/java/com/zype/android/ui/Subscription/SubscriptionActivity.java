@@ -265,7 +265,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
             if (purchases != null && !purchases.isEmpty()) {
                 if (selectedSubscription != null) {
-                    SubscriptionsHelper.validateSubscription(purchases, selectedSubscription.getMarketplace().getSku(), getApi());
+                    SubscriptionsHelper.validateSubscription(selectedSubscription, purchases, getApi());
                 }
             }
         }
@@ -353,16 +353,14 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     //
     @Subscribe
     public void handleBifrost(BifrostEvent event) {
-        BifrostData data = event.getEventData().getModelData().data;
-        if (data.success) {
-            if (data.isValid) {
-                hideProgress();
-                setResult(RESULT_OK);
-                finish();
-            }
-            else {
-                // TODO: Show subscription not valid message
-            }
-        }
+//        BifrostData data = event.getEventData().getModelData().data;
+//        if (data != null) {
+            hideProgress();
+            setResult(RESULT_OK);
+            finish();
+//        }
+//        else {
+//            // TODO: Show subscription not valid message
+//        }
     }
 }

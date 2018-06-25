@@ -13,6 +13,7 @@ import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 /**
  * Created by Evgeny Cherkasov on 10.07.2017.
@@ -42,12 +43,14 @@ public class SubscriptionsHelper {
         }
     }
 
-    public static void validateSubscription(List<Purchase> purchases, String subscriptionSku, WebApiManager apiManager) {
+    public static void validateSubscription(Subscription subscription, List<Purchase> purchases, WebApiManager apiManager) {
         for (Purchase item : purchases) {
-            if (item.getSku().equals(subscriptionSku)) {
+            if (item.getSku().equals(subscription.getMarketplace().getSku())) {
                 BifrostParamsBuilder builder = new BifrostParamsBuilder()
-                        .addPackageName(item.getPackageName())
-                        .addSubscriptionId(item.getSku())
+                        .addConsumerId(SettingsProvider.getInstance().getConsumerId())
+                        .addConsumerToken(SettingsProvider.getInstance().getAccessToken())
+//                        .addPackageName(item.getPackageName())
+                        .addPlanId(subscription.getZypePlan().id)
                         .addPurchaseToken(item.getPurchaseToken());
                 apiManager.executeRequest(WebApiManager.Request.BIFROST, builder.build());
             }
