@@ -48,6 +48,7 @@
                 android:fontFamily="sans-serif-condensed"
                 android:ellipsize="end"
                 android:maxLines="2"
+                android:gravity="center"
                 tools:text="Title"
                 />
         </FrameLayout>
