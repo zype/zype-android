@@ -9,6 +9,7 @@ import com.zype.android.Auth.AuthHelper;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.Gallery.GalleryActivity;
 import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
@@ -120,6 +121,14 @@ public class NavigationHelper {
         Intent intent = new Intent(activity, VideosActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(BundleConstants.PARENT_ID, playlistId);
+        intent.putExtras(bundle);
+        activity.startActivity(intent);
+    }
+
+    public void switchToGalleryScreen(Activity activity, String playlistId) {
+        Intent intent = new Intent(activity, GalleryActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(BundleConstants.PLAYLIST_ID, playlistId);
         intent.putExtras(bundle);
         activity.startActivity(intent);
     }

@@ -70,7 +70,7 @@ public class GalleryFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_gallery, container, false);
 
         pagerHeroImages = rootView.findViewById(R.id.pagerHeroImages);
-        if (ZypeConfiguration.playlistGalleryHeroImages(getActivity())) {
+        if (heroImagesEnabled()) {
             adapterHeroImages = new HeroImagesPagerAdapter(getActivity().getSupportFragmentManager());
             pagerHeroImages.setAdapter(adapterHeroImages);
         }
@@ -92,7 +92,7 @@ public class GalleryFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (ZypeConfiguration.playlistGalleryHeroImages(getActivity())) {
+        if (heroImagesEnabled()) {
             modelHeroImages = ViewModelProviders.of(getActivity()).get(HeroImagesViewModel.class);
             modelHeroImages.getHeroImages().observe(this, new Observer<List<HeroImage>>() {
                 @Override
@@ -116,6 +116,11 @@ public class GalleryFragment extends Fragment {
                 adapter.setData(galleryRows);
             }
         });
+    }
+
+    private boolean heroImagesEnabled() {
+        return ZypeConfiguration.playlistGalleryHeroImages(getActivity())
+                && parentPlaylistId.equals(ZypeConfiguration.getRootPlaylistId(getActivity()));
     }
 
     // TODO: Remove loading data from API related code below from here
