@@ -37,15 +37,15 @@ public class AuthHelper {
             }
             else if (ZypeConfiguration.isUniversalSubscriptionEnabled(context)) {
                 if (isLoggedIn()) {
-                    return false;
-                }
-                else {
                     if (SubscriptionHelper.hasSubscription()) {
                         return true;
                     }
                     else {
                         return false;
                     }
+                }
+                else {
+                    return false;
                 }
             }
             else {

@@ -38,7 +38,7 @@ android {
     }
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
-    def zypeTemplateVersion = "1.10.2"
+    def zypeTemplateVersion = "1.10.3"
 
     compileSdkVersion 27
     buildToolsVersion '27.0.3'
