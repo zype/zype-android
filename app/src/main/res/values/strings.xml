@@ -95,9 +95,13 @@
 
     <!-- Dialogs -->
     <string name="dialog_button_cancel">Cancel</string>
+    <string name="dialog_button_close">Close</string>
     <string name="dialog_login_title">Sign In Required</string>
     <string name="dialog_login_message">You do not have access to this video. Please sign in with your account to watch this video.</string>
     <string name="dialog_login_button_login">Sign in</string>
+
+    <!-- Gallery -->
+    <string name="gallery_hero_image_error_playlist">We’re sorry, that playlist cannot be found.</string>
 
     <!-- Intro -->
     <string name="intro_button_browse">Browse</string>

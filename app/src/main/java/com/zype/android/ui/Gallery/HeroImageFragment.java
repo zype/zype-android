@@ -13,6 +13,7 @@ import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.R;
 import com.zype.android.ui.NavigationHelper;
+import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.UiUtils;
 
 /**
@@ -55,11 +56,16 @@ public class HeroImageFragment extends Fragment {
             public void onClick(View v) {
                 if (!TextUtils.isEmpty(playlistId)) {
                     Playlist playlist = DataRepository.getInstance(getActivity().getApplication()).getPlaylistSync(playlistId);
-                    if (playlist.playlistItemCount > 0) {
-                        NavigationHelper.getInstance(getActivity()).switchToPlaylistVideosScreen(getActivity(), playlistId);
+                    if (playlist == null) {
+                        DialogHelper.showErrorAlert(getActivity(), getString(R.string.gallery_hero_image_error_playlist));
                     }
                     else {
-                        NavigationHelper.getInstance(getActivity()).switchToPlaylistScreen(getActivity(), playlistId);
+                        if (playlist.playlistItemCount > 0) {
+                            NavigationHelper.getInstance(getActivity()).switchToPlaylistVideosScreen(getActivity(), playlistId);
+                        }
+                        else {
+                            NavigationHelper.getInstance(getActivity()).switchToPlaylistScreen(getActivity(), playlistId);
+                        }
                     }
                 }
             }
