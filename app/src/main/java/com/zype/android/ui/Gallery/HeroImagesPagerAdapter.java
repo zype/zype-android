@@ -3,7 +3,6 @@ package com.zype.android.ui.Gallery;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.text.TextUtils;
 
 import com.zype.android.ui.Gallery.Model.HeroImage;
 

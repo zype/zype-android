@@ -71,7 +71,7 @@ public class GalleryFragment extends Fragment {
 
         pagerHeroImages = rootView.findViewById(R.id.pagerHeroImages);
         if (heroImagesEnabled()) {
-            adapterHeroImages = new HeroImagesPagerAdapter(getActivity().getSupportFragmentManager());
+            adapterHeroImages = new HeroImagesPagerAdapter(getChildFragmentManager());
             pagerHeroImages.setAdapter(adapterHeroImages);
         }
         else {
