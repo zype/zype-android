@@ -99,12 +99,18 @@ public class GalleryFragment extends Fragment {
                 public void onChanged(@Nullable List<HeroImage> heroImages) {
                     modelHeroImages.stopTimer();
                     adapterHeroImages.setData(heroImages);
-                    modelHeroImages.startTimer(0).observe(GalleryFragment.this, new Observer<Integer>() {
-                        @Override
-                        public void onChanged(Integer page) {
-                            pagerHeroImages.setCurrentItem(page);
-                        }
-                    });
+                    if (heroImages.size() > 0) {
+                        pagerHeroImages.setVisibility(View.VISIBLE);
+                        modelHeroImages.startTimer(0).observe(GalleryFragment.this, new Observer<Integer>() {
+                            @Override
+                            public void onChanged(Integer page) {
+                                pagerHeroImages.setCurrentItem(page);
+                            }
+                        });
+                    }
+                    else {
+                        pagerHeroImages.setVisibility(View.GONE);
+                    }
                 }
             });
         }
