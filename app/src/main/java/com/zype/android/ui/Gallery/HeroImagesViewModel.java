@@ -20,7 +20,7 @@ public class HeroImagesViewModel extends ViewModel {
     private MutableLiveData<Integer> currentPage;
     private Timer timer;
     private TimerTask timerTask;
-    private long TIMER_PERIOD = 5000;
+    private long TIMER_PERIOD = 7000;
 
     public HeroImageLiveData getHeroImages() {
         if (data == null) {

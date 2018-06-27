@@ -20,6 +20,7 @@ import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ui.Gallery.Model.GalleryRow;
 import com.zype.android.ui.Gallery.Model.HeroImage;
+import com.zype.android.ui.Widget.CustomViewPager;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.PlaylistParamsBuilder;
@@ -48,7 +49,7 @@ public class GalleryFragment extends Fragment {
     private HeroImagesPagerAdapter adapterHeroImages;
     private GalleryRowsAdapter adapter;
 
-    ViewPager pagerHeroImages;
+    CustomViewPager pagerHeroImages;
 
     public static GalleryFragment newInstance(String parentPlaylistId) {
         GalleryFragment fragment = new GalleryFragment();
@@ -70,6 +71,7 @@ public class GalleryFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_gallery, container, false);
 
         pagerHeroImages = rootView.findViewById(R.id.pagerHeroImages);
+        pagerHeroImages.setScrollDuration(500);
         if (heroImagesEnabled()) {
             adapterHeroImages = new HeroImagesPagerAdapter(getChildFragmentManager());
             pagerHeroImages.setAdapter(adapterHeroImages);
