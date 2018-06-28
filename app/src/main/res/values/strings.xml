@@ -145,6 +145,7 @@
     <string name="subscription_logged_in">Signed in as: </string>
     <string name="subscription_title">Select Plan</string>
 
+    <string name="subscribe_or_login_button_restore">Restore Purchases</string>
     <string name="subscribe_or_login_button_subscribe_now">Subscribe Now</string>
     <string name="subscribe_or_login_title">Subscribe or Sign In</string>
 

@@ -355,14 +355,10 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     //
     @Subscribe
     public void handleBifrost(BifrostEvent event) {
-//        BifrostData data = event.getEventData().getModelData().data;
-//        if (data != null) {
-            hideProgress();
-            setResult(RESULT_OK);
-            finish();
-//        }
-//        else {
-//            // TODO: Show subscription not valid message
-//        }
+        hideProgress();
+        // TODO: Check response data to properly update subscription count
+        SettingsProvider.getInstance().saveSubscriptionCount(1);
+        setResult(RESULT_OK);
+        finish();
     }
 }

@@ -511,7 +511,9 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
-        SubscriptionsHelper.updateSubscriptionCount(purchases);
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+            SubscriptionsHelper.updateSubscriptionCount(purchases);
+        }
     }
 
     //    -------------------SUBSCRIBE-------------------

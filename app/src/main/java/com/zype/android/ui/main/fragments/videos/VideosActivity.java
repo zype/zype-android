@@ -77,6 +77,8 @@ import java.util.List;
 
 import retrofit.RetrofitError;
 
+import static com.zype.android.utils.BundleConstants.REQUEST_SUBSCRIBE_OR_LOGIN;
+
 public class VideosActivity extends MainActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>,
                                                         BillingManager.BillingUpdatesListener {
 
@@ -98,7 +100,9 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     private TextView mTvEmpty;
     private LoaderManager mLoader;
     private ArrayList<VideoData> mVideoList;
-    private String playlistId = "123";
+    private String playlistId = null;
+    private String selectedVideoId = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,6 +187,17 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_SUBSCRIBE_OR_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    NavigationHelper.getInstance(this).switchToVideoDetailsScreen(this, selectedVideoId, playlistId, false);
+                }
+                break;
+        }
     }
 
     // //////////
@@ -332,6 +347,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         Logger.d("onItemClick()");
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
 
+        selectedVideoId = holder.videoId;
         NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
         if (AuthHelper.isVideoAuthorized(this, holder.videoId)) {
             navigationHelper.switchToVideoDetailsScreen(this, holder.videoId, playlistId, false);
@@ -374,7 +390,9 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
-        SubscriptionsHelper.updateSubscriptionCount(purchases);
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+            SubscriptionsHelper.updateSubscriptionCount(purchases);
+        }
     }
 
     // //////////

@@ -108,6 +108,19 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
         return true;
     }
 
+    public BillingManager getBillingManager() {
+        return billingManager;
+    }
+
+    public Subscription findSubscriptionBySku(String sku) {
+        for (Map.Entry<String, Subscription> entry : subscriptionsLiveData.getValue().entrySet()) {
+            if (entry.getValue().getZypePlan().thirdPartyId.equals(sku)) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
     //
     // BillingManager.BillingUpdatesListener implementation
     //

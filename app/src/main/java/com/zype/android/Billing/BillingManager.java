@@ -29,6 +29,8 @@ public class BillingManager implements PurchasesUpdatedListener {
     private final Context context;
     private BillingClient mBillingClient;
     private final BillingUpdatesListener mBillingUpdatesListener;
+    private List<Purchase> purchases;
+
     /**
      * True if billing service is connected now.
      */
@@ -227,10 +229,7 @@ public class BillingManager implements PurchasesUpdatedListener {
     @Override
     public void onPurchasesUpdated(int responseCode, List<Purchase> purchases) {
         if (responseCode == BillingResponse.OK) {
-//            for (Purchase purchase : purchases) {
-//                handlePurchase(purchase);
-//            }
-//            mBillingUpdatesListener.onPurchasesUpdated(mPurchases);
+            this.purchases = purchases;
             mBillingUpdatesListener.onPurchasesUpdated(purchases);
         }
         else if (responseCode == BillingResponse.USER_CANCELED) {
@@ -239,5 +238,9 @@ public class BillingManager implements PurchasesUpdatedListener {
         else {
             Log.w(TAG, "onPurchasesUpdated() got unknown resultCode: " + responseCode);
         }
+    }
+
+    public List<Purchase> getPurchases() {
+        return this.purchases;
     }
 }

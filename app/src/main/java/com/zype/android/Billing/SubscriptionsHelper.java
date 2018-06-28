@@ -3,6 +3,7 @@ package com.zype.android.Billing;
 import android.content.Context;
 
 import com.android.billingclient.api.Purchase;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;

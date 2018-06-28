@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.android.billingclient.api.Purchase;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -23,6 +25,10 @@ import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.model.video.VideoData;
+
+import java.util.List;
+
+import static com.zype.android.ZypeApp.marketplaceGateway;
 
 /**
  * Created by Evgeny Cherkasov on 11.07.2017.
@@ -194,7 +200,13 @@ public class NavigationHelper {
             }
             else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
                 if (AuthHelper.isLoggedIn()) {
-                    switchToSubscriptionScreen(activity, extras);
+                    List<Purchase> purchases = ZypeApp.marketplaceGateway.getBillingManager().getPurchases();
+                    if (purchases != null && purchases.size() > 0) {
+                        switchToSubscribeOrLoginScreen(activity, extras);
+                    }
+                    else {
+                        switchToSubscriptionScreen(activity, extras);
+                    }
                 }
                 else {
                     switchToSubscribeOrLoginScreen(activity, extras);

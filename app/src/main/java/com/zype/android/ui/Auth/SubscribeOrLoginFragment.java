@@ -9,8 +9,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.android.billingclient.api.Purchase;
+import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Billing.BillingManager;
+import com.zype.android.Billing.Subscription;
+import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ui.NavigationHelper;
+import com.zype.android.ui.base.BaseActivity;
+
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 import static com.zype.android.utils.BundleConstants.REQUEST_CONSUMER;
@@ -21,7 +30,6 @@ import static com.zype.android.utils.BundleConstants.REQUEST_SUBSCRIPTION;
  * A simple {@link Fragment} subclass.
  */
 public class SubscribeOrLoginFragment extends Fragment {
-
 
     public SubscribeOrLoginFragment() {
     }
@@ -45,6 +53,31 @@ public class SubscribeOrLoginFragment extends Fragment {
                 NavigationHelper.getInstance(getActivity()).switchToLoginScreen(getActivity(), null);
             }
         });
+
+        final List<Purchase> purchases = ZypeApp.marketplaceGateway.getBillingManager().getPurchases();
+        Button buttonRestorePurchases = rootView.findViewById(R.id.buttonRestorePurchases);
+        buttonRestorePurchases.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (AuthHelper.isLoggedIn()) {
+                    if (purchases != null && purchases.size() > 0) {
+                        Subscription subscription = ZypeApp.marketplaceGateway.findSubscriptionBySku(purchases.get(0).getSku());
+                        if (subscription != null) {
+                            SubscriptionsHelper.validateSubscription(subscription, purchases, ((BaseActivity) getActivity()).getApi());
+                        }
+                    }
+                }
+                else {
+                    NavigationHelper.getInstance(getActivity()).switchToConsumerScreen(getActivity());
+                }
+            }
+        });
+        if (purchases != null && purchases.size() > 0) {
+            buttonRestorePurchases.setVisibility(View.VISIBLE);
+        }
+        else {
+            buttonRestorePurchases.setVisibility(View.GONE);
+        }
 
         return rootView;
     }
