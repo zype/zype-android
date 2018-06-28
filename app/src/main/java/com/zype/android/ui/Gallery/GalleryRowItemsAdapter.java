@@ -77,40 +77,11 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                     Video video = (Video) holder.item;
                     if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
                         navigationHelper.switchToVideoDetailsScreen((Activity) holder.view.getContext(), video.id,
-                                        playlistId, true);
+                                        playlistId, false);
                     }
                     else {
-                        navigationHelper.handleNotAuthorizedVideo((Activity) holder.view.getContext(), video.id);
+                        navigationHelper.handleNotAuthorizedVideo((Activity) holder.view.getContext(), video.id, playlistId);
                     }
-//                    if (ZypeConfiguration.isUniversalTVODEnabled(holder.view.getContext())
-//                            && Boolean.valueOf(video.purchaseRequired)) {
-//                        if (Boolean.valueOf(video.isEntitled.toString())) {
-//                            NavigationHelper.getInstance(holder.view.getContext())
-//                                    .switchToVideoDetailsScreen((Activity) holder.view.getContext(), video.id,
-//                                            playlistId, true);
-//                        }
-//                        else {
-//                            if (SettingsProvider.getInstance().isLoggedIn()) {
-//                                // TODO: Need to request video entitlement
-////                                requestEntitled(video.id);
-//                            }
-//                            else {
-//                                NavigationHelper.getInstance(holder.view.getContext())
-//                                        .switchToLoginScreen((Activity) holder.view.getContext());
-//                            }
-//                        }
-//                        return;
-//                    }
-//                    if (Integer.valueOf(video.subscriptionRequired) == 1) {
-//                        NavigationHelper.getInstance(holder.view.getContext())
-//                                .checkSubscription((Activity) holder.view.getContext(), video.id,
-//                                        playlistId, Boolean.valueOf(video.onAir.toString()));
-//                    }
-//                    else {
-//                        NavigationHelper.getInstance(holder.view.getContext())
-//                                .switchToVideoDetailsScreen((Activity) holder.view.getContext(), video.id,
-//                                        playlistId, true);
-//                    }
                 }
                 else if (holder.item instanceof Playlist) {
                     Playlist playlist = (Playlist) holder.item;

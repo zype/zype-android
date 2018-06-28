@@ -7,7 +7,9 @@ import android.widget.Button;
 
 import com.zype.android.R;
 import com.zype.android.ui.NavigationHelper;
+import com.zype.android.ui.Subscription.SubscriptionHelper;
 import com.zype.android.ui.base.BaseActivity;
+import com.zype.android.utils.BundleConstants;
 
 import static com.zype.android.utils.BundleConstants.REQUEST_CONSUMER;
 import static com.zype.android.utils.BundleConstants.REQUEST_LOGIN;
@@ -30,7 +32,7 @@ public class SubscribeOrLoginActivity extends BaseActivity {
         switch (requestCode) {
             case REQUEST_CONSUMER:
                 if (resultCode == RESULT_OK) {
-                    NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
+                    NavigationHelper.getInstance(this).switchToSubscriptionScreen(this, getIntent().getExtras());
                 }
                 else {
                     onCancel();
@@ -38,14 +40,27 @@ public class SubscribeOrLoginActivity extends BaseActivity {
                 break;
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
-                    NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
+                    if (SubscriptionHelper.hasSubscription()) {
+                        NavigationHelper.getInstance(this).switchToVideoDetailsScreen(this,
+                                getIntent().getExtras().getString(BundleConstants.VIDEO_ID),
+                                getIntent().getExtras().getString(BundleConstants.PLAYLIST_ID),
+                                false);
+                        finish();
+                    }
+                    else {
+                        NavigationHelper.getInstance(this).switchToSubscriptionScreen(this, getIntent().getExtras());
+                    }
                 }
                 else {
                     onCancel();
                 }
             case REQUEST_SUBSCRIPTION:
                 if (resultCode == RESULT_OK) {
-
+                    NavigationHelper.getInstance(this).switchToVideoDetailsScreen(this,
+                            getIntent().getExtras().getString(BundleConstants.VIDEO_ID),
+                            getIntent().getExtras().getString(BundleConstants.PLAYLIST_ID),
+                            false);
+                    finish();
                 }
                 else {
                     onCancel();

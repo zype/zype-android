@@ -337,7 +337,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
             navigationHelper.switchToVideoDetailsScreen(this, holder.videoId, playlistId, false);
         }
         else {
-            navigationHelper.handleNotAuthorizedVideo(this, holder.videoId);
+            navigationHelper.handleNotAuthorizedVideo(this, holder.videoId, playlistId);
         }
 //        if (ZypeConfiguration.isUniversalTVODEnabled(this) && holder.purchaseRequired) {
 //            if (holder.isEntitled) {

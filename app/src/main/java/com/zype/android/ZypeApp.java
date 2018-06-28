@@ -81,6 +81,10 @@ public class ZypeApp extends MultiDexApplication {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
 
+        // This is used to create database via Room, but not Content provider. Need to be removed
+        // after refactoring to use Room for working with database.
+        initDataRepository();
+
         // Google Analytics
         // TODO: Uncomment following line to use Google Analytics
 //        initGoogleAnalytics();
@@ -190,4 +194,8 @@ public class ZypeApp extends MultiDexApplication {
 //        // this is the default behavior but is mentioned to make it clear that it is configurable.
 //        VideoCastManager.getInstance().setCastControllerImmersive(true);
 //    }
+
+    private void initDataRepository() {
+        DataRepository.getInstance(this).getPlaylistsSync(ZypeConfiguration.getRootPlaylistId(this));
+    }
 }

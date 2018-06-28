@@ -50,9 +50,12 @@ public class NavigationHelper {
     }
 
     public void checkSubscription(Activity activity, String videoId, String playlistId, boolean onAir) {
+        Bundle extras = new Bundle();
+        extras.putString(BundleConstants.VIDEO_ID, videoId);
+        extras.putString(BundleConstants.PLAYLIST_ID, playlistId);
         if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                switchToSubscriptionScreen(activity);
+                switchToSubscriptionScreen(activity, extras);
             }
             else {
                 switchToVideoDetailsScreen(activity, videoId, playlistId, false);
@@ -65,11 +68,11 @@ public class NavigationHelper {
                     switchToVideoDetailsScreen(activity, videoId, playlistId, false);
                 }
                 else {
-                    switchToSubscriptionScreen(activity);
+                    switchToSubscriptionScreen(activity, extras);
                 }
             }
             else {
-                switchToSubscriptionScreen(activity);
+                switchToSubscriptionScreen(activity, extras);
             }
         }
         else {
@@ -129,8 +132,9 @@ public class NavigationHelper {
         activity.startActivity(intent);
     }
 
-    public void switchToSubscriptionScreen(Activity activity) {
+    public void switchToSubscriptionScreen(Activity activity, Bundle extras) {
         Intent intent = new Intent(activity, SubscriptionActivity.class);
+        intent.putExtras(extras);
         activity.startActivityForResult(intent, BundleConstants.REQUEST_SUBSCRIPTION);
     }
 
@@ -160,21 +164,25 @@ public class NavigationHelper {
         activity.startActivity(intent);
     }
 
-    public void switchToSubscribeOrLoginScreen(Activity activity) {
+    public void switchToSubscribeOrLoginScreen(Activity activity, Bundle extras) {
         Intent intent = new Intent(activity, SubscribeOrLoginActivity.class);
+        intent.putExtras(extras);
         activity.startActivityForResult(intent, BundleConstants.REQUEST_SUBSCRIBE_OR_LOGIN);
     }
 
     //
-    public void handleNotAuthorizedVideo(Activity activity, String videoId) {
+    public void handleNotAuthorizedVideo(Activity activity, String videoId, String playlistId) {
         Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
+        Bundle extras = new Bundle();
+        extras.putString(BundleConstants.VIDEO_ID, videoId);
+        extras.putString(BundleConstants.PLAYLIST_ID, playlistId);
         if (video == null) {
             Logger.e("handleNotAuthorizedVideo(): Error get video, videoId=" + videoId);
             return;
         }
         if (Integer.valueOf(video.subscriptionRequired) == 1) {
             if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
-                switchToSubscriptionScreen(activity);
+                switchToSubscriptionScreen(activity, extras);
             }
             else if (ZypeConfiguration.isUniversalSubscriptionEnabled(activity)) {
                 if (AuthHelper.isLoggedIn()) {
@@ -186,10 +194,10 @@ public class NavigationHelper {
             }
             else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
                 if (AuthHelper.isLoggedIn()) {
-                    switchToSubscriptionScreen(activity);
+                    switchToSubscriptionScreen(activity, extras);
                 }
                 else {
-                    switchToSubscribeOrLoginScreen(activity);
+                    switchToSubscribeOrLoginScreen(activity, extras);
                 }
             }
             else {
