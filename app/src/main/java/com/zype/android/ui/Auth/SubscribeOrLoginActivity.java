@@ -54,6 +54,7 @@ public class SubscribeOrLoginActivity extends BaseActivity {
                 else {
                     onCancel();
                 }
+                break;
             case REQUEST_SUBSCRIPTION:
                 if (resultCode == RESULT_OK) {
                     NavigationHelper.getInstance(this).switchToVideoDetailsScreen(this,
@@ -65,6 +66,7 @@ public class SubscribeOrLoginActivity extends BaseActivity {
                 else {
                     onCancel();
                 }
+                break;
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

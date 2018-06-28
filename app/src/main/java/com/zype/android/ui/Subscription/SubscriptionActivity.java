@@ -270,8 +270,10 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             }
         }
         if (result) {
-            setResult(RESULT_OK);
-            finish();
+            if (selectedSubscription != null) {
+                setResult(RESULT_OK);
+                finish();
+            }
         }
         else {
 //            getSubscriptions(purchases);

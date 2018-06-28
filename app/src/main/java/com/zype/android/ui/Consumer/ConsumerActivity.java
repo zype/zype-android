@@ -232,8 +232,7 @@ public class ConsumerActivity extends BaseActivity {
     }
 
     private boolean isEmailValid(String value) {
-        // TODO: Add implementation
-        return true;
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches();
     }
 
     private void updateConsumer() {
