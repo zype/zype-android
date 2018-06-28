@@ -89,7 +89,8 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
         }
         else {
             mSigninButton.setText(R.string.action_sign_in);
-            if (ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())) {
+            if (ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())
+                    || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(getActivity())) {
                 mSigninButton.setVisibility(View.VISIBLE);
                 mSigninButton.setOnClickListener(new View.OnClickListener() {
                     @Override
