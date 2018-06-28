@@ -78,16 +78,18 @@
     <string name="subtitles_off">Turn off</string>
 
     <!-- Consumer -->
+    <string name="consumer_button_update">Create Account</string>
     <string name="consumer_create_form_description">Enter a valid email and password. Account credentials will allow access on all devices.</string>
     <string name="consumer_create_form_subtitle">Create your account</string>
     <string name="consumer_create_sign_in">Already have an account? Sign in</string>
     <string name="consumer_create_sign_in_link">Sign in</string>
     <string name="consumer_create_terms">By clicking Create Account, you agree to our Terms of Service and Privacy</string>
     <string name="consumer_create_terms_link">Terms of Service and Privacy</string>
-    <string name="consumer_button_update">Create Account</string>
     <string name="consumer_email">Email</string>
     <string name="consumer_email_error_empty">Email is required</string>
     <string name="consumer_email_error_invalid">Enter valid email</string>
+    <string name="consumer_error_create">We’re sorry, that email address already belongs to an account.
+        Please click Sign In below if you’d like to sign into your existing account.</string>
     <string name="consumer_password">Password</string>
     <string name="consumer_password_error_empty">Enter password</string>
     <string name="consumer_progress_create">Creating account…</string>
@@ -95,6 +97,7 @@
 
     <!-- Dialogs -->
     <string name="dialog_button_cancel">Cancel</string>
+    <string name="dialog_button_close">Close</string>
     <string name="dialog_login_title">Sign In Required</string>
     <string name="dialog_login_message">You do not have access to this video. Please sign in with your account to watch this video.</string>
     <string name="dialog_login_button_login">Sign in</string>
@@ -142,6 +145,7 @@
     <string name="subscription_title">Select Plan</string>
 
     <string name="subscribe_or_login_button_subscribe_now">Subscribe Now</string>
+    <string name="subscribe_or_login_title">Subscribe or Sign In</string>
 
     <!-- Videos -->
     <string name="videos_loading">Gathering videos for you…</string>

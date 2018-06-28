@@ -26,6 +26,7 @@ import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.main.MainActivity;
 import com.zype.android.ui.settings.TermsActivity;
+import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
@@ -198,8 +199,8 @@ public class ConsumerActivity extends BaseActivity {
     //
     private Consumer getViewModel() {
         Consumer result = new Consumer();
-        result.email = layoutEmail.getEditText().getText().toString();
-        result.password = layoutPassword.getEditText().getText().toString();
+        result.email = layoutEmail.getEditText().getText().toString().trim();
+        result.password = layoutPassword.getEditText().getText().toString().trim();
         return result;
     }
 
@@ -274,6 +275,11 @@ public class ConsumerActivity extends BaseActivity {
     public void handleError(ErrorEvent err) {
         Logger.e("handleError");
         hideProgress();
-        UiUtils.showErrorSnackbar(buttonUpdate, err.getErrMessage());
+        if (err.getError().getResponse().getStatus() == 422) {
+            DialogHelper.showErrorAlert(this, getString(R.string.consumer_error_create));
+        }
+        else {
+            UiUtils.showErrorSnackbar(buttonUpdate, err.getErrMessage());
+        }
     }
 }
