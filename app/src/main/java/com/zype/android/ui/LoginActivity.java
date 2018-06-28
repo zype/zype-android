@@ -80,6 +80,9 @@ public class LoginActivity extends BaseActivity {
 
         setContentView(R.layout.activity_login);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle(R.string.login_title);
+
         layoutAuthMethod = (LinearLayout) findViewById(R.id.layoutAuthMethod);
         buttonLinkDevice = (Button) findViewById(R.id.buttonLinkDevice);
         buttonLinkDevice.setOnClickListener(new View.OnClickListener() {

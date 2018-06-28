@@ -118,6 +118,7 @@
     <string name="login_device_linking_url">From your computer or mobile device visit:</string>
     <string name="login_error_device_id">Error get device id</string>
     <string name="login_pin">Enter Pin:</string>
+    <string name="login_title">Sign In</string>
 
     <!-- Main -->
     <string name="main_tab_my_library">My library</string>

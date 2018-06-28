@@ -60,6 +60,13 @@
             android:value="AIzaSyAOfxiG4aV66h3XmssCEkP3qCvCqMbDGDI" />
 
         <activity
+            android:name=".ui.Consumer.ConsumerActivity"
+            android:theme="@style/AppThemeWithActionBar"
+            />
+        <activity
+            android:name=".ui.Intro.IntroActivity"
+            />
+        <activity
             android:name=".ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".ui.launch.LaunchActivity">
@@ -118,9 +125,9 @@
         -->
         <activity
             android:name=".ui.LoginActivity"
-            android:label="@string/title_activity_login"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppThemeWithActionBar"
+            />
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -170,6 +177,10 @@
                 android:value="com.zype.android.ui.settings.SettingsActivity" />
         </activity>
         <activity
+            android:name=".ui.main.fragments.playlist.PlaylistActivity"
+            android:label="@string/title_activity_playlist"
+            />
+        <activity
             android:name=".ui.search.SearchActivity"
             android:label="@string/title_activity_search"
             android:parentActivityName=".ui.main.MainActivity"
@@ -178,6 +189,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zype.android.ui.main.MainActivity" />
         </activity>
+        <activity
+            android:name=".ui.Auth.SubscribeOrLoginActivity"
+            android:theme="@style/AppThemeWithActionBar"
+            />
+        <activity
+            android:name=".ui.Subscription.SubscriptionActivity"
+            android:theme="@style/AppThemeWithActionBar"
+            />
+        <activity
+            android:name=".ui.main.fragments.videos.VideosActivity"
+            android:theme="@style/AppTheme"
+            />
 
         <!--
          Optionally, register AnalyticsReceiver and AnalyticsService to support background
@@ -217,21 +240,6 @@
 
         <service android:name=".service.BackgroundSoundService" />
 
-        <activity
-            android:name=".ui.main.fragments.playlist.PlaylistActivity"
-            android:label="@string/title_activity_playlist" />
-        <activity
-            android:name=".ui.main.fragments.videos.VideosActivity"
-            android:theme="@style/AppTheme" />
-        <activity android:name=".ui.Intro.IntroActivity" />
-        <activity
-            android:name=".ui.Consumer.ConsumerActivity"
-            android:theme="@style/AppThemeWithActionBar" />
-        <activity
-            android:name=".ui.Subscription.SubscriptionActivity"
-            android:theme="@style/AppThemeWithActionBar" />
-        <activity android:name=".ui.Auth.SubscribeOrLoginActivity"
-            android:theme="@style/AppThemeWithActionBar" />
     </application>
 
 </manifest>

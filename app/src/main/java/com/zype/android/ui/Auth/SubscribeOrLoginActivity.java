@@ -24,7 +24,7 @@ public class SubscribeOrLoginActivity extends BaseActivity {
         setContentView(R.layout.activity_subscribe_or_login);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setTitle("");
+        setTitle(getString(R.string.subscribe_or_login_title));
     }
 
     @Override

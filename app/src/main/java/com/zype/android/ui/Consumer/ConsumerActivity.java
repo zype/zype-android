@@ -176,13 +176,6 @@ public class ConsumerActivity extends BaseActivity {
         }
     }
 
-    private void switchToSubscriptionScreen() {
-        // TODO: Change to Subcription activity
-        Intent intent = new Intent(this, SubscriptionActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
     private void switchToLoginScreen() {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
