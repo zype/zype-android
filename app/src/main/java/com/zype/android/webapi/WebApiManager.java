@@ -10,6 +10,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.ResponseBody;
 import com.zype.android.BuildConfig;
@@ -26,6 +28,7 @@ import com.zype.android.webapi.builder.DownloadVideoParamsBuilder;
 import com.zype.android.webapi.builder.EntitlementParamsBuilder;
 import com.zype.android.webapi.builder.FavoriteParamsBuilder;
 import com.zype.android.webapi.builder.ParamsBuilder;
+import com.zype.android.webapi.builder.PlanParamsBuilder;
 import com.zype.android.webapi.builder.PlayerParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.BaseEvent;
@@ -34,6 +37,7 @@ import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.auth.AccessTokenInfoEvent;
 import com.zype.android.webapi.events.auth.RefreshAccessTokenEvent;
 import com.zype.android.webapi.events.auth.RetrieveAccessTokenEvent;
+import com.zype.android.webapi.events.bifrost.BifrostEvent;
 import com.zype.android.webapi.events.category.CategoryEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
 import com.zype.android.webapi.events.consumer.ConsumerFavoriteVideoEvent;
@@ -47,6 +51,7 @@ import com.zype.android.webapi.events.linking.DevicePinEvent;
 import com.zype.android.webapi.events.onair.OnAirAudioEvent;
 import com.zype.android.webapi.events.onair.OnAirEvent;
 import com.zype.android.webapi.events.onair.OnAirVideoEvent;
+import com.zype.android.webapi.events.plan.PlanEvent;
 import com.zype.android.webapi.events.player.PlayerAudioEvent;
 import com.zype.android.webapi.events.player.PlayerVideoEvent;
 import com.zype.android.webapi.events.playlist.PlaylistEvent;
@@ -61,6 +66,8 @@ import com.zype.android.webapi.model.ErrorBody;
 import com.zype.android.webapi.model.auth.AccessTokenInfoResponse;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
+import com.zype.android.webapi.model.bifrost.BifrostResponse;
+import com.zype.android.webapi.model.bifrost.MarketplaceBody;
 import com.zype.android.webapi.model.category.CategoryResponse;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoResponse;
 import com.zype.android.webapi.model.consumers.ConsumerResponse;
@@ -74,6 +81,7 @@ import com.zype.android.webapi.model.linking.DevicePinResponse;
 import com.zype.android.webapi.model.onair.OnAirAudioResponse;
 import com.zype.android.webapi.model.onair.OnAirResponse;
 import com.zype.android.webapi.model.onair.OnAirVideoResponse;
+import com.zype.android.webapi.model.plan.PlanResponse;
 import com.zype.android.webapi.model.player.PlayerAudioResponse;
 import com.zype.android.webapi.model.player.PlayerVideoResponse;
 import com.zype.android.webapi.model.playlist.PlaylistResponse;
@@ -115,6 +123,7 @@ public class WebApiManager {
     private final ZypeApiEndpointInterface mLoginApi;
     private final ZypeApiEndpointInterface mDownloadApi;
     private final ZypeApiEndpointInterface mCookieApi;
+    private final ZypeApiEndpointInterface marketplaceConnectApi;
     private final Context mContext;
     private EventBus mBus;
     private WorkerHandler mHandler;
@@ -165,6 +174,14 @@ public class WebApiManager {
                 .setClient(new OkClient(okHttpClient))
                 .build();
         mCookieApi = cookieRestAdapter.create(ZypeApiEndpointInterface.class);
+
+        RestAdapter marketplaceConnectRestAdapter = new RestAdapter.Builder()
+                .setEndpoint("https://mkt.zype.com")
+                .setRequestInterceptor(new CustomRequestInterceptor())
+                .setLogLevel(logLevel)
+                .setClient(new OkClient(okHttpClient))
+                .build();
+        marketplaceConnectApi = marketplaceConnectRestAdapter.create(ZypeApiEndpointInterface.class);
 
         mContext = contextArg;
 
@@ -230,6 +247,16 @@ public class WebApiManager {
                 return new RefreshAccessTokenEvent(ticket, new RefreshAccessToken(mApi.authRefreshAccessToken(postParams)));
             case AUTH_RETRIEVE_ACCESS_TOKEN:
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
+            case BIFROST:
+                MarketplaceBody body = new MarketplaceBody();
+                body.consumerId = postParams.get("consumer_id");
+                body.consumerToken = postParams.get("consumer_token");
+                body.receipt = postParams.get("receipt");
+                body.planId = postParams.get("plan_id");
+                return new BifrostEvent(ticket, new BifrostResponse(marketplaceConnectApi.verifySubscription(body)));
+            case PLAN:
+                String planId = pathParams.get(PlanParamsBuilder.PLAN_ID);
+                return new PlanEvent(ticket, new PlanResponse(mApi.getPlan(planId, getParams)));
             case TOKEN_INFO:
                 String token = getParams.get(AuthParamsBuilder.ACCESS_TOKEN);
                 return new AccessTokenInfoEvent(ticket, new AccessTokenInfoResponse(mApi.getTokenInfo(token)));
@@ -319,6 +346,8 @@ public class WebApiManager {
     public enum Request {
         AUTH_REFRESH_ACCESS_TOKEN,
         AUTH_RETRIEVE_ACCESS_TOKEN,
+        BIFROST,
+        PLAN,
         TOKEN_INFO,
         VIDEO_LATEST_GET,
         VIDEO_FROM_PLAYLIST,

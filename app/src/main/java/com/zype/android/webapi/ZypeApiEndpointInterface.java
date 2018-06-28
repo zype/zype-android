@@ -1,8 +1,10 @@
 package com.zype.android.webapi;
 
+import com.zype.android.webapi.model.bifrost.Bifrost;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
 import com.zype.android.webapi.model.auth.TokenInfo;
+import com.zype.android.webapi.model.bifrost.MarketplaceBody;
 import com.zype.android.webapi.model.category.Categories;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideo;
@@ -14,6 +16,7 @@ import com.zype.android.webapi.model.linking.DevicePin;
 import com.zype.android.webapi.model.onair.OnAirAudioResponseData;
 import com.zype.android.webapi.model.onair.OnAirData;
 import com.zype.android.webapi.model.onair.OnAirVideoResponseData;
+import com.zype.android.webapi.model.plan.Plan;
 import com.zype.android.webapi.model.player.PlayerAudioData;
 import com.zype.android.webapi.model.player.PlayerVideoData;
 import com.zype.android.webapi.model.playlist.Playlist;
@@ -102,6 +105,14 @@ public interface ZypeApiEndpointInterface {
 
     @POST("/pin/acquire/")
     DevicePin createDevicePin(@QueryMap HashMap<String, String> queryParams, @Body String emptyBody);
+
+    // Marketplace Connect
+    @POST("/v1/googleplay/")
+    Bifrost verifySubscription(@Body MarketplaceBody body);
+
+    // Plans
+    @GET("/plans/{plan_id}")
+    Plan getPlan(@Path("plan_id") String planId, @QueryMap HashMap<String, String> getParams);
 
     // Video entitlements
     @GET("/videos/{video_id}/entitled/")

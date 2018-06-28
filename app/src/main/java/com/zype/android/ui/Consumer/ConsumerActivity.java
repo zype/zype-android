@@ -21,16 +21,21 @@ import com.zype.android.R;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Consumer.Model.Consumer;
 import com.zype.android.ui.LoginActivity;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.main.MainActivity;
 import com.zype.android.ui.settings.TermsActivity;
+import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.ConsumerCreateParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
+import com.zype.android.webapi.model.consumers.ConsumerData;
+
+import static com.zype.android.utils.BundleConstants.REQUEST_LOGIN;
 
 /**
  * Created by Evgeny Cherkasov on 27.06.2017.
@@ -155,11 +160,20 @@ public class ConsumerActivity extends BaseActivity {
         }
     }
 
-    private void switchToSubscriptionScreen() {
-        // TODO: Change to Subcription activity
-        Intent intent = new Intent(this, SubscriptionActivity.class);
-        startActivity(intent);
-        finish();
+    // //////////
+    // Actions
+    //
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    setResult(RESULT_OK);
+                    finish();
+                }
+                break;
+        }
     }
 
     private void switchToLoginScreen() {
@@ -178,8 +192,8 @@ public class ConsumerActivity extends BaseActivity {
     //
     private Consumer getViewModel() {
         Consumer result = new Consumer();
-        result.email = layoutEmail.getEditText().getText().toString();
-        result.password = layoutPassword.getEditText().getText().toString();
+        result.email = layoutEmail.getEditText().getText().toString().trim();
+        result.password = layoutPassword.getEditText().getText().toString().trim();
         return result;
     }
 
@@ -212,12 +226,11 @@ public class ConsumerActivity extends BaseActivity {
     }
 
     private boolean isEmailValid(String value) {
-        // TODO: Add implementation
-        return true;
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches();
     }
 
     private void updateConsumer() {
-        Consumer consumer = getViewModel();
+        consumer = getViewModel();
         if (validate(consumer)) {
             requestCreateConsumer(consumer);
         }
@@ -241,17 +254,25 @@ public class ConsumerActivity extends BaseActivity {
     public void handleConsumer(ConsumerEvent event) {
         Logger.d("handleConsumer()");
         hideProgress();
-        com.zype.android.webapi.model.consumers.Consumer data = event.getEventData().getModelData();
-        int subscriptionCount = data.getConsumerData().getSubscriptionCount();
-        SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
+        ConsumerData data = event.getEventData().getModelData().getConsumerData();
+        SettingsProvider.getInstance().saveSubscriptionCount(data.getSubscriptionCount());
+        SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, consumer.email);
+        SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_PASSWORD, consumer.password);
 
-        switchToSubscriptionScreen();
+        Bundle extras = new Bundle();
+        extras.putBoolean(LoginActivity.PARAMETERS_FORCE_LOGIN, true);
+        NavigationHelper.getInstance(ConsumerActivity.this).switchToLoginScreen(ConsumerActivity.this, extras);
     }
 
     @Subscribe
     public void handleError(ErrorEvent err) {
         Logger.e("handleError");
         hideProgress();
-        UiUtils.showErrorSnackbar(buttonUpdate, err.getErrMessage());
+        if (err.getError().getResponse().getStatus() == 422) {
+            DialogHelper.showErrorAlert(this, getString(R.string.consumer_error_create));
+        }
+        else {
+            UiUtils.showErrorSnackbar(buttonUpdate, err.getErrMessage());
+        }
     }
 }

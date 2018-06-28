@@ -75,7 +75,6 @@ public class DialogHelper {
 
     public static void showErrorAlert(final Activity activity, String message) {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
-//        alertDialog.setTitle(activity.getString(R.string.dialog_login_title));
         alertDialog.setMessage(message);
         alertDialog.setNegativeButton(activity.getString(R.string.dialog_button_close), new DialogInterface.OnClickListener() {
             @Override
@@ -86,4 +85,5 @@ public class DialogHelper {
         AlertDialog alert = alertDialog.create();
         alert.show();
     }
+
 }

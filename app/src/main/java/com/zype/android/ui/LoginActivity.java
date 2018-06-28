@@ -57,6 +57,8 @@ public class LoginActivity extends BaseActivity {
 
     private LinearLayout layoutEmail;
 
+    public final static String PARAMETERS_FORCE_LOGIN = "ForceLogin";
+
     private View mProgressView;
     private View mLoginFormView;
     private TextInputLayout emailWrapper;
@@ -70,11 +72,16 @@ public class LoginActivity extends BaseActivity {
     private static final int MODE_DEVICE_LINKING = 1;
     private static final int MODE_SIGN_IN_WITH_EMAIL = 2;
 
+    private boolean forceLogin = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_login);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle(R.string.login_title);
 
         layoutAuthMethod = (LinearLayout) findViewById(R.id.layoutAuthMethod);
         buttonLinkDevice = (Button) findViewById(R.id.buttonLinkDevice);
@@ -135,6 +142,12 @@ public class LoginActivity extends BaseActivity {
 
         init(savedInstanceState);
         bindViews();
+
+        if (forceLogin) {
+            emailWrapper.getEditText().setText(SettingsProvider.getInstance().getString(SettingsProvider.CONSUMER_EMAIL));
+            passwordWrapper.getEditText().setText(SettingsProvider.getInstance().getString(SettingsProvider.CONSUMER_PASSWORD));
+            attemptLogin();
+        }
     }
 
     private void init(Bundle savedInstanceState) {
@@ -146,6 +159,7 @@ public class LoginActivity extends BaseActivity {
             args = getIntent().getExtras();
         }
         if (args != null) {
+            forceLogin = args.getBoolean(PARAMETERS_FORCE_LOGIN);
         }
         if (ZypeConfiguration.isDeviceLinkingEnabled(this)) {
             mode = MODE_SELECT_METHOD;
@@ -363,6 +377,7 @@ public class LoginActivity extends BaseActivity {
         SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
         String consumerId = data.getConsumerData().getId();
         SettingsProvider.getInstance().saveConsumerId(consumerId);
+        SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, data.getConsumerData().getEmail());
         showProgress(false);
         setResult(RESULT_OK);
         finish();

@@ -1,14 +1,21 @@
 package com.zype.android.ui;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.android.billingclient.api.Purchase;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Video;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.Auth.SubscribeOrLoginActivity;
+import com.zype.android.ui.Consumer.ConsumerActivity;
 import com.zype.android.ui.Gallery.GalleryActivity;
 import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
@@ -19,6 +26,10 @@ import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.model.video.VideoData;
+
+import java.util.List;
+
+import static com.zype.android.ZypeApp.marketplaceGateway;
 
 /**
  * Created by Evgeny Cherkasov on 11.07.2017.
@@ -46,36 +57,39 @@ public class NavigationHelper {
     }
 
     public void checkSubscription(Activity activity, String videoId, String playlistId, boolean onAir) {
+        Bundle extras = new Bundle();
+        extras.putString(BundleConstants.VIDEO_ID, videoId);
+        extras.putString(BundleConstants.PLAYLIST_ID, playlistId);
         if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                switchToSubscriptionScreen(activity);
+                switchToSubscriptionScreen(activity, extras);
             }
             else {
-                VideoDetailActivity.startActivity(activity, videoId, playlistId);
+                switchToVideoDetailsScreen(activity, videoId, playlistId, false);
+            }
+        }
+        else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
+            if (SettingsProvider.getInstance().isLoggedIn()) {
+                if (SettingsProvider.getInstance().getSubscriptionCount() > 0
+                        || !isLiveStreamLimitExceeded(onAir)) {
+                    switchToVideoDetailsScreen(activity, videoId, playlistId, false);
+                }
+                else {
+                    switchToSubscriptionScreen(activity, extras);
+                }
+            }
+            else {
+                switchToSubscriptionScreen(activity, extras);
             }
         }
         else {
             if (SettingsProvider.getInstance().isLoggedIn()) {
-                boolean liveStreamLimitExceeded = false;
-                if (onAir) {
-                    // Check total played live stream time
-                    Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
-                    int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
-                    if (liveStreamTime >= SettingsProvider.getInstance().getLiveStreamLimit()
-                            && SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                        liveStreamLimitExceeded = true;
-                    }
-                }
-                if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || liveStreamLimitExceeded) {
-                    if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
-                        switchToSubscriptionScreen(activity);
-                    }
-                    else {
-                        DialogHelper.showSubscriptionAlertIssue(activity);
-                    }
+                if (SettingsProvider.getInstance().getSubscriptionCount() > 0
+                        || !isLiveStreamLimitExceeded(onAir)) {
+                    switchToVideoDetailsScreen(activity, videoId, playlistId, false);
                 }
                 else {
-                    VideoDetailActivity.startActivity(activity, videoId, playlistId);
+                    DialogHelper.showSubscriptionAlertIssue(context);
                 }
             }
             else {
@@ -84,8 +98,39 @@ public class NavigationHelper {
         }
     }
 
+    private boolean isLiveStreamLimitExceeded(boolean onAir) {
+        boolean result = false;
+        if (onAir) {
+            int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
+
+            Logger.d("isLiveStreamLimitExceeded(): liveStreamLimit=" + liveStreamTime);
+
+            if (liveStreamTime >= SettingsProvider.getInstance().getLiveStreamLimit()
+                    && SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+                result = true;
+            }
+        }
+        else {
+            // For non live stream limit checking doesn't make sense, so just return true;
+            result = true;
+        }
+        return result;
+    }
+
+    public void switchToConsumerScreen(Activity activity) {
+        Intent intent = new Intent(activity, ConsumerActivity.class);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_CONSUMER);
+    }
+
     public void switchToLoginScreen(Activity activity) {
+        switchToLoginScreen(activity, null);
+    }
+
+    public void switchToLoginScreen(Activity activity, Bundle extras) {
         Intent intent = new Intent(context, LoginActivity.class);
+        if (extras != null) {
+            intent.putExtras(extras);
+        }
         activity.startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
     }
 
@@ -94,8 +139,9 @@ public class NavigationHelper {
         activity.startActivity(intent);
     }
 
-    public void switchToSubscriptionScreen(Activity activity) {
+    public void switchToSubscriptionScreen(Activity activity, Bundle extras) {
         Intent intent = new Intent(activity, SubscriptionActivity.class);
+        intent.putExtras(extras);
         activity.startActivityForResult(intent, BundleConstants.REQUEST_SUBSCRIPTION);
     }
 
@@ -133,16 +179,25 @@ public class NavigationHelper {
         activity.startActivity(intent);
     }
 
+    public void switchToSubscribeOrLoginScreen(Activity activity, Bundle extras) {
+        Intent intent = new Intent(activity, SubscribeOrLoginActivity.class);
+        intent.putExtras(extras);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_SUBSCRIBE_OR_LOGIN);
+    }
+
     //
-    public void handleNotAuthorizedVideo(Activity activity, String videoId) {
-        VideoData videoData = VideoHelper.getFullData(activity.getContentResolver(), videoId);
-        if (videoData == null) {
-            Logger.e("Error get video data, videoId=" + videoId);
+    public void handleNotAuthorizedVideo(Activity activity, String videoId, String playlistId) {
+        Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
+        Bundle extras = new Bundle();
+        extras.putString(BundleConstants.VIDEO_ID, videoId);
+        extras.putString(BundleConstants.PLAYLIST_ID, playlistId);
+        if (video == null) {
+            Logger.e("handleNotAuthorizedVideo(): Error get video, videoId=" + videoId);
             return;
         }
-        if (videoData.isSubscriptionRequired()) {
+        if (Integer.valueOf(video.subscriptionRequired) == 1) {
             if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
-                NavigationHelper.getInstance(activity).switchToSubscriptionScreen(activity);
+                switchToSubscriptionScreen(activity, extras);
             }
             else if (ZypeConfiguration.isUniversalSubscriptionEnabled(activity)) {
                 if (AuthHelper.isLoggedIn()) {
@@ -152,10 +207,23 @@ public class NavigationHelper {
                     DialogHelper.showLoginAlert(activity);
                 }
             }
+            else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
+                if (AuthHelper.isLoggedIn()) {
+                    List<Purchase> purchases = ZypeApp.marketplaceGateway.getBillingManager().getPurchases();
+                    if (purchases != null && purchases.size() > 0) {
+                        switchToSubscribeOrLoginScreen(activity, extras);
+                    }
+                    else {
+                        switchToSubscriptionScreen(activity, extras);
+                    }
+                }
+                else {
+                    switchToSubscribeOrLoginScreen(activity, extras);
+                }
+            }
             else {
-
+                Logger.e("handleNotAuthorizedVideo(): Failed to handle not authorized video, videoId=" + videoId);
             }
         }
-
     }
 }

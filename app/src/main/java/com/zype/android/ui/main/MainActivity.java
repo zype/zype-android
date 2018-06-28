@@ -95,7 +95,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     public void onLatestVideoClick(String videoId) {
         if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-            onRequestSubscription();
+            onRequestSubscription(videoId);
         } else {
             VideoDetailActivity.startActivity(this, videoId, null);
         }
@@ -104,7 +104,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     public void onDownloadVideo(String videoId) {
         if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-            onRequestSubscription();
+            onRequestSubscription(videoId);
         } else {
             DownloadVideoParamsBuilder downloadVideoParamsBuilder = new DownloadVideoParamsBuilder()
                     .addVideoId(videoId);
@@ -115,7 +115,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     public void onDownloadAudio(String videoId) {
         if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-            onRequestSubscription();
+            onRequestSubscription(videoId);
         } else {
             DownloadAudioParamsBuilder playerParamsBuilder = new DownloadAudioParamsBuilder()
                     .addAudioId(videoId);
@@ -127,7 +127,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     public void onFavoriteVideoClick(String videoId, boolean isFavorite) {
         if (ZypeConfiguration.isUniversalSubscriptionEnabled(this)) {
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                onRequestSubscription();
+                onRequestSubscription(videoId);
             }
             else {
                 VideoDetailActivity.startActivity(this, videoId, null);
@@ -229,9 +229,12 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     }
 
     @Override
-    public void onRequestSubscription() {
+    public void onRequestSubscription(String videoId) {
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
-            NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
+            Bundle extras = new Bundle();
+            extras.putString(BundleConstants.VIDEO_ID, videoId);
+            extras.putString(BundleConstants.PLAYLIST_ID, null);
+            NavigationHelper.getInstance(this).switchToSubscriptionScreen(this, extras);
         }
         else {
             DialogHelper.showSubscriptionAlertIssue(this);
@@ -270,7 +273,9 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
-        SubscriptionsHelper.updateSubscriptionCount(purchases);
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+            SubscriptionsHelper.updateSubscriptionCount(purchases);
+        }
     }
 
 //    @Override

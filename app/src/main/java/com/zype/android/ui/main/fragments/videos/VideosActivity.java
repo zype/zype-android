@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.BuildConfig;
@@ -76,6 +77,8 @@ import java.util.List;
 
 import retrofit.RetrofitError;
 
+import static com.zype.android.utils.BundleConstants.REQUEST_SUBSCRIBE_OR_LOGIN;
+
 public class VideosActivity extends MainActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>,
                                                         BillingManager.BillingUpdatesListener {
 
@@ -97,7 +100,9 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     private TextView mTvEmpty;
     private LoaderManager mLoader;
     private ArrayList<VideoData> mVideoList;
-    private String playlistId = "123";
+    private String playlistId = null;
+    private String selectedVideoId = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +131,8 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         mListView.setAdapter(mAdapter);
         mTvEmpty = (TextView) findViewById(R.id.empty);
 
-        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)
+                || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
             new BillingManager(this, this);
         }
 
@@ -181,6 +187,17 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_SUBSCRIBE_OR_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    NavigationHelper.getInstance(this).switchToVideoDetailsScreen(this, selectedVideoId, playlistId, false);
+                }
+                break;
+        }
     }
 
     // //////////
@@ -330,26 +347,34 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         Logger.d("onItemClick()");
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
 
-        if (ZypeConfiguration.isUniversalTVODEnabled(this) && holder.purchaseRequired) {
-            if (holder.isEntitled) {
-                VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
-            }
-            else {
-                if (SettingsProvider.getInstance().isLoggedIn()) {
-                    requestEntitled(holder.videoId);
-                }
-                else {
-                    NavigationHelper.getInstance(this).switchToLoginScreen(this);
-                }
-            }
-            return;
-        }
-        if (holder.subscriptionRequired) {
-            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, playlistId, holder.onAir);
+        selectedVideoId = holder.videoId;
+        NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
+        if (AuthHelper.isVideoAuthorized(this, holder.videoId)) {
+            navigationHelper.switchToVideoDetailsScreen(this, holder.videoId, playlistId, false);
         }
         else {
-            VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
+            navigationHelper.handleNotAuthorizedVideo(this, holder.videoId, playlistId);
         }
+//        if (ZypeConfiguration.isUniversalTVODEnabled(this) && holder.purchaseRequired) {
+//            if (holder.isEntitled) {
+//                VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
+//            }
+//            else {
+//                if (SettingsProvider.getInstance().isLoggedIn()) {
+//                    requestEntitled(holder.videoId);
+//                }
+//                else {
+//                    NavigationHelper.getInstance(this).switchToLoginScreen(this);
+//                }
+//            }
+//            return;
+//        }
+//        if (holder.subscriptionRequired) {
+//            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, playlistId, holder.onAir);
+//        }
+//        else {
+//            VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
+//        }
     }
 
     //
@@ -365,7 +390,9 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
-        SubscriptionsHelper.updateSubscriptionCount(purchases);
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+            SubscriptionsHelper.updateSubscriptionCount(purchases);
+        }
     }
 
     // //////////

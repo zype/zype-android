@@ -374,7 +374,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     }
 
     @Override
-    public void onRequestSubscription() {
+    public void onRequestSubscription(String videoId) {
         DialogHelper.showSubscriptionAlertIssue(this);
     }
 
@@ -422,7 +422,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     @Override
     public void onDownloadVideo(String videoId) {
         if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-            onRequestSubscription();
+            onRequestSubscription(videoId);
         } else {
             DownloadVideoParamsBuilder downloadVideoParamsBuilder = new DownloadVideoParamsBuilder()
                     .addVideoId(videoId);
@@ -433,7 +433,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     @Override
     public void onDownloadAudio(String videoId) {
         if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-            onRequestSubscription();
+            onRequestSubscription(videoId);
         } else {
             DownloadAudioParamsBuilder playerParamsBuilder = new DownloadAudioParamsBuilder()
                     .addAudioId(videoId);
@@ -511,7 +511,9 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
-        SubscriptionsHelper.updateSubscriptionCount(purchases);
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+            SubscriptionsHelper.updateSubscriptionCount(purchases);
+        }
     }
 
     //    -------------------SUBSCRIBE-------------------

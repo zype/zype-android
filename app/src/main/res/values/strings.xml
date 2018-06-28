@@ -78,20 +78,22 @@
     <string name="subtitles_off">Turn off</string>
 
     <!-- Consumer -->
-    <string name="consumer_create_form_description">Fill out your email address and create a password. Use this login to gain access to our content on other devices.</string>
-    <string name="consumer_create_form_subtitle">Create your login to unlock your content</string>
+    <string name="consumer_button_update">Create Account</string>
+    <string name="consumer_create_form_description">Enter a valid email and password. Account credentials will allow access on all devices.</string>
+    <string name="consumer_create_form_subtitle">Create your account</string>
     <string name="consumer_create_sign_in">Already have an account? Sign in</string>
     <string name="consumer_create_sign_in_link">Sign in</string>
-    <string name="consumer_create_terms">By clicking Create my login, you agree to our Terms of Service and Privacy</string>
+    <string name="consumer_create_terms">By clicking Create Account, you agree to our Terms of Service and Privacy</string>
     <string name="consumer_create_terms_link">Terms of Service and Privacy</string>
-    <string name="consumer_button_update">Create Login</string>
     <string name="consumer_email">Email</string>
     <string name="consumer_email_error_empty">Email is required</string>
     <string name="consumer_email_error_invalid">Enter valid email</string>
+    <string name="consumer_error_create">We’re sorry, that email address already belongs to an account.
+        Please click Sign In below if you’d like to sign into your existing account.</string>
     <string name="consumer_password">Password</string>
     <string name="consumer_password_error_empty">Enter password</string>
-    <string name="consumer_progress_create">Creating login…</string>
-    <string name="consumer_title_create">Create login</string>
+    <string name="consumer_progress_create">Creating account…</string>
+    <string name="consumer_title_create">Create Account</string>
 
     <!-- Dialogs -->
     <string name="dialog_button_cancel">Cancel</string>
@@ -102,6 +104,10 @@
 
     <!-- Gallery -->
     <string name="gallery_hero_image_error_playlist">We’re sorry, that playlist cannot be found.</string>
+
+    <!--General-->
+    <string name="button_sign_in">Sign in</string>
+    <string name="button_ok">OK</string>
 
     <!-- Intro -->
     <string name="intro_button_browse">Browse</string>
@@ -115,6 +121,7 @@
     <string name="login_device_linking_url">From your computer or mobile device visit:</string>
     <string name="login_error_device_id">Error get device id</string>
     <string name="login_pin">Enter Pin:</string>
+    <string name="login_title">Sign In</string>
 
     <!-- Main -->
     <string name="main_tab_my_library">My library</string>
@@ -136,8 +143,14 @@
     <string name="settings_instagram">%1$s on Instagram</string>
 
     <!-- Subscription -->
-    <string name="subscription_title">Select Plan</string>
+    <string name="subscription_button_login">Sign in</string>
     <string name="subscription_item_button_continue">Continue with %1$s</string>
+    <string name="subscription_logged_in">Signed in as: </string>
+    <string name="subscription_title">Select Plan</string>
+
+    <string name="subscribe_or_login_button_restore">Restore Purchases</string>
+    <string name="subscribe_or_login_button_subscribe_now">Subscribe Now</string>
+    <string name="subscribe_or_login_title">Subscribe or Sign In</string>
 
     <!-- Videos -->
     <string name="videos_loading">Gathering videos for you…</string>
@@ -146,5 +159,6 @@
     <string name="instagram_title">Instagram</string>
     <string name="web_title">Web</string>
 
-    <string name="button_ok">OK</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
