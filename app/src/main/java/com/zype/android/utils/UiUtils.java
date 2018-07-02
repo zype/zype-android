@@ -3,6 +3,7 @@ package com.zype.android.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -26,6 +27,11 @@ import com.zype.android.webapi.model.video.VideoData;
  *          date 7/1/15
  */
 public class UiUtils {
+
+    public static boolean isLandscapeOrientation(Activity activity) {
+        return (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
+    }
+
     public static void loadImage(@Nullable final Context context, @Nullable final String imgUrl, @Nullable final ImageView img) {
         if (context == null) {
             Logger.e("Context is null");

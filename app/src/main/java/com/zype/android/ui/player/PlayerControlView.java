@@ -5,7 +5,6 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.MediaController;
@@ -21,6 +20,7 @@ import com.zype.android.core.settings.SettingsProvider;
 public class PlayerControlView extends MediaController {
 
     private ImageButton buttonCC;
+    private ImageButton buttonFullscreen;
 
     private Context context;
     private IPlayerControlListener listenerPlayerControl = null;
@@ -28,7 +28,8 @@ public class PlayerControlView extends MediaController {
     public interface IPlayerControlListener {
         void onNext();
         void onPrevious();
-        void onClickClosedCaptions();
+        void onClosedCaptions();
+        void onFullscreen();
     }
 
     public PlayerControlView(Context context, AttributeSet attrs) {
@@ -64,6 +65,7 @@ public class PlayerControlView extends MediaController {
         }
         View viewCC = makeClosedCaptionsView();
         rootView.addView(viewCC, frameParams);
+        rootView.addView(makeFullscreenView(), frameParams);
     }
 
     private View makeClosedCaptionsView() {
@@ -73,7 +75,7 @@ public class PlayerControlView extends MediaController {
         buttonCC.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (listenerPlayerControl != null) {
-                    listenerPlayerControl.onClickClosedCaptions();
+                    listenerPlayerControl.onClosedCaptions();
                 }
             }
         });
@@ -108,6 +110,20 @@ public class PlayerControlView extends MediaController {
         return buttonPrevious;
     }
 
+    private View makeFullscreenView() {
+        buttonFullscreen = new ImageButton(context);
+        updateFullscreenButton(false);
+        buttonFullscreen.setBackground(null);
+        buttonFullscreen.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if (listenerPlayerControl != null) {
+                    listenerPlayerControl.onFullscreen();
+                }
+            }
+        });
+        return buttonFullscreen;
+    }
+
     public void setPlayerControlListener(IPlayerControlListener listener) {
         this.listenerPlayerControl = listener;
     }
@@ -118,6 +134,15 @@ public class PlayerControlView extends MediaController {
 
     public void hideCC() {
         buttonCC.setVisibility(GONE);
+    }
+
+    public void updateFullscreenButton(boolean fullscreen) {
+        if (fullscreen) {
+            buttonFullscreen.setImageResource(R.drawable.baseline_fullscreen_exit_white_24);
+        }
+        else {
+            buttonFullscreen.setImageResource(R.drawable.baseline_fullscreen_white_24);
+        }
     }
 }
 

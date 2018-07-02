@@ -43,6 +43,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -100,31 +101,59 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     }
 
     @Override
-    public void onFullscreenChanged() {
-        int orientation = getResources().getConfiguration().orientation;
-        boolean isFullscreen = false;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            isFullscreen = true;
-        }
+    public void onFullscreenChanged(boolean isFullscreen) {
         if (isFullscreen) {
+            hideSystemUI();
+            findViewById(R.id.layoutRoot).setFitsSystemWindows(false);
             mTabLayout.setVisibility(View.GONE);
             mViewPager.setVisibility(View.GONE);
             mActionBar.hide();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             findViewById(R.id.layoutVideo).setLayoutParams(params);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            findViewById(R.id.layoutVideo).invalidate();
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         }
         else {
+            showSystemUI();
+            findViewById(R.id.layoutRoot).setFitsSystemWindows(true);
             mTabLayout.setVisibility(View.VISIBLE);
             mViewPager.setVisibility(View.VISIBLE);
             mActionBar.show();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             params.height = (int) getResources().getDimension(R.dimen.episode_video_height);
             findViewById(R.id.layoutVideo).setLayoutParams(params);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            hideSystemUI();
+        }
+    }
+
+    private void hideSystemUI() {
+        if (UiUtils.isLandscapeOrientation(this)) {
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        }
+    }
+
+    private void showSystemUI() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
 
     @Override

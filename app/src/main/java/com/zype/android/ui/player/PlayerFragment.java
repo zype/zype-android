@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.media.AudioManager;
@@ -340,7 +341,9 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     private void onScreenOrientationChanged() {
-        mListener.onFullscreenChanged();
+        boolean fullscreen = UiUtils.isLandscapeOrientation(getActivity());
+        mListener.onFullscreenChanged(fullscreen);
+        mediaController.updateFullscreenButton(fullscreen);
         hideControls();
     }
 
@@ -386,7 +389,7 @@ public class PlayerFragment extends BaseFragment implements
 
         configureSubtitleView();
 
-        mListener.onFullscreenChanged();
+        mListener.onFullscreenChanged(UiUtils.isLandscapeOrientation(getActivity()));
         registerReceivers();
         if (player == null) {
             analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
@@ -1335,10 +1338,20 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     @Override
-    public void onClickClosedCaptions() {
+    public void onClosedCaptions() {
         showClosedCaptionsDialog();
     }
 
+    public void onFullscreen() {
+        boolean fullscreen = UiUtils.isLandscapeOrientation(getActivity());
+        if (fullscreen) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+        else {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+        mediaController.updateFullscreenButton(!fullscreen);
+    }
 
     //
     // Closed captions

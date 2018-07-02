@@ -49,12 +49,7 @@ public class LivePlayerActivity extends BaseVideoActivity {
     }
 
     @Override
-    public void onFullscreenChanged() {
-        int orientation = getResources().getConfiguration().orientation;
-        boolean isFullscreen = false;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            isFullscreen = true;
-        }
+    public void onFullscreenChanged(boolean isFullscreen) {
         if (isFullscreen) {
             mActionBar.hide();
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);

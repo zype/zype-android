@@ -15,6 +15,7 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.receiver.RemoteControlReceiver;
 import com.zype.android.utils.GoogleKeyUtils;
 import com.zype.android.utils.Logger;
+import com.zype.android.utils.UiUtils;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -61,7 +62,7 @@ public class YouTubeFragment extends YouTubePlayerSupportFragment implements Med
     }
 
     private void onScreenOrientationChanged() {
-        mListener.onFullscreenChanged();
+        mListener.onFullscreenChanged(UiUtils.isLandscapeOrientation(getActivity()));
     }
 
     public void init(Context context) {
