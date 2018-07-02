@@ -147,9 +147,12 @@
     <string name="subscription_item_button_continue">Continue with %1$s</string>
     <string name="subscription_logged_in">Signed in as: </string>
     <string name="subscription_title">Select Plan</string>
+    <string name="subscription_verify">Verifying subscription</string>
 
     <string name="subscribe_or_login_button_restore">Restore Purchases</string>
     <string name="subscribe_or_login_button_subscribe_now">Subscribe Now</string>
+    <string name="subscribe_or_login_error_restore_purchase_zype">Not found Zype Plan for existing in-app subscription</string>
+    <string name="subscribe_or_login_error_validation">Error validation subscription via Zype service</string>
     <string name="subscribe_or_login_title">Subscribe or Sign In</string>
 
     <!-- Videos -->

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.zype.android">
+    package="com.zype.android"
+    >
 
     <supports-screens
         android:anyDensity="true"
@@ -62,6 +64,10 @@
         <activity
             android:name=".ui.Consumer.ConsumerActivity"
             android:theme="@style/AppThemeWithActionBar"
+            />
+        <activity
+            android:name=".ui.Gallery.GalleryActivity"
+            android:theme="@style/AppTheme"
             />
         <activity
             android:name=".ui.Intro.IntroActivity"

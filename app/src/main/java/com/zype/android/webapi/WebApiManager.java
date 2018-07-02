@@ -10,10 +10,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.ResponseBody;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeSettings;
@@ -37,7 +34,7 @@ import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.auth.AccessTokenInfoEvent;
 import com.zype.android.webapi.events.auth.RefreshAccessTokenEvent;
 import com.zype.android.webapi.events.auth.RetrieveAccessTokenEvent;
-import com.zype.android.webapi.events.bifrost.BifrostEvent;
+import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 import com.zype.android.webapi.events.category.CategoryEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
 import com.zype.android.webapi.events.consumer.ConsumerFavoriteVideoEvent;
@@ -66,8 +63,8 @@ import com.zype.android.webapi.model.ErrorBody;
 import com.zype.android.webapi.model.auth.AccessTokenInfoResponse;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
-import com.zype.android.webapi.model.bifrost.BifrostResponse;
-import com.zype.android.webapi.model.bifrost.MarketplaceBody;
+import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectResponse;
+import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBody;
 import com.zype.android.webapi.model.category.CategoryResponse;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoResponse;
 import com.zype.android.webapi.model.consumers.ConsumerResponse;
@@ -92,8 +89,6 @@ import com.zype.android.webapi.model.settings.SettingsResponse;
 import com.zype.android.webapi.model.video.VideoResponse;
 import com.zype.android.webapi.model.zobjects.ZObjectResponse;
 
-import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.HashMap;
@@ -102,7 +97,6 @@ import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.OkClient;
-import retrofit.client.Response;
 
 /**
  * @author vasya
@@ -248,12 +242,12 @@ public class WebApiManager {
             case AUTH_RETRIEVE_ACCESS_TOKEN:
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
             case BIFROST:
-                MarketplaceBody body = new MarketplaceBody();
+                MarketplaceConnectBody body = new MarketplaceConnectBody();
                 body.consumerId = postParams.get("consumer_id");
                 body.consumerToken = postParams.get("consumer_token");
                 body.receipt = postParams.get("receipt");
                 body.planId = postParams.get("plan_id");
-                return new BifrostEvent(ticket, new BifrostResponse(marketplaceConnectApi.verifySubscription(body)));
+                return new MarketplaceConnectEvent(ticket, new MarketplaceConnectResponse(marketplaceConnectApi.verifySubscription(body)));
             case PLAN:
                 String planId = pathParams.get(PlanParamsBuilder.PLAN_ID);
                 return new PlanEvent(ticket, new PlanResponse(mApi.getPlan(planId, getParams)));

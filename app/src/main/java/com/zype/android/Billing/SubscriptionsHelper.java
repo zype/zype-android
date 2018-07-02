@@ -3,18 +3,14 @@ package com.zype.android.Billing;
 import android.content.Context;
 
 import com.android.billingclient.api.Purchase;
-import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.builder.BifrostParamsBuilder;
-import com.zype.android.webapi.builder.ConsumerParamsBuilder;
+import com.zype.android.webapi.builder.MarketplaceConnectParamsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 /**
  * Created by Evgeny Cherkasov on 10.07.2017.
@@ -47,10 +43,11 @@ public class SubscriptionsHelper {
     public static void validateSubscription(Subscription subscription, List<Purchase> purchases, WebApiManager apiManager) {
         for (Purchase item : purchases) {
             if (item.getSku().equals(subscription.getMarketplace().getSku())) {
-                BifrostParamsBuilder builder = new BifrostParamsBuilder()
+                Logger.i("purchase originalJson=" + item.getOriginalJson());
+                Logger.i("purchase signature=" + item.getSignature());
+                MarketplaceConnectParamsBuilder builder = new MarketplaceConnectParamsBuilder()
                         .addConsumerId(SettingsProvider.getInstance().getConsumerId())
                         .addConsumerToken(SettingsProvider.getInstance().getAccessToken())
-//                        .addPackageName(item.getPackageName())
                         .addPlanId(subscription.getZypePlan().id)
                         .addPurchaseToken(item.getPurchaseToken());
                 apiManager.executeRequest(WebApiManager.Request.BIFROST, builder.build());

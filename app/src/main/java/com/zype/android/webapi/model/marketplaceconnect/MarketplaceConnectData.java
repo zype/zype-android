@@ -1,16 +1,12 @@
-package com.zype.android.webapi.model.bifrost;
+package com.zype.android.webapi.model.marketplaceconnect;
 
 import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Evgeny Cherkasov on 10.11.2017.
  */
 
-public class BifrostData {
+public class MarketplaceConnectData {
     @Expose
     public String type;
 

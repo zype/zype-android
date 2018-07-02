@@ -1,10 +1,10 @@
 package com.zype.android.webapi;
 
-import com.zype.android.webapi.model.bifrost.Bifrost;
+import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnect;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
 import com.zype.android.webapi.model.auth.TokenInfo;
-import com.zype.android.webapi.model.bifrost.MarketplaceBody;
+import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBody;
 import com.zype.android.webapi.model.category.Categories;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideo;
@@ -108,7 +108,7 @@ public interface ZypeApiEndpointInterface {
 
     // Marketplace Connect
     @POST("/v1/googleplay/")
-    Bifrost verifySubscription(@Body MarketplaceBody body);
+    MarketplaceConnect verifySubscription(@Body MarketplaceConnectBody body);
 
     // Plans
     @GET("/plans/{plan_id}")

@@ -87,9 +87,9 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     protected void onStart() {
         super.onStart();
-        if (SettingsProvider.getInstance().isLogined()) {
-            requestConsumerData();
-        }
+//        if (SettingsProvider.getInstance().isLogined()) {
+//            requestConsumerData();
+//        }
     }
 
     @Override

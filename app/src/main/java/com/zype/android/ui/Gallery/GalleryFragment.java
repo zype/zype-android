@@ -99,6 +99,7 @@ public class GalleryFragment extends Fragment {
             modelHeroImages.getHeroImages().observe(this, new Observer<List<HeroImage>>() {
                 @Override
                 public void onChanged(@Nullable List<HeroImage> heroImages) {
+                    Logger.d("onChanged(): Hero images changed, size=" + heroImages.size());
                     modelHeroImages.stopTimer();
                     adapterHeroImages.setData(heroImages);
                     if (heroImages.size() > 0) {
@@ -121,6 +122,7 @@ public class GalleryFragment extends Fragment {
         model.getGalleryRows(parentPlaylistId).observe(this, new Observer<List<GalleryRow>>() {
             @Override
             public void onChanged(@Nullable List<GalleryRow> galleryRows) {
+                Logger.d("onChanged(): Gallery rows changed, size=" + galleryRows.size());
                 adapter.setData(galleryRows);
             }
         });

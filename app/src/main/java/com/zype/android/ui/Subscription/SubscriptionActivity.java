@@ -16,8 +16,6 @@ import android.widget.TextView;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.Subscription;
@@ -25,20 +23,15 @@ import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
-import com.zype.android.ui.Gallery.HeroImagesViewModel;
 import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.Subscription.Model.SubscriptionItem;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.utils.BundleConstants;
+import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
-import com.zype.android.webapi.events.bifrost.BifrostEvent;
-import com.zype.android.webapi.events.consumer.ConsumerEvent;
-import com.zype.android.webapi.model.bifrost.Bifrost;
-import com.zype.android.webapi.model.bifrost.BifrostData;
-import com.zype.android.webapi.model.consumers.Consumer;
-import com.zype.android.webapi.model.settings.Settings;
+import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.events.ErrorEvent;
+import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,17 +153,17 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
 //        }
     }
 
-    private void showProgress() {
-//        dialogProgress = new ProgressDialog(this);
-//        dialogProgress.setMessage(getString(R.string.consumer_progress_create));
-//        dialogProgress.setCancelable(false);
-//        dialogProgress.show();
+    private void showProgress(String message) {
+        dialogProgress = new ProgressDialog(this);
+        dialogProgress.setMessage(message);
+        dialogProgress.setCancelable(false);
+        dialogProgress.show();
     }
 
     private void hideProgress() {
-//        if (dialogProgress != null) {
-//            dialogProgress.dismiss();
-//        }
+        if (dialogProgress != null) {
+            dialogProgress.dismiss();
+        }
     }
 
     // //////////
@@ -265,6 +258,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
             if (purchases != null && !purchases.isEmpty()) {
                 if (selectedSubscription != null) {
+                    showProgress(getString(R.string.subscription_verify));
                     SubscriptionsHelper.validateSubscription(selectedSubscription, purchases, getApi());
                 }
             }
@@ -313,13 +307,6 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
                     @Override
                     public void onClick(View v) {
                         selectedSubscription = holder.item;
-//                    if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
-//                        // Create consumer before making purchase in case user is not logged in
-//                        if (!SettingsProvider.getInstance().isLoggedIn()) {
-//                            NavigationHelper.getInstance(SubscriptionActivity.this).switchToConsumerScreen(SubscriptionActivity.this);
-//                            return;
-//                        }
-//                    }
                         purchaseSubscription(selectedSubscription);
                     }
                 });
@@ -354,11 +341,21 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     // Event bus listeners
     //
     @Subscribe
-    public void handleBifrost(BifrostEvent event) {
+    public void handleBifrost(MarketplaceConnectEvent event) {
         hideProgress();
         // TODO: Check response data to properly update subscription count
         SettingsProvider.getInstance().saveSubscriptionCount(1);
         setResult(RESULT_OK);
         finish();
     }
+
+    @Subscribe
+    public void handleError(ErrorEvent event) {
+        Logger.e("handleError()");
+        if (event.getEventData() == WebApiManager.Request.BIFROST) {
+            hideProgress();
+            DialogHelper.showErrorAlert(this, getString(R.string.subscribe_or_login_error_validation));
+        }
+    }
+
 }

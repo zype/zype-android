@@ -7,7 +7,7 @@ import com.zype.android.core.settings.SettingsProvider;
  * Created by Evgeny Cherkasov on 10.11.2017.
  */
 
-public class BifrostParamsBuilder extends ParamsBuilder {
+public class MarketplaceConnectParamsBuilder extends ParamsBuilder {
     public static final String CONSUMER_ID = "consumer_id";
     public static final String CONSUMER_TOKEN = "consumer_token";
     public static final String PACKAGE_NAME = "packageName";
@@ -20,7 +20,7 @@ public class BifrostParamsBuilder extends ParamsBuilder {
 
     public static final String ACCESS_TOKEN = "access_token";
 
-    public BifrostParamsBuilder() {
+    public MarketplaceConnectParamsBuilder() {
         super();
 //        addAccessToken();
 //        addClientId();
@@ -28,47 +28,47 @@ public class BifrostParamsBuilder extends ParamsBuilder {
 //        addRedirectUri();
     }
 
-    public BifrostParamsBuilder addConsumerId(String consumerId) {
+    public MarketplaceConnectParamsBuilder addConsumerId(String consumerId) {
         addPostParam(CONSUMER_ID, consumerId);
         return this;
     }
 
-    public BifrostParamsBuilder addConsumerToken(String consumerToken) {
+    public MarketplaceConnectParamsBuilder addConsumerToken(String consumerToken) {
         addPostParam(CONSUMER_TOKEN, consumerToken);
         return this;
     }
 
-    public BifrostParamsBuilder addPackageName(String packageName) {
+    public MarketplaceConnectParamsBuilder addPackageName(String packageName) {
         addPostParam(PACKAGE_NAME, packageName);
         return this;
     }
 
-    public BifrostParamsBuilder addPlanId(String planId) {
+    public MarketplaceConnectParamsBuilder addPlanId(String planId) {
         addPostParam(PLAN_ID, planId);
         return this;
     }
 
-    public BifrostParamsBuilder addPurchaseToken(String purchaseToken) {
+    public MarketplaceConnectParamsBuilder addPurchaseToken(String purchaseToken) {
         addPostParam(RECEIPT, purchaseToken);
         return this;
     }
 
-    private BifrostParamsBuilder addClientId() {
+    private MarketplaceConnectParamsBuilder addClientId() {
         addPostParam(CLIENT_ID, ZypeSettings.GOOGLE_CLIENT_ID);
         return this;
     }
 
-    private BifrostParamsBuilder addClientSecret() {
+    private MarketplaceConnectParamsBuilder addClientSecret() {
         addPostParam(CLIENT_SECRET, ZypeSettings.GOOGLE_CLIENT_SECRET);
         return this;
     }
 
-    private BifrostParamsBuilder addRedirectUri() {
+    private MarketplaceConnectParamsBuilder addRedirectUri() {
         addPostParam(REDIRECT_URI, ZypeSettings.GOOGLE_REDIRECT_URL);
         return this;
     }
 
-    private BifrostParamsBuilder addAccessToken() {
+    private MarketplaceConnectParamsBuilder addAccessToken() {
         addGetParam(ACCESS_TOKEN, SettingsProvider.getInstance().getAccessToken());
         return this;
     }
