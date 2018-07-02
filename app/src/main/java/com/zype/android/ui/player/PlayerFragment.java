@@ -869,6 +869,7 @@ public class PlayerFragment extends BaseFragment implements
 
     private void showControls() {
         if (mediaController != null) {
+            updateClosedCaptionsVisibility();
             if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE) {
                 if (isControlsEnabled) {
                     mediaController.show(5000);
@@ -1344,6 +1345,15 @@ public class PlayerFragment extends BaseFragment implements
     //
     private boolean ccEnabled;
     private String ccTrack;
+
+    private void updateClosedCaptionsVisibility() {
+        if (player.getTrackCount(CustomPlayer.TYPE_TEXT) > 0) {
+            mediaController.showCC();
+        }
+        else {
+            mediaController.hideCC();
+        }
+    }
 
     // 'CaptionListener' implementation
     @Override
