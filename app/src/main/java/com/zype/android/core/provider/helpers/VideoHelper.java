@@ -332,10 +332,22 @@ public class VideoHelper {
         }
     }
 
+    /**
+     * Find a thumbnail of the video that is most close to specified height
+     *
+     * @param video
+     * @param height
+     * @return
+     */
     public static Thumbnail getThumbnailByHeight(Video video, int height) {
-        Thumbnail result = null;
         Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
         List<Thumbnail> thumbnails = new Gson().fromJson(video.thumbnails, thumbnailType);
+        return getThumbnailByHeight(thumbnails, height);
+    }
+
+    // TODO: make this private after refactoring to working with local database via Room
+    public static Thumbnail getThumbnailByHeight(List<Thumbnail> thumbnails, int height) {
+        Thumbnail result = null;
         if (thumbnails != null && thumbnails.size() > 0) {
             for (Thumbnail thumbnail : thumbnails) {
                 if (result == null) {

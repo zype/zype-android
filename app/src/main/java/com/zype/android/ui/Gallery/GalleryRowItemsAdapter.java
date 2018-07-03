@@ -131,8 +131,6 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                 Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 240);
                 if (thumbnail != null) {
                     UiUtils.loadImage(thumbnail.getUrl(), R.drawable.outline_play_circle_filled_white_white_48, holder.imageThumbnail);
-//                    UiUtils.loadImage(holder.view.getContext(), thumbnail.getUrl(),
-//                            R.drawable.outline_play_circle_filled_white_white_48, holder.imageThumbnail, null);
                 }
                 else {
                     holder.imageThumbnail.setImageDrawable(ContextCompat.getDrawable(holder.view.getContext(),

@@ -15,6 +15,7 @@ import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
 import com.zype.android.utils.BundleConstants;
+import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
@@ -53,6 +54,8 @@ import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.zype.android.webapi.WebApiManager.WorkerHandler.BAD_REQUEST;
 
 public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistVideos {
     public static final String TAG = VideoDetailActivity.class.getSimpleName();
@@ -169,13 +172,13 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         getSupportActionBar().setTitle(VideoHelper.getFullData(getContentResolver(), mVideoId).getTitle());
 
         VideoDetailPagerAdapter videoDetailPagerAdapter = new VideoDetailPagerAdapter(this, getSupportFragmentManager(), mVideoId);
-        mViewPager = (VideoDetailPager) findViewById(R.id.pager);
+        mViewPager = findViewById(R.id.pager);
         mViewPager.setAdapter(videoDetailPagerAdapter);
-        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout = findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(mViewPager);
 
-        layoutImage = (FrameLayout) findViewById(R.id.layoutImage);
-        imageVideo = (ImageView) findViewById(R.id.imageVideo);
+        layoutImage = findViewById(R.id.layoutImage);
+        imageVideo = findViewById(R.id.imageVideo);
         imageVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -195,10 +198,11 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         List<Thumbnail> thumbnails = videoData.getThumbnails();
         layoutImage.setVisibility(View.VISIBLE);
         if (thumbnails.size() > 0) {
-            UiUtils.loadImage(this, thumbnails.get(1).getUrl(), R.drawable.placeholder_video, imageVideo, getVideoProgressBar());
+            UiUtils.loadImage(thumbnails.get(1).getUrl(), R.drawable.placeholder_video, imageVideo);
         }
         else {
-            imageVideo.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.placeholder_video));
+            imageVideo.setImageDrawable(ContextCompat.getDrawable(this,
+                    R.drawable.outline_play_circle_filled_white_white_48));
         }
     }
 
@@ -322,33 +326,28 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     @Subscribe
     public void handleError(ErrorEvent err) {
         Logger.e("handleError");
-        if (err instanceof ForbiddenErrorEvent) {
+        if (err.getError().getResponse().getStatus() == BAD_REQUEST) {
             if (err.getEventData() == WebApiManager.Request.PLAYER_VIDEO) {
                 hideProgress();
-//                if (VideoHelper.getFullData(getContentResolver(), mVideoId).isSubscriptionRequired()) {
-//                    if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
-//                        NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
-//                    }
-//                    else {
-//                        if (SettingsProvider.getInstance().isLoggedIn()) {
-//                            DialogHelper.showSubscriptionAlertIssue(this);
-//                        }
-//                        else {
-//                            showVideoThumbnail();
-//                            DialogHelper.showLoginAlert(this);
-//                        }
-//                    }
-//                }
                 showVideoThumbnail();
-                UiUtils.showErrorIndefiniteSnackbar(findViewById(R.id.root_view), err.getErrMessage());
+                DialogHelper.showErrorAlert(this, getString(R.string.video_error_bad_request));
             }
         }
-        else if (err instanceof AuthorizationErrorEvent) {
-            // TODO: Handle 401 error
-        }
         else {
-            if (err.getEventData() != WebApiManager.Request.UN_FAVORITE) {
-                UiUtils.showErrorSnackbar(findViewById(R.id.root_view), err.getErrMessage());
+            if (err instanceof ForbiddenErrorEvent) {
+                if (err.getEventData() == WebApiManager.Request.PLAYER_VIDEO) {
+                    hideProgress();
+                    showVideoThumbnail();
+                    UiUtils.showErrorIndefiniteSnackbar(findViewById(R.id.root_view), err.getErrMessage());
+                }
+            }
+            else if (err instanceof AuthorizationErrorEvent) {
+                // TODO: Handle 401 error
+            }
+            else {
+                if (err.getEventData() != WebApiManager.Request.UN_FAVORITE) {
+//                    UiUtils.showErrorSnackbar(findViewById(R.id.root_view), err.getErrMessage());
+                }
             }
         }
     }

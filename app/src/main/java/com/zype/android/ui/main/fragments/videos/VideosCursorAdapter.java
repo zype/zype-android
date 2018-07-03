@@ -12,6 +12,7 @@ import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
+import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
@@ -384,14 +385,15 @@ public class VideosCursorAdapter extends CursorAdapter {
     private void loadImage(final Context context, final Cursor cursor, final VideosViewHolder viewHolder) {
         final String thumbnailsString = cursor.getString(COL_VIDEO_THUMBNAILS);
         if (thumbnailsString != null) {
-            Type thumbnailType = new TypeToken<List<Thumbnail>>() {
-            }.getType();
+            Type thumbnailType = new TypeToken<List<Thumbnail>>() {}.getType();
             List<Thumbnail> thumbnails = (new Gson().fromJson(thumbnailsString, thumbnailType));
-            if (thumbnails.size() > 0) {
-                UiUtils.loadImage(context, thumbnails.get(1).getUrl(), R.drawable.placeholder_video, viewHolder.thumbnail, viewHolder.progressBarThumbnail);
+            Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(thumbnails, 240);
+            if (thumbnail != null) {
+                UiUtils.loadImage(thumbnail.getUrl(), R.drawable.outline_play_circle_filled_white_white_48, viewHolder.thumbnail);
             }
             else {
-                viewHolder.thumbnail.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.placeholder_video));
+                viewHolder.thumbnail.setImageDrawable(ContextCompat.getDrawable(context,
+                        R.drawable.outline_play_circle_filled_white_white_48));
             }
         }
     }

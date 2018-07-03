@@ -149,7 +149,7 @@ public class SubscribeOrLoginFragment extends Fragment {
     @Subscribe
     public void handleError(ErrorEvent event) {
         Logger.e("handleError()");
-        if (event.getEventData() == WebApiManager.Request.BIFROST) {
+        if (event.getEventData() == WebApiManager.Request.MARKETPLACE_CONNECT) {
             hideProgress();
             DialogHelper.showErrorAlert(getActivity(), getString(R.string.subscribe_or_login_error_validation));
         }

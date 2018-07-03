@@ -241,7 +241,7 @@ public class WebApiManager {
                 return new RefreshAccessTokenEvent(ticket, new RefreshAccessToken(mApi.authRefreshAccessToken(postParams)));
             case AUTH_RETRIEVE_ACCESS_TOKEN:
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
-            case BIFROST:
+            case MARKETPLACE_CONNECT:
                 MarketplaceConnectBody body = new MarketplaceConnectBody();
                 body.consumerId = postParams.get("consumer_id");
                 body.consumerToken = postParams.get("consumer_token");
@@ -340,7 +340,7 @@ public class WebApiManager {
     public enum Request {
         AUTH_REFRESH_ACCESS_TOKEN,
         AUTH_RETRIEVE_ACCESS_TOKEN,
-        BIFROST,
+        MARKETPLACE_CONNECT,
         PLAN,
         TOKEN_INFO,
         VIDEO_LATEST_GET,
@@ -421,8 +421,10 @@ public class WebApiManager {
 
     public class WorkerHandler extends Handler {
 
+        public static final int BAD_REQUEST = 400;
         public static final int UNAUTHORIZED = 401;
         public static final int FORBIDDEN = 403;
+        public static final int INTERNAL_SERVER_ERROR = 500;
         public static final int UNRESOLVED_HOST = 0;
         private static final int MSG_DO_JOB = 0;
         private Job mCurrentJob;
@@ -492,6 +494,10 @@ public class WebApiManager {
             }
             catch (RetrofitError err) {
                 int statusCode = (err.getResponse() != null) ? err.getResponse().getStatus() : UNRESOLVED_HOST;
+                if (statusCode == INTERNAL_SERVER_ERROR) {
+                    Log.e(TAG, "Request failed: " + job.getRequest(), err.getCause());
+                    return new ErrorEvent(job.getTicket(), job.getRequest(), "(" + statusCode + ") " + mContext.getString(R.string.GENERIC_ERROR), err);
+                }
                 ErrorBody errorBody = parseError(err);
                 if (statusCode == UNAUTHORIZED) {
 //                    BaseModel model = (BaseModel) err.getBodyAs(BaseModel.class);

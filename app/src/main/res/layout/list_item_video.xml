@@ -15,17 +15,20 @@
     <FrameLayout
         style="@style/thumbnail"
         android:id="@+id/layoutThumbnail"
+        android:background="@color/black_12"
         >
         <ImageView
             android:id="@+id/icon"
             style="@style/thumbnail"
-            tools:src="@drawable/placeholder_video"
+            android:scaleType="center"
+            tools:src="@drawable/outline_play_circle_filled_white_white_48"
             />
         <ProgressBar
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:id="@+id/progressBarThumbnail"
+            android:visibility="gone"
             />
         <ImageView
             android:layout_width="24dp"

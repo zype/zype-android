@@ -1323,7 +1323,6 @@ public class PlayerFragment extends BaseFragment implements
         return customDimensions;
     }
 
-
     //
     // 'PlayerControlView.IPlayerControlListener' implementation
     //

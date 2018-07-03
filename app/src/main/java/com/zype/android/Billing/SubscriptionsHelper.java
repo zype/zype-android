@@ -50,7 +50,7 @@ public class SubscriptionsHelper {
                         .addConsumerToken(SettingsProvider.getInstance().getAccessToken())
                         .addPlanId(subscription.getZypePlan().id)
                         .addPurchaseToken(item.getPurchaseToken());
-                apiManager.executeRequest(WebApiManager.Request.BIFROST, builder.build());
+                apiManager.executeRequest(WebApiManager.Request.MARKETPLACE_CONNECT, builder.build());
             }
         }
     }

@@ -138,7 +138,7 @@ public class SubscribeOrLoginActivity extends BaseActivity {
     @Subscribe
     public void handleError(ErrorEvent event) {
         Logger.e("handleError()");
-        if (event.getEventData() == WebApiManager.Request.BIFROST) {
+        if (event.getEventData() == WebApiManager.Request.MARKETPLACE_CONNECT) {
             hideProgress();
             RetrofitError error = event.getError();
             if (error != null) {

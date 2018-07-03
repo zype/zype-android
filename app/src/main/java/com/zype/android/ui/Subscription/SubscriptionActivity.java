@@ -341,7 +341,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     // Event bus listeners
     //
     @Subscribe
-    public void handleBifrost(MarketplaceConnectEvent event) {
+    public void handleMarketplaceConnect(MarketplaceConnectEvent event) {
         hideProgress();
         // TODO: Check response data to properly update subscription count
         SettingsProvider.getInstance().saveSubscriptionCount(1);
@@ -352,7 +352,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     @Subscribe
     public void handleError(ErrorEvent event) {
         Logger.e("handleError()");
-        if (event.getEventData() == WebApiManager.Request.BIFROST) {
+        if (event.getEventData() == WebApiManager.Request.MARKETPLACE_CONNECT) {
             hideProgress();
             DialogHelper.showErrorAlert(this, getString(R.string.subscribe_or_login_error_validation));
         }
