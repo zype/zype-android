@@ -168,12 +168,21 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
 
     private void updateLockIcon(ViewHolder holder) {
         if (holder.item instanceof Video) {
+            holder.imageLocked.setVisibility(View.VISIBLE);
             Video video = (Video) holder.item;
-            if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
-                holder.imageLocked.setVisibility(GONE);
+            if (AuthHelper.isVideoRequiredAuthorization(holder.view.getContext(), video.id)) {
+                if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
+                    holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
+                    holder.imageLocked.setColorFilter(ContextCompat.getColor(holder.view.getContext(),
+                            R.color.icon_unlocked));
+                } else {
+                    holder.imageLocked.setImageResource(R.drawable.baseline_lock_white_18);
+                    holder.imageLocked.setColorFilter(ContextCompat.getColor(holder.view.getContext(),
+                            R.color.icon_locked));
+                }
             }
             else {
-                holder.imageLocked.setVisibility(View.VISIBLE);
+                holder.imageLocked.setVisibility(GONE);
             }
         }
         else {

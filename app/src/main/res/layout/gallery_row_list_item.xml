@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:id="@+id/imageLocked"
-            android:src="@drawable/outline_lock_white_18"
+            android:src="@drawable/baseline_lock_white_18"
             />
         <FrameLayout
             android:layout_width="match_parent"

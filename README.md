@@ -112,6 +112,8 @@ An example of fully functional app that is using a Zype sandbox account.
 
 > #### Optional
 
+**4.** Check out [this guide](https://github.com/zype/zype-android/blob/master/UI.md) for additional UI customization options.
+
 **5.** Update your social network ids in [ZypeSettings.java](https://github.com/zype/zype-android/blob/master/app/src/template/java/com/zype/android/ZypeSettings.java)
 
 **6.** To use Google Analytics:

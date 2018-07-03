@@ -24,6 +24,24 @@ public class AuthHelper {
         return SettingsProvider.getInstance().isLoggedIn();
     }
 
+    public static boolean isVideoRequiredAuthorization(Context context, String videoId) {
+        boolean result = false;
+
+        Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
+        if (video == null) {
+            return false;
+        }
+        if (Integer.valueOf(video.purchaseRequired) == 1) {
+            return true;
+        }
+        if (Integer.valueOf(video.subscriptionRequired) == 1) {
+            return true;
+        }
+
+        return result;
+
+    }
+
     public static boolean isVideoAuthorized(Context context, String videoId) {
         boolean result = true;
 
