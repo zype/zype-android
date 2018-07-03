@@ -13,6 +13,15 @@ public class ZypeSettings {
     // Playlist
     public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
 
+//    // Zype app key
+//    public static final String APP_KEY = "DV8vhDumvxPh2ieCfjOzuQQdn0zSOZ-otnGALBnzFAqtIO-feZbsSwKXy3DA_JhK";
+//    // OAuth credentials
+//    public static final String CLIENT_ID = "fb40dd8a2bc4ae7c7d66054936f185b04d21b8165990ed27c3d64eaaa9146bb6";
+//    public static final String CLIENT_SECRET = "068b42f2487e00dde76707668a9edd9dd2fe16e3b5c34ac450419bf43c61034e";
+//    // Playlist
+//    public static final String ROOT_PLAYLIST_ID = "5807ccdc849e2d0d11000146";
+
+
     // Google Analytics Tracking Id
     public static final String GA_TRACKING_ID = "";
 

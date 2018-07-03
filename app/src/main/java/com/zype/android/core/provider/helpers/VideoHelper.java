@@ -3,6 +3,7 @@ package com.zype.android.core.provider.helpers;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.utils.Logger;
@@ -331,4 +332,22 @@ public class VideoHelper {
         }
     }
 
+    public static Thumbnail getThumbnailByHeight(Video video, int height) {
+        Thumbnail result = null;
+        Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
+        List<Thumbnail> thumbnails = new Gson().fromJson(video.thumbnails, thumbnailType);
+        if (thumbnails != null && thumbnails.size() > 0) {
+            for (Thumbnail thumbnail : thumbnails) {
+                if (result == null) {
+                    result = thumbnail;
+                }
+                else {
+                    if (Math.abs(height - thumbnail.getHeight()) < Math.abs(height - result.getHeight())) {
+                        result = thumbnail;
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }

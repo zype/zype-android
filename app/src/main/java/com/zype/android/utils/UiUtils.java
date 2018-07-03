@@ -14,6 +14,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.zype.android.R;
@@ -30,6 +32,13 @@ public class UiUtils {
 
     public static boolean isLandscapeOrientation(Activity activity) {
         return (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
+    }
+
+    public static void loadImage(@Nullable String url, int placeholderRes, @NonNull ImageView view) {
+        Glide.with(view.getContext())
+                .load(url)
+                .apply(RequestOptions.centerCropTransform())
+                .into(view);
     }
 
     public static void loadImage(@Nullable final Context context, @Nullable final String imgUrl, @Nullable final ImageView img) {

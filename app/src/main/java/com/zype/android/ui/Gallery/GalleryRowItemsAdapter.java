@@ -22,6 +22,7 @@ import com.zype.android.Db.Entity.PlaylistItem;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
@@ -127,11 +128,11 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
         if (holder.item instanceof Video) {
             Video video = (Video) holder.item;
             if (video.thumbnails != null) {
-                Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
-                List<Thumbnail> thumbnails = new Gson().fromJson(video.thumbnails, thumbnailType);
-                if (thumbnails.size() > 0) {
-                    UiUtils.loadImage(holder.view.getContext(), thumbnails.get(1).getUrl(),
-                            R.drawable.outline_play_circle_filled_white_white_48, holder.imageThumbnail, null);
+                Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 240);
+                if (thumbnail != null) {
+                    UiUtils.loadImage(thumbnail.getUrl(), R.drawable.outline_play_circle_filled_white_white_48, holder.imageThumbnail);
+//                    UiUtils.loadImage(holder.view.getContext(), thumbnail.getUrl(),
+//                            R.drawable.outline_play_circle_filled_white_white_48, holder.imageThumbnail, null);
                 }
                 else {
                     holder.imageThumbnail.setImageDrawable(ContextCompat.getDrawable(holder.view.getContext(),
