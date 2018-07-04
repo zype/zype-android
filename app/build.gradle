@@ -40,7 +40,7 @@ android {
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
     def zypeTemplateVersion = "1.12.2"
 
-    compileSdkVersion 27
+    compileSdkVersion 28
     buildToolsVersion '27.0.3'
 
     dexOptions {
@@ -48,7 +48,7 @@ android {
     }
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 28
         multiDexEnabled true
         versionCode currentCodeVersion
         buildConfigField "String", "ZYPE_TEMPLATE_VERSION", "\"${zypeTemplateVersion}\""
@@ -141,13 +141,17 @@ dependencies {
     androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.4.1'
     implementation project(':CastCompanionLibrary')
 //    compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.9.1'
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'com.android.support:support-v4:27.1.1'
-    implementation 'com.android.support:cardview-v7:27.1.1'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.android.support:mediarouter-v7:27.1.1'
-    implementation 'com.android.support:customtabs:27.1.1'
+
+    // Support library
+//    def androidSupportVersion = "27.1.1"
+    def androidSupportVersion = "28.0.0-alpha3"
+    implementation "com.android.support:appcompat-v7:$androidSupportVersion"
+    implementation "com.android.support:design:$androidSupportVersion"
+    implementation "com.android.support:support-v4:$androidSupportVersion"
+    implementation "com.android.support:cardview-v7:$androidSupportVersion"
+    implementation "com.android.support:recyclerview-v7:$androidSupportVersion"
+    implementation "com.android.support:mediarouter-v7:$androidSupportVersion"
+    implementation "com.android.support:customtabs:$androidSupportVersion"
 
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 

@@ -53,6 +53,8 @@
         app:itemIconTint="@color/bottom_navigation"
         app:itemTextColor="@color/bottom_navigation"
         app:layout_behavior="com.zype.android.ui.Widget.BottomNavigationBehavior"
+        app:labelVisibilityMode="labeled"
+        app:elevation="2dp"
         />
 </android.support.design.widget.CoordinatorLayout>
 
