@@ -18,6 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:id="@+id/toolbar"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             />
 
 <!--
@@ -49,7 +50,7 @@
         android:layout_gravity="bottom"
         android:id="@+id/navigation"
         app:menu="@menu/menu_navigation"
-        app:itemBackground="@color/colorPrimaryWhite"
+        app:itemBackground="?attr/colorPrimary"
         app:itemIconTint="@color/bottom_navigation"
         app:itemTextColor="@color/bottom_navigation"
         app:layout_behavior="com.zype.android.ui.Widget.BottomNavigationBehavior"

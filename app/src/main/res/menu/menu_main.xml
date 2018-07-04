@@ -4,7 +4,7 @@
     <item
         android:id="@+id/menuMainSearch"
         android:title="@string/menu_main_search"
-        android:icon="@drawable/baseline_search_black_24"
+        android:icon="@drawable/baseline_search_24"
         app:showAsAction="always"
         />
 </menu>
