@@ -77,7 +77,7 @@
                 android:shrinkColumns="*"
                 />
             <com.zype.android.ui.video_details.VideoDetailPager
-                android:id="@+id/pager"
+                android:id="@+id/pagerSections"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />

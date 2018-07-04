@@ -126,6 +126,12 @@
     <!-- Main -->
     <string name="main_tab_my_library">My library</string>
 
+    <string name="menu_main_search">Search</string>
+    <string name="menu_navigation_downloads">Downloads</string>
+    <string name="menu_navigation_favorites">Favorites</string>
+    <string name="menu_navigation_home">Home</string>
+    <string name="menu_navigation_settings">Settings</string>
+
     <!-- My library -->
     <string name="my_library_error_empty">You have not purchased any videos.\n
         Any videos you purchase will automatically appear in your library.</string>

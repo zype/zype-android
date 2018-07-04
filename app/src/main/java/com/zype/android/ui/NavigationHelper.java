@@ -21,6 +21,7 @@ import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
 import com.zype.android.ui.main.fragments.videos.VideosActivity;
+import com.zype.android.ui.search.SearchActivity;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
@@ -136,6 +137,11 @@ public class NavigationHelper {
 
     public void switchToIntroScreen(Activity activity) {
         Intent intent = new Intent(activity, IntroActivity.class);
+        activity.startActivity(intent);
+    }
+
+    public void switchToSearchScreen(Activity activity) {
+        Intent intent = new Intent(activity, SearchActivity.class);
         activity.startActivity(intent);
     }
 

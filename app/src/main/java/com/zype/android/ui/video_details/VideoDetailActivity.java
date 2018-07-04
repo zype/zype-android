@@ -40,14 +40,11 @@ import com.zype.android.webapi.model.zobjects.ZobjectData;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -172,7 +169,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         getSupportActionBar().setTitle(VideoHelper.getFullData(getContentResolver(), mVideoId).getTitle());
 
         VideoDetailPagerAdapter videoDetailPagerAdapter = new VideoDetailPagerAdapter(this, getSupportFragmentManager(), mVideoId);
-        mViewPager = findViewById(R.id.pager);
+        mViewPager = findViewById(R.id.pagerSections);
         mViewPager.setAdapter(videoDetailPagerAdapter);
         mTabLayout = findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(mViewPager);

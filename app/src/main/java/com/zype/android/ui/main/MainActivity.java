@@ -2,8 +2,12 @@ package com.zype.android.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,6 +29,7 @@ import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.Widget.CustomViewPager;
 import com.zype.android.ui.base.BaseActivity;
+import com.zype.android.ui.main.Model.Section;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.main.fragments.videos.VideosActivity;
 import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
@@ -51,31 +56,43 @@ import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.File;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MainActivity extends BaseActivity implements OnMainActivityFragmentListener, OnVideoItemAction, OnLoginAction,
-                                                    BillingManager.BillingUpdatesListener {
+public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
+        OnMainActivityFragmentListener, OnVideoItemAction, OnLoginAction,
+        BillingManager.BillingUpdatesListener {
+
+    CustomViewPager pagerSections;
+    Map<Integer, Section> sections;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        setTitle(R.string.menu_navigation_home);
 
-        CustomViewPager viewPager = findViewById(R.id.pager);
-        viewPager.setAdapter(mSectionsPagerAdapter);
-        if (ZypeConfiguration.playlistGalleryView(this)) {
-            viewPager.setSwipeEnabled(false);
-        }
+        setupNavigation();
+        SectionsPagerAdapter adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            TabLayout.Tab tab = tabLayout.getTabAt(i);
-            tab.setCustomView(mSectionsPagerAdapter.getTabView(i));
-        }
+        pagerSections = findViewById(R.id.pagerSections);
+        pagerSections.setAdapter(adapterSections);
+        pagerSections.setSwipeEnabled(false);
 
+        BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+
+//        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+//        tabLayout.setupWithViewPager(pagerSections);
+//        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+//            TabLayout.Tab tab = tabLayout.getTabAt(i);
+//            tab.setCustomView(adapterSections.getTabView(i));
+//        }
+//
         SettingsParamsBuilder settingsParamsBuilder = new SettingsParamsBuilder();
         getApi().executeRequest(WebApiManager.Request.GET_SETTINGS, settingsParamsBuilder.build());
 
@@ -90,6 +107,49 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 //        if (SettingsProvider.getInstance().isLogined()) {
 //            requestConsumerData();
 //        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuMainSearch:
+                NavigationHelper.getInstance(this).switchToSearchScreen(this);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setupNavigation() {
+        sections = new HashMap<>();
+        sections.put(R.id.menuNavigationHome, new Section(0, getString(R.string.menu_navigation_home)));
+        sections.put(R.id.menuNavigationFavorites, new Section(1, getString(R.string.menu_navigation_favorites)));
+        sections.put(R.id.menuNavigationDownloads, new Section(2, getString(R.string.menu_navigation_downloads)));
+        sections.put(R.id.menuNavigationSettings, new Section(3, getString(R.string.menu_navigation_settings)));
+    }
+
+    //
+    // 'BottomNavigationView.OnNavigationItemSelectedListener' implementation
+    //
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuNavigationHome:
+            case R.id.menuNavigationFavorites:
+            case R.id.menuNavigationDownloads:
+            case R.id.menuNavigationSettings:
+                Section section = sections.get(item.getItemId());
+                pagerSections.setCurrentItem(section.position);
+                setTitle(section.title);
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -281,7 +341,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 //    @Override
 //    public void openVideoFragment(String url) {
 //        Logger.d("openVideoFragment " + url);
-////        LatestFragment f = (LatestFragment) mSectionsPagerAdapter.getItem(0);
+////        LatestFragment f = (LatestFragment) adapterPager.getItem(0);
 ////        f.showVideoFragment(url);
 //    }
 
