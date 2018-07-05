@@ -102,6 +102,10 @@
     <string name="dialog_login_message">You do not have access to this video. Please sign in with your account to watch this video.</string>
     <string name="dialog_login_button_login">Sign in</string>
 
+    <!-- Favorites -->
+    <string name="favorites_empty_title">It looks like you haven’t added any videos to Favorites yet</string>
+    <string name="favorites_empty_message">You can save your favorite videos in this section by clicking on the Favorite star icon for any individual video.</string>
+
     <!-- Gallery -->
     <string name="gallery_hero_image_error_playlist">We’re sorry, that playlist cannot be found.</string>
 

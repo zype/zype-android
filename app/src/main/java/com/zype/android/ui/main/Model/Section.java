@@ -7,8 +7,7 @@ public class Section {
     public int position;
     public String title;
 
-    public Section(int position, String title) {
-        this.position = position;
+    public Section(String title) {
         this.title = title;
     }
 }

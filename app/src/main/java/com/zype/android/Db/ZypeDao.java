@@ -12,6 +12,7 @@ import com.zype.android.Db.Entity.Video;
 
 import java.util.List;
 
+import static android.arch.persistence.room.OnConflictStrategy.IGNORE;
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
 /**
@@ -48,7 +49,7 @@ public interface ZypeDao {
     @Query("SELECT * FROM video WHERE video._id = :videoId LIMIT 1")
     public Video getVideoSync(String videoId);
 
-    @Insert(onConflict = REPLACE)
+    @Insert(onConflict = IGNORE)
     public void insertVideos(List<Video> videos);
 
 }

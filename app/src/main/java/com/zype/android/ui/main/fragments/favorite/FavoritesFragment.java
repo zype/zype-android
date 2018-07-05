@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -49,7 +50,8 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     private static final int LOADER_FAVORITE_VIDEO = 0;
 
     private ListView listFavorites;
-    private TextView textEmpty;
+//    private TextView textEmpty;
+    private LinearLayout layoutEmpty;
 
     private LoaderManager loaderManager;
     private VideosCursorAdapter adapter;
@@ -70,24 +72,26 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.fragment_favorites, null);
+
+        layoutEmpty = rootView.findViewById(R.id.layoutEmpty);
 
         adapter = new VideosCursorAdapter(getActivity(), CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, onVideoItemActionListener, onLoginListener);
-        View view = inflater.inflate(R.layout.fragment_favorites, null);
-        listFavorites = (ListView) view.findViewById(R.id.listFavorites);
-        textEmpty = (TextView) view.findViewById(R.id.empty);
-        listFavorites.setEmptyView(textEmpty);
+        listFavorites = rootView.findViewById(R.id.listFavorites);
+//        textEmpty = (TextView) view.findViewById(R.id.empty);
+//        listFavorites.setEmptyView(layoutEmpty);
         listFavorites.setOnItemClickListener(this);
         listFavorites.setAdapter(adapter);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                updateTextEmpty();
+//                updateTextEmpty();
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
 
-        return view;
+        return rootView;
     }
 
     @Override
@@ -140,7 +144,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     @Override
     public void onResume() {
         super.onResume();
-        updateTextEmpty();
+//        updateTextEmpty();
         if (ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())) {
            if (SettingsProvider.getInstance().isLoggedIn()) {
                 requestConsumerFavoriteVideo(1);
@@ -156,14 +160,14 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     // //////////
     // UI
     //
-    private void updateTextEmpty() {
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            textEmpty.setText(SettingsProvider.getInstance().getNoFavoritesMessage());
-        }
-        else {
-            textEmpty.setText(SettingsProvider.getInstance().getNoFavoritesMessageNotLoggedIn());
-        }
-    }
+//    private void updateTextEmpty() {
+//        if (SettingsProvider.getInstance().isLoggedIn()) {
+//            textEmpty.setText(SettingsProvider.getInstance().getNoFavoritesMessage());
+//        }
+//        else {
+//            textEmpty.setText(SettingsProvider.getInstance().getNoFavoritesMessageNotLoggedIn());
+//        }
+//    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -208,12 +212,13 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor != null && cursor.getCount() > 0) {
-            textEmpty.setVisibility(View.GONE);
-        } else {
-            textEmpty.setVisibility(View.VISIBLE);
-        }
         adapter.changeCursor(cursor);
+        if (cursor != null && cursor.getCount() > 0) {
+            layoutEmpty.setVisibility(View.GONE);
+        }
+        else {
+            layoutEmpty.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
