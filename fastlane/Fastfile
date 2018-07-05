@@ -15,24 +15,101 @@
 
 default_platform(:android)
 
+# app_version_code = 1
+# app_version_name = "1.0.0"
+
+default_apk_path = "../app/build/outputs/apk/template/release/"
+
+# Code signing fields - UPDATE THESE FIELDS
+keystore_name = "android"       # name of your keystore
+alias_name = "android-fastlane" # alias for keystore
+store_password = "password"     # password to access keystore
+key_password = "password"       # password to read the key in keystore
+
+# Path to Java keystore for signing. Created in /fastlane file by default
+keystore_path = Dir.pwd + "/" + keystore_name + ".jks"
+
 platform :android do
-  desc "Runs all the tests"
-  lane :test do
-    gradle(task: "test")
+  desc "Create keystore for signing. Saved in /fastlane"
+  lane :create_keystore do |options|
+    system("keytool -genkeypair -v -keystore " + (options[:keystore_name] || keystore_name) + ".jks -alias " + (options[:alias_name] || alias_name) + " -keyalg RSA -keysize 2048 -validity 10000 -storepass \'" + (options[:store_password] || store_password) + "\' -keypass \'" + (options[:key_password] || key_password) + "\'")
   end
 
-  desc "Submit a new Beta Build to Crashlytics Beta"
-  lane :beta do
-    gradle(task: "clean assembleRelease")
-    crashlytics
+  desc "Build release APK. Accepts:"
+  desc "\tkeystore_path  - (Optional) path to your keystore"
+  desc "\talias_name     - (Optional) alias for your keystore"
+  desc "\tstore_password - (Optional) password to access keystore"
+  desc "\tkey_password   - (Optional) password to read key"
+  lane :build_apk do |options|
+    sh("brew list gradle || brew install gradle")
+    sh("cd .. && gradle wrapper")
 
-    # sh "your_script.sh"
-    # You can also use other beta testing services here
+    gradle(
+      task: "assemble",
+      flavor: "Template",
+      build_type: "Release",
+      properties: {
+        # "versionCode" => app_version_code,
+        # "versionName" => app_version_name,
+        "android.injected.signing.store.file" => options[:keystore_path] || keystore_path,
+        "android.injected.signing.store.password" => options[:store_password] || store_password,
+        "android.injected.signing.key.alias" => options[:alias_name] || alias_name,
+        "android.injected.signing.key.password" => options[:key_password] || key_password
+      }
+    )
   end
 
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
+  desc "Create keystore and apk"
+  desc "\tkeystore_name  - (Optional) name of keystore file"
+  desc "\talias_name     - (Optional) alias for your keystore"
+  desc "\tstore_password - (Optional) password to access keystore"
+  desc "\tkey_password   - (Optional) password to read key"
+  lane :create_key_and_apk do |options|
+    create_keystore(
+      keystore_name: options[:keystore_name],
+      alias_name: options[:alias_name],
+      store_password: options[:store_password],
+      key_password: options[:key_password]
+    )
+
+    if options[:keystore_name]
+      keystore_path = Dir.pwd + "/" + options[:keystore_name] + ".jks"
+    end
+    build_apk(
+      keystore_path: keystore_path,
+      alias_name: options[:alias_name],
+      store_password: options[:store_password],
+      key_password: options[:key_password]
+    )
+  end
+
+  desc "Upload APK to Play Store. Accepts:"
+  desc "\ttrack    - (Optional) stage you are at: production(default), beta, alpha, internal"
+  desc "\tapk_path - (Optional) relative path to the APK you want to upload"
+  desc "\t           uses default path otherwise (app/build/outputs/apk/template/release/*.apk)"
+  lane :upload_apk do |options|
+    # Select track to upload to. production is default track
+    release_track = "production"
+    if options[:track]
+      if options[:track] === "production" || options[:track] === "beta" || options[:track] === "alpha" || options[:track] === "internal"
+        release_track = options[:track]
+      end
+    end
+
+    # Upload to Google Play
+    if options[:apk_path]
+      upload_to_play_store(
+        track: release_track,
+        apk: options[:apk_path]
+      )
+    else
+      apk_paths = Dir[default_apk_path + "*.apk"]
+      apk_path = apk_paths[0].gsub("../", "")
+
+      upload_to_play_store(
+        track: release_track,
+        apk: apk_path
+      )
+    end
   end
 end
