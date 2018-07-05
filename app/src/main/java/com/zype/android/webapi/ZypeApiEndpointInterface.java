@@ -25,6 +25,7 @@ import com.zype.android.webapi.model.settings.ContentSettings;
 import com.zype.android.webapi.model.settings.LiveStreamSettings;
 import com.zype.android.webapi.model.settings.Settings;
 import com.zype.android.webapi.model.video.Video;
+import com.zype.android.webapi.model.video.VideoList;
 import com.zype.android.webapi.model.zobjects.ZObject;
 
 import java.util.HashMap;
@@ -58,11 +59,11 @@ public interface ZypeApiEndpointInterface {
     @GET("/oauth/token/info/")
     TokenInfo getTokenInfo(@Query("access_token") String accessToken);
 
-    @GET("/videos/")
-    Video getVideo(@Query("id") String id, @Query("api_key") String apiKey);
+    @GET("/videos/{video_id}")
+    Video getVideo(@Path("video_id") String videoId, @QueryMap HashMap<String, String> getParams);
 
     @GET("/videos/")
-    Video getVideoList(@QueryMap Map<String, String> getParams);
+    VideoList getVideoList(@QueryMap Map<String, String> getParams);
 
     @GET("/videos/")
     Search getSearchVideo(@QueryMap HashMap<String, String> getParams);
@@ -114,7 +115,7 @@ public interface ZypeApiEndpointInterface {
     @GET("/plans/{plan_id}")
     Plan getPlan(@Path("plan_id") String planId, @QueryMap HashMap<String, String> getParams);
 
-    // Video entitlements
+    // VideoList entitlements
     @GET("/videos/{video_id}/entitled/")
     VideoEntitlement checkVideoEntitlement(@Path("video_id") String videoId, @QueryMap HashMap<String, String> getParams);
 
@@ -146,6 +147,6 @@ public interface ZypeApiEndpointInterface {
     Playlist getPlaylists(@QueryMap HashMap<String, String> getParams);
 
     @GET("/playlists/{playlist_id}/videos")
-    Video getVideosFromPlaylist(@Path("playlist_id") String playlistId, @QueryMap Map<String, String> getParams);
+    VideoList getVideosFromPlaylist(@Path("playlist_id") String playlistId, @QueryMap Map<String, String> getParams);
 
 }

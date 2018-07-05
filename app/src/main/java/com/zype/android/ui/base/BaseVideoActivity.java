@@ -28,6 +28,8 @@ import com.google.android.libraries.cast.companionlibrary.cast.exceptions.NoConn
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.google.android.libraries.cast.companionlibrary.cast.player.VideoCastController;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
@@ -294,17 +296,23 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     private void showFragment(Fragment fragment) {
-        if (mInterface != null) {
-            mInterface.stop();
+        Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+        if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
+            if (mInterface != null) {
+                mInterface.stop();
+            }
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            mInterface = (MediaControlInterface) fragment;
+            if (mInterface == null) {
+                throw new IllegalStateException("mInterface is null");
+            }
+            fragmentTransaction.replace(R.id.video_container, fragment, FRAGMENT_TAG_PLAYER);
+            fragmentTransaction.commit();
         }
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        mInterface = (MediaControlInterface) fragment;
-        if (mInterface == null) {
-            throw new IllegalStateException("mInterface is null");
+        else {
+            Logger.i("showFragment(): VideoList " + mVideoId + "is live event and isn't  on air yet.");
         }
-        fragmentTransaction.replace(R.id.video_container, fragment, FRAGMENT_TAG_PLAYER);
-        fragmentTransaction.commit();
     }
 
     protected void requestVideoUrl(String videoId) {
@@ -720,8 +728,11 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             Logger.e("VideoId is empty !!");// но тут должен быть путь
         }
         if (mType == TYPE_WEB) {
+            Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
             if (AuthHelper.isVideoAuthorized(this, mVideoId)) {
-                requestVideoUrl(mVideoId);
+                if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
+                    requestVideoUrl(mVideoId);
+                }
             }
         }
     }

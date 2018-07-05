@@ -3,11 +3,14 @@ package com.zype.android;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 
+import com.google.gson.Gson;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.Db.ZypeDb;
+import com.zype.android.webapi.model.video.VideoData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**

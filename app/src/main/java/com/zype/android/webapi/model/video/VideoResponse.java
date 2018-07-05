@@ -3,9 +3,7 @@ package com.zype.android.webapi.model.video;
 import com.zype.android.webapi.model.DataModel;
 
 /**
- * @author vasya
- * @version 1
- *          date 6/29/15
+ * Created by Evgeny Cherkasov on 05.07.2018
  */
 public class VideoResponse extends DataModel<Video> {
     public VideoResponse(Video data) {

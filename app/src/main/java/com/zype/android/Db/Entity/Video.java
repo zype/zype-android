@@ -111,6 +111,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "is_play_finished")
     public Integer isPlayFinished;
 
+    @ColumnInfo(name = "is_zype_live")
+    public Integer isZypeLive;
+
     @ColumnInfo(name = "keywords")
     public String keywords;
 

@@ -9,7 +9,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,36 +21,26 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
-import com.zype.android.ZypeConfiguration;
-import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
-import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.main.fragments.videos.VideosCursorAdapter;
 import com.zype.android.ui.video_details.VideoDetailActivity;
-import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
-import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.builder.EntitlementsParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
-import com.zype.android.webapi.events.ErrorEvent;
-import com.zype.android.webapi.events.consumer.ConsumerFavoriteVideoEvent;
 import com.zype.android.webapi.events.entitlements.VideoEntitlementsEvent;
-import com.zype.android.webapi.events.video.RetrieveVideoEvent;
-import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideo;
-import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
+import com.zype.android.webapi.events.video.VideoListEvent;
 import com.zype.android.webapi.model.entitlements.VideoEntitlementData;
 import com.zype.android.webapi.model.entitlements.VideoEntitlements;
 import com.zype.android.webapi.model.video.Pagination;
-import com.zype.android.webapi.model.video.Video;
+import com.zype.android.webapi.model.video.VideoList;
 import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.ArrayList;
@@ -305,15 +294,15 @@ public class MyLibraryFragment extends BaseFragment implements ListView.OnItemCl
             for (String videoId : videoEntitlements.keySet()) {
                 VideoParamsBuilder builder = new VideoParamsBuilder()
                         .addVideoId(videoId);
-                getApi().executeRequest(WebApiManager.Request.VIDEO_LATEST_GET, builder.build());
+                getApi().executeRequest(WebApiManager.Request.VIDEO_LIST, builder.build());
             }
         }
     }
 
     @Subscribe
-    public void handleRetrieveVideo(RetrieveVideoEvent event) {
+    public void handleRetrieveVideo(VideoListEvent event) {
         Logger.d("handleRetrieveVideo(): size=" + event.getEventData().getModelData().getVideoData().size());
-        Video data = event.getEventData().getModelData();
+        VideoList data = event.getEventData().getModelData();
         if (data.getVideoData().size() > 0) {
             for (VideoData item : data.getVideoData()) {
                 if (videoEntitlements.containsKey(item.getId())) {

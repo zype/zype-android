@@ -67,7 +67,7 @@ public class TestZObject extends ActivityInstrumentationTestCase2<ActivityForTes
             public void run() {
                 ZObjectParamsBuilder builder = new ZObjectParamsBuilder()
                         .addType(ZObjectParamsBuilder.TYPE_GUEST);
-                mApi.executeRequest(WebApiManager.Request.VIDEO_LATEST_GET, builder.build());
+                mApi.executeRequest(WebApiManager.Request.VIDEO_LIST, builder.build());
             }
         });
         assertTrue(mLock.await(TEST_FAIL_TIME, TimeUnit.MILLISECONDS));
@@ -101,7 +101,7 @@ public class TestZObject extends ActivityInstrumentationTestCase2<ActivityForTes
             public void run() {
                 ZObjectParamsBuilder builder = new ZObjectParamsBuilder()
                         .addType(ZObjectParamsBuilder.TYPE_CONTENT);
-                mApi.executeRequest(WebApiManager.Request.VIDEO_LATEST_GET, builder.build());
+                mApi.executeRequest(WebApiManager.Request.VIDEO_LIST, builder.build());
             }
         });
         assertTrue(mLock.await(TEST_FAIL_TIME, TimeUnit.MILLISECONDS));

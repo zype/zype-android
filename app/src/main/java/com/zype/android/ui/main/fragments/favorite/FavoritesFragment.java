@@ -16,12 +16,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -35,11 +33,11 @@ import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.consumer.ConsumerFavoriteVideoEvent;
-import com.zype.android.webapi.events.video.RetrieveVideoEvent;
+import com.zype.android.webapi.events.video.VideoListEvent;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideo;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.video.Pagination;
-import com.zype.android.webapi.model.video.Video;
+import com.zype.android.webapi.model.video.VideoList;
 import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.ArrayList;
@@ -241,14 +239,14 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
         for (ConsumerFavoriteVideoData item : favorite.getResponse()) {
             VideoParamsBuilder builder = new VideoParamsBuilder()
                     .addVideoId(item.getVideoId());
-            getApi().executeRequest(WebApiManager.Request.VIDEO_LATEST_GET, builder.build());
+            getApi().executeRequest(WebApiManager.Request.VIDEO_LIST, builder.build());
         }
     }
 
     @Subscribe
-    public void handleRetrieveVideo(RetrieveVideoEvent event) {
+    public void handleRetrieveVideo(VideoListEvent event) {
         Logger.d("handleRetrieveVideo(): size=" + event.getEventData().getModelData().getVideoData().size());
-        Video data = event.getEventData().getModelData();
+        VideoList data = event.getEventData().getModelData();
         if (data.getVideoData().size() > 0) {
             for (VideoData item : data.getVideoData()) {
                 if (!TextUtils.isEmpty(DataHelper.getFavoriteId(getActivity().getContentResolver(), item.getId()))) {

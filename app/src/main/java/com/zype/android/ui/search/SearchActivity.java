@@ -319,9 +319,9 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
             String[] selectionArgs;
             switch (tab) {
                 case 0:
-//                    selection = Contract.Video.COLUMN_KEYWORDS + " LIKE ? OR " +
-//                            Contract.Video.COLUMN_TITLE + " LIKE ? OR " +
-//                            Contract.Video.COLUMN_DESCRIPTION + " LIKE ?";
+//                    selection = Contract.VideoList.COLUMN_KEYWORDS + " LIKE ? OR " +
+//                            Contract.VideoList.COLUMN_TITLE + " LIKE ? OR " +
+//                            Contract.VideoList.COLUMN_DESCRIPTION + " LIKE ?";
                     selectionArgs = new String[]{searchString, searchString, searchString};
                     selection = Contract.Video.COLUMN_TITLE + " LIKE ? ";
                     selectionArgs = new String[] { searchString };

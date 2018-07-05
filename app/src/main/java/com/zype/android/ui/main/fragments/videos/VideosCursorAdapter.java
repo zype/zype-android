@@ -294,7 +294,7 @@ public class VideosCursorAdapter extends CursorAdapter {
                                 case ITEM_DOWNLOAD_VIDEO:
                                     mOnVideoItemAction.onDownloadVideo(viewHolder.videoId);
                                     event = new HitBuilders.EventBuilder()
-                                            .setAction("Download Video")
+                                            .setAction("Download VideoList")
                                             .setLabel("id=" + viewHolder.videoId)
                                             .build();
                                     break;
@@ -310,7 +310,7 @@ public class VideosCursorAdapter extends CursorAdapter {
                                     FileUtils.deleteVideoFile(viewHolder.videoId, context);
                                     DataHelper.setVideoDeleted(context.getContentResolver(), viewHolder.videoId);
                                     event = new HitBuilders.EventBuilder()
-                                            .setAction("Delete Downloaded Video")
+                                            .setAction("Delete Downloaded VideoList")
                                             .setLabel("id=" + viewHolder.videoId)
                                             .build();
                                     break;

@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.google.gson.Gson;
 import com.squareup.otto.Subscribe;
+import com.zype.android.DataHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
@@ -26,7 +26,7 @@ import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.PlaylistParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.playlist.PlaylistEvent;
-import com.zype.android.webapi.events.video.RetrieveVideoEvent;
+import com.zype.android.webapi.events.video.VideoListEvent;
 import com.zype.android.webapi.model.playlist.Playlist;
 import com.zype.android.webapi.model.playlist.PlaylistData;
 import com.zype.android.webapi.model.video.VideoData;
@@ -200,14 +200,15 @@ public class GalleryFragment extends Fragment {
     }
 
     @Subscribe
-    public void handleRetrieveVideo(RetrieveVideoEvent event) {
+    public void handleRetrieveVideo(VideoListEvent event) {
+        DataRepository repo = DataRepository.getInstance(getActivity().getApplication());
         List<VideoData> videoData = event.getEventData().getModelData().getVideoData();
         if (videoData != null) {
             Logger.d("handleRetrieveVideo(): size=" + videoData.size());
             if (videoData.size() > 0) {
-                DataRepository.getInstance(getActivity().getApplication()).insertVideos(videoDataToVideoEntity(videoData));
-                DataRepository.getInstance(getActivity().getApplication()).deletePlaylistVideos(event.getPlaylistId());
-                DataRepository.getInstance(getActivity().getApplication()).insertPlaylistVideos(videoDataToPlaylistVideoEntity(videoData, event.getPlaylistId()));
+                repo.insertVideos(DataHelper.videoDataToVideoEntity(videoData));
+                repo.deletePlaylistVideos(event.getPlaylistId());
+                repo.insertPlaylistVideos(videoDataToPlaylistVideoEntity(videoData, event.getPlaylistId()));
             }
         }
     }
@@ -226,48 +227,4 @@ public class GalleryFragment extends Fragment {
         return result;
     }
 
-    private List<Video> videoDataToVideoEntity(List<VideoData> videoData) {
-        List<Video> result = new ArrayList<>(videoData.size());
-        for (VideoData item : videoData) {
-            Video entity = new Video();
-            entity.id = item.getId();
-            entity.active = item.isActive() ? 1 : 0;
-            entity.category = new Gson().toJson(item.getCategories());
-            entity.country = item.getCountry();
-            entity.createdAt = item.getCreatedAt();
-            entity.crunchyrollId = item.getCrunchyrollId();
-            entity.description = (item.getDescription() == null) ? "" : item.getDescription();
-            entity.discoveryUrl = item.getDiscoveryUrl();
-            entity.duration = item.getDuration();
-            entity.episode = String.valueOf(item.getEpisode());
-            entity.expireAt = item.getExpireAt();
-            entity.featured = String.valueOf(item.isFeatured() ? 1 : 0);
-            entity.foreignId = item.getForeignId();
-            entity.huluId = item.getHuluId();
-            entity.keywords = new Gson().toJson(item.getKeywords());
-            entity.matureContent = String.valueOf(item.isMatureContent() ? 1 : 0);
-            entity.onAir = item.isOnAir() ? 1 : 0;
-            entity.publishedAt = item.getPublishedAt();
-            entity.purchaseRequired = String.valueOf(item.isPurchaseRequired() ? 1 : 0);
-            entity.rating = String.valueOf(item.getRating());
-            entity.relatedPlaylistIds = new Gson().toJson(item.getRelatedPlaylistIds());
-            entity.requestCount = String.valueOf(item.getRequestCount());
-            entity.season = item.getSeason();
-            entity.segments = new Gson().toJson(item.getSegments());
-            entity.shortDescription = item.getShortDescription();
-            entity.siteId = item.getSiteId();
-            entity.startAt = item.getStartAt();
-            entity.status = item.getStatus();
-            entity.subscriptionRequired = String.valueOf(item.isSubscriptionRequired() ? 1 : 0);
-            entity.thumbnails = new Gson().toJson(item.getThumbnails());
-            entity.title = item.getTitle();
-            entity.transcoded = item.isTranscoded() ? 1 : 0;
-            entity.updatedAt = item.getUpdatedAt();
-            entity.videoZObject = new Gson().toJson(item.getVideoZobjects());
-            entity.youtubeId = item.getYoutubeId();
-            entity.zobjectIds = new Gson().toJson(item.getZobjectIds());
-            result.add(entity);
-        }
-        return result;
-    }
 }

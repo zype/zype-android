@@ -68,6 +68,10 @@ public class VideoData {
     @Expose
     private String foreignId;
 
+    @SerializedName("is_zype_live")
+    @Expose
+    public boolean isZypeLive;
+
     @Nullable
     @Expose
     private List<String> keywords = new ArrayList<>();

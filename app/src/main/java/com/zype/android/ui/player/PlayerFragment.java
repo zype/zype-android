@@ -648,9 +648,10 @@ public class PlayerFragment extends BaseFragment implements
                 public void onRendererInitializationError(Exception e) {
                     Logger.e("onRendererInitializationError", e);
                     if (!WebApiManager.isHaveActiveNetworkConnection(getActivity())) {
-                        UiUtils.showErrorSnackbar(getView(), "Video is not available right now. " + getActivity().getString(R.string.connection_error));
-                    } else {
-                        UiUtils.showErrorSnackbar(getView(), "onRendererInitializationError");
+                        UiUtils.showErrorSnackbar(getView(), "VideoList is not available right now. " + getActivity().getString(R.string.connection_error));
+                    }
+                    else {
+//                        UiUtils.showErrorSnackbar(getView(), "onRendererInitializationError");
                     }
                     if (player.getPlaybackState() != ExoPlayer.STATE_ENDED) {
                         mListener.saveCurrentTimeStamp(player.getCurrentPosition());
@@ -686,9 +687,9 @@ public class PlayerFragment extends BaseFragment implements
                 public void onLoadError(int sourceId, IOException e) {
                     Logger.e("onLoadError", e);
                     if (!WebApiManager.isHaveActiveNetworkConnection(getActivity())) {
-                        UiUtils.showErrorSnackbar(getView(), "Video is not available right now. " + getActivity().getString(R.string.connection_error));
+                        UiUtils.showErrorSnackbar(getView(), "VideoList is not available right now. " + getActivity().getString(R.string.connection_error));
                     } else {
-                        UiUtils.showErrorSnackbar(getView(), "Video is not available right now");
+                        UiUtils.showErrorSnackbar(getView(), "VideoList is not available right now");
                     }
                     releasePlayer();
                 }

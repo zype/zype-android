@@ -2,6 +2,8 @@ package com.zype.android.ui.video_details;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;
@@ -39,8 +41,10 @@ import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.webapi.model.zobjects.ZobjectData;
 
 import android.app.Activity;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
@@ -65,6 +69,8 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     private FrameLayout layoutImage;
     private ImageView imageVideo;
 
+    VideoViewModel videoViewModel;
+
     public static void startActivity(Activity activity, String videoId, String playlistId) {
         Intent intent = new Intent(activity, VideoDetailActivity.class);
         Bundle bundle = new Bundle();
@@ -79,7 +85,32 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         Logger.d("onCreate()");
         super.onCreate(savedInstanceState);
         initUI();
-        updateDownloadUrls();
+        Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+        if (video != null) {
+            if (video.isZypeLive == 0) {
+                updateDownloadUrls();
+            }
+            else {
+                showVideoThumbnail();
+                videoViewModel = new VideoViewModel();
+                videoViewModel.getVideo(mVideoId).observe(this, new Observer<Video>() {
+                    @Override
+                    public void onChanged(@Nullable Video video) {
+                        if (VideoHelper.isLiveEventOnAir(video)) {
+                            showPlayer();
+                        }
+                        else {
+//                            videoViewModel.checkOnAir(mVideoId).observe(VideoDetailActivity.this, new Observer<Video>() {
+//                                @Override
+//                                public void onChanged(@Nullable Video video) {
+//                                    showPlayer();
+//                                }
+//                            });
+                        }
+                    }
+                });
+            }
+        }
     }
 
     @Override
@@ -184,7 +215,12 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                             .handleNotAuthorizedVideo(VideoDetailActivity.this, mVideoId, playlistId);
                 }
                 else {
-                    requestVideoUrl(mVideoId);
+                    Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+                    if (video != null) {
+                        if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
+                            requestVideoUrl(mVideoId);
+                        }
+                    }
                 }
             }
         });
@@ -205,6 +241,12 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
 
     private void hideVideoThumbnail() {
         layoutImage.setVisibility(View.GONE);
+    }
+
+    private void showPlayer() {
+        hideVideoThumbnail();
+        requestVideoUrl(mVideoId);
+        changeFragment(isChromecastConntected());
     }
 
     // //////////
@@ -369,7 +411,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
             List<AdvertisingSchedule> schedule = advertising.getSchedule();
             DataHelper.updateAdSchedule(getContentResolver(), mVideoId, schedule);
             // TODO: Ad tags saved in separate table by 'updateAdSchedule'. Probably we don't need to keep the tag
-            // in the 'Video' table. But we do this now because the tags are the same for all ad cue points
+            // in the 'VideoList' table. But we do this now because the tags are the same for all ad cue points
             if (schedule != null && !schedule.isEmpty()) {
                 String adTag = advertising.getSchedule().get(0).getTag();
                 DataHelper.saveAdVideoTag(getContentResolver(), mVideoId, adTag);

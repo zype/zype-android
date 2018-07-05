@@ -362,4 +362,8 @@ public class VideoHelper {
         }
         return result;
     }
+
+    public static boolean isLiveEventOnAir(Video video) {
+        return (video.isZypeLive == 1 && video.onAir == 1);
+    }
 }

@@ -90,7 +90,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                     case DownloadConstants.PROGRESS_CANCELED_VIDEO:
                         isVideoDownloaded = false;
                         isVideoDownloading = false;
-                        UiUtils.showWarningSnackbar(getView(), "Video Download has canceled");
+                        UiUtils.showWarningSnackbar(getView(), "VideoList Download has canceled");
                         updateDownloadProgress(-1);
                         break;
                     case DownloadConstants.PROGRESS_END_AUDIO:
@@ -102,7 +102,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                     case DownloadConstants.PROGRESS_END_VIDEO:
                         isVideoDownloaded = true;
                         isVideoDownloading = false;
-                        UiUtils.showPositiveSnackbar(getView(), "Video was downloaded");
+                        UiUtils.showPositiveSnackbar(getView(), "VideoList was downloaded");
                         updateDownloadProgress(-1);
                         break;
                     case DownloadConstants.PROGRESS_FAIL_AUDIO:
@@ -128,7 +128,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                     case DownloadConstants.PROGRESS_START_VIDEO:
                         isVideoDownloaded = false;
                         isVideoDownloading = true;
-                        UiUtils.showPositiveSnackbar(getView(), "Video downloading was started");
+                        UiUtils.showPositiveSnackbar(getView(), "VideoList downloading was started");
                         updateDownloadProgress(0);
                         break;
                     case DownloadConstants.PROGRESS_UPDATE_AUDIO:

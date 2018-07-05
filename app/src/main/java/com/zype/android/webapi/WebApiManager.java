@@ -57,7 +57,8 @@ import com.zype.android.webapi.events.settings.ContentSettingsEvent;
 import com.zype.android.webapi.events.settings.LiveStreamSettingsEvent;
 import com.zype.android.webapi.events.settings.SettingsEvent;
 import com.zype.android.webapi.events.video.RetrieveHighLightVideoEvent;
-import com.zype.android.webapi.events.video.RetrieveVideoEvent;
+import com.zype.android.webapi.events.video.VideoEvent;
+import com.zype.android.webapi.events.video.VideoListEvent;
 import com.zype.android.webapi.events.zobject.ZObjectEvent;
 import com.zype.android.webapi.model.ErrorBody;
 import com.zype.android.webapi.model.auth.AccessTokenInfoResponse;
@@ -86,6 +87,7 @@ import com.zype.android.webapi.model.search.SearchResponse;
 import com.zype.android.webapi.model.settings.ContentSettingsResponse;
 import com.zype.android.webapi.model.settings.LiveStreamSettingsResponse;
 import com.zype.android.webapi.model.settings.SettingsResponse;
+import com.zype.android.webapi.model.video.VideoListResponse;
 import com.zype.android.webapi.model.video.VideoResponse;
 import com.zype.android.webapi.model.zobjects.ZObjectResponse;
 
@@ -254,10 +256,14 @@ public class WebApiManager {
             case TOKEN_INFO:
                 String token = getParams.get(AuthParamsBuilder.ACCESS_TOKEN);
                 return new AccessTokenInfoEvent(ticket, new AccessTokenInfoResponse(mApi.getTokenInfo(token)));
-            case VIDEO_LATEST_GET:
-                return new RetrieveVideoEvent(ticket, new VideoResponse(mApi.getVideoList(getParams)), null);
+            case VIDEO_LIST:
+                return new VideoListEvent(ticket, new VideoListResponse(mApi.getVideoList(getParams)), null);
+            case VIDEO:
+                videoId = getParams.get(VideoParamsBuilder.VIDEO_ID);
+                getParams.remove(VideoParamsBuilder.VIDEO_ID);
+                return new VideoEvent(ticket, new VideoResponse(mApi.getVideo(videoId, getParams)));
             case VIDEO_HIGHLIGHT_GET:
-                return new RetrieveHighLightVideoEvent(ticket, new VideoResponse(mApi.getVideoList(getParams)));
+                return new RetrieveHighLightVideoEvent(ticket, new VideoListResponse(mApi.getVideoList(getParams)));
             case CONSUMER_FAVORITE_VIDEO_GET:
                 return new ConsumerFavoriteVideoEvent(ticket, new ConsumerFavoriteVideoResponse(mApi.getFavoriteVideoList(SettingsProvider.getInstance().getConsumerId(), getParams)));
             case FAVORITE:
@@ -313,7 +319,7 @@ public class WebApiManager {
             case VIDEO_FROM_PLAYLIST:
                 if (pathParams.containsKey(VideoParamsBuilder.PLAYLIST_ID)) {
                     playlistId = pathParams.get(VideoParamsBuilder.PLAYLIST_ID);
-                    return new RetrieveVideoEvent(ticket, new VideoResponse(mApi.getVideosFromPlaylist(playlistId, getParams)), playlistId);
+                    return new VideoListEvent(ticket, new VideoListResponse(mApi.getVideosFromPlaylist(playlistId, getParams)), playlistId);
                 } else {
                     throw new IllegalStateException("VideoParamsBuilder.PLAYLIST_ID can not be null");
                 }
@@ -343,7 +349,8 @@ public class WebApiManager {
         MARKETPLACE_CONNECT,
         PLAN,
         TOKEN_INFO,
-        VIDEO_LATEST_GET,
+        VIDEO,
+        VIDEO_LIST,
         VIDEO_FROM_PLAYLIST,
         VIDEO_HIGHLIGHT_GET,
         CONSUMER_CREATE,
