@@ -10,6 +10,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -34,25 +35,29 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
     protected OnLoginAction mOnLoginListener;
     protected LoaderManager mLoader;
     protected VideosCursorAdapter mAdapter;
-    protected TextView mEmpty;
+//    protected TextView mEmpty;
     protected ListView mListView;
     private TabHost tabHost;
     protected int selectedTab = 0;
 
+    private LinearLayout layoutEmpty;
+
     protected abstract void startLoadCursors(int selectedTab);
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.fragment_base_tab_list, null);
+
+        layoutEmpty = rootView.findViewById(R.id.layoutEmpty);
+
         mAdapter = new VideosCursorAdapter(getActivity(), CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, mOnVideoItemActionListener, mOnLoginListener);
-        View view = inflater.inflate(R.layout.fragment_base_tab_list, null);
-        mListView = (ListView) view.findViewById(R.id.list_tab);
-        mEmpty = (TextView) view.findViewById(R.id.empty);
-        mListView.setEmptyView(mEmpty);
+        mListView = rootView.findViewById(R.id.list_tab);
+//        mEmpty = rootView.findViewById(R.id.empty);
+//        mListView.setEmptyView(mEmpty);
         mListView.setOnItemClickListener(this);
         mListView.setAdapter(mAdapter);
-        tabHost = (TabHost) view.findViewById(android.R.id.tabhost);
+        tabHost = rootView.findViewById(android.R.id.tabhost);
 
         tabHost.setup();
 
@@ -81,7 +86,7 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
                 startLoadCursors(selectedTab);
             }
         });
-        return view;
+        return rootView;
     }
 
     private void setTabColors(TabHost tabHost) {
@@ -93,6 +98,11 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
                 tabHost.getTabWidget().getChildAt(i).setBackgroundColor(ContextCompat.getColor(getActivity(), android.R.color.transparent));
             }
         }
+    }
+
+    public void setEmptyText(String title, String message) {
+        ((TextView) layoutEmpty.findViewById(R.id.textEmptyTitle)).setText(title);
+        ((TextView) layoutEmpty.findViewById(R.id.textEmptyMessage)).setText(message);
     }
 
     @Override
@@ -129,12 +139,13 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor != null && cursor.getCount() > 0) {
-            mEmpty.setVisibility(View.GONE);
-        } else {
-            mEmpty.setVisibility(View.VISIBLE);
-        }
         mAdapter.changeCursor(cursor);
+        if (cursor != null && cursor.getCount() > 0) {
+            layoutEmpty.setVisibility(View.GONE);
+        }
+        else {
+            layoutEmpty.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

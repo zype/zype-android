@@ -102,6 +102,10 @@
     <string name="dialog_login_message">You do not have access to this video. Please sign in with your account to watch this video.</string>
     <string name="dialog_login_button_login">Sign in</string>
 
+    <!-- Downloads -->
+    <string name="downloads_empty_title">It looks like you haven’t downloaded any videos yet</string>
+    <string name="downloads_empty_message">You can download videos in order to watch them offline by clicking on the Download icon for any individual video.</string>
+
     <!-- Favorites -->
     <string name="favorites_empty_title">It looks like you haven’t added any videos to Favorites yet</string>
     <string name="favorites_empty_message">You can save your favorite videos in this section by clicking on the Favorite star icon for any individual video.</string>

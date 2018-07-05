@@ -32,6 +32,7 @@ public class DownloadFragment extends AbstractTabFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         mAdapter.setShowDownloadOptions(true);
+        setEmptyText(getString(R.string.downloads_empty_title), getString(R.string.downloads_empty_message));
         return view;
     }
 
@@ -66,7 +67,7 @@ public class DownloadFragment extends AbstractTabFragment {
     @Override
     public void onResume() {
         super.onResume();
-        mEmpty.setText(SettingsProvider.getInstance().getNoDownloadsMessage());
+//        mEmpty.setText(SettingsProvider.getInstance().getNoDownloadsMessage());
     }
 
     @Override
