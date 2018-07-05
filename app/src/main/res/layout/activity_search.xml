@@ -69,6 +69,15 @@
                             android:text="@string/search_empty_list"
                             android:visibility="gone"
                             />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="20dp"
+                            android:id="@+id/textErrorEmptyQuery"
+                            android:text="@string/search_error_empty_query"
+                            android:gravity="center"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                            />
                         <ProgressBar
                             android:id="@+id/search_progress"
                             style="?android:attr/progressBarStyleLarge"

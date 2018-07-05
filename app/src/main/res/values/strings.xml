@@ -141,6 +141,9 @@
     <!-- Player -->
     <string name="menu_player_closed_captions">Closed captions</string>
 
+    <!--Search-->
+    <string name="search_error_empty_query">Please enter search terms in order to begin a new search.</string>
+
     <!--Settings-->
     <string name="settings">Settings</string>
     <string name="settings_facebook">%1$s on Facebook</string>

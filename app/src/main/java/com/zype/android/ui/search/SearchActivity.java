@@ -3,6 +3,7 @@ package com.zype.android.ui.search;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
@@ -16,7 +17,6 @@ import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.base.BaseActivity;
-import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.main.fragments.videos.VideosCursorAdapter;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
@@ -50,6 +50,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -83,13 +84,16 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     private int selectedTab;
 
     private SearchView viewSearch;
+    private ListView listVideos;
+    private TextView textEmpty;
+    private TextView textErrorEmptyQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -98,15 +102,18 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         } else {
             throw new IllegalStateException("VideoId can not be empty");
         }
-        searchProgress = (ProgressBar) findViewById(R.id.search_progress);
-        tvSearchField = (TextView) findViewById(R.id.search_field);
+        searchProgress = findViewById(R.id.search_progress);
+        tvSearchField = findViewById(R.id.search_field);
         tvSearchField.setText(searchString);
 
-        viewSearch = (SearchView) findViewById(R.id.viewSearch);
+        viewSearch = findViewById(R.id.viewSearch);
         viewSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                startSearch();
+                updateUI();
+                if (!TextUtils.isEmpty(query)) {
+                    startSearch();
+                }
                 return false;
             }
 
@@ -121,10 +128,8 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
                 return false;
             }
         });
-        viewSearch.setQuery(searchString, false);
-        viewSearch.setIconified(false);
-        viewSearch.setFocusable(false);
-        viewSearch.clearFocus();
+
+        textErrorEmptyQuery = findViewById(R.id.textErrorEmptyQuery);
 
 //        tvSearchField.setOnKeyListener(new View.OnKeyListener() {
 //
@@ -149,13 +154,15 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
 //                return false;
 //            }
 //        });
-        mAdapter = new VideosCursorAdapter(this, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, this, this);
-        ListView mListView = (ListView) findViewById(R.id.list_search);
-        mListView.setEmptyView(findViewById(R.id.empty));
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        tabHost = (TabHost) findViewById(android.R.id.tabhost);
+        textEmpty = findViewById(R.id.empty);
 
+        mAdapter = new VideosCursorAdapter(this, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, this, this);
+        listVideos = findViewById(R.id.list_search);
+        listVideos.setEmptyView(findViewById(R.id.empty));
+        listVideos.setAdapter(mAdapter);
+        listVideos.setOnItemClickListener(this);
+
+        tabHost = findViewById(android.R.id.tabhost);
         tabHost.setup();
 
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("tagAll");
@@ -184,14 +191,21 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
             }
         });
 
-        TabWidget tabs = (TabWidget) findViewById(android.R.id.tabs);
+        TabWidget tabs = findViewById(android.R.id.tabs);
         tabs.setVisibility(GONE);
+
+        viewSearch.setQuery(searchString, false);
+        viewSearch.setIconified(false);
+        viewSearch.setFocusable(false);
+        viewSearch.clearFocus();
 
         requestSearchResult(1, searchString);
 
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             new BillingManager(this, this);
         }
+
+        updateUI();
     }
 
     @Override
@@ -199,6 +213,24 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         super.onStart();
         if (SettingsProvider.getInstance().isLoggedIn()) {
             requestConsumerData();
+        }
+    }
+
+    // //////////
+    // UI
+    //
+    private void updateUI() {
+        if (TextUtils.isEmpty(searchString)) {
+            textErrorEmptyQuery.setVisibility(View.VISIBLE);
+            listVideos.setVisibility(GONE);
+            textEmpty.setVisibility(GONE);
+        }
+        else {
+            textErrorEmptyQuery.setVisibility(GONE);
+            listVideos.setVisibility(View.VISIBLE);
+            if (mAdapter.getCount() == 0) {
+                textEmpty.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -315,6 +347,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mAdapter.swapCursor(cursor);
+        updateUI();
     }
 
     @Override
@@ -453,49 +486,13 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Logger.d("onItemClick()");
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
-        if (holder.subscriptionRequired) {
-            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, null, holder.onAir);
+        NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
+        if (AuthHelper.isVideoAuthorized(this, holder.videoId)) {
+            navigationHelper.switchToVideoDetailsScreen(this, holder.videoId, null, false);
         }
         else {
-            VideoDetailActivity.startActivity(this, holder.videoId, null);
+            navigationHelper.handleNotAuthorizedVideo(this, holder.videoId, null);
         }
-//        if (holder.subscriptionRequired) {
-//            if (holder.onAir) {
-//                if (!SettingsProvider.getInstance().isLoggedIn() || SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-//                    // Check total played live stream time
-//                    Logger.d(String.format("onItemClick(): liveStreamLimit=%1$s", SettingsProvider.getInstance().getLiveStreamLimit()));
-//                    int liveStreamTime = SettingsProvider.getInstance().getLiveStreamTime();
-//                    if (liveStreamTime < SettingsProvider.getInstance().getLiveStreamLimit()) {
-//                        VideoDetailActivity.startActivity(this, holder.videoId);
-//                    } else {
-//                        ErrorDialogFragment dialog = ErrorDialogFragment.newInstance(SettingsProvider.getInstance().getLiveStreamMessage(), null, null);
-//                        dialog.show(getSupportFragmentManager(), ErrorDialogFragment.TAG);
-//                    }
-//                }
-//                else {
-//                    VideoDetailActivity.startActivity(this, holder.videoId);
-//                }
-//            }
-//            else {
-//                if (SettingsProvider.getInstance().isLoggedIn()) {
-//                    if (holder.isTranscoded) {
-//                        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-//                            DialogHelper.showSubscriptionAlertIssue(this);
-//                        } else {
-//                            VideoDetailActivity.startActivity(this, holder.videoId);
-//                        }
-//                    } else {
-//                        return;
-//                    }
-//                } else {
-//                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-//                    startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
-//                }
-//            }
-//        }
-//        else {
-//            VideoDetailActivity.startActivity(this, holder.videoId);
-//        }
     }
 
     //
