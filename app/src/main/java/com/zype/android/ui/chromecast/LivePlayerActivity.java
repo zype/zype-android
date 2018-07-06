@@ -61,6 +61,11 @@ public class LivePlayerActivity extends BaseVideoActivity {
         }
     }
 
+    @Override
+    public void onError() {
+
+    }
+
     @Subscribe
     public void handleVideoPlayer(OnAirVideoEvent event) {
         Logger.d("live handlePlayer");

@@ -651,7 +651,7 @@ public class PlayerFragment extends BaseFragment implements
                         UiUtils.showErrorSnackbar(getView(), "Video is not available right now. " + getActivity().getString(R.string.connection_error));
                     }
                     else {
-//                        UiUtils.showErrorSnackbar(getView(), "onRendererInitializationError");
+                        mListener.onError();
                     }
                     if (player.getPlaybackState() != ExoPlayer.STATE_ENDED) {
                         mListener.saveCurrentTimeStamp(player.getCurrentPosition());

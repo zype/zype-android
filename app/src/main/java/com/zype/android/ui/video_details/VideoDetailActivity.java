@@ -305,6 +305,13 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         AutoplayHelper.playPreviousVideo(this, mVideoId, playlistId);
     }
 
+    @Override
+    public void onError() {
+        hideProgress();
+        showVideoThumbnail();
+        DialogHelper.showErrorAlert(this, getString(R.string.video_error_bad_request));
+    }
+
     // //////////
     // Data
     //

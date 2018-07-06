@@ -22,4 +22,6 @@ public interface OnVideoAudioListener {
     void saveCurrentTimeStamp(long currentPosition);
 
     void onSeekToMillis(int ms);
+
+    void onError();
 }
