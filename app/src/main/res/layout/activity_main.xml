@@ -35,6 +35,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="56dp"
         android:id="@+id/root_view"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
@@ -53,7 +54,6 @@
         app:itemBackground="?attr/colorPrimary"
         app:itemIconTint="@color/bottom_navigation"
         app:itemTextColor="@color/bottom_navigation"
-        app:layout_behavior="com.zype.android.ui.Widget.BottomNavigationBehavior"
         app:labelVisibilityMode="labeled"
         app:elevation="2dp"
         />
