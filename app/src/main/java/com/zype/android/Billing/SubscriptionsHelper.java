@@ -49,7 +49,9 @@ public class SubscriptionsHelper {
                         .addConsumerId(SettingsProvider.getInstance().getConsumerId())
                         .addConsumerToken(SettingsProvider.getInstance().getAccessToken())
                         .addPlanId(subscription.getZypePlan().id)
-                        .addPurchaseToken(item.getPurchaseToken());
+                        .addPurchaseToken(item.getPurchaseToken())
+                        .addReceipt(item.getOriginalJson())
+                        .addSignature(item.getSignature());
                 apiManager.executeRequest(WebApiManager.Request.MARKETPLACE_CONNECT, builder.build());
             }
         }

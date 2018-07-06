@@ -64,6 +64,7 @@ import com.zype.android.webapi.model.ErrorBody;
 import com.zype.android.webapi.model.auth.AccessTokenInfoResponse;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
+import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBodyData;
 import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectResponse;
 import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBody;
 import com.zype.android.webapi.model.category.CategoryResponse;
@@ -245,10 +246,19 @@ public class WebApiManager {
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
             case MARKETPLACE_CONNECT:
                 MarketplaceConnectBody body = new MarketplaceConnectBody();
+                body.appId = "573c8bfb1bdf330d10006bec";
+//                body.appId = "5b23cc5972289b131c003834";
                 body.consumerId = postParams.get("consumer_id");
-                body.consumerToken = postParams.get("consumer_token");
-                body.receipt = postParams.get("receipt");
+//                body.consumerToken = postParams.get("consumer_token");
                 body.planId = postParams.get("plan_id");
+                body.purchaseToken = postParams.get("purchase_token");
+                body.siteId = "571e32ef973e2807f601267a";
+//                body.siteId = "57c0bdb26b7f0f0d14000f38";
+                MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
+                bodyData.receipt = postParams.get("receipt");
+                bodyData.signature = postParams.get("signature");
+                body.data = bodyData;
+
                 return new MarketplaceConnectEvent(ticket, new MarketplaceConnectResponse(marketplaceConnectApi.verifySubscription(body)));
             case PLAN:
                 String planId = pathParams.get(PlanParamsBuilder.PLAN_ID);
