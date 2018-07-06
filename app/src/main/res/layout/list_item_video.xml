@@ -31,12 +31,13 @@
             android:visibility="gone"
             />
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:id="@+id/imageLocked"
             android:src="@drawable/icon_locked"
             />
+<!--
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -44,6 +45,7 @@
             android:id="@+id/imageUnlocked"
             android:src="@drawable/icon_unlocked"
             />
+-->
     </FrameLayout>
 
     <RelativeLayout

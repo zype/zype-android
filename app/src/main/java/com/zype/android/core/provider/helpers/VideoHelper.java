@@ -345,7 +345,14 @@ public class VideoHelper {
         return getThumbnailByHeight(thumbnails, height);
     }
 
-    // TODO: make this private after refactoring to working with local database via Room
+    // TODO: Remove this method after refactoring to use Room for working with database
+    public static Thumbnail getThumbnailByHeight(Cursor cursor, int height) {
+        Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
+        List<Thumbnail> thumbnails = new Gson().fromJson(cursor.getString(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_THUMBNAILS)), thumbnailType);
+        return getThumbnailByHeight(thumbnails, height);
+    }
+
+    // TODO: Make this private after refactoring to use Room for working with database
     public static Thumbnail getThumbnailByHeight(List<Thumbnail> thumbnails, int height) {
         Thumbnail result = null;
         if (thumbnails != null && thumbnails.size() > 0) {
