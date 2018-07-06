@@ -311,7 +311,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             fragmentTransaction.commit();
         }
         else {
-            Logger.i("showFragment(): VideoList " + mVideoId + "is live event and isn't  on air yet.");
+            Logger.i("showFragment(): Video " + mVideoId + "is live event and isn't on air yet.");
         }
     }
 

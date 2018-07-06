@@ -49,6 +49,9 @@ public interface ZypeDao {
     @Query("SELECT * FROM video WHERE video._id = :videoId LIMIT 1")
     public Video getVideoSync(String videoId);
 
+    @Update(onConflict = REPLACE)
+    public void updateVideo(Video video);
+
     @Insert(onConflict = IGNORE)
     public void insertVideos(List<Video> videos);
 

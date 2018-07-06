@@ -75,6 +75,10 @@ public class DataRepository {
         return db.zypeDao().getVideoSync(videoId);
     }
 
+    public void updateVideo(Video video) {
+        db.zypeDao().updateVideo(video);
+    }
+
     public void insertVideos(List<Video> videos) {
         db.zypeDao().insertVideos(videos);
     }

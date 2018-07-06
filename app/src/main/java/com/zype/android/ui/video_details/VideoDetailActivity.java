@@ -69,7 +69,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     private FrameLayout layoutImage;
     private ImageView imageVideo;
 
-    VideoViewModel videoViewModel;
+    VideoDetailViewModel videoDetailViewModel;
 
     public static void startActivity(Activity activity, String videoId, String playlistId) {
         Intent intent = new Intent(activity, VideoDetailActivity.class);
@@ -92,23 +92,28 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
             }
             else {
                 showVideoThumbnail();
-                videoViewModel = new VideoViewModel();
-                videoViewModel.getVideo(mVideoId).observe(this, new Observer<Video>() {
+                videoDetailViewModel = new VideoDetailViewModel(getApplication());
+                final Observer<Video> videoObserver = new Observer<Video>() {
                     @Override
                     public void onChanged(@Nullable Video video) {
                         if (VideoHelper.isLiveEventOnAir(video)) {
+                            videoDetailViewModel.updateVideoOnAir(video);
                             showPlayer();
                         }
                         else {
-//                            videoViewModel.checkOnAir(mVideoId).observe(VideoDetailActivity.this, new Observer<Video>() {
-//                                @Override
-//                                public void onChanged(@Nullable Video video) {
-//                                    showPlayer();
-//                                }
-//                            });
+                            videoDetailViewModel.checkOnAir(mVideoId).observe(VideoDetailActivity.this, new Observer<Video>() {
+                                @Override
+                                public void onChanged(@Nullable Video video) {
+                                    videoDetailViewModel.onCleared();
+                                    videoDetailViewModel.updateVideoOnAir(video);
+                                    showPlayer();
+                                }
+                            });
                         }
+                        videoDetailViewModel.getVideo(mVideoId).removeObserver(this);
                     }
-                });
+                };
+                videoDetailViewModel.getVideo(mVideoId).observe(this, videoObserver);
             }
         }
     }
@@ -119,6 +124,17 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         super.onNewIntent(intent);
         initUI();
         checkVideoAuthorization();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // TODO: 'onCleared()' should be called automatically on finish activity, but it doesn't
+        // for some reason. There was a bug in support library 27.1.0, should be fixed in 27.1.1.
+        // But we have to use 28.0.0.alpha-3 for now and the bug may appear in this version again.
+        if (videoDetailViewModel != null) {
+            videoDetailViewModel.onCleared();
+        }
+        super.onBackPressed();
     }
 
     @Override
@@ -245,8 +261,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
 
     private void showPlayer() {
         hideVideoThumbnail();
-        requestVideoUrl(mVideoId);
-        changeFragment(isChromecastConntected());
+        VideoDetailActivity.startActivity(this, mVideoId, playlistId);
     }
 
     // //////////

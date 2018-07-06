@@ -43,13 +43,17 @@ public class VideoLiveData extends LiveData<Video> {
         VideoData data = event.getEventData().getModelData().getVideoData();
         Video video = DataHelper.videoDataToVideoEntity(data);
         if (checkOnAir) {
-            if (getValue().onAir == 0 && video.onAir == 1) {
+            if ((getValue() == null || getValue().onAir == 0) && video.onAir == 1) {
                 setValue(video);
+            }
+            else {
+                if (getValue() != null) {
+                    Logger.d("handleVideo(): videoId=" + video.id + ", onAir=" + getValue().onAir);
+                }
             }
         }
         else {
             setValue(video);
         }
     }
-
 }
