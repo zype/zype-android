@@ -1,16 +1,53 @@
-package com.zype.android;
+package com.zype.android.Db;
 
 import com.google.gson.Gson;
+import com.zype.android.Db.Entity.Playlist;
+import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.webapi.model.playlist.PlaylistData;
 import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Evgeny Cherkasov on 05.07.2018
+ * Created by Evgeny Cherkasov on 07.07.2018
  */
-public class DataHelper {
+public class DbHelper {
+
+    public static List<Playlist> playlistDataToEntity(List<PlaylistData> playlists) {
+        List<Playlist> result = new ArrayList<>(playlists.size());
+        for (PlaylistData item : playlists) {
+            Playlist playlistEntity = new Playlist();
+            playlistEntity.id = item.getId();
+            playlistEntity.createdAt = item.getCreatedAt();
+            playlistEntity.deletedAt = item.getDeletedAt();
+            playlistEntity.images = new Gson().toJson(item.getImages());
+            playlistEntity.parentId = item.getParentId();
+            playlistEntity.playlistItemCount = item.getPlaylistItemCount();
+            playlistEntity.priority = item.getPriority();
+            playlistEntity.thumbnails = new Gson().toJson(item.getThumbnails());
+            playlistEntity.title = item.getTitle();
+            playlistEntity.updatedAt = item.getUpdatedAt();
+            result.add(playlistEntity);
+        }
+        return result;
+    }
+
+    public static List<PlaylistVideo> videoDataToPlaylistVideoEntity(List<VideoData> videoData, String playlistId) {
+        List<PlaylistVideo> result = new ArrayList<>(videoData.size());
+        int number = 1;
+        for (VideoData item : videoData) {
+            PlaylistVideo entity = new PlaylistVideo();
+            entity.number = number;
+            entity.playlistId = playlistId;
+            entity.videoId = item.getId();
+            result.add(entity);
+            number++;
+        }
+        return result;
+    }
+
     public static Video videoDataToVideoEntity(VideoData videoData) {
         Video entity = new Video();
         entity.id = videoData.getId();
@@ -61,4 +98,5 @@ public class DataHelper {
         }
         return result;
     }
+
 }

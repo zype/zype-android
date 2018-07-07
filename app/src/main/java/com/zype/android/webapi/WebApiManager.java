@@ -246,14 +246,14 @@ public class WebApiManager {
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
             case MARKETPLACE_CONNECT:
                 MarketplaceConnectBody body = new MarketplaceConnectBody();
-                body.appId = "573c8bfb1bdf330d10006bec";
-//                body.appId = "5b23cc5972289b131c003834";
+//                body.appId = "573c8bfb1bdf330d10006bec";
+                body.appId = "5b23cc5972289b131c003834";
                 body.consumerId = postParams.get("consumer_id");
 //                body.consumerToken = postParams.get("consumer_token");
                 body.planId = postParams.get("plan_id");
                 body.purchaseToken = postParams.get("purchase_token");
-                body.siteId = "571e32ef973e2807f601267a";
-//                body.siteId = "57c0bdb26b7f0f0d14000f38";
+//                body.siteId = "571e32ef973e2807f601267a";
+                body.siteId = "57c0bdb26b7f0f0d14000f38";
                 MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
                 bodyData.receipt = postParams.get("receipt");
                 bodyData.signature = postParams.get("signature");
