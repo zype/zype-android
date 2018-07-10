@@ -112,4 +112,42 @@ platform :android do
       )
     end
   end
+
+  desc "Build test APKs"
+  lane :build_test_apk do
+    sh("brew list gradle || brew install gradle")
+    sh("cd .. && gradle wrapper")
+    gradle(
+      task: "assemble",
+      flavor: "Template",
+      build_type: "Debug"
+    )
+
+    gradle(
+      task: "assemble",
+      flavor: "androidTest"
+    )
+  end
+
+  desc "Take screenshots"
+  lane :screenshots do
+    build_test_apk
+
+    template_debug_apk_paths = Dir["../app/build/outputs/apk/template/debug/*.apk"]
+    template_debug_apk_path = template_debug_apk_paths[0].gsub("../", "")
+
+    test_apk_paths = Dir["../app/build/outputs/apk/androidTest/template/debug/*.apk"]
+    test_apk_path = test_apk_paths[0].gsub("../", "")
+
+    screengrab(
+      locales: ["en-US"],
+      clear_previous_screenshots: true,
+      app_apk_path: template_debug_apk_path,
+      tests_apk_path: test_apk_path
+    )
+  end
+
+
+
+
 end
