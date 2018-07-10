@@ -19,6 +19,10 @@ public class Playlist implements PlaylistItem {
     @NonNull
     public String id;
 
+    @ColumnInfo(name = "active")
+    @NonNull
+    public Integer active;
+
     @ColumnInfo(name = "created_at")
     public String createdAt;
 

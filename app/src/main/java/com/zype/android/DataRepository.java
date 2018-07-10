@@ -42,10 +42,6 @@ public class DataRepository {
         return db.zypeDao().getPlaylists(parentId);
     }
 
-    public List<Playlist> getAllPlaylistsSync() {
-        return db.zypeDao().getAllPlaylistsSync();
-    }
-
     public List<Playlist> getPlaylistsSync(String parentId) {
         return db.zypeDao().getPlaylistsSync(parentId);
     }

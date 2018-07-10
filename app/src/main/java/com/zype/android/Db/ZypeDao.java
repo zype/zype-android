@@ -22,13 +22,10 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 @Dao
 public interface ZypeDao {
 
-    @Query("SELECT * FROM playlist WHERE playlist.parent_id = :parentPlaylistId ORDER BY playlist.priority")
+    @Query("SELECT * FROM playlist WHERE playlist.parent_id = :parentPlaylistId AND playlist.active = 1 ORDER BY playlist.priority")
     public LiveData<List<Playlist>> getPlaylists(String parentPlaylistId);
 
-    @Query("SELECT * FROM playlist ORDER BY playlist.priority")
-    public List<Playlist> getAllPlaylistsSync();
-
-    @Query("SELECT * FROM playlist WHERE playlist.parent_id = :parentPlaylistId ORDER BY playlist.priority")
+    @Query("SELECT * FROM playlist WHERE playlist.parent_id = :parentPlaylistId AND playlist.active = 1 ORDER BY playlist.priority")
     public List<Playlist> getPlaylistsSync(String parentPlaylistId);
 
     @Query("SELECT * FROM playlist WHERE playlist._id = :playlistId LIMIT 1")

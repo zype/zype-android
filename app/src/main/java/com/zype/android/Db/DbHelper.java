@@ -20,6 +20,7 @@ public class DbHelper {
         for (PlaylistData item : playlists) {
             Playlist playlistEntity = new Playlist();
             playlistEntity.id = item.getId();
+            playlistEntity.active = item.active ? 1 : 0;
             playlistEntity.createdAt = item.getCreatedAt();
             playlistEntity.deletedAt = item.getDeletedAt();
             playlistEntity.images = new Gson().toJson(item.getImages());
