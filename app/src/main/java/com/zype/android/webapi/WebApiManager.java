@@ -260,6 +260,8 @@ public class WebApiManager {
                 body.data = bodyData;
 
                 return new MarketplaceConnectEvent(ticket, new MarketplaceConnectResponse(marketplaceConnectApi.verifySubscription(body)));
+            case CONSUMER_FORGOT_PASSWORD:
+                return new ConsumerEvent(ticket, request, new ConsumerResponse(mApi.consumerForgotPassword(getParams, postParams)));
             case PLAN:
                 String planId = pathParams.get(PlanParamsBuilder.PLAN_ID);
                 return new PlanEvent(ticket, new PlanResponse(mApi.getPlan(planId, getParams)));
@@ -283,9 +285,9 @@ public class WebApiManager {
                 videoId = pathParams.get(FavoriteParamsBuilder.VIDEO_ID);
                 return new UnfavoriteEvent(ticket, new UnfavoriteResponse(mApi.setUnFavoriteVideo(SettingsProvider.getInstance().getConsumerId(), favoriteId, postParams)), videoId);
             case CONSUMER_CREATE:
-                return new ConsumerEvent(ticket, new ConsumerResponse(mApi.createConsumer(getParams, postParams)));
+                return new ConsumerEvent(ticket, request, new ConsumerResponse(mApi.createConsumer(getParams, postParams)));
             case CONSUMER_GET:
-                return new ConsumerEvent(ticket, new ConsumerResponse(mApi.getConsumer(SettingsProvider.getInstance().getAccessTokenResourceOwnerId(), getParams)));
+                return new ConsumerEvent(ticket, request, new ConsumerResponse(mApi.getConsumer(SettingsProvider.getInstance().getAccessTokenResourceOwnerId(), getParams)));
             case DEVICE_PIN_CREATE:
                 return new DevicePinEvent(ticket, args, new DevicePinResponse(mApi.createDevicePin(getParams, "")));
             case DEVICE_PIN_GET:
@@ -356,6 +358,7 @@ public class WebApiManager {
     public enum Request {
         AUTH_REFRESH_ACCESS_TOKEN,
         AUTH_RETRIEVE_ACCESS_TOKEN,
+        CONSUMER_FORGOT_PASSWORD,
         MARKETPLACE_CONNECT,
         PLAN,
         TOKEN_INFO,
@@ -528,9 +531,11 @@ public class WebApiManager {
                         return new UnrsolvedHostErrorEvent(job.getTicket(), job.getRequest(), mContext.getString(R.string.connection_error));
                     } else
                         return new UnrsolvedHostErrorEvent(job.getTicket(), job.getRequest(), err.getMessage());
-                } else {
+                }
+                else {
                     Log.d(TAG, "Request failed: " + job.getRequest(), err.getCause());
-                    return new ErrorEvent(job.getTicket(), job.getRequest(), "(" + statusCode + ") " + mContext.getString(R.string.GENERIC_ERROR), err);
+//                    return new ErrorEvent(job.getTicket(), job.getRequest(), "(" + statusCode + ") " + mContext.getString(R.string.GENERIC_ERROR), err);
+                    return new ErrorEvent(job.getTicket(), job.getRequest(), errorBody.message, err);
                 }
             }
         }

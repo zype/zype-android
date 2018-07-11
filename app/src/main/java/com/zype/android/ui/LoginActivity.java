@@ -7,7 +7,11 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,10 +30,12 @@ import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.utils.AdMacrosHelper;
+import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.AuthParamsBuilder;
+import com.zype.android.webapi.builder.ConsumerForgotPasswordParamsBuilder;
 import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.builder.DevicePinParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
@@ -57,12 +63,16 @@ public class LoginActivity extends BaseActivity {
 
     private LinearLayout layoutEmail;
 
+    private LinearLayout layoutReset;
+    private LinearLayout layoutResetCompleted;
+
     public final static String PARAMETERS_FORCE_LOGIN = "ForceLogin";
 
     private View mProgressView;
     private View mLoginFormView;
     private TextInputLayout emailWrapper;
     private TextInputLayout passwordWrapper;
+    private TextView textForgotPassword;
 
     private String deviceId;
     private String pin;
@@ -71,6 +81,8 @@ public class LoginActivity extends BaseActivity {
     private static final int MODE_SELECT_METHOD = 0;
     private static final int MODE_DEVICE_LINKING = 1;
     private static final int MODE_SIGN_IN_WITH_EMAIL = 2;
+    private static final int MODE_RESET_PASSWORD = 3;
+    private static final int MODE_RESET_PASSWORD_COMPLETED = 4;
 
     private boolean forceLogin = false;
 
@@ -137,7 +149,28 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
+        textForgotPassword = findViewById(R.id.textForgotPassword);
+
+        layoutReset = findViewById(R.id.layoutReset);
         mLoginFormView = findViewById(R.id.login_form);
+        Button buttonReset = findViewById(R.id.buttonReset);
+        buttonReset.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resetPassword();
+            }
+        });
+
+        layoutResetCompleted = findViewById(R.id.layoutResetCompleted);
+        Button buttonResetCompleted = findViewById(R.id.buttonResetCompleted);
+        buttonResetCompleted.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
+
         mProgressView = findViewById(R.id.login_progress);
 
         init(savedInstanceState);
@@ -188,25 +221,42 @@ public class LoginActivity extends BaseActivity {
         textDeviceLinkingUrl.setText(ZypeConfiguration.getDeviceLinkingUrl(this));
         textPin.setText(pin);
 
+        // Set Forgot password link
+        SpannableString spannableForgotPassword = new SpannableString(textForgotPassword.getText());
+        ClickableSpan spanSignIn = new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                switchToResetPasswordScreen();
+            }
+        };
+        spannableForgotPassword.setSpan(spanSignIn, 0, textForgotPassword.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        textForgotPassword.setText(spannableForgotPassword);
+        textForgotPassword.setMovementMethod(LinkMovementMethod.getInstance());
+
         updateViews();
     }
 
     private void updateViews() {
+        layoutAuthMethod.setVisibility(View.GONE);
+        layoutLinkDevice.setVisibility(View.GONE);
+        layoutEmail.setVisibility(View.GONE);
+        layoutReset.setVisibility(View.GONE);
+        layoutResetCompleted.setVisibility(View.GONE);
         switch (mode) {
             case MODE_SELECT_METHOD:
                 layoutAuthMethod.setVisibility(View.VISIBLE);
-                layoutLinkDevice.setVisibility(View.GONE);
-                layoutEmail.setVisibility(View.GONE);
                 break;
             case MODE_DEVICE_LINKING:
-                layoutAuthMethod.setVisibility(View.GONE);
                 layoutLinkDevice.setVisibility(View.VISIBLE);
-                layoutEmail.setVisibility(View.GONE);
                 break;
             case MODE_SIGN_IN_WITH_EMAIL:
-                layoutAuthMethod.setVisibility(View.GONE);
-                layoutLinkDevice.setVisibility(View.GONE);
                 layoutEmail.setVisibility(View.VISIBLE);
+                break;
+            case MODE_RESET_PASSWORD:
+                layoutReset.setVisibility(View.VISIBLE);
+                break;
+            case MODE_RESET_PASSWORD_COMPLETED:
+                layoutResetCompleted.setVisibility(View.VISIBLE);
                 break;
         }
         if (TextUtils.isEmpty(pin)) {
@@ -254,6 +304,16 @@ public class LoginActivity extends BaseActivity {
 
     private boolean isPasswordValid(String password) {
         return password.length() > 4;
+    }
+
+    private void switchToResetPasswordScreen() {
+        mode = MODE_RESET_PASSWORD;
+        updateViews();
+    }
+
+    private void switchToResetPasswordCompletedScreen() {
+        mode = MODE_RESET_PASSWORD_COMPLETED;
+        updateViews();
     }
 
     // //////////
@@ -320,6 +380,26 @@ public class LoginActivity extends BaseActivity {
         getApi().executeRequest(WebApiManager.Request.AUTH_RETRIEVE_ACCESS_TOKEN, builder.build());
     }
 
+    private void resetPassword() {
+        hideKeyboard();
+        TextInputLayout layoutEmailReset = findViewById(R.id.layoutEmailReset);
+        String email = layoutEmailReset.getEditText().getText().toString();
+        if (TextUtils.isEmpty(email)) {
+            layoutEmailReset.setError(getString(R.string.error_field_required));
+            return;
+        }
+        else if (!isEmailValid(email)) {
+            layoutEmailReset.setError(getString(R.string.error_invalid_email));
+            return;
+        }
+
+        showProgress(true);
+
+        ConsumerForgotPasswordParamsBuilder builder = new ConsumerForgotPasswordParamsBuilder();
+        builder.addEmail(email);
+        getApi().executeRequest(WebApiManager.Request.CONSUMER_FORGOT_PASSWORD, builder.build());
+    }
+
     // //////////
     // Subscriptions
     //
@@ -372,13 +452,17 @@ public class LoginActivity extends BaseActivity {
 
     @Subscribe
     public void handleConsumer(ConsumerEvent event) {
+        showProgress(false);
+        if (event.getRequest() == WebApiManager.Request.CONSUMER_FORGOT_PASSWORD) {
+            switchToResetPasswordCompletedScreen();
+            return;
+        }
         Consumer data = event.getEventData().getModelData();
         int subscriptionCount = data.getConsumerData().getSubscriptionCount();
         SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
         String consumerId = data.getConsumerData().getId();
         SettingsProvider.getInstance().saveConsumerId(consumerId);
         SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, data.getConsumerData().getEmail());
-        showProgress(false);
         setResult(RESULT_OK);
         finish();
     }
@@ -394,8 +478,12 @@ public class LoginActivity extends BaseActivity {
 
     @Subscribe
     public void handleError(ErrorEvent event) {
-        SettingsProvider.getInstance().logout();
         showProgress(false);
+        if (event.getEventData() == WebApiManager.Request.CONSUMER_FORGOT_PASSWORD) {
+            DialogHelper.showErrorAlert(this, event.getErrMessage());
+            return;
+        }
+        SettingsProvider.getInstance().logout();
         UiUtils.showErrorSnackbar(findViewById(R.id.root_view), event.getErrMessage());
     }
 

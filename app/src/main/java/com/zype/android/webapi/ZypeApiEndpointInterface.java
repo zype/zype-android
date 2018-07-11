@@ -37,6 +37,7 @@ import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.POST;
+import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
 import retrofit.http.QueryMap;
@@ -83,6 +84,8 @@ public interface ZypeApiEndpointInterface {
     @GET("/zobjects/?zobject_type=content")
     ContentSettings getContentSettings(@QueryMap Map<String, String> getParams);
 
+    // Consumers
+
     @GET("/consumers/{consumer_id}")
     Consumer getConsumer(@Path("consumer_id") String consumerId, @QueryMap HashMap<String, String> getParams);
 
@@ -100,7 +103,12 @@ public interface ZypeApiEndpointInterface {
     @DELETE("/consumers/{consumer_id}/video_favorites/{favorite_id}/")
     DeleteFavorite setUnFavoriteVideo(@Path("consumer_id") String consumerId, @Path("favorite_id") String favoriteId, @QueryMap HashMap<String, String> postParams);
 
+    @FormUrlEncoded
+    @PUT("/consumers/forgot_password/")
+    Consumer consumerForgotPassword(@QueryMap HashMap<String, String> getParams, @FieldMap HashMap<String, String> postParams);
+
     // Device linking
+
     @GET("/pin/status/")
     DevicePin getDevicePin(@QueryMap HashMap<String, String> queryParams);
 
