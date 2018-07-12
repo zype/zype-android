@@ -282,7 +282,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     public void onLogout() {
         SettingsProvider.getInstance().logout();
-        DataHelper.clearAllVideos(getContentResolver());
+//        DataHelper.clearAllVideos(getContentResolver());
         DownloaderService.cancelAllDownloads();
     }
 
