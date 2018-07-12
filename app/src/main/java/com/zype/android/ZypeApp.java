@@ -16,12 +16,20 @@ import com.google.android.gms.analytics.Tracker;
 import com.onesignal.OneSignal;
 import com.google.android.gms.cast.CastMediaControlIntent;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
+import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.MarketplaceGateway;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.utils.Logger;
 import com.zype.android.utils.StorageUtils;
 import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.builder.AppParamsBuilder;
+import com.zype.android.webapi.events.ErrorEvent;
+import com.zype.android.webapi.events.app.AppEvent;
+import com.zype.android.webapi.model.app.AppData;
 
 import io.fabric.sdk.android.Fabric;
+
+import static com.zype.android.webapi.WebApiManager.WorkerHandler.BAD_REQUEST;
 
 /**
  * @author vasya
@@ -40,6 +48,7 @@ public class ZypeApp extends MultiDexApplication {
     // Monitors Memory Leaks
 //    private RefWatcher refWatcher;
 
+    public static AppData appData;
     public static MarketplaceGateway marketplaceGateway;
 
     @NonNull
@@ -60,6 +69,14 @@ public class ZypeApp extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
+        StorageUtils.initStorage(this);
+        SettingsProvider.create(this);
+        WebApiManager.create(this);
+
+        WebApiManager.getInstance().subscribe(this);
+
+        initApp();
+
         // Fabric
         // TODO: Uncomment following line to use Fabric
 //        initFabric();
@@ -67,11 +84,6 @@ public class ZypeApp extends MultiDexApplication {
         // OneSignal
         // TODO: Uncomment following line to use OneSignal
 //        OneSignal.startInit(this).init();
-
-        //init external folders storage
-        StorageUtils.initStorage(this);
-        SettingsProvider.create(this);
-        WebApiManager.create(this);
 
 //        AppCompatDelegate.setDefaultNightMode(ZypeSettings.isThemeLight() ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES);
         if (ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_LIGHT)) {
@@ -127,6 +139,32 @@ public class ZypeApp extends MultiDexApplication {
             marketplaceGateway = new MarketplaceGateway(this, ZypeConfiguration.getAppKey(),
                     ZypeConfiguration.getPlanIds());
             marketplaceGateway.setup();
+        }
+    }
+
+    @Override
+    public void onTerminate() {
+        WebApiManager.getInstance().unsubscribe(this);
+
+        super.onTerminate();
+    }
+
+    private void initApp() {
+        appData = null;
+        AppParamsBuilder builder = new AppParamsBuilder();
+        WebApiManager.getInstance().executeRequest(WebApiManager.Request.APP, builder.build());
+    }
+
+    @Subscribe
+    public void handleApp(AppEvent event) {
+        appData = event.getEventData().getModelData().getAppData();
+        Logger.i("handleApp(): App data successfully loaded");
+    }
+
+    @Subscribe
+    public void handleError(ErrorEvent event) {
+        if (event.getEventData() == WebApiManager.Request.APP) {
+            Logger.e("handleError(): Retrieving app data failed");
         }
     }
 

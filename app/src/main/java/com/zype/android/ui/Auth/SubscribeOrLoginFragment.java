@@ -138,7 +138,7 @@ public class SubscribeOrLoginFragment extends Fragment {
     // Event bus listeners
     //
     @Subscribe
-    public void handleBifrost(MarketplaceConnectEvent event) {
+    public void handleMarketplaceConnect(MarketplaceConnectEvent event) {
         hideProgress();
         // TODO: Check response data to properly update subscription count
         SettingsProvider.getInstance().saveSubscriptionCount(1);

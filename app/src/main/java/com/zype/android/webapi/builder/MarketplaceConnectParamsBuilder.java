@@ -11,14 +11,10 @@ import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBody;
 
 public class MarketplaceConnectParamsBuilder extends ParamsBuilder {
     public static final String CONSUMER_ID = "consumer_id";
-    public static final String CONSUMER_TOKEN = "consumer_token";
-    public static final String PACKAGE_NAME = "packageName";
     public static final String PLAN_ID = "plan_id";
     public static final String PURCHASE_TOKEN = "purchase_token";
-
-    private static final String CLIENT_ID = "client_id";
-    private static final String CLIENT_SECRET = "client_secret";
-    private static final String REDIRECT_URI= "redirect_uri";
+    public static final String RECEIPT = "receipt";
+    public static final String SIGNATURE = "signature";
 
     public static final String ACCESS_TOKEN = "access_token";
 
@@ -26,34 +22,20 @@ public class MarketplaceConnectParamsBuilder extends ParamsBuilder {
 
     public MarketplaceConnectParamsBuilder() {
         super();
-//        addAccessToken();
-//        addClientId();
-//        addClientSecret();
-//        addRedirectUri();
     }
 
     public MarketplaceConnectParamsBuilder addReceipt(String receipt) {
-        addPostParam("receipt", receipt);
+        addPostParam(RECEIPT, receipt);
         return this;
     }
 
     public MarketplaceConnectParamsBuilder addSignature(String signature) {
-        addPostParam("signature", signature);
+        addPostParam(SIGNATURE, signature);
         return this;
     }
 
     public MarketplaceConnectParamsBuilder addConsumerId(String consumerId) {
         addPostParam(CONSUMER_ID, consumerId);
-        return this;
-    }
-
-    public MarketplaceConnectParamsBuilder addConsumerToken(String consumerToken) {
-        addPostParam(CONSUMER_TOKEN, consumerToken);
-        return this;
-    }
-
-    public MarketplaceConnectParamsBuilder addPackageName(String packageName) {
-        addPostParam(PACKAGE_NAME, packageName);
         return this;
     }
 
@@ -66,26 +48,5 @@ public class MarketplaceConnectParamsBuilder extends ParamsBuilder {
         addPostParam(PURCHASE_TOKEN, purchaseToken);
         return this;
     }
-
-    private MarketplaceConnectParamsBuilder addClientId() {
-        addPostParam(CLIENT_ID, ZypeSettings.GOOGLE_CLIENT_ID);
-        return this;
-    }
-
-    private MarketplaceConnectParamsBuilder addClientSecret() {
-        addPostParam(CLIENT_SECRET, ZypeSettings.GOOGLE_CLIENT_SECRET);
-        return this;
-    }
-
-    private MarketplaceConnectParamsBuilder addRedirectUri() {
-        addPostParam(REDIRECT_URI, ZypeSettings.GOOGLE_REDIRECT_URL);
-        return this;
-    }
-
-    private MarketplaceConnectParamsBuilder addAccessToken() {
-        addGetParam(ACCESS_TOKEN, SettingsProvider.getInstance().getAccessToken());
-        return this;
-    }
-
 
 }

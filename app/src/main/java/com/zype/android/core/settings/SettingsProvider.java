@@ -69,7 +69,7 @@ public class SettingsProvider extends CommonPreferences {
     public static final String SETTINGS_MIGRATION = "SETTINGS_MIGRATION";
     public static final String RESERVED = "RESERVED";
 
-    private static final String CONSUMER_SUBSCRIPTION_COUNT = "CONSUMER_SUBSCRIPTION_COUNT";
+    public static final String CONSUMER_SUBSCRIPTION_COUNT = "CONSUMER_SUBSCRIPTION_COUNT";
     private static final String CONSUMER_ID = "ConsumerId";
     private static final String SUBSCRIBE_URL = "SUBSCRIBE_URL";
     public static final String FILE_LENGTH = "FILE_";

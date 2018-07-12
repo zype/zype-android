@@ -158,8 +158,6 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             findViewById(R.id.layoutVideo).setLayoutParams(params);
             findViewById(R.id.layoutVideo).invalidate();
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         }
         else {
             showSystemUI();
@@ -170,8 +168,6 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             params.height = (int) getResources().getDimension(R.dimen.episode_video_height);
             findViewById(R.id.layoutVideo).setLayoutParams(params);
-//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         }
     }
 
@@ -387,11 +383,13 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     @Subscribe
     public void handleError(ErrorEvent err) {
         Logger.e("handleError");
+        if (err.getError() == null) {
+            onError();
+            return;
+        }
         if (err.getError().getResponse().getStatus() == BAD_REQUEST) {
             if (err.getEventData() == WebApiManager.Request.PLAYER_VIDEO) {
-                hideProgress();
-                showVideoThumbnail();
-                DialogHelper.showErrorAlert(this, getString(R.string.video_error_bad_request));
+                onError();
             }
         }
         else {

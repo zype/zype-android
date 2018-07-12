@@ -47,7 +47,6 @@ public class SubscriptionsHelper {
                 Logger.i("purchase signature=" + item.getSignature());
                 MarketplaceConnectParamsBuilder builder = new MarketplaceConnectParamsBuilder()
                         .addConsumerId(SettingsProvider.getInstance().getConsumerId())
-                        .addConsumerToken(SettingsProvider.getInstance().getAccessToken())
                         .addPlanId(subscription.getZypePlan().id)
                         .addPurchaseToken(item.getPurchaseToken())
                         .addReceipt(item.getOriginalJson())

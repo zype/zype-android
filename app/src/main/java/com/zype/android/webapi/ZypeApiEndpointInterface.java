@@ -1,5 +1,6 @@
 package com.zype.android.webapi;
 
+import com.zype.android.webapi.model.app.App;
 import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnect;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
@@ -59,6 +60,13 @@ public interface ZypeApiEndpointInterface {
 
     @GET("/oauth/token/info/")
     TokenInfo getTokenInfo(@Query("access_token") String accessToken);
+
+    // App
+
+    @GET("/app/")
+    App getApp(@QueryMap HashMap<String, String> getParams);
+
+    // Videos
 
     @GET("/videos/{video_id}")
     Video getVideo(@Path("video_id") String videoId, @QueryMap HashMap<String, String> getParams);

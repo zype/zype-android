@@ -13,6 +13,7 @@ import android.util.Log;
 import com.squareup.okhttp.OkHttpClient;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.bus.EventBus;
 import com.zype.android.core.events.AuthorizationErrorEvent;
@@ -24,6 +25,7 @@ import com.zype.android.webapi.builder.DownloadAudioParamsBuilder;
 import com.zype.android.webapi.builder.DownloadVideoParamsBuilder;
 import com.zype.android.webapi.builder.EntitlementParamsBuilder;
 import com.zype.android.webapi.builder.FavoriteParamsBuilder;
+import com.zype.android.webapi.builder.MarketplaceConnectParamsBuilder;
 import com.zype.android.webapi.builder.ParamsBuilder;
 import com.zype.android.webapi.builder.PlanParamsBuilder;
 import com.zype.android.webapi.builder.PlayerParamsBuilder;
@@ -31,6 +33,7 @@ import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.BaseEvent;
 import com.zype.android.webapi.events.DataEvent;
 import com.zype.android.webapi.events.ErrorEvent;
+import com.zype.android.webapi.events.app.AppEvent;
 import com.zype.android.webapi.events.auth.AccessTokenInfoEvent;
 import com.zype.android.webapi.events.auth.RefreshAccessTokenEvent;
 import com.zype.android.webapi.events.auth.RetrieveAccessTokenEvent;
@@ -61,6 +64,7 @@ import com.zype.android.webapi.events.video.VideoEvent;
 import com.zype.android.webapi.events.video.VideoListEvent;
 import com.zype.android.webapi.events.zobject.ZObjectEvent;
 import com.zype.android.webapi.model.ErrorBody;
+import com.zype.android.webapi.model.app.AppResponse;
 import com.zype.android.webapi.model.auth.AccessTokenInfoResponse;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
@@ -240,23 +244,22 @@ public class WebApiManager {
             postParams.put(accessToken, SettingsProvider.getInstance().getAccessToken());
 
         switch (request) {
+            case APP:
+                return new AppEvent(ticket, request, new AppResponse(mApi.getApp(getParams)));
             case AUTH_REFRESH_ACCESS_TOKEN:
                 return new RefreshAccessTokenEvent(ticket, new RefreshAccessToken(mApi.authRefreshAccessToken(postParams)));
             case AUTH_RETRIEVE_ACCESS_TOKEN:
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
             case MARKETPLACE_CONNECT:
                 MarketplaceConnectBody body = new MarketplaceConnectBody();
-//                body.appId = "573c8bfb1bdf330d10006bec";
-                body.appId = "5b23cc5972289b131c003834";
-                body.consumerId = postParams.get("consumer_id");
-//                body.consumerToken = postParams.get("consumer_token");
-                body.planId = postParams.get("plan_id");
-                body.purchaseToken = postParams.get("purchase_token");
-//                body.siteId = "571e32ef973e2807f601267a";
-                body.siteId = "57c0bdb26b7f0f0d14000f38";
+                body.appId = ZypeApp.appData.id;
+                body.consumerId = postParams.get(MarketplaceConnectParamsBuilder.CONSUMER_ID);
+                body.planId = postParams.get(MarketplaceConnectParamsBuilder.PLAN_ID);
+                body.purchaseToken = postParams.get(MarketplaceConnectParamsBuilder.PURCHASE_TOKEN);
+                body.siteId = ZypeApp.appData.siteId;
                 MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
-                bodyData.receipt = postParams.get("receipt");
-                bodyData.signature = postParams.get("signature");
+                bodyData.receipt = postParams.get(MarketplaceConnectParamsBuilder.RECEIPT);
+                bodyData.signature = postParams.get(MarketplaceConnectParamsBuilder.SIGNATURE);
                 body.data = bodyData;
 
                 return new MarketplaceConnectEvent(ticket, new MarketplaceConnectResponse(marketplaceConnectApi.verifySubscription(body)));
@@ -356,6 +359,7 @@ public class WebApiManager {
     }
 
     public enum Request {
+        APP,
         AUTH_REFRESH_ACCESS_TOKEN,
         AUTH_RETRIEVE_ACCESS_TOKEN,
         CONSUMER_FORGOT_PASSWORD,
