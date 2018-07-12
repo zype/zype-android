@@ -103,7 +103,7 @@
         android:id="@+id/layoutEmail"
         tools:visibility="visible"
         >
-        <ScrollView
+        <RelativeLayout
             android:id="@+id/login_form"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -112,6 +112,8 @@
                 android:id="@+id/email_login_form"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignTop="@+id/textSignUp"
                 android:orientation="vertical"
                 >
                 <ImageView
@@ -184,7 +186,15 @@
                     android:gravity="center_horizontal"
                     />
             </LinearLayout>
-        </ScrollView>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:id="@+id/textSignUp"
+                android:text="@string/login_sign_up"
+                android:gravity="center_horizontal"
+                />
+        </RelativeLayout>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"

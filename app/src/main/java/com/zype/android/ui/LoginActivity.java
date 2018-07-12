@@ -3,7 +3,9 @@ package com.zype.android.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
@@ -30,6 +32,7 @@ import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.utils.AdMacrosHelper;
+import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
@@ -62,17 +65,17 @@ public class LoginActivity extends BaseActivity {
     private Button buttonDeviceLinked;
 
     private LinearLayout layoutEmail;
-
-    private LinearLayout layoutReset;
-    private LinearLayout layoutResetCompleted;
-
-    public final static String PARAMETERS_FORCE_LOGIN = "ForceLogin";
-
     private View mProgressView;
     private View mLoginFormView;
     private TextInputLayout emailWrapper;
     private TextInputLayout passwordWrapper;
     private TextView textForgotPassword;
+    private TextView textSignUp;
+
+    private LinearLayout layoutReset;
+    private LinearLayout layoutResetCompleted;
+
+    public final static String PARAMETERS_FORCE_LOGIN = "ForceLogin";
 
     private String deviceId;
     private String pin;
@@ -95,8 +98,8 @@ public class LoginActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setTitle(R.string.login_title);
 
-        layoutAuthMethod = (LinearLayout) findViewById(R.id.layoutAuthMethod);
-        buttonLinkDevice = (Button) findViewById(R.id.buttonLinkDevice);
+        layoutAuthMethod = findViewById(R.id.layoutAuthMethod);
+        buttonLinkDevice = findViewById(R.id.buttonLinkDevice);
         buttonLinkDevice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,7 +108,7 @@ public class LoginActivity extends BaseActivity {
                 updateViews();
             }
         });
-        buttonEmail = (Button) findViewById(R.id.buttonEmail);
+        buttonEmail = findViewById(R.id.buttonEmail);
         buttonEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,10 +117,10 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
-        layoutLinkDevice = (LinearLayout) findViewById(R.id.layoutLinkDevice);
-        textDeviceLinkingUrl = (TextView) findViewById(R.id.textDeviceLinkingUrl);
-        textPin = (TextView) findViewById(R.id.textPin);
-        buttonDeviceLinked = (Button) findViewById(R.id.buttonDeviceLinked);
+        layoutLinkDevice = findViewById(R.id.layoutLinkDevice);
+        textDeviceLinkingUrl = findViewById(R.id.textDeviceLinkingUrl);
+        textPin = findViewById(R.id.textPin);
+        buttonDeviceLinked = findViewById(R.id.buttonDeviceLinked);
         buttonDeviceLinked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,9 +128,9 @@ public class LoginActivity extends BaseActivity {
             }
         });
 
-        layoutEmail = (LinearLayout) findViewById(R.id.layoutEmail);
-        emailWrapper = (TextInputLayout) findViewById(R.id.emailWrapper);
-        passwordWrapper = (TextInputLayout) findViewById(R.id.passwordWrapper);
+        layoutEmail = findViewById(R.id.layoutEmail);
+        emailWrapper = findViewById(R.id.emailWrapper);
+        passwordWrapper = findViewById(R.id.passwordWrapper);
         passwordWrapper.getEditText().setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -141,7 +144,7 @@ public class LoginActivity extends BaseActivity {
         emailWrapper.setHint(getString(R.string.prompt_email));
         passwordWrapper.setHint(getString(R.string.prompt_password));
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -150,6 +153,7 @@ public class LoginActivity extends BaseActivity {
         });
 
         textForgotPassword = findViewById(R.id.textForgotPassword);
+        textSignUp = findViewById(R.id.textSignUp);
 
         layoutReset = findViewById(R.id.layoutReset);
         mLoginFormView = findViewById(R.id.login_form);
@@ -169,7 +173,6 @@ public class LoginActivity extends BaseActivity {
                 finish();
             }
         });
-
 
         mProgressView = findViewById(R.id.login_progress);
 
@@ -223,15 +226,30 @@ public class LoginActivity extends BaseActivity {
 
         // Set Forgot password link
         SpannableString spannableForgotPassword = new SpannableString(textForgotPassword.getText());
-        ClickableSpan spanSignIn = new ClickableSpan() {
+        ClickableSpan spanForgotPassword = new ClickableSpan() {
             @Override
             public void onClick(View widget) {
                 switchToResetPasswordScreen();
             }
         };
-        spannableForgotPassword.setSpan(spanSignIn, 0, textForgotPassword.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableForgotPassword.setSpan(spanForgotPassword, 0, textForgotPassword.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         textForgotPassword.setText(spannableForgotPassword);
         textForgotPassword.setMovementMethod(LinkMovementMethod.getInstance());
+
+        // Set Sign up link
+        String signUp = getString(R.string.login_sign_up);
+        String signUpLink = getString(R.string.login_sign_up_link);
+        SpannableString spannableSignIn = new SpannableString(signUp);
+        ClickableSpan spanSignUp = new ClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                NavigationHelper.getInstance(LoginActivity.this).switchToConsumerScreen(LoginActivity.this);
+            }
+        };
+        int indexSignUp = signUp.indexOf(signUpLink);
+        spannableSignIn.setSpan(spanSignUp, indexSignUp, indexSignUp + signUpLink.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        textSignUp.setText(spannableSignIn);
+        textSignUp.setMovementMethod(LinkMovementMethod.getInstance());
 
         updateViews();
     }
@@ -319,16 +337,24 @@ public class LoginActivity extends BaseActivity {
     // //////////
     // Actions
     //
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case BundleConstants.REQUEST_CONSUMER:
+                if (resultCode == RESULT_OK) {
+                    emailWrapper.getEditText().setText(SettingsProvider.getInstance().getString(SettingsProvider.CONSUMER_EMAIL));
+                    passwordWrapper.getEditText().setText(SettingsProvider.getInstance().getString(SettingsProvider.CONSUMER_PASSWORD));
+                    attemptLogin();
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     public void attemptLogin() {
         hideKeyboard();
         String email = emailWrapper.getEditText().getText().toString();
         String password = passwordWrapper.getEditText().getText().toString();
-        if (BuildConfig.DEBUG) {
-            if (email.length() == 0 && password.length() == 0) {
-                email = "brian@zypemedia.com";
-                password = "Password1";
-            }
-        }
 
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             passwordWrapper.setError(getString(R.string.error_invalid_password));
@@ -336,9 +362,11 @@ public class LoginActivity extends BaseActivity {
 
         if (TextUtils.isEmpty(email)) {
             emailWrapper.setError(getString(R.string.error_field_required));
-        } else if (!isEmailValid(email)) {
+        }
+        else if (!isEmailValid(email)) {
             emailWrapper.setError(getString(R.string.error_invalid_email));
-        } else {
+        }
+        else {
             emailWrapper.setErrorEnabled(false);
             passwordWrapper.setErrorEnabled(false);
             showProgress(true);

@@ -136,6 +136,8 @@
     <string name="login_reset_title">Reset your password</string>
     <string name="login_reset_completed_message">An email with password reset instructions has been sent to your email address, if it exists in our system.</string>
     <string name="login_reset_completed_title">Thank you!</string>
+    <string name="login_sign_up">Don\'t have an account? Sign up</string>
+    <string name="login_sign_up_link">Sign up</string>
     <string name="login_title">Sign In</string>
 
     <!-- Main -->
