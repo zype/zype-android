@@ -350,7 +350,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     @Subscribe
     public void handleDownloadVideo(DownloadVideoEvent event) {
         Logger.d("handleDownloadVideo");
-        File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
+        File file = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
         String url;
         if (file != null) {
             url = file.getUrl();
@@ -366,7 +366,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
 
     @Subscribe
     public void handleDownloadAudio(DownloadAudioEvent event) {
-        File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
+        File file = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
         String url;
         if (file != null) {
             url = file.getUrl();

@@ -505,7 +505,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     @Subscribe
     public void handleDownloadVideo(DownloadVideoEvent event) {
         Logger.d("handleDownloadVideo");
-        File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
+        File file = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
         String url;
         if (file != null) {
             url = file.getUrl();

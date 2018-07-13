@@ -56,7 +56,6 @@ import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.File;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -379,7 +378,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Subscribe
     public void handleDownloadVideo(DownloadVideoEvent event) {
         Logger.d("handleDownloadVideo");
-        File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
+        File file = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
         String url;
         if (file != null) {
             url = file.getUrl();
@@ -395,7 +394,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Subscribe
     public void handleDownloadAudio(DownloadAudioEvent event) {
         Logger.d("handleDownloadAudio");
-        File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
+        File file = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
         String url;
         if (file != null) {
             url = file.getUrl();
