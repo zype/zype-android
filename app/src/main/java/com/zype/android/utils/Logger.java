@@ -4,13 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.zype.android.BuildConfig;
+
 import java.lang.reflect.Field;
 
 public class Logger {
 
     private static final String LOG_TAG = "Log";
 
-    private final static boolean isDebug = true;
+    private final static boolean isDebug = BuildConfig.DEBUG;
 
     static {
         Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());
@@ -80,7 +82,6 @@ public class Logger {
     }
 
     public static void v(String message, Throwable cause) {
-//        if (BuildConfig.DEBUG) {
         if (isDebug) {
             Log.v(LOG_TAG, message, cause);
         }
