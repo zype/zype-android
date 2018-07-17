@@ -22,7 +22,7 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
-import com.zype.android.ui.LoginActivity;
+import com.zype.android.ui.Auth.LoginActivity;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
@@ -64,6 +64,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         OnMainActivityFragmentListener, OnVideoItemAction, OnLoginAction,
         BillingManager.BillingUpdatesListener {
 
+    BottomNavigationView bottomNavigationView;
+
     CustomViewPager pagerSections;
     Map<Integer, Section> sections;
 
@@ -78,16 +80,13 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         setSupportActionBar(toolbar);
         setTitle(R.string.menu_navigation_home);
 
+        bottomNavigationView = findViewById(R.id.navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
         setupNavigation();
-        adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
-        adapterSections.setData(sections);
 
         pagerSections = findViewById(R.id.pagerSections);
         pagerSections.setAdapter(adapterSections);
         pagerSections.setSwipeEnabled(false);
-
-        BottomNavigationView bottomNavigationView = findViewById(R.id.navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
 //        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 //        tabLayout.setupWithViewPager(pagerSections);
@@ -133,8 +132,17 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         sections = new LinkedHashMap<>();
         sections.put(R.id.menuNavigationHome, new Section(getString(R.string.menu_navigation_home)));
         sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
-        sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
+        if (ZypeConfiguration.isDownloadsEnabled(this)) {
+            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(true);
+            sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
+        }
+        else {
+            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(false);
+        }
         sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings)));
+
+        adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        adapterSections.setData(sections);
     }
 
     //

@@ -40,22 +40,6 @@ public class SubscriptionsHelper {
         }
     }
 
-    public static void validateSubscription(Subscription subscription, List<Purchase> purchases, WebApiManager apiManager) {
-        for (Purchase item : purchases) {
-            if (item.getSku().equals(subscription.getMarketplace().getSku())) {
-                Logger.i("purchase originalJson=" + item.getOriginalJson());
-                Logger.i("purchase signature=" + item.getSignature());
-                MarketplaceConnectParamsBuilder builder = new MarketplaceConnectParamsBuilder()
-                        .addConsumerId(SettingsProvider.getInstance().getConsumerId())
-                        .addPlanId(subscription.getZypePlan().id)
-                        .addPurchaseToken(item.getPurchaseToken())
-                        .addReceipt(item.getOriginalJson())
-                        .addSignature(item.getSignature());
-                apiManager.executeRequest(WebApiManager.Request.MARKETPLACE_CONNECT, builder.build());
-            }
-        }
-    }
-
     public static List<String> getSkuList() {
         List<String> result = new ArrayList<>();
         result.add("com.zype.android.demo.monthly");

@@ -130,7 +130,7 @@
             />
         -->
         <activity
-            android:name=".ui.LoginActivity"
+            android:name=".ui.Auth.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeWithActionBar"
             />
@@ -196,7 +196,7 @@
                 android:value="com.zype.android.ui.main.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.Auth.SubscribeOrLoginActivity"
+            android:name=".ui.Subscription.SubscribeOrLoginActivity"
             android:theme="@style/AppThemeWithActionBar"
             />
         <activity

@@ -79,7 +79,7 @@ public class DialogHelper {
         alertDialog.setNegativeButton(activity.getString(R.string.dialog_button_close), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+                dialog.dismiss();
             }
         });
         AlertDialog alert = alertDialog.create();

@@ -1,8 +1,10 @@
-package com.zype.android.ui.Auth;
+package com.zype.android.ui.Subscription;
 
 import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
@@ -12,7 +14,6 @@ import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.Subscription.SubscriptionHelper;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
@@ -53,7 +54,20 @@ public class SubscribeOrLoginActivity extends BaseActivity {
                         Subscription subscription = ZypeApp.marketplaceGateway.findSubscriptionBySku(purchases.get(0).getSku());
                         if (subscription != null) {
                             showProgress();
-                            SubscriptionsHelper.validateSubscription(subscription, purchases, getApi());
+                            ZypeApp.marketplaceGateway.verifySubscription(subscription).observe(this, new Observer<Boolean>() {
+                                @Override
+                                public void onChanged(@Nullable Boolean result) {
+                                    hideProgress();
+                                    if (result) {
+                                        setResult(RESULT_OK);
+                                        finish();
+                                    }
+                                    else {
+                                        DialogHelper.showErrorAlert(SubscribeOrLoginActivity.this,
+                                                getString(R.string.subscribe_or_login_error_validation));
+                                    }
+                                }
+                            });
                         }
                         else {
                             Logger.e("Not found Zype Plan for existing in-app purchase, sku=" + purchases.get(0).getSku());
@@ -120,30 +134,6 @@ public class SubscribeOrLoginActivity extends BaseActivity {
     private void hideProgress() {
         if (dialogProgress != null) {
             dialogProgress.dismiss();
-        }
-    }
-
-    // //////////
-    // Event bus listeners
-    //
-    @Subscribe
-    public void handleBifrost(MarketplaceConnectEvent event) {
-        hideProgress();
-        // TODO: Check response data to properly update subscription count
-        SettingsProvider.getInstance().saveSubscriptionCount(1);
-        setResult(RESULT_OK);
-        finish();
-    }
-
-    @Subscribe
-    public void handleError(ErrorEvent event) {
-        Logger.e("handleError()");
-        if (event.getEventData() == WebApiManager.Request.MARKETPLACE_CONNECT) {
-            hideProgress();
-            RetrofitError error = event.getError();
-            if (error != null) {
-                DialogHelper.showErrorAlert(this, getString(R.string.subscribe_or_login_error_validation));
-            }
         }
     }
 

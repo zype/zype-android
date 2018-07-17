@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -12,19 +11,15 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.R;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Consumer.Model.Consumer;
-import com.zype.android.ui.LoginActivity;
+import com.zype.android.ui.Auth.LoginActivity;
 import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseActivity;
-import com.zype.android.ui.main.MainActivity;
 import com.zype.android.ui.settings.TermsActivity;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
@@ -65,9 +60,9 @@ public class ConsumerActivity extends BaseActivity {
 
         initParameters(savedInstanceState);
 
-        layoutEmail = (TextInputLayout) findViewById(R.id.layoutEmail);
-        layoutPassword = (TextInputLayout) findViewById(R.id.layoutPassword);
-        buttonUpdate = (Button) findViewById(R.id.buttonUpdate);
+        layoutEmail = findViewById(R.id.layoutEmail);
+        layoutPassword = findViewById(R.id.layoutPassword);
+        buttonUpdate = findViewById(R.id.buttonUpdate);
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,8 +70,8 @@ public class ConsumerActivity extends BaseActivity {
                 updateConsumer();
             }
         });
-        textTerms = (TextView) findViewById(R.id.textTerms);
-        textSignIn = (TextView) findViewById(R.id.textSignIn);
+        textTerms = findViewById(R.id.textTerms);
+        textSignIn = findViewById(R.id.textSignIn);
 
         hideProgress();
         bindViews();

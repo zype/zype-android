@@ -99,7 +99,7 @@ public class GalleryViewModel extends AndroidViewModel {
                                     @Override
                                     public void onChanged(@Nullable List<Playlist> playlists) {
                                         Logger.d("onChanged(): Nested playlists, size=" + playlists.size());
-                                        List<Playlist> nestedPlaylists = DataRepository.getInstance(getApplication()).getPlaylistsSync(playlist.id);
+//                                        List<Playlist> nestedPlaylists = DataRepository.getInstance(getApplication()).getPlaylistsSync(playlist.id);
                                         row.nestedPlaylists = playlists;
                                         data.setValue(galleryRows);
                                     }

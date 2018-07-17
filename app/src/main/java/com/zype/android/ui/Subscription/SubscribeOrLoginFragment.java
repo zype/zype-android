@@ -1,7 +1,8 @@
-package com.zype.android.ui.Auth;
+package com.zype.android.ui.Subscription;
 
 
 import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -75,12 +76,6 @@ public class SubscribeOrLoginFragment extends Fragment {
         });
 
         final List<Purchase> purchases = ZypeApp.marketplaceGateway.getBillingManager().getPurchases();
-        if (purchases != null && purchases.size() > 0) {
-            Logger.d("There are purchases, size=" + purchases.size());
-        }
-        else {
-            Logger.d("There are no purchases on the device");
-        }
         Button buttonRestorePurchases = rootView.findViewById(R.id.buttonRestorePurchases);
         buttonRestorePurchases.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,7 +85,20 @@ public class SubscribeOrLoginFragment extends Fragment {
                     Subscription subscription = ZypeApp.marketplaceGateway.findSubscriptionBySku(purchases.get(0).getSku());
                     if (subscription != null) {
                         showProgress(getString(R.string.subscription_verify));
-                        SubscriptionsHelper.validateSubscription(subscription, purchases, api);
+                        ZypeApp.marketplaceGateway.verifySubscription(subscription).observe(SubscribeOrLoginFragment.this, new Observer<Boolean>() {
+                            @Override
+                            public void onChanged(@Nullable Boolean result) {
+                                hideProgress();
+                                if (result) {
+                                    getActivity().setResult(RESULT_OK);
+                                    getActivity().finish();
+                                }
+                                else {
+                                    DialogHelper.showErrorAlert(getActivity(),
+                                            getString(R.string.subscribe_or_login_error_validation));
+                                }
+                            }
+                        });
                     }
                     else {
                         Logger.e("Not found Zype Plan for existing in-app purchase, sku=" + purchases.get(0).getSku());
@@ -103,9 +111,11 @@ public class SubscribeOrLoginFragment extends Fragment {
             }
         });
         if (purchases != null && purchases.size() > 0) {
+            Logger.d("There are purchases, size=" + purchases.size());
             buttonRestorePurchases.setVisibility(View.VISIBLE);
         }
         else {
+            Logger.d("There are no purchases on the device");
             buttonRestorePurchases.setVisibility(View.GONE);
         }
 
@@ -131,27 +141,6 @@ public class SubscribeOrLoginFragment extends Fragment {
     private void hideProgress() {
         if (dialogProgress != null) {
             dialogProgress.dismiss();
-        }
-    }
-
-    // //////////
-    // Event bus listeners
-    //
-    @Subscribe
-    public void handleMarketplaceConnect(MarketplaceConnectEvent event) {
-        hideProgress();
-        // TODO: Check response data to properly update subscription count
-        SettingsProvider.getInstance().saveSubscriptionCount(1);
-        getActivity().setResult(RESULT_OK);
-        getActivity().finish();
-    }
-
-    @Subscribe
-    public void handleError(ErrorEvent event) {
-        Logger.e("handleError()");
-        if (event.getEventData() == WebApiManager.Request.MARKETPLACE_CONNECT) {
-            hideProgress();
-            DialogHelper.showErrorAlert(getActivity(), getString(R.string.subscribe_or_login_error_validation));
         }
     }
 

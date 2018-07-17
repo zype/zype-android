@@ -38,7 +38,7 @@ import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.ui.Helpers.AutoplayHelper;
-import com.zype.android.ui.LoginActivity;
+import com.zype.android.ui.Auth.LoginActivity;
 import com.zype.android.ui.chromecast.ChromecastCheckStatusFragment;
 import com.zype.android.ui.chromecast.ChromecastFragment;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;

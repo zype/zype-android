@@ -6,11 +6,9 @@ import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.core.provider.DataHelper;
-import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadConstants;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
-import com.zype.android.ui.LoginActivity;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
@@ -22,8 +20,6 @@ import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.FileUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
-import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.builder.FavoriteParamsBuilder;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -42,7 +38,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;

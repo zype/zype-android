@@ -12,9 +12,9 @@ import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
-import com.zype.android.ui.Auth.SubscribeOrLoginActivity;
+import com.zype.android.ui.Auth.LoginActivity;
+import com.zype.android.ui.Subscription.SubscribeOrLoginActivity;
 import com.zype.android.ui.Consumer.ConsumerActivity;
 import com.zype.android.ui.Gallery.GalleryActivity;
 import com.zype.android.ui.Intro.IntroActivity;
@@ -26,11 +26,8 @@ import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
-import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.List;
-
-import static com.zype.android.ZypeApp.marketplaceGateway;
 
 /**
  * Created by Evgeny Cherkasov on 11.07.2017.

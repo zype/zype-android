@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_margin="16dp"
     android:id="@+id/root_view"
-    tools:context="com.zype.android.ui.LoginActivity"
+    tools:context="com.zype.android.ui.Auth.LoginActivity"
     >
 
     <!-- Login progress -->

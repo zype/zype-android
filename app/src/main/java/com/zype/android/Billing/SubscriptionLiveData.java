@@ -20,27 +20,17 @@ import java.util.List;
  * Created by Evgeny Cherkasov on 23.06.2018
  */
 public class SubscriptionLiveData extends LiveData<Subscription> {
-    @Override
-    protected void onActive() {
-        WebApiManager.getInstance().subscribe(this);
-    }
 
-    @Override
-    protected void onInactive() {
-        WebApiManager.getInstance().unsubscribe(this);
-    }
-
-    public void loadPlan(String planId) {
-        PlanParamsBuilder builder = new PlanParamsBuilder(planId);
-        WebApiManager.getInstance().executeRequest(WebApiManager.Request.PLAN, builder.build());
-    }
-
-    @Subscribe
-    public void handlePlan(PlanEvent event) {
-        Logger.d("handlePlan()");
-        PlanData data = event.getEventData().getModelData().data;
-        Subscription subscription = new Subscription();
-        subscription.setZypePlan(data);
+    public SubscriptionLiveData(Subscription subscription) {
+        super();
         setValue(subscription);
+    }
+
+    public void setVerified(boolean verified) {
+        Subscription subscription = getValue();
+        if (subscription != null) {
+            subscription.setVerified(verified);
+            setValue(subscription);
+        }
     }
 }

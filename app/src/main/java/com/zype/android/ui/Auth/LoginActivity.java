@@ -1,4 +1,4 @@
-package com.zype.android.ui;
+package com.zype.android.ui.Auth;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -24,11 +24,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
-import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.utils.AdMacrosHelper;

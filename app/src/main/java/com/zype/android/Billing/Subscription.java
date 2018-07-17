@@ -9,6 +9,7 @@ import com.zype.android.webapi.model.plan.PlanData;
 public class Subscription {
     private PlanData zypePlan;
     private SkuDetails marketplace;
+    private boolean verified = false;
 
     public PlanData getZypePlan() {
         return zypePlan;
@@ -24,5 +25,13 @@ public class Subscription {
 
     public void setMarketplace(SkuDetails skuDetails) {
         marketplace = skuDetails;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
     }
 }

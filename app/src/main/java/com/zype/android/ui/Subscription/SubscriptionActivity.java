@@ -259,7 +259,20 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             if (purchases != null && !purchases.isEmpty()) {
                 if (selectedSubscription != null) {
                     showProgress(getString(R.string.subscription_verify));
-                    SubscriptionsHelper.validateSubscription(selectedSubscription, purchases, getApi());
+                    ZypeApp.marketplaceGateway.verifySubscription(selectedSubscription).observe(this, new Observer<Boolean>() {
+                        @Override
+                        public void onChanged(@Nullable Boolean result) {
+                            hideProgress();
+                            if (result) {
+                                setResult(RESULT_OK);
+                                finish();
+                            }
+                            else {
+                                DialogHelper.showErrorAlert(SubscriptionActivity.this,
+                                        getString(R.string.subscribe_or_login_error_validation));
+                            }
+                        }
+                    });
                 }
             }
         }
@@ -329,32 +342,11 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             public ViewHolder(View view) {
                 super(view);
                 this.view = view;
-                textTitle = (TextView) view.findViewById(R.id.textTitle);
-                textPrice = (TextView) view.findViewById(R.id.textPrice);
-                textDescription = (TextView) view.findViewById(R.id.textDescription);
-                buttonContinue = (Button) view.findViewById(R.id.buttonContinue);
+                textTitle = view.findViewById(R.id.textTitle);
+                textPrice = view.findViewById(R.id.textPrice);
+                textDescription = view.findViewById(R.id.textDescription);
+                buttonContinue = view.findViewById(R.id.buttonContinue);
             }
-        }
-    }
-
-    // //////////
-    // Event bus listeners
-    //
-    @Subscribe
-    public void handleMarketplaceConnect(MarketplaceConnectEvent event) {
-        hideProgress();
-        // TODO: Check response data to properly update subscription count
-        SettingsProvider.getInstance().saveSubscriptionCount(1);
-        setResult(RESULT_OK);
-        finish();
-    }
-
-    @Subscribe
-    public void handleError(ErrorEvent event) {
-        Logger.e("handleError()");
-        if (event.getEventData() == WebApiManager.Request.MARKETPLACE_CONNECT) {
-            hideProgress();
-            DialogHelper.showErrorAlert(this, getString(R.string.subscribe_or_login_error_validation));
         }
     }
 
