@@ -126,7 +126,7 @@ public class GalleryViewModel extends AndroidViewModel {
     private LiveData<List<Playlist>> getPlaylists(String parentPlaylistId) {
         Logger.d("getPlaylists(): parentPlaylistId=" + parentPlaylistId);
         LiveData<List<Playlist>> result = repo.getPlaylists(parentPlaylistId);
-        if (result.getValue() == null || result.getValue().size() == 0) {
+        if (result.getValue() == null || result.getValue().isEmpty()) {
             loadPlaylists(parentPlaylistId);
         }
         return result;

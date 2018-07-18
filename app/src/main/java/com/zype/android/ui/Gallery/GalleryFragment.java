@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
@@ -42,6 +43,7 @@ public class GalleryFragment extends Fragment {
     private GalleryRowsAdapter adapter;
 
     CustomViewPager pagerHeroImages;
+    ProgressBar progressBar;
 
     public static GalleryFragment newInstance(String parentPlaylistId) {
         GalleryFragment fragment = new GalleryFragment();
@@ -75,6 +77,8 @@ public class GalleryFragment extends Fragment {
         RecyclerView listGallery = rootView.findViewById(R.id.listGallery);
         adapter = new GalleryRowsAdapter();
         listGallery.setAdapter(adapter);
+
+        progressBar = rootView.findViewById(R.id.progress);
 
         return rootView;
     }
@@ -124,12 +128,37 @@ public class GalleryFragment extends Fragment {
     }
 
     private void updateGalleryRows() {
+        showProgress();
         model.getGalleryRows(parentPlaylistId).observe(this, new Observer<List<GalleryRow>>() {
             @Override
             public void onChanged(@Nullable List<GalleryRow> galleryRows) {
                 Logger.d("onChanged(): Gallery rows changed, size=" + galleryRows.size());
-                adapter.setData(galleryRows);
+                if (allDataLoaded(galleryRows)) {
+                    adapter.setData(galleryRows);
+                    hideProgress();
+                }
             }
         });
     }
+
+    private boolean allDataLoaded(List<GalleryRow> galleryRows) {
+        boolean result = true;
+        for (GalleryRow item : galleryRows) {
+            if ((item.videos == null || item.videos.isEmpty())
+                    && (item.nestedPlaylists == null || item.nestedPlaylists.isEmpty())) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
+    private void showProgress() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgress() {
+        progressBar.setVisibility(View.GONE);
+    }
+
 }
