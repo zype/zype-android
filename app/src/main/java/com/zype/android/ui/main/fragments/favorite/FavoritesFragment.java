@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.Contract;
@@ -184,7 +185,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     }
 
     protected void startLoadCursors() {
-        if (SettingsProvider.getInstance().isLogined()
+        if (AuthHelper.isLoggedIn()
                 || !ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())) {
             if (loaderManager == null) {
                 loaderManager = getLoaderManager();

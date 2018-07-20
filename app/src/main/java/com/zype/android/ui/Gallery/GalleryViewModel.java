@@ -68,6 +68,9 @@ public class GalleryViewModel extends AndroidViewModel {
                 public void onChanged(@Nullable List<Playlist> playlists) {
                     Logger.d("onChanged(): Playlists, size=" + playlists.size());
 
+                    if (!playlists.isEmpty()) {
+                        data.removeSource(liveDataPlaylists);
+                    }
                     final List<GalleryRow> galleryRows = new ArrayList<>();
 
                     for (final Playlist playlist : playlists) {
@@ -84,7 +87,9 @@ public class GalleryViewModel extends AndroidViewModel {
                                     public void onChanged(@Nullable List<Video> videos) {
                                         Logger.d("onChanged(): Videos, size=" + videos.size());
                                         row.videos = videos;
-                                        data.setValue(galleryRows);
+                                        if (allDataLoaded()) {
+                                            data.setValue(galleryRows);
+                                        }
                                     }
                                 });
                             }
@@ -101,7 +106,9 @@ public class GalleryViewModel extends AndroidViewModel {
                                         Logger.d("onChanged(): Nested playlists, size=" + playlists.size());
 //                                        List<Playlist> nestedPlaylists = DataRepository.getInstance(getApplication()).getPlaylistsSync(playlist.id);
                                         row.nestedPlaylists = playlists;
-                                        data.setValue(galleryRows);
+                                        if (allDataLoaded()) {
+                                            data.setValue(galleryRows);
+                                        }
                                     }
                                 });
                             }
@@ -114,6 +121,21 @@ public class GalleryViewModel extends AndroidViewModel {
             });
         }
         return data;
+    }
+
+    public boolean allDataLoaded() {
+        if (data.getValue() == null || data.getValue().isEmpty()) {
+            return false;
+        }
+        boolean result = true;
+        for (GalleryRow item : data.getValue()) {
+            if ((item.videos == null || item.videos.isEmpty())
+                    && (item.nestedPlaylists == null || item.nestedPlaylists.isEmpty())) {
+                result = false;
+                break;
+            }
+        }
+        return result;
     }
 
     /**

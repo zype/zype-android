@@ -113,12 +113,13 @@ public class GalleryFragment extends Fragment {
         }
 
         model = ViewModelProviders.of(getActivity()).get(GalleryViewModel.class);
-        updateGalleryRows();
+//        updateGalleryRows();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        updateGalleryRows();
         adapter.notifyDataSetChanged();
     }
 

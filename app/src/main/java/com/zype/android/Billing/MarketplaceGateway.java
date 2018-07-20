@@ -162,8 +162,8 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
 
     @Subscribe
     public void handleError(ErrorEvent event) {
-        Logger.e("handleError()");
         if (event.getEventData() == WebApiManager.Request.MARKETPLACE_CONNECT) {
+            Logger.e("handleError(): Marketplace connect");
             RetrofitError error = event.getError();
             if (error != null) {
                 if (subscriptionVerified != null) {
