@@ -2,13 +2,19 @@ package com.zype.android.core.provider.helpers;
 
 import com.google.gson.Gson;
 
+import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.webapi.model.playlist.PlaylistData;
 
+import android.app.Application;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
+
+import java.util.List;
 
 /**
  * @author vasya
@@ -31,6 +37,32 @@ public class PlaylistHelper {
         contentValues.put(Contract.Playlist.COLUMN_IMAGES, new Gson().toJson(playlistData.getImages()));
 
         return contentValues;
+    }
+
+    public static String getNextVideoId(String currentVideoId, String playlistId, Application application) {
+        Video nextVideo = null;
+        List<Video> playlistVideos = DataRepository.getInstance(application)
+                .getPlaylistVideosSync(playlistId);
+        if (playlistVideos != null && !playlistVideos.isEmpty()) {
+            for (int i = 0; i < playlistVideos.size(); i++) {
+                Video video = playlistVideos.get(i);
+                if (video.id.equals(currentVideoId)) {
+                    if (i == playlistVideos.size() - 1) {
+                        nextVideo = playlistVideos.get(0);
+                    }
+                    else {
+                        nextVideo = playlistVideos.get(i + 1);
+                    }
+                    break;
+                }
+            }
+        }
+        if (nextVideo != null) {
+            return nextVideo.id;
+        }
+        else {
+            return null;
+        }
     }
 
     public static String getNextVideoId(String currentVideoId, Cursor playlistVideosCursor) {

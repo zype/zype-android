@@ -37,7 +37,8 @@ public class DataRepository {
         return INSTANCE;
     }
 
-    // Playlists
+    // Playlist
+
     public LiveData<List<Playlist>> getPlaylists(String parentId) {
         return db.zypeDao().getPlaylists(parentId);
     }
@@ -54,9 +55,14 @@ public class DataRepository {
         db.zypeDao().insertPlaylists(playlists);
     }
 
-    // Videos
+    // Video
+
     public LiveData<List<Video>> getPlaylistVideos(String playlistId) {
         return db.zypeDao().getPlaylistVideos(playlistId);
+    }
+
+    public List<Video> getPlaylistVideosSync(String playlistId) {
+        return db.zypeDao().getPlaylistVideosSync(playlistId);
     }
 
     public void insertPlaylistVideos(List<PlaylistVideo> playlistVideos) {

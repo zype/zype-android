@@ -22,6 +22,8 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 @Dao
 public interface ZypeDao {
 
+    // Playlist
+
     @Query("SELECT * FROM playlist WHERE playlist.parent_id = :parentPlaylistId AND playlist.active = 1 ORDER BY playlist.priority")
     public LiveData<List<Playlist>> getPlaylists(String parentPlaylistId);
 
@@ -34,8 +36,13 @@ public interface ZypeDao {
     @Insert(onConflict = REPLACE)
     public void insertPlaylists(List<Playlist> playlists);
 
+    // Video
+
     @Query("SELECT * FROM video INNER JOIN playlist_video ON video._id = playlist_video.video_id WHERE playlist_video.playlist_id = :playlistId")
     public LiveData<List<Video>> getPlaylistVideos(String playlistId);
+
+    @Query("SELECT * FROM video INNER JOIN playlist_video ON video._id = playlist_video.video_id WHERE playlist_video.playlist_id = :playlistId")
+    public List<Video> getPlaylistVideosSync(String playlistId);
 
     @Insert(onConflict = REPLACE)
     public void insertPlaylistVideos(List<PlaylistVideo> playlistVideos);
