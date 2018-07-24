@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -70,6 +71,7 @@ import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.receiver.PhoneCallReceiver;
 import com.zype.android.receiver.RemoteControlReceiver;
+import com.zype.android.ui.Gallery.GalleryViewModel;
 import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.Helpers.IPlaylistVideos;
 import com.zype.android.ui.base.BaseFragment;
@@ -164,6 +166,7 @@ public class PlayerFragment extends BaseFragment implements
     private boolean isControlsEnabled = true;
 
     private boolean autoplay = false;
+    private boolean fullscreenSelected = false;
 
     //
     // IMA SDK
@@ -188,6 +191,9 @@ public class PlayerFragment extends BaseFragment implements
     private Handler handlerTimer;
     private Runnable runnableTimer;
     private Calendar liveStreamTimeStart;
+
+    // Sensors
+    SensorViewModel sensorViewModel;
 
     public static PlayerFragment newInstance(int mediaType, String filePath, String fileId) {
         PlayerFragment fragment = new PlayerFragment();
@@ -282,14 +288,14 @@ public class PlayerFragment extends BaseFragment implements
             }
         });
 
-        videoFrame = (AspectRatioFrameLayout) mainView.findViewById(R.id.video_frame);
+        videoFrame = mainView.findViewById(R.id.video_frame);
 
-        surfaceView = (SurfaceView) mainView.findViewById(R.id.surface_view);
+        surfaceView = mainView.findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(surfaceCallback);
 
-        subtitleLayout = (SubtitleLayout) mainView.findViewById(R.id.subtitles);
+        subtitleLayout = mainView.findViewById(R.id.subtitles);
 
-        thumbnailView = (ImageView) mainView.findViewById(R.id.thumbnailView);
+        thumbnailView = mainView.findViewById(R.id.thumbnailView);
         if (contentType == TYPE_AUDIO_WEB || contentType == TYPE_AUDIO_LOCAL) {
             thumbnailView.setVisibility(View.VISIBLE);
         } else if (contentType == TYPE_AUDIO_LIVE) {
@@ -331,6 +337,8 @@ public class PlayerFragment extends BaseFragment implements
             }
         });
 
+        sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
+
         setHasOptionsMenu(true);
     }
 
@@ -341,6 +349,8 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     private void onScreenOrientationChanged() {
+        int rotate = getActivity().getWindowManager().getDefaultDisplay().getRotation();
+        Logger.d("onScreenOrientationChanged(): rotate=" + rotate);
         boolean fullscreen = UiUtils.isLandscapeOrientation(getActivity());
         mListener.onFullscreenChanged(fullscreen);
         mediaController.updateFullscreenButton(fullscreen);
@@ -1345,12 +1355,15 @@ public class PlayerFragment extends BaseFragment implements
     public void onFullscreen() {
         boolean fullscreen = UiUtils.isLandscapeOrientation(getActivity());
         if (fullscreen) {
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+            listenForDeviceRotation(Configuration.ORIENTATION_PORTRAIT);
         }
         else {
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            listenForDeviceRotation(Configuration.ORIENTATION_LANDSCAPE);
         }
         mediaController.updateFullscreenButton(!fullscreen);
+        fullscreenSelected = !fullscreenSelected;
     }
 
     //
@@ -1476,4 +1489,19 @@ public class PlayerFragment extends BaseFragment implements
                 });
     }
 
+    //
+    // Sensors
+    //
+    private void listenForDeviceRotation(final int requiredOrientation) {
+        sensorViewModel.getOrientation().observe(this, new android.arch.lifecycle.Observer<Integer>() {
+            @Override
+            public void onChanged(@Nullable Integer orientation) {
+                Logger.d("listenForDeviceRotation(): orientation=" + orientation);
+                if (orientation == requiredOrientation) {
+                    sensorViewModel.stopListeningOrientation();
+                    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                }
+            }
+        });
+    }
 }
