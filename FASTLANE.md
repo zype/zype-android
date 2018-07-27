@@ -57,7 +57,10 @@ This will create your APK file which you can upload to the Google Play Store. Us
 
 1. Follow the steps at [https://docs.fastlane.tools/actions/supply/#setup](https://docs.fastlane.tools/actions/supply/#setup) in order to create to create a service account which can upload for your dev team.
 2. After creating the service account and downloading the JSON file for your service account, place your service account JSON within the app folder. After you have placed your JSON in the app folder, you should update the `json_key_file` inside **fastlane/Appfile**. This allows Fastlane to upload to the correct account.
-3. Before your service account can upload apps to your account, your app needs to be added under your service accounts permissions.
+
+<a href="https://drive.google.com/uc?export=view&id=1m0f5fHFAU2XHDfDBOuM8ggzq-ZfRs11t"><img src="https://drive.google.com/uc?export=view&id=1m0f5fHFAU2XHDfDBOuM8ggzq-ZfRs11t" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
+
+3. Before your service account can upload apps to your account, your app needs to be added under your service accounts permissions. You can find your service account by going to the Google Play Console at [https://play.google.com/apps/publish](https://play.google.com/apps/publish). From there, go to **Settings** tab, then the **API access** tab under the **Developer account** tab after that. You can find your service account at the bottom of the API access page under the **Service Accounts**. Click **View permissions** next to your service account to see your service account. You can edit the permissions for the account by clicking **Change permissions** next to your service account in the **Users with access** section.
 
 <a href="https://drive.google.com/uc?export=view&id=1ZJwFE-t5ezi0ryfdIa-eq-adwMHQ0PxF"><img src="https://drive.google.com/uc?export=view&id=1ZJwFE-t5ezi0ryfdIa-eq-adwMHQ0PxF" style="width: 500px; max-width: 100%; height: auto" title="Click for the larger version." /></a>
 
