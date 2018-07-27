@@ -16,6 +16,7 @@ import com.zype.android.ui.Helpers.IPlaylistVideos;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
+import com.zype.android.ui.player.PlayerViewModel;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
@@ -42,6 +43,7 @@ import com.zype.android.webapi.model.zobjects.ZobjectData;
 
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -70,6 +72,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     private ImageView imageVideo;
 
     VideoDetailViewModel videoDetailViewModel;
+    PlayerViewModel playerViewModel;
 
     public static void startActivity(Activity activity, String videoId, String playlistId) {
         Intent intent = new Intent(activity, VideoDetailActivity.class);
@@ -87,6 +90,15 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         initUI();
         Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
         if (video != null) {
+            // Load player urls
+            playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class);
+            playerViewModel.getPlayerUrl(video.id).observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(@Nullable String url) {
+                    Logger.d("getPlayerUrl(): onChanged(): url=" + url);
+                }
+            });
+
             if (video.isZypeLive == 0) {
                 updateDownloadUrls();
             }
@@ -454,10 +466,10 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
 
     @Subscribe
     public void handleAudioPlayer(PlayerAudioEvent event) {
-        Logger.d("handlePlayer");
-        String url = event.getEventData().getModelData().getResponse().getBody().getFiles().get(0).getUrl();
-        DataHelper.saveAudioPlayerLink(getContentResolver(), mVideoId, url);
-        mType = PlayerFragment.TYPE_AUDIO_WEB;
-        changeFragment(isChromecastConntected());
+//        Logger.d("handlePlayer");
+//        String url = event.getEventData().getModelData().getResponse().getBody().getFiles().get(0).getUrl();
+//        DataHelper.saveAudioPlayerLink(getContentResolver(), mVideoId, url);
+//        mType = PlayerFragment.TYPE_AUDIO_WEB;
+//        changeFragment(isChromecastConntected());
     }
 }

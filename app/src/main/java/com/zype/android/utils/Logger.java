@@ -12,7 +12,8 @@ public class Logger {
 
     private static final String LOG_TAG = "Log";
 
-    private final static boolean isDebug = BuildConfig.DEBUG;
+//    private final static boolean isDebug = BuildConfig.DEBUG;
+    private final static boolean isDebug = true;
 
     static {
         Thread.setDefaultUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler());

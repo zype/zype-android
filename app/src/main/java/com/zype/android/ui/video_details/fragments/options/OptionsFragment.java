@@ -13,6 +13,7 @@ import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.ui.dialog.VideoMenuDialogFragment;
+import com.zype.android.ui.player.PlayerViewModel;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
 import com.zype.android.ui.main.fragments.videos.VideosMenuItem;
 import com.zype.android.ui.player.PlayerFragment;
@@ -21,6 +22,8 @@ import com.zype.android.utils.FileUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +32,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,7 +52,8 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
 
     private static final int OPTION_DOWNLOAD = 1;
     private static final int OPTION_FAVORITES = 2;
-    private static final int OPTION_SHARE = 3;
+    private static final int OPTION_PLAY_AS = 3;
+    private static final int OPTION_SHARE = 4;
 
     private String videoId;
     private Context mContext;
@@ -64,6 +69,8 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     private boolean onAir;
 
     private boolean playAsVideo = true;
+
+    private PlayerViewModel playerViewModel;
 
     private OnDetailActivityFragmentListener mListener;
 
@@ -181,9 +188,11 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                 if (cursor.moveToFirst()) {
                     onAir = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_ON_AIR)) == 1;
                     if (cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_VIDEO)) == 1) {
-                    } else if (cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_AUDIO)) == 1) {
+                    }
+                    else if (cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_AUDIO)) == 1) {
                         playAsVideo = false;
-                    } else {
+                    }
+                    else {
                         playAsVideo = true;
                     }
                 } else {
@@ -193,7 +202,27 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
             } else {
                 throw new IllegalStateException("DB does not contains video with VideoId=" + videoId);
             }
-        } else {
+
+            playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
+            playerViewModel.getPlayerMode().observe(this, new Observer<PlayerViewModel.PlayerMode>() {
+                @Override
+                public void onChanged(@Nullable PlayerViewModel.PlayerMode playerMode) {
+                    if (mAdapter != null) {
+                        updatePlayAs(playerMode);
+                    }
+                }
+            });
+            playerViewModel.getAvailablePlayerModes().observe(this, new Observer<List<PlayerViewModel.PlayerMode>>() {
+                @Override
+                public void onChanged(@Nullable List<PlayerViewModel.PlayerMode> playerModes) {
+                    if (mAdapter != null) {
+                        initOptions(playerModes);
+                    }
+                }
+            });
+        }
+        else
+            {
             throw new IllegalStateException("VideoId can not be empty");
         }
     }
@@ -202,14 +231,18 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_options, container, false);
-        mOptionList = (RecyclerView) view.findViewById(R.id.list_options);
+        mOptionList = view.findViewById(R.id.list_options);
+
+        mAdapter = new OptionsAdapter(getOptionsList(), videoId, this);
+        initOptions();
+
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updateOptionList();
+//        updateOptionList();
         IntentFilter filter = new IntentFilter(DownloadConstants.ACTION);
         LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).registerReceiver(downloaderReceiver, filter);
     }
@@ -259,7 +292,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         }
     }
 
-    private void updateOptionList() {
+    private void initOptions(List<PlayerViewModel.PlayerMode> playerModes) {
         Cursor cursor = CursorHelper.getVideoCursor(getActivity().getContentResolver(), videoId);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -274,7 +307,8 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
             throw new IllegalStateException("DB does not contains video with VideoId=" + videoId);
         }
         setPlayAsVariable();
-        mAdapter = new OptionsAdapter(getOptionsList(), videoId, this);
+//        mAdapter = new OptionsAdapter(getOptionsList(), videoId, this);
+        mAdapter.changeList(getOptionsList(playerModes));
         mOptionList.setAdapter(mAdapter);
         mOptionList.setLayoutManager(new LinearLayoutManager(getContext()));
         mOptionList.post(new Runnable() {
@@ -290,6 +324,26 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
 
     }
 
+    private void updatePlayAs(PlayerViewModel.PlayerMode playerMode) {
+        mAdapter.changeList(getOptionsList());
+        if (playerViewModel.getAvailableModes(videoId).size() > 1) {
+            Options item = mAdapter.getItemByOptionId(OPTION_PLAY_AS);
+            if (item != null) {
+                switch (playerMode) {
+                    case AUDIO:
+                        item.title = getString(R.string.video_options_play_as_video);
+                        break;
+                    case VIDEO:
+                        item.title = getString(R.string.video_options_play_as_audio);
+                        break;
+                    default:
+                        item.title = "";
+                }
+                mAdapter.notifyItemChanged(mAdapter.getItemPosition(item));
+            }
+        }
+    }
+
     private void updateDownloadProgress(int progress) {
         Options item = mAdapter.getItemByOptionId(OPTION_DOWNLOAD);
         if (item != null) {
@@ -298,8 +352,11 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         }
     }
 
-    private List<Options> getOptionsList() {
+    private List<Options> getOptionsList(List<PlayerViewModel.PlayerMode> playerModes) {
         List<Options> list = new ArrayList<>();
+        if (playerModes != null && playerModes.size() > 1) {
+            list.add(new Options(OPTION_PLAY_AS, getString(R.string.video_options_play_as_video), -1));
+        }
         list.add(new Options(OPTION_FAVORITES, getFavoriteTitle(isFavorite), getFavoriteIcon(isFavorite)));
         if (ZypeSettings.SHARE_VIDEO_ENABLED) {
             list.add(new Options(OPTION_SHARE, getString(R.string.option_share), R.drawable.icn_share));
@@ -419,6 +476,16 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                     mListener.onUnFavorite(videoId);
                 }
                 mAdapter.changeList(getOptionsList());
+                break;
+            case OPTION_PLAY_AS:
+                switch (playerViewModel.getPlayerMode().getValue()) {
+                    case AUDIO:
+                        playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.VIDEO);
+                        break;
+                    case VIDEO:
+                        playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.AUDIO);
+                        break;
+                }
                 break;
             case OPTION_SHARE:
                 mListener.onShareVideo(videoId);
