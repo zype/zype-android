@@ -18,13 +18,23 @@ default_platform(:android)
 # app_version_code = 1
 # app_version_name = "1.0.0"
 
-default_apk_path = "../app/build/outputs/apk/template/release/"
+# Path to Release version of APK - Used when uploading
+# - UPDATE this depending on where your apk is built
+release_apk_path = "../app/build/outputs/apk/template/release/"
+
+# Path to Debug version of APK - Used for screenshots
+# - UPDATE this depending on where your apk is built
+template_debug_apk_path = "../app/build/outputs/apk/template/debug/*.apk"
+
+# Path to tests APK - Used for screenshots
+# - UPDATE this depending on where your apk is built
+test_apk_path = "../app/build/outputs/apk/androidTest/template/debug/*.apk"
 
 # Code signing fields - UPDATE THESE FIELDS
-keystore_name = "android"       # name of your keystore
-alias_name = "android-fastlane" # alias for keystore
-store_password = "password"     # password to access keystore
-key_password = "password"       # password to read the key in keystore
+keystore_name   = "app_name-keystore" # name of your keystore
+alias_name      = "app_name"          # alias for keystore
+store_password  = "password"          # password to access keystore
+key_password    = "password"          # password to read the key in keystore
 
 # Path to Java keystore for signing. Created in /fastlane file by default
 keystore_path = Dir.pwd + "/" + keystore_name + ".jks"
@@ -103,7 +113,7 @@ platform :android do
         apk: options[:apk_path]
       )
     else
-      apk_paths = Dir[default_apk_path + "*.apk"]
+      apk_paths = Dir[release_apk_path + "*.apk"]
       apk_path = apk_paths[0].gsub("../", "")
 
       upload_to_play_store(
@@ -133,17 +143,17 @@ platform :android do
   lane :screenshots do
     build_test_apk
 
-    template_debug_apk_paths = Dir["../app/build/outputs/apk/template/debug/*.apk"]
-    template_debug_apk_path = template_debug_apk_paths[0].gsub("../", "")
+    template_debug_dir = Dir[template_debug_apk_path]
+    path_to_debug_apk = template_debug_dir[0].gsub("../", "")
 
-    test_apk_paths = Dir["../app/build/outputs/apk/androidTest/template/debug/*.apk"]
-    test_apk_path = test_apk_paths[0].gsub("../", "")
+    test_dir = Dir[test_apk_path]
+    path_to_test_apk = test_dir[0].gsub("../", "")
 
     screengrab(
       locales: ["en-US"],
       clear_previous_screenshots: true,
-      app_apk_path: template_debug_apk_path,
-      tests_apk_path: test_apk_path
+      app_apk_path: path_to_debug_apk,
+      tests_apk_path: path_to_test_apk
     )
   end
 

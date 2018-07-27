@@ -79,7 +79,7 @@ An example of fully functional app that is using a Zype sandbox account.
    `<UNIVERSAL_TVOD>`
 
    `<AUTOPLAY>`
-   
+
    `<BACKGROUND_PLAYBACK_ENABLED>`
 
    `<DOWNLOADS_ENABLED>`
@@ -124,7 +124,9 @@ An example of fully functional app that is using a Zype sandbox account.
 
 **8.** To use OneSignal uncomment init of OneSignal in [ZypeApp.java](https://github.com/zype/zype-android/blob/master/app/src/main/java/com/zype/android/ZypeApp.java).
 
+## Fastlane
 
+This app template is integrated with Fastlane, which allows you to automate parts of your app building process. For more information, see [here](FASTLANE.md).
 
 ## Built With
 
@@ -149,4 +151,3 @@ See also the list of [contributors](https://github.com/zype/zype-android/graphs/
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
-
