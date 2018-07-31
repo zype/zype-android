@@ -53,6 +53,9 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHold
             if (item.drawableId != -1) {
                 holder.ivOptionsImage.setImageResource(item.drawableId);
             }
+            else {
+                holder.ivOptionsImage.setVisibility(View.GONE);
+            }
         }
         if (item.progress > -1) {
             holder.progressBar.setVisibility(View.VISIBLE);

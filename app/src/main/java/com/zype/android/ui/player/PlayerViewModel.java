@@ -6,6 +6,8 @@ import android.arch.lifecycle.MutableLiveData;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.google.android.exoplayer.TimeRange;
+import com.google.android.exoplayer.chunk.Format;
 import com.squareup.otto.Subscribe;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
@@ -21,14 +23,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.zype.android.webapi.builder.PlayerParamsBuilder.AUDIO;
+
 /**
  * Created by Evgeny Cherkasov on 23.07.2018
  */
-public class PlayerViewModel extends AndroidViewModel {
+public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.InfoListener {
 
     private MutableLiveData<List<PlayerMode>> availablePlayerModes;
     private MutableLiveData<PlayerMode> playerMode;
     private MutableLiveData<String> playerUrl;
+
+    private String videoId;
 
     public enum PlayerMode {
         AUDIO,
@@ -56,7 +62,19 @@ public class PlayerViewModel extends AndroidViewModel {
         super.onCleared();
     }
 
-    public MutableLiveData<String> getPlayerUrl(String videoId) {
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
+        init();
+    }
+
+    private void init() {
+        Video video = repo.getVideoSync(videoId);
+        if (availablePlayerModes.getValue().isEmpty()) {
+            updateAvailablePlayerModes();
+        }
+    }
+
+    public MutableLiveData<String> getPlayerUrl() {
         if (playerUrl == null) {
             playerUrl = new MutableLiveData<>();
         }
@@ -67,6 +85,11 @@ public class PlayerViewModel extends AndroidViewModel {
         if (TextUtils.isEmpty(video.playerVideoUrl)) {
 //                    loadVideoPlayerUrl(videoId);
         }
+        updatePlayerUrl(video);
+        return playerUrl;
+    }
+
+    private void updatePlayerUrl(Video video) {
         switch (playerMode.getValue()) {
             case AUDIO:
                 playerUrl.setValue(video.playerAudioUrl);
@@ -75,7 +98,6 @@ public class PlayerViewModel extends AndroidViewModel {
                 playerUrl.setValue(video.playerVideoUrl);
                 break;
         }
-        return playerUrl;
     }
 
     public MutableLiveData<PlayerMode> getPlayerMode() {
@@ -83,14 +105,18 @@ public class PlayerViewModel extends AndroidViewModel {
     }
 
     public void setPlayerMode(PlayerMode mode) {
-        playerMode.setValue(mode);
+        Video video = repo.getVideoSync(videoId);
+        if (video != null) {
+            playerMode.setValue(mode);
+            updatePlayerUrl(video);
+        }
     }
 
     public MutableLiveData<List<PlayerMode>> getAvailablePlayerModes() {
         return availablePlayerModes;
     }
 
-    public List<PlayerMode> getAvailableModes(String videoId) {
+    private void updateAvailablePlayerModes() {
         List<PlayerMode> result = new ArrayList<>();
 
         Video video = repo.getVideoSync(videoId);
@@ -102,7 +128,8 @@ public class PlayerViewModel extends AndroidViewModel {
                 result.add(PlayerMode.VIDEO);
             }
         }
-        return result;
+
+        availablePlayerModes.setValue(result);
     }
 
     /**
@@ -145,6 +172,7 @@ public class PlayerViewModel extends AndroidViewModel {
 
         // Take first source in the list
         String url = files.get(0).getUrl();
+        Logger.d("handleAudioPlayerUrl(): url=" + url);
 
         // Save audio url in the local database if it was changed
         Video video = repo.getVideoSync(videoId);
@@ -155,9 +183,50 @@ public class PlayerViewModel extends AndroidViewModel {
             if (playerMode.getValue() == PlayerMode.AUDIO) {
                 playerUrl.setValue(url);
             }
-            availablePlayerModes.setValue(getAvailableModes(videoId));
+            updateAvailablePlayerModes();
         }
     }
 
 
+    @Override
+    public void onVideoFormatEnabled(Format format, int trigger, long mediaTimeMs) {
+        Logger.i("onVideoFormatEnabled()");
+        if (getPlayerMode().getValue() == PlayerMode.VIDEO && format.codecs.equals("mp4a.40.2")) {
+            Video video = repo.getVideoSync(videoId);
+            video.playerVideoUrl = null;
+            repo.updateVideo(video);
+
+            updateAvailablePlayerModes();
+            setPlayerMode(PlayerMode.AUDIO);
+        }
+    }
+
+    @Override
+    public void onAudioFormatEnabled(Format format, int trigger, long mediaTimeMs) {
+        Logger.i("onAudioFormatEnabled()");
+    }
+
+    @Override
+    public void onDroppedFrames(int count, long elapsed) {
+    }
+
+    @Override
+    public void onBandwidthSample(int elapsedMs, long bytes, long bitrateEstimate) {
+    }
+
+    @Override
+    public void onLoadStarted(int sourceId, long length, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs) {
+    }
+
+    @Override
+    public void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs) {
+    }
+
+    @Override
+    public void onDecoderInitialized(String decoderName, long elapsedRealtimeMs, long initializationDurationMs) {
+    }
+
+    @Override
+    public void onAvailableRangeChanged(TimeRange availableRange) {
+    }
 }

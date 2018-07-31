@@ -49,6 +49,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -92,10 +93,23 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         if (video != null) {
             // Load player urls
             playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class);
-            playerViewModel.getPlayerUrl(video.id).observe(this, new Observer<String>() {
+            playerViewModel.setVideoId(video.id);
+            playerViewModel.getPlayerUrl().observe(this, new Observer<String>() {
                 @Override
                 public void onChanged(@Nullable String url) {
                     Logger.d("getPlayerUrl(): onChanged(): url=" + url);
+                    if (!TextUtils.isEmpty(url)) {
+                        switch (playerViewModel.getPlayerMode().getValue()) {
+                            case AUDIO:
+                                mType = PlayerFragment.TYPE_AUDIO_WEB;
+                                break;
+                            case VIDEO:
+                                mType = PlayerFragment.TYPE_VIDEO_WEB;
+                                break;
+                         }
+                        changeFragment(isChromecastConntected());
+                        hideProgress();
+                    }
                 }
             });
 

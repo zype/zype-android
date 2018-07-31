@@ -193,6 +193,7 @@ public class PlayerFragment extends BaseFragment implements
     private Calendar liveStreamTimeStart;
 
     // Sensors
+    PlayerViewModel playerViewModel;
     SensorViewModel sensorViewModel;
 
     public static PlayerFragment newInstance(int mediaType, String filePath, String fileId) {
@@ -244,6 +245,8 @@ public class PlayerFragment extends BaseFragment implements
         if (ccEnabled) {
             ccTrack = SettingsProvider.getInstance().getString(SettingsProvider.SELECTED_CLOSED_CAPTIONS_TRACK);
         }
+
+        playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
 
         // Listener to detect current playback time
         runnablePlaybackTime = new Runnable() {
@@ -625,9 +628,11 @@ public class PlayerFragment extends BaseFragment implements
             case TYPE_VIDEO_LIVE:
             case TYPE_AUDIO_WEB:
             case TYPE_AUDIO_LIVE:
-                if (contentUri.contains(".mp4")) {
+                if (contentUri != null &&
+                        (contentUri.contains(".mp4") || contentUri.contains(".m4a"))) {
                     return new ExtractorRendererBuilder(getContext(), userAgent, Uri.parse(contentUri), new Mp4Extractor());
-                } else {
+                }
+                else {
                     return new HlsRendererBuilder(getContext(), userAgent, contentUri);
                 }
             case TYPE_VIDEO_LOCAL:
@@ -644,6 +649,7 @@ public class PlayerFragment extends BaseFragment implements
             player.addListener(this);
             player.setCaptionListener(this);
             playerNeedsPrepare = true;
+            player.setInfoListener(playerViewModel);
 //            mediaController = new MediaController(getContext());
             mediaController = new PlayerControlView(getContext());
             mediaController.setAnchorView(mainView);

@@ -159,7 +159,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         setContentView(getLayoutId());
         baseView = getBaseView();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);

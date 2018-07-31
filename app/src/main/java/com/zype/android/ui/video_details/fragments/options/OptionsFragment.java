@@ -204,19 +204,20 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
             }
 
             playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
+            playerViewModel.setVideoId(videoId);
+            playerViewModel.getAvailablePlayerModes().observe(this, new Observer<List<PlayerViewModel.PlayerMode>>() {
+                @Override
+                public void onChanged(@Nullable List<PlayerViewModel.PlayerMode> playerModes) {
+                    if (mAdapter != null) {
+                        mAdapter.changeList(getOptionsList(playerModes));
+                    }
+                }
+            });
             playerViewModel.getPlayerMode().observe(this, new Observer<PlayerViewModel.PlayerMode>() {
                 @Override
                 public void onChanged(@Nullable PlayerViewModel.PlayerMode playerMode) {
                     if (mAdapter != null) {
                         updatePlayAs(playerMode);
-                    }
-                }
-            });
-            playerViewModel.getAvailablePlayerModes().observe(this, new Observer<List<PlayerViewModel.PlayerMode>>() {
-                @Override
-                public void onChanged(@Nullable List<PlayerViewModel.PlayerMode> playerModes) {
-                    if (mAdapter != null) {
-                        initOptions(playerModes);
                     }
                 }
             });
@@ -292,7 +293,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         }
     }
 
-    private void initOptions(List<PlayerViewModel.PlayerMode> playerModes) {
+    private void initOptions() {
         Cursor cursor = CursorHelper.getVideoCursor(getActivity().getContentResolver(), videoId);
         if (cursor != null) {
             if (cursor.moveToFirst()) {
@@ -308,7 +309,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         }
         setPlayAsVariable();
 //        mAdapter = new OptionsAdapter(getOptionsList(), videoId, this);
-        mAdapter.changeList(getOptionsList(playerModes));
+        mAdapter.changeList(getOptionsList());
         mOptionList.setAdapter(mAdapter);
         mOptionList.setLayoutManager(new LinearLayoutManager(getContext()));
         mOptionList.post(new Runnable() {
@@ -326,7 +327,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
 
     private void updatePlayAs(PlayerViewModel.PlayerMode playerMode) {
         mAdapter.changeList(getOptionsList());
-        if (playerViewModel.getAvailableModes(videoId).size() > 1) {
+        if (playerViewModel.getAvailablePlayerModes().getValue().size() > 1) {
             Options item = mAdapter.getItemByOptionId(OPTION_PLAY_AS);
             if (item != null) {
                 switch (playerMode) {
@@ -352,10 +353,16 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         }
     }
 
+    private List<Options> getOptionsList() {
+        List<PlayerViewModel.PlayerMode> playerModes = playerViewModel.getAvailablePlayerModes().getValue();
+        return getOptionsList(playerModes);
+    }
+
     private List<Options> getOptionsList(List<PlayerViewModel.PlayerMode> playerModes) {
         List<Options> list = new ArrayList<>();
+
         if (playerModes != null && playerModes.size() > 1) {
-            list.add(new Options(OPTION_PLAY_AS, getString(R.string.video_options_play_as_video), -1));
+            list.add(new Options(OPTION_PLAY_AS, getString(R.string.video_options_play_as_audio), -1));
         }
         list.add(new Options(OPTION_FAVORITES, getFavoriteTitle(isFavorite), getFavoriteIcon(isFavorite)));
         if (ZypeSettings.SHARE_VIDEO_ENABLED) {
@@ -475,7 +482,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                 } else {
                     mListener.onUnFavorite(videoId);
                 }
-                mAdapter.changeList(getOptionsList());
+                mAdapter.changeList(getOptionsList(playerViewModel.getAvailablePlayerModes().getValue()));
                 break;
             case OPTION_PLAY_AS:
                 switch (playerViewModel.getPlayerMode().getValue()) {
