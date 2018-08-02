@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.zype.android.webapi.builder.PlayerParamsBuilder.AUDIO;
-
 /**
  * Created by Evgeny Cherkasov on 23.07.2018
  */
@@ -53,7 +51,6 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         availablePlayerModes = new MutableLiveData<>();
         availablePlayerModes.setValue(new ArrayList<PlayerMode>());
         playerMode = new MutableLiveData<>();
-        playerMode.setValue(PlayerMode.VIDEO);
     }
 
     @Override
@@ -62,15 +59,21 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         super.onCleared();
     }
 
-    public void setVideoId(String videoId) {
+    public void init(String videoId, PlayerMode mediaType) {
         this.videoId = videoId;
-        init();
-    }
 
-    private void init() {
-        Video video = repo.getVideoSync(videoId);
-        if (availablePlayerModes.getValue().isEmpty()) {
-            updateAvailablePlayerModes();
+        updateAvailablePlayerModes();
+        if (mediaType != null || isMediaTypeAvailable(mediaType)) {
+            playerMode.setValue(mediaType);
+        }
+        else {
+            List<PlayerMode> mediaTypes = availablePlayerModes.getValue();
+            if (mediaTypes != null && !mediaTypes.isEmpty()) {
+                playerMode.setValue(mediaTypes.get(0));
+            }
+            else {
+                playerMode.setValue(null);
+            }
         }
     }
 
@@ -90,13 +93,19 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     private void updatePlayerUrl(Video video) {
-        switch (playerMode.getValue()) {
-            case AUDIO:
-                playerUrl.setValue(video.playerAudioUrl);
-                break;
-            case VIDEO:
-                playerUrl.setValue(video.playerVideoUrl);
-                break;
+        if (playerMode.getValue() != null) {
+            switch (playerMode.getValue()) {
+                case AUDIO:
+                    if (video.isDownloadedAudio == 1) {
+                        playerUrl.setValue(video.downloadAudioPath);
+                    } else {
+                        playerUrl.setValue(video.playerAudioUrl);
+                    }
+                    break;
+                case VIDEO:
+                    playerUrl.setValue(video.playerVideoUrl);
+                    break;
+            }
         }
     }
 
@@ -121,15 +130,31 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
         Video video = repo.getVideoSync(videoId);
         if (video != null) {
-            if (!TextUtils.isEmpty(video.playerAudioUrl)) {
+            if (!TextUtils.isEmpty(video.playerAudioUrl)
+                    || video.isDownloadedAudio == 1) {
                 result.add(PlayerMode.AUDIO);
             }
-            if (!TextUtils.isEmpty(video.playerVideoUrl)) {
+            if (!TextUtils.isEmpty(video.playerVideoUrl)
+                    || video.isDownloadedVideo == 1) {
                 result.add(PlayerMode.VIDEO);
             }
         }
 
         availablePlayerModes.setValue(result);
+    }
+
+    public boolean isMediaTypeAvailable(PlayerMode mediaType) {
+        return availablePlayerModes.getValue() != null
+                && availablePlayerModes.getValue().contains(mediaType);
+    }
+
+    public boolean isAudioDownloaded() {
+        Video video = repo.getVideoSync(videoId);
+        if (video != null) {
+            return video.isDownloadedAudio == 1;
+        }
+        else
+            return false;
     }
 
     /**
@@ -187,6 +212,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
     }
 
+    //
+    // 'CustomPlayer.InfoListener' implementation
+    //
 
     @Override
     public void onVideoFormatEnabled(Format format, int trigger, long mediaTimeMs) {

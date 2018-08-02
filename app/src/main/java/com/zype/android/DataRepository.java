@@ -74,7 +74,10 @@ public class DataRepository {
     }
 
     public Video getVideoSync(String videoId) {
-        return db.zypeDao().getVideoSync(videoId);
+        Video video = db.zypeDao().getVideoSync(videoId);
+        if (video.isDownloadedAudio == null) video.isDownloadedAudio = 0;
+        if (video.isDownloadedVideo == null) video.isDownloadedVideo = 0;
+        return video;
     }
 
     public void updateVideo(Video video) {

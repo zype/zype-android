@@ -152,4 +152,8 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.changeCursor(null);
     }
+
+    public int getSelectedTab() {
+        return selectedTab;
+    }
 }

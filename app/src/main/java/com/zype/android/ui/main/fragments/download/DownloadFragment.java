@@ -16,6 +16,9 @@ import com.zype.android.core.provider.Contract;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.main.fragments.AbstractTabFragment;
 import com.zype.android.ui.main.fragments.videos.VideosCursorAdapter;
+import com.zype.android.ui.player.PlayerFragment;
+
+import static com.zype.android.ui.base.BaseVideoActivity.TYPE_UNKNOWN;
 
 public class DownloadFragment extends AbstractTabFragment {
     private static final int LOADER_DOWNLOAD_VIDEO = 0;
@@ -103,7 +106,16 @@ public class DownloadFragment extends AbstractTabFragment {
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        mListener.onDownloadedVideoClick(((VideosCursorAdapter.VideosViewHolder) view.getTag()).videoId);
+        int mediaType = TYPE_UNKNOWN;
+        switch (getSelectedTab()) {
+            case 1:
+                mediaType = PlayerFragment.TYPE_AUDIO_LOCAL;
+                break;
+            case 2:
+                mediaType = PlayerFragment.TYPE_VIDEO_LOCAL;
+                break;
+        }
+        mListener.onDownloadedVideoClick(((VideosCursorAdapter.VideosViewHolder) view.getTag()).videoId, mediaType);
     }
 
     @Override

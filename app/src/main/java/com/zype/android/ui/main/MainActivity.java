@@ -210,11 +210,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     }
 
     @Override
-    public void onDownloadedVideoClick(String videoId) {
+    public void onDownloadedVideoClick(String videoId, int mediaType) {
 //        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
 //            onRequestSubscription();
 //        } else {
-            VideoDetailActivity.startActivity(this, videoId, null);
+            VideoDetailActivity.startActivity(this, videoId, null, mediaType);
 //        }
     }
 

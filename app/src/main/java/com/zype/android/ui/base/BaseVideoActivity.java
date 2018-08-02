@@ -713,7 +713,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         if (getIntent() != null && getIntent().hasExtra(BundleConstants.VIDEO_ID) && !TextUtils.isEmpty(getIntent().getStringExtra(BundleConstants.VIDEO_ID))) {
             playlistId = getIntent().getStringExtra(BundleConstants.PLAYLIST_ID);
             mVideoId = getIntent().getStringExtra(BundleConstants.VIDEO_ID);
-            mType = getIntent().getIntExtra(BundleConstants.VIDEO_TYPE, TYPE_UNKNOWN);
+            mType = getIntent().getIntExtra(BundleConstants.MEDIA_TYPE, TYPE_UNKNOWN);
             if (mType == PlayerFragment.TYPE_VIDEO_LIVE) {
                 requestLiveVideoUrl(mVideoId);
             } else if (mType == PlayerFragment.TYPE_AUDIO_LIVE) {

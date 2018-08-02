@@ -84,16 +84,38 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         activity.startActivity(intent);
     }
 
+    public static void startActivity(Activity activity, String videoId, String playlistId, int mediaType) {
+        Intent intent = new Intent(activity, VideoDetailActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(BundleConstants.VIDEO_ID, videoId);
+        bundle.putString(BundleConstants.PLAYLIST_ID, playlistId);
+        bundle.putInt(BundleConstants.MEDIA_TYPE, mediaType);
+        intent.putExtras(bundle);
+        activity.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d("onCreate()");
         super.onCreate(savedInstanceState);
         initUI();
-        Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+        final Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
         if (video != null) {
             // Load player urls
             playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class);
-            playerViewModel.setVideoId(video.id);
+            PlayerViewModel.PlayerMode mediaType = null;
+            switch (mType) {
+                case PlayerFragment.TYPE_AUDIO_LOCAL:
+                case PlayerFragment.TYPE_AUDIO_WEB:
+                    mediaType = PlayerViewModel.PlayerMode.AUDIO;
+                    break;
+                case PlayerFragment.TYPE_VIDEO_LOCAL:
+                case PlayerFragment.TYPE_VIDEO_WEB:
+                case BaseVideoActivity.TYPE_WEB:
+                    mediaType = PlayerViewModel.PlayerMode.VIDEO;
+                    break;
+            }
+            playerViewModel.init(video.id, mediaType);
             playerViewModel.getPlayerUrl().observe(this, new Observer<String>() {
                 @Override
                 public void onChanged(@Nullable String url) {
@@ -101,12 +123,18 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                     if (!TextUtils.isEmpty(url)) {
                         switch (playerViewModel.getPlayerMode().getValue()) {
                             case AUDIO:
-                                mType = PlayerFragment.TYPE_AUDIO_WEB;
+                                if (playerViewModel.isAudioDownloaded()) {
+                                    mType = PlayerFragment.TYPE_AUDIO_LOCAL;
+                                }
+                                else {
+                                    mType = PlayerFragment.TYPE_AUDIO_WEB;
+                                }
                                 break;
                             case VIDEO:
                                 mType = PlayerFragment.TYPE_VIDEO_WEB;
                                 break;
-                         }
+                        }
+                        hideVideoThumbnail();
                         changeFragment(isChromecastConntected());
                         hideProgress();
                     }
@@ -256,7 +284,9 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                     Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
                     if (video != null) {
                         if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
-                            requestVideoUrl(mVideoId);
+                            if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.VIDEO) {
+                                requestVideoUrl(mVideoId);
+                            }
                         }
                     }
                 }

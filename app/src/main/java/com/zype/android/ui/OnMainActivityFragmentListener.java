@@ -5,7 +5,7 @@ public interface OnMainActivityFragmentListener {
 
     void onFavoriteVideoClick(String videoId, boolean isFavorite);
 
-    void onDownloadedVideoClick(String videoId);
+    void onDownloadedVideoClick(String videoId, int mediaType);
 
     void onSearch(String text);
 

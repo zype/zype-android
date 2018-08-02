@@ -204,7 +204,6 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
             }
 
             playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
-            playerViewModel.setVideoId(videoId);
             playerViewModel.getAvailablePlayerModes().observe(this, new Observer<List<PlayerViewModel.PlayerMode>>() {
                 @Override
                 public void onChanged(@Nullable List<PlayerViewModel.PlayerMode> playerModes) {
@@ -485,13 +484,15 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                 mAdapter.changeList(getOptionsList(playerViewModel.getAvailablePlayerModes().getValue()));
                 break;
             case OPTION_PLAY_AS:
-                switch (playerViewModel.getPlayerMode().getValue()) {
-                    case AUDIO:
-                        playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.VIDEO);
-                        break;
-                    case VIDEO:
-                        playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.AUDIO);
-                        break;
+                if (playerViewModel.getPlayerMode().getValue() != null) {
+                    switch (playerViewModel.getPlayerMode().getValue()) {
+                        case AUDIO:
+                            playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.VIDEO);
+                            break;
+                        case VIDEO:
+                            playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.AUDIO);
+                            break;
+                    }
                 }
                 break;
             case OPTION_SHARE:

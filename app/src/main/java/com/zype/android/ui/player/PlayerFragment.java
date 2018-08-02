@@ -71,8 +71,6 @@ import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.receiver.PhoneCallReceiver;
 import com.zype.android.receiver.RemoteControlReceiver;
-import com.zype.android.ui.Gallery.GalleryViewModel;
-import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.Helpers.IPlaylistVideos;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.base.BaseVideoActivity;
@@ -1065,7 +1063,7 @@ public class PlayerFragment extends BaseFragment implements
         Bundle bundle = new Bundle();
         if (isLive) {
             notificationIntent = new Intent(getActivity(), LivePlayerActivity.class);
-            bundle.putInt(BundleConstants.VIDEO_TYPE, type);
+            bundle.putInt(BundleConstants.MEDIA_TYPE, type);
             title = "Live";
         } else {
             notificationIntent = new Intent(getActivity(), VideoDetailActivity.class);
@@ -1379,11 +1377,12 @@ public class PlayerFragment extends BaseFragment implements
     private String ccTrack;
 
     private void updateClosedCaptionsVisibility() {
-        if (player.getTrackCount(CustomPlayer.TYPE_TEXT) > 0) {
-            mediaController.showCC();
-        }
-        else {
-            mediaController.hideCC();
+        if (player != null) {
+            if (player.getTrackCount(CustomPlayer.TYPE_TEXT) > 0) {
+                mediaController.showCC();
+            } else {
+                mediaController.hideCC();
+            }
         }
     }
 
