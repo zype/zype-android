@@ -1070,6 +1070,7 @@ public class PlayerFragment extends BaseFragment implements
         bundle.putString(BundleConstants.VIDEO_ID, fileId);
         if (isLive) {
             notificationIntent = new Intent(getActivity(), LivePlayerActivity.class);
+            bundle.putInt(BundleConstants.MEDIA_TYPE, type);
             title = "Live";
         }
         else {
