@@ -131,7 +131,12 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                                 }
                                 break;
                             case VIDEO:
-                                mType = PlayerFragment.TYPE_VIDEO_WEB;
+                                if (playerViewModel.isVideoDownloaded()) {
+                                    mType = PlayerFragment.TYPE_VIDEO_LOCAL;
+                                }
+                                else {
+                                    mType = PlayerFragment.TYPE_VIDEO_WEB;
+                                }
                                 break;
                         }
                         hideVideoThumbnail();
@@ -298,8 +303,9 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
         List<Thumbnail> thumbnails = videoData.getThumbnails();
         layoutImage.setVisibility(View.VISIBLE);
-        if (thumbnails.size() > 0) {
-            UiUtils.loadImage(thumbnails.get(1).getUrl(), R.drawable.placeholder_video, imageVideo);
+        Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(thumbnails, 480);
+        if (thumbnail != null) {
+            UiUtils.loadImage(thumbnail.getUrl(), R.drawable.placeholder_video, imageVideo);
         }
         else {
             imageVideo.setImageDrawable(ContextCompat.getDrawable(this,
@@ -422,7 +428,14 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
 
     @Subscribe
     public void handleDownloadAudio(DownloadAudioEvent event) {
-        File file = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
+        File fileM4A = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
+        File fileMP3 = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp3");
+        File file = null;
+        if (fileM4A != null)
+            file = fileM4A;
+        else if (fileMP3 != null)
+            file = fileMP3;
+
         String url;
         if (file != null) {
             url = file.getUrl();
@@ -432,7 +445,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
             initUI();
         }
         else {
-            Logger.e("Server response must contains \"m4a\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
+            Logger.e("Server response must contains \"m4a\" or mp3 but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
         }
     }
 

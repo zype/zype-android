@@ -5,12 +5,12 @@ import com.zype.android.webapi.WebApiManager;
 
 public class DownloadAudioParamsBuilder extends ParamsBuilder {
 
-public static final String VIDEO_ID = "video_id";
     public static final String ACCESS_TOKEN = "access_token";
+    public static final String DOWNLOAD = "download";
+    public static final String VIDEO_ID = "video_id";
 
     public DownloadAudioParamsBuilder() {
-        addGetParam("audio", String.valueOf(true));
-//        addGetParam(ACCESS_TOKEN, SettingsProvider.getInstance().getAccessToken());
+        addGetParam(DOWNLOAD, String.valueOf(true));
     }
 
     public DownloadAudioParamsBuilder addAudioId(String videoId) {

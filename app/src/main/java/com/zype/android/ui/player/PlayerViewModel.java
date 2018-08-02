@@ -98,12 +98,18 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 case AUDIO:
                     if (video.isDownloadedAudio == 1) {
                         playerUrl.setValue(video.downloadAudioPath);
-                    } else {
+                    }
+                    else {
                         playerUrl.setValue(video.playerAudioUrl);
                     }
                     break;
                 case VIDEO:
-                    playerUrl.setValue(video.playerVideoUrl);
+                    if (video.isDownloadedVideo == 1) {
+                        playerUrl.setValue(video.downloadVideoPath);
+                    }
+                    else {
+                        playerUrl.setValue(video.playerVideoUrl);
+                    }
                     break;
             }
         }
@@ -152,6 +158,15 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         Video video = repo.getVideoSync(videoId);
         if (video != null) {
             return video.isDownloadedAudio == 1;
+        }
+        else
+            return false;
+    }
+
+    public boolean isVideoDownloaded() {
+        Video video = repo.getVideoSync(videoId);
+        if (video != null) {
+            return video.isDownloadedVideo == 1;
         }
         else
             return false;
