@@ -11,6 +11,7 @@ import com.google.android.exoplayer.chunk.Format;
 import com.squareup.otto.Subscribe;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
@@ -170,6 +171,22 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
         else
             return false;
+    }
+
+    public boolean isBackgroundPlaybackEnabled() {
+        if (playerMode.getValue() != null) {
+            switch (playerMode.getValue()) {
+                case AUDIO:
+                    return ZypeConfiguration.isBackgroundAudioPlaybackEnabled(getApplication());
+                case VIDEO:
+                    return ZypeConfiguration.isBackgroundPlaybackEnabled(getApplication());
+                default:
+                    return false;
+            }
+        }
+        else {
+            return false;
+        }
     }
 
     /**

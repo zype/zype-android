@@ -1,9 +1,10 @@
 package com.zype.android;
 
 import android.app.Activity;
-import android.app.Application;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDexApplication;
@@ -13,7 +14,6 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.onesignal.OneSignal;
 import com.google.android.gms.cast.CastMediaControlIntent;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.squareup.otto.Subscribe;
@@ -29,8 +29,6 @@ import com.zype.android.webapi.model.app.AppData;
 
 import io.fabric.sdk.android.Fabric;
 
-import static com.zype.android.webapi.WebApiManager.WorkerHandler.BAD_REQUEST;
-
 /**
  * @author vasya
  * @version 1
@@ -40,7 +38,9 @@ import static com.zype.android.webapi.WebApiManager.WorkerHandler.BAD_REQUEST;
 
 public class ZypeApp extends MultiDexApplication {
     public static final double VOLUME_INCREMENT = 0.05;
-    public static final int NOTIFICATION_ID = 13254;
+    public static final int NOTIFICATION_ID = 100;
+    public static final String NOTIFICATION_CHANNEL_ID = "ZypeChannel";
+
     public static GoogleAnalytics analytics;
     public static Tracker tracker;
 
@@ -68,6 +68,8 @@ public class ZypeApp extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        createNotificationChannel();
 
         StorageUtils.initStorage(this);
         SettingsProvider.create(this);
@@ -147,6 +149,23 @@ public class ZypeApp extends MultiDexApplication {
         WebApiManager.getInstance().unsubscribe(this);
 
         super.onTerminate();
+    }
+
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.notification_channel_name);
+            String description = getString(R.string.notification_channel_description);
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     private void initApp() {

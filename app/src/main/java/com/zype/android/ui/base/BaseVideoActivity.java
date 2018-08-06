@@ -710,7 +710,8 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     private void initVideo() {
-        if (getIntent() != null && getIntent().hasExtra(BundleConstants.VIDEO_ID) && !TextUtils.isEmpty(getIntent().getStringExtra(BundleConstants.VIDEO_ID))) {
+        if (getIntent() != null && getIntent().hasExtra(BundleConstants.VIDEO_ID)
+                && !TextUtils.isEmpty(getIntent().getStringExtra(BundleConstants.VIDEO_ID))) {
             playlistId = getIntent().getStringExtra(BundleConstants.PLAYLIST_ID);
             mVideoId = getIntent().getStringExtra(BundleConstants.VIDEO_ID);
             mType = getIntent().getIntExtra(BundleConstants.MEDIA_TYPE, TYPE_UNKNOWN);

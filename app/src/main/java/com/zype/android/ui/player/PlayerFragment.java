@@ -1,8 +1,6 @@
 package com.zype.android.ui.player;
 
 import android.annotation.TargetApi;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
@@ -19,6 +17,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.Display;
@@ -65,7 +65,6 @@ import com.google.android.exoplayer.util.Util;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
-import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -127,7 +126,7 @@ public class PlayerFragment extends BaseFragment implements
 
     private static final CookieManager defaultCookieManager;
     public static final int MEDIA_STOP_CODE = 115756;
-    public static String MEDIA_STOP = "MEDIA_STOP";
+    public static final String ACTION_STOP = "ACTION_STOP";
 
     static {
         defaultCookieManager = new CookieManager();
@@ -407,7 +406,7 @@ public class PlayerFragment extends BaseFragment implements
             preparePlayer(true);
         }
         else {
-            if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
+            if (playerViewModel.isBackgroundPlaybackEnabled()) {
                 player.setBackgrounded(false);
             }
 
@@ -446,7 +445,7 @@ public class PlayerFragment extends BaseFragment implements
         }
         hideControls();
         if (player != null) {
-            if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
+            if (playerViewModel.isBackgroundPlaybackEnabled()) {
                 player.setBackgrounded(true);
             }
             stopTimer();
@@ -469,10 +468,11 @@ public class PlayerFragment extends BaseFragment implements
         if (BuildConfig.DEBUG) {
             Logger.d("onStop()");
         }
-        if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
+        if (playerViewModel.isBackgroundPlaybackEnabled()) {
             if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
                 showNotification(true, contentType);
-            } else {
+            }
+            else {
                 showNotification(false, contentType);
             }
         }
@@ -1050,7 +1050,11 @@ public class PlayerFragment extends BaseFragment implements
         }
     }
 
-    public void showNotification(boolean isLive, int type) {
+    public void showNotification(boolean isLive, int mediaType) {
+        Logger.d("showNotification()");
+        if (player == null) {
+            return;
+        }
 
         VideoData video = VideoHelper.getVideo(getActivity().getContentResolver(), fileId);
         String title = "";
@@ -1061,50 +1065,50 @@ public class PlayerFragment extends BaseFragment implements
         }
         Intent notificationIntent;
         Bundle bundle = new Bundle();
+        bundle.putInt(BundleConstants.MEDIA_TYPE, mediaType);
+        bundle.putString(BundleConstants.VIDEO_ID, fileId);
         if (isLive) {
             notificationIntent = new Intent(getActivity(), LivePlayerActivity.class);
-            bundle.putInt(BundleConstants.MEDIA_TYPE, type);
             title = "Live";
-        } else {
+        }
+        else {
             notificationIntent = new Intent(getActivity(), VideoDetailActivity.class);
         }
         notificationIntent.putExtras(bundle);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-        PendingIntent intent = PendingIntent.getActivity(getActivity(), 0, notificationIntent, 0);
 
-        Notification.Builder builder = new Notification.Builder(getActivity());
+        PendingIntent intent = PendingIntent.getActivity(getActivity(), 0,
+                notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(),
+                ZypeApp.NOTIFICATION_CHANNEL_ID);
         builder.setContentIntent(intent)
-                .setSmallIcon(R.drawable.ic_notif)
                 .setContentTitle(getActivity().getString(R.string.app_name))
-                .setContentIntent(intent)
-                .setPriority(Notification.PRIORITY_HIGH)
                 .setContentText(title)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setAutoCancel(true)
                 .setOngoing(true)
-                .setWhen(0)
-                .setOngoing(true)
-                .setContentTitle(title);
+                .setWhen(0);
 
-        Intent stopIntent = new Intent();
-        stopIntent.setAction(MEDIA_STOP);
-        PendingIntent pendingIntentStop = PendingIntent.getBroadcast(getActivity(), 12345, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        Intent intentStop = new Intent();
+//        intentStop.setAction(ACTION_STOP);
+//        PendingIntent pendingIntentStop = PendingIntent.getBroadcast(getActivity(), 12345, intentStop, PendingIntent.FLAG_UPDATE_CURRENT);
+//        builder.addAction(R.drawable.ic_stop_black_24px, "Stop", pendingIntentStop);
 
-        Notification not = builder
-                .setPriority(Notification.PRIORITY_MAX)
-                .addAction(R.drawable.ic_stop_black_24px, "Stop", pendingIntentStop)
-                .setWhen(0)
-                .build();
-        NotificationManager notificationManager =
-                (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(ZypeApp.NOTIFICATION_ID, not);
-
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+        notificationManager.notify(ZypeApp.NOTIFICATION_ID, builder.build());
     }
 
     public void hideNotification() {
-        Logger.d("hideNotification");
-        NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(getActivity().NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(ZypeApp.NOTIFICATION_ID);
+        Logger.d("hideNotification()");
+        if (getActivity() != null) {
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+            notificationManager.cancel(ZypeApp.NOTIFICATION_ID);
+        }
+        else {
+            Logger.d("hideNotification(): Activity is not exist");
+        }
     }
 
     //

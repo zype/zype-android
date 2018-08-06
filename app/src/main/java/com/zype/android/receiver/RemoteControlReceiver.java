@@ -24,7 +24,7 @@ public class RemoteControlReceiver extends BroadcastReceiver {
             } else {
                 Log.i(TAG, "null event");
             }
-        } else if (intent.getAction().equals(PlayerFragment.MEDIA_STOP)) {
+        } else if (intent.getAction().equals(PlayerFragment.ACTION_STOP)) {
             getObservable().stateChanged(PlayerFragment.MEDIA_STOP_CODE);
         }
     }

@@ -155,6 +155,10 @@
     <string name="my_library_sign_in">Please sign in to see\nMy library videos</string>
     <string name="entitlement_dialog_error_title">Error</string>
 
+    <!--m Notifications -->
+    <string name="notification_channel_name">Zype</string>
+    <string name="notification_channel_description">Zype Notification Channel</string>
+
     <!-- Player -->
     <string name="menu_player_closed_captions">Closed captions</string>
 

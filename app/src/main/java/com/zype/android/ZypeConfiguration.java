@@ -18,6 +18,7 @@ import java.util.List;
 
 public class ZypeConfiguration {
     private static final String PREFERENCE_AUTOPLAY = "ZypeAutoplay";
+    private static final String PREFERENCE_BACKGROUND_AUDIO_PLAYBACK = "ZypeBackgroundAudioPlayback";
     private static final String PREFERENCE_BACKGROUND_PLAYBACK = "ZypeBackgroundPlayback";
     private static final String PREFERENCE_DEVICE_LINKING = "ZypeDeviceLinking";
     private static final String PREFERENCE_DEVICE_LINKING_URL = "ZypeDeviceLinkingUrl";
@@ -170,6 +171,11 @@ public class ZypeConfiguration {
     public static boolean isBackgroundPlaybackEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_BACKGROUND_PLAYBACK, ZypeSettings.BACKGROUND_PLAYBACK_ENABLED, context);
     }
+
+    public static boolean isBackgroundAudioPlaybackEnabled(Context context) {
+        return getBooleanPreference(PREFERENCE_BACKGROUND_AUDIO_PLAYBACK, ZypeSettings.BACKGROUND_AUDIO_PLAYBACK_ENABLED, context);
+    }
+
 
     public static boolean isDeviceLinkingEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_DEVICE_LINKING, ZypeSettings.DEVICE_LINKING, context);
