@@ -5,6 +5,8 @@ import android.test.ActivityInstrumentationTestCase2;
 import com.zype.android.ui.ActivityForTests;
 import com.zype.android.webapi.WebApiManager;
 
+import org.junit.Ignore;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -13,6 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @version 1
  *          date 8/6/15
  */
+@Ignore
 public class DownloaderServiceTest extends ActivityInstrumentationTestCase2<ActivityForTests> {
 
     private static final int TEST_FAIL_TIME = 500000;

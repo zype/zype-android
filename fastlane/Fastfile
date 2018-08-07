@@ -1,0 +1,163 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+# app_version_code = 1
+# app_version_name = "1.0.0"
+
+# Path to Release version of APK - Used when uploading
+# - UPDATE this depending on where your apk is built
+release_apk_path = "../app/build/outputs/apk/template/release/"
+
+# Path to Debug version of APK - Used for screenshots
+# - UPDATE this depending on where your apk is built
+template_debug_apk_path = "../app/build/outputs/apk/template/debug/*.apk"
+
+# Path to tests APK - Used for screenshots
+# - UPDATE this depending on where your apk is built
+test_apk_path = "../app/build/outputs/apk/androidTest/template/debug/*.apk"
+
+# Code signing fields - UPDATE THESE FIELDS
+keystore_name   = "app_name-keystore" # name of your keystore
+alias_name      = "app_name"          # alias for keystore
+store_password  = "password"          # password to access keystore
+key_password    = "password"          # password to read the key in keystore
+
+# Path to Java keystore for signing. Created in /fastlane file by default
+keystore_path = Dir.pwd + "/" + keystore_name + ".jks"
+
+platform :android do
+  desc "Create keystore for signing. Saved in /fastlane"
+  lane :create_keystore do |options|
+    system("keytool -genkeypair -v -keystore " + (options[:keystore_name] || keystore_name) + ".jks -alias " + (options[:alias_name] || alias_name) + " -keyalg RSA -keysize 2048 -validity 10000 -storepass \'" + (options[:store_password] || store_password) + "\' -keypass \'" + (options[:key_password] || key_password) + "\'")
+  end
+
+  desc "Build release APK. Accepts:"
+  desc "\tkeystore_path  - (Optional) path to your keystore"
+  desc "\talias_name     - (Optional) alias for your keystore"
+  desc "\tstore_password - (Optional) password to access keystore"
+  desc "\tkey_password   - (Optional) password to read key"
+  lane :build_apk do |options|
+    sh("brew list gradle || brew install gradle")
+    sh("cd .. && gradle wrapper")
+
+    gradle(
+      task: "assemble",
+      flavor: "Template",
+      build_type: "Release",
+      properties: {
+        # "versionCode" => app_version_code,
+        # "versionName" => app_version_name,
+        "android.injected.signing.store.file" => options[:keystore_path] || keystore_path,
+        "android.injected.signing.store.password" => options[:store_password] || store_password,
+        "android.injected.signing.key.alias" => options[:alias_name] || alias_name,
+        "android.injected.signing.key.password" => options[:key_password] || key_password
+      }
+    )
+  end
+
+  desc "Create keystore and apk"
+  desc "\tkeystore_name  - (Optional) name of keystore file"
+  desc "\talias_name     - (Optional) alias for your keystore"
+  desc "\tstore_password - (Optional) password to access keystore"
+  desc "\tkey_password   - (Optional) password to read key"
+  lane :create_key_and_apk do |options|
+    create_keystore(
+      keystore_name: options[:keystore_name],
+      alias_name: options[:alias_name],
+      store_password: options[:store_password],
+      key_password: options[:key_password]
+    )
+
+    if options[:keystore_name]
+      keystore_path = Dir.pwd + "/" + options[:keystore_name] + ".jks"
+    end
+    build_apk(
+      keystore_path: keystore_path,
+      alias_name: options[:alias_name],
+      store_password: options[:store_password],
+      key_password: options[:key_password]
+    )
+  end
+
+  desc "Upload APK to Play Store. Accepts:"
+  desc "\ttrack    - (Optional) stage you are at: production(default), beta, alpha, internal"
+  desc "\tapk_path - (Optional) relative path to the APK you want to upload"
+  desc "\t           uses default path otherwise (app/build/outputs/apk/template/release/*.apk)"
+  lane :upload_apk do |options|
+    # Select track to upload to. production is default track
+    release_track = "production"
+    if options[:track]
+      if options[:track] === "production" || options[:track] === "beta" || options[:track] === "alpha" || options[:track] === "internal"
+        release_track = options[:track]
+      end
+    end
+
+    # Upload to Google Play
+    if options[:apk_path]
+      upload_to_play_store(
+        track: release_track,
+        apk: options[:apk_path]
+      )
+    else
+      apk_paths = Dir[release_apk_path + "*.apk"]
+      apk_path = apk_paths[0].gsub("../", "")
+
+      upload_to_play_store(
+        track: release_track,
+        apk: apk_path
+      )
+    end
+  end
+
+  desc "Build test APKs"
+  lane :build_test_apk do
+    sh("brew list gradle || brew install gradle")
+    sh("cd .. && gradle wrapper")
+    gradle(
+      task: "assemble",
+      flavor: "Template",
+      build_type: "Debug"
+    )
+
+    gradle(
+      task: "assemble",
+      flavor: "androidTest"
+    )
+  end
+
+  desc "Take screenshots"
+  lane :screenshots do
+    build_test_apk
+
+    template_debug_dir = Dir[template_debug_apk_path]
+    path_to_debug_apk = template_debug_dir[0].gsub("../", "")
+
+    test_dir = Dir[test_apk_path]
+    path_to_test_apk = test_dir[0].gsub("../", "")
+
+    screengrab(
+      locales: ["en-US"],
+      clear_previous_screenshots: true,
+      app_apk_path: path_to_debug_apk,
+      tests_apk_path: path_to_test_apk
+    )
+  end
+
+
+
+
+end
