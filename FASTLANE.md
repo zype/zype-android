@@ -1,6 +1,6 @@
 # Fastlane Tutorial
 
-Fastlane is a set of command line tools which allow you to automate parts of your app building workflow. With Fastlane you can automate screenshots, build your app and upload to the Google Play Store. **Note: For the Google Play Store, you will not be able to use Fastlane to automate first time uploads.**
+Fastlane is a set of command line tools which allow you to automate parts of your app building workflow. __Note: Fastlane is only supported on macOS at the moment. There is no current support for Windows or Linux.__ With Fastlane you can automate screenshots, build your app and upload to the Google Play Store. **Note: For the Google Play Store, you will not be able to use Fastlane to automate first time uploads.**
 
 ## Requirements
 
