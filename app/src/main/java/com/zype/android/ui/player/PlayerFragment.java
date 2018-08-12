@@ -19,6 +19,11 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.media.app.NotificationCompat.MediaStyle;
+import android.support.v4.media.session.MediaButtonReceiver;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.Display;
@@ -137,6 +142,7 @@ public class PlayerFragment extends BaseFragment implements
     private PlayerControlView mediaController;
     private AspectRatioFrameLayout videoFrame;
     private CustomPlayer player;
+    private MediaSessionCompat mediaSession;
     private SurfaceView surfaceView;
     private SubtitleLayout subtitleLayout;
 
@@ -521,6 +527,52 @@ public class PlayerFragment extends BaseFragment implements
         mListener = null;
     }
 
+    private void initMediaSession() {
+//        ComponentName mediaButtonReceiver = new ComponentName(getContext().getApplicationContext(),
+//                MediaButtonReceiver.class);
+        ComponentName mediaButtonReceiver = new ComponentName(getContext().getApplicationContext(),
+                RemoteControlReceiver.class);
+        mediaSession = new MediaSessionCompat(getContext().getApplicationContext(), "TAG_MEDIA_SESSION",
+                mediaButtonReceiver, null);
+
+        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        mediaButtonIntent.setClass(getActivity(), RemoteControlReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, mediaButtonIntent, 0);
+        mediaSession.setMediaButtonReceiver(pendingIntent);
+
+        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PLAY_PAUSE);
+        mediaSession.setPlaybackState(stateBuilder.build());
+
+        mediaSession.setCallback(new MediaSessionCompat.Callback() {
+            @Override
+            public void onPlay() {
+                super.onPlay();
+            }
+
+            @Override
+            public void onPause() {
+                super.onPause();
+            }
+
+            @Override
+            public void onPlayFromMediaId(String mediaId, Bundle extras) {
+                super.onPlayFromMediaId(mediaId, extras);
+            }
+
+            @Override
+            public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+                return super.onMediaButtonEvent(mediaButtonEvent);
+            }
+        });
+
+        MediaControllerCompat mediaController = new MediaControllerCompat(getActivity(), mediaSession);
+        MediaControllerCompat.setMediaController(getActivity(), mediaController);
+    }
+
     // //////////
     // Menu
     //
@@ -655,6 +707,8 @@ public class PlayerFragment extends BaseFragment implements
             mediaController.setEnabled(true);
             mediaController.setPlayerControlListener(this);
 
+            initMediaSession();
+
             attachPlayerToAnalyticsManager();
 
             player.setInternalErrorListener(new CustomPlayer.InternalErrorListener() {
@@ -785,6 +839,8 @@ public class PlayerFragment extends BaseFragment implements
                 }
                 break;
             case ExoPlayer.STATE_READY:
+                mediaSession.setActive(true);
+
                 if (isNeedToSeekToLatestListenPosition) {
                     long playerPosition = 0;
                     if (contentType != TYPE_AUDIO_LIVE && contentType != TYPE_VIDEO_LIVE) {
@@ -945,6 +1001,7 @@ public class PlayerFragment extends BaseFragment implements
         if (player != null) {
             attachPlayerToAnalyticsManager();
             player.getPlayerControl().start();
+            mediaSession.setActive(true);
         }
     }
 
@@ -954,6 +1011,7 @@ public class PlayerFragment extends BaseFragment implements
         if (player != null) {
             player.getPlayerControl().pause();
             releasePlayer();
+            mediaSession.setActive(false);
         }
     }
 
@@ -986,6 +1044,9 @@ public class PlayerFragment extends BaseFragment implements
                         player.getPlayerControl().pause();
                     } else {
                         player.getPlayerControl().start();
+                    }
+                    if (player.getBackgrounded()) {
+                        showNotification(false, contentType);
                     }
                 }
                 break;
@@ -1079,7 +1140,7 @@ public class PlayerFragment extends BaseFragment implements
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
 
         PendingIntent intent = PendingIntent.getActivity(getActivity(), 0,
-                notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(),
                 ZypeApp.NOTIFICATION_CHANNEL_ID);
@@ -1096,6 +1157,22 @@ public class PlayerFragment extends BaseFragment implements
 //        intentStop.setAction(ACTION_STOP);
 //        PendingIntent pendingIntentStop = PendingIntent.getBroadcast(getActivity(), 12345, intentStop, PendingIntent.FLAG_UPDATE_CURRENT);
 //        builder.addAction(R.drawable.ic_stop_black_24px, "Stop", pendingIntentStop);
+        if (player != null) {
+            if (player.getPlayerControl().isPlaying()) {
+                builder.addAction(new NotificationCompat.Action(R.drawable.ic_pause_black_24dp, "Pause",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE)));
+            } else {
+                builder.addAction(new NotificationCompat.Action(R.drawable.ic_play_arrow_black_24dp, "Play",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE)));
+            }
+        }
+        builder.setStyle(new MediaStyle()
+                .setMediaSession(mediaSession.getSessionToken())
+                .setShowCancelButton(true)
+                .setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
+                        PlaybackStateCompat.ACTION_STOP)));
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
         notificationManager.notify(ZypeApp.NOTIFICATION_ID, builder.build());
