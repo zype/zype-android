@@ -240,7 +240,7 @@
         <receiver android:name=".receiver.RemoteControlReceiver">
             <intent-filter android:priority="2147483647">
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
-                <action android:name="MEDIA_STOP" /> <!-- this constant -->
+                <action android:name="ACTION_STOP" />
             </intent-filter>
         </receiver>
 

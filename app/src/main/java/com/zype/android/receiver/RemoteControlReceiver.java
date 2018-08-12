@@ -18,7 +18,11 @@ public class RemoteControlReceiver extends BroadcastReceiver {
     public void onReceive(Context ctx, Intent intent) {
         if (Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())) {
             KeyEvent event = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-            if (event != null && (event.getAction() == KeyEvent.ACTION_UP)) {
+            if (event != null && (event.getAction() == KeyEvent.ACTION_DOWN)) {
+                int keycode = event.getKeyCode();
+                getObservable().stateChanged(keycode);
+            }
+            else if (event != null && (event.getAction() == KeyEvent.ACTION_UP)) {
                 int keycode = event.getKeyCode();
                 getObservable().stateChanged(keycode);
             } else {
