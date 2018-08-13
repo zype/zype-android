@@ -252,85 +252,85 @@ public class VideosCursorAdapter extends CursorAdapter {
             @Override
             public void onClick(View v) {
 //                if (SettingsProvider.getInstance().isLoggedIn()) {
-                    mActivity.openContextMenu(v);
-                    ArrayList<VideosMenuItem> items = new ArrayList<>();
-                    items.addAll(getListForMenu(viewHolder, isYoutubeVideo));
+                mActivity.openContextMenu(v);
+                ArrayList<VideosMenuItem> items = new ArrayList<>();
+                items.addAll(getListForMenu(viewHolder, isYoutubeVideo));
 
-                    final VideoMenuDialogFragment fragment = VideoMenuDialogFragment.newInstance(items);
-                    fragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Map<String, String> event;
-                            Tracker tracker = ZypeApp.getTracker();
-                            switch (fragment.getList().get(position).getId()) {
-                                case ITEM_UNFAVORITE:
-                                    mOnVideoItemAction.onUnFavoriteVideo(viewHolder.videoId);
-                                    event = new HitBuilders.EventBuilder()
-                                            .setAction("Unfavorite")
-                                            .setLabel("id=" + viewHolder.videoId)
-                                            .build();
-                                    break;
-                                case ITEM_FAVORITE:
-                                    mOnVideoItemAction.onFavoriteVideo(viewHolder.videoId);
-                                    event = new HitBuilders.EventBuilder()
-                                            .setAction("Favorite")
-                                            .setLabel("id=" + viewHolder.videoId)
-                                            .build();
-                                    break;
-                                case ITEM_SHARE:
-                                    mOnVideoItemAction.onShareVideo(viewHolder.videoId);
-                                    event = new HitBuilders.EventBuilder()
-                                            .setAction("Share")
-                                            .setLabel("id=" + viewHolder.videoId)
-                                            .build();
-                                    break;
-                                case ITEM_DOWNLOAD_STOP:
-                                    DownloadHelper.stopDownload(mContext.getContentResolver(), viewHolder.videoId);
-                                    event = new HitBuilders.EventBuilder()
-                                            .setAction("Stop Download")
-                                            .setLabel("id=" + viewHolder.videoId)
-                                            .build();
-                                    break;
-                                case ITEM_DOWNLOAD_AUDIO:
-                                    mOnVideoItemAction.onDownloadAudio(viewHolder.videoId);
-                                    event = new HitBuilders.EventBuilder()
-                                            .setAction("Download Audio")
-                                            .setLabel("id=" + viewHolder.videoId)
-                                            .build();
-                                    break;
-                                case ITEM_DOWNLOAD_VIDEO:
-                                    mOnVideoItemAction.onDownloadVideo(viewHolder.videoId);
-                                    event = new HitBuilders.EventBuilder()
-                                            .setAction("Download VideoList")
-                                            .setLabel("id=" + viewHolder.videoId)
-                                            .build();
-                                    break;
-                                case ITEM_DELETE_AUDIO:
-                                    FileUtils.deleteAudioFile(viewHolder.videoId, context);
-                                    DataHelper.setAudioDeleted(context.getContentResolver(), viewHolder.videoId);
-                                    event = new HitBuilders.EventBuilder()
-                                            .setAction("Delete Downloaded Audio")
-                                            .setLabel("id=" + viewHolder.videoId)
-                                            .build();
-                                    break;
-                                case ITEM_DELETE_VIDEO:
-                                    FileUtils.deleteVideoFile(viewHolder.videoId, context);
-                                    DataHelper.setVideoDeleted(context.getContentResolver(), viewHolder.videoId);
-                                    event = new HitBuilders.EventBuilder()
-                                            .setAction("Delete Downloaded VideoList")
-                                            .setLabel("id=" + viewHolder.videoId)
-                                            .build();
-                                    break;
-                                default:
-                                    throw new IllegalStateException("unknown id=" + fragment.getList().get(position).getId());
-                            }
-                            fragment.dismiss();
-                            if (tracker != null) {
-                                tracker.send(event);
-                            }
+                final VideoMenuDialogFragment fragment = VideoMenuDialogFragment.newInstance(items);
+                fragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Map<String, String> event;
+                        Tracker tracker = ZypeApp.getTracker();
+                        switch (fragment.getList().get(position).getId()) {
+                            case ITEM_UNFAVORITE:
+                                mOnVideoItemAction.onUnFavoriteVideo(viewHolder.videoId);
+                                event = new HitBuilders.EventBuilder()
+                                        .setAction("Unfavorite")
+                                        .setLabel("id=" + viewHolder.videoId)
+                                        .build();
+                                break;
+                            case ITEM_FAVORITE:
+                                mOnVideoItemAction.onFavoriteVideo(viewHolder.videoId);
+                                event = new HitBuilders.EventBuilder()
+                                        .setAction("Favorite")
+                                        .setLabel("id=" + viewHolder.videoId)
+                                        .build();
+                                break;
+                            case ITEM_SHARE:
+                                mOnVideoItemAction.onShareVideo(viewHolder.videoId);
+                                event = new HitBuilders.EventBuilder()
+                                        .setAction("Share")
+                                        .setLabel("id=" + viewHolder.videoId)
+                                        .build();
+                                break;
+                            case ITEM_DOWNLOAD_STOP:
+                                DownloadHelper.stopDownload(mContext.getContentResolver(), viewHolder.videoId);
+                                event = new HitBuilders.EventBuilder()
+                                        .setAction("Stop Download")
+                                        .setLabel("id=" + viewHolder.videoId)
+                                        .build();
+                                break;
+                            case ITEM_DOWNLOAD_AUDIO:
+                                mOnVideoItemAction.onDownloadAudio(viewHolder.videoId);
+                                event = new HitBuilders.EventBuilder()
+                                        .setAction("Download Audio")
+                                        .setLabel("id=" + viewHolder.videoId)
+                                        .build();
+                                break;
+                            case ITEM_DOWNLOAD_VIDEO:
+                                mOnVideoItemAction.onDownloadVideo(viewHolder.videoId);
+                                event = new HitBuilders.EventBuilder()
+                                        .setAction("Download VideoList")
+                                        .setLabel("id=" + viewHolder.videoId)
+                                        .build();
+                                break;
+                            case ITEM_DELETE_AUDIO:
+                                FileUtils.deleteAudioFile(viewHolder.videoId, context);
+                                DataHelper.setAudioDeleted(context.getContentResolver(), viewHolder.videoId);
+                                event = new HitBuilders.EventBuilder()
+                                        .setAction("Delete Downloaded Audio")
+                                        .setLabel("id=" + viewHolder.videoId)
+                                        .build();
+                                break;
+                            case ITEM_DELETE_VIDEO:
+                                FileUtils.deleteVideoFile(viewHolder.videoId, context);
+                                DataHelper.setVideoDeleted(context.getContentResolver(), viewHolder.videoId);
+                                event = new HitBuilders.EventBuilder()
+                                        .setAction("Delete Downloaded VideoList")
+                                        .setLabel("id=" + viewHolder.videoId)
+                                        .build();
+                                break;
+                            default:
+                                throw new IllegalStateException("unknown id=" + fragment.getList().get(position).getId());
                         }
-                    });
-                    fragment.show(mActivity.getFragmentManager(), "menu");
+                        fragment.dismiss();
+                        if (tracker != null) {
+                            tracker.send(event);
+                        }
+                    }
+                });
+                fragment.show(mActivity.getFragmentManager(), "menu");
 //                }
 //                else {
 //                    mOnLoginListener.onRequestLogin();
@@ -450,11 +450,11 @@ public class VideosCursorAdapter extends CursorAdapter {
         if (!TextUtils.isEmpty(cursor.getString(COL_VIDEO_THUMBNAILS))) {
             Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(cursor, 240);
             if (thumbnail != null) {
-                UiUtils.loadImage(thumbnail.getUrl(), R.drawable.outline_play_circle_filled_white_white_48, holder.thumbnail);
+                UiUtils.loadImage(thumbnail.getUrl(), R.drawable.placeholder_video, holder.thumbnail);
             }
             else {
                 holder.thumbnail.setImageDrawable(ContextCompat.getDrawable(holder.thumbnail.getContext(),
-                        R.drawable.outline_play_circle_filled_white_white_48));
+                        R.drawable.placeholder_video));
             }
         }
     }
@@ -483,15 +483,15 @@ public class VideosCursorAdapter extends CursorAdapter {
         public ProgressBar progressBar;
         public boolean isTranscoded;
         public String videoId;
-//        public View detailsView;
+        //        public View detailsView;
         public TextView title;
         public TextView episode;
-//        public TextView episodeDate;
+        //        public TextView episodeDate;
         public ImageView thumbnail;
         public ProgressBar progressBarThumbnail;
         public ImageView imageLocked;
         public ImageView imageUnlocked;
-//        public View episodeView;
+        //        public View episodeView;
         public boolean isVideoDownloaded;
         public boolean isAudioDownloaded;
         public boolean onAir;

@@ -78,7 +78,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                     Video video = (Video) holder.item;
                     if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
                         navigationHelper.switchToVideoDetailsScreen((Activity) holder.view.getContext(), video.id,
-                                        playlistId, false);
+                                playlistId, false);
                     }
                     else {
                         navigationHelper.handleNotAuthorizedVideo((Activity) holder.view.getContext(), video.id, playlistId);
@@ -130,11 +130,11 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
             if (video.thumbnails != null) {
                 Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 240);
                 if (thumbnail != null) {
-                    UiUtils.loadImage(thumbnail.getUrl(), R.drawable.outline_play_circle_filled_white_white_48, holder.imageThumbnail);
+                    UiUtils.loadImage(thumbnail.getUrl(), R.drawable.placeholder_video, holder.imageThumbnail);
                 }
                 else {
                     holder.imageThumbnail.setImageDrawable(ContextCompat.getDrawable(holder.view.getContext(),
-                            R.drawable.outline_play_circle_filled_white_white_48));
+                            R.drawable.placeholder_video));
                 }
             }
         }
@@ -171,10 +171,12 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
             if (AuthHelper.isVideoRequiredAuthorization(holder.view.getContext(), video.id)) {
                 holder.imageLocked.setVisibility(View.VISIBLE);
                 if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
+                    holder.imageLocked.setVisibility(GONE);
                     holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
                     holder.imageLocked.setColorFilter(ContextCompat.getColor(holder.view.getContext(),
                             R.color.icon_unlocked));
-                } else {
+                }
+                else {
                     holder.imageLocked.setImageResource(R.drawable.baseline_lock_white_18);
                     holder.imageLocked.setColorFilter(ContextCompat.getColor(holder.view.getContext(),
                             R.color.icon_locked));
