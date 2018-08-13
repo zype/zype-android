@@ -8,12 +8,17 @@ import android.text.TextUtils;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.webapi.model.app.AppData;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by Evgeny Cherkasov on 23.01.2018.
  */
 
 public class ZypeConfiguration {
     private static final String PREFERENCE_AUTOPLAY = "ZypeAutoplay";
+    private static final String PREFERENCE_BACKGROUND_AUDIO_PLAYBACK = "ZypeBackgroundAudioPlayback";
     private static final String PREFERENCE_BACKGROUND_PLAYBACK = "ZypeBackgroundPlayback";
     private static final String PREFERENCE_DEVICE_LINKING = "ZypeDeviceLinking";
     private static final String PREFERENCE_DEVICE_LINKING_URL = "ZypeDeviceLinkingUrl";
@@ -21,6 +26,9 @@ public class ZypeConfiguration {
     private static final String PREFERENCE_DOWNLOADS_FOR_GUESTS = "ZypeDownloadsForGuests";
     private static final String PREFERENCE_NATIVE_SUBSCRIPTION = "ZypeNativeSubscription";
     private static final String PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION = "ZypeNativeToUniversalSubscription";
+    private static final String PREFERENCE_PLAYLIST_GALLERY_VIEW = "ZypePlaylistGalleryView";
+    private static final String PREFERENCE_PLAYLIST_GALLERY_HERO_IMAGES = "ZypePlaylistGalleryHeroImages";
+    private static final String PREFERENCE_PLAYLIST_GALLERY_ITEM_TITLES = "ZypePlaylistGalleryItemTitles";
     private static final String PREFERENCE_ROOT_PLAYLIST_ID = "ZypeRootPlaylistId";
     private static final String PREFERENCE_SUBSCRIBE_TO_WATCH_AD_FREE = "ZypeSubscribeToWatchAdFree";
     private static final String PREFERENCE_THEME = "ZypeTheme";
@@ -116,6 +124,10 @@ public class ZypeConfiguration {
         }
     }
 
+    public static String getAppKey() {
+        return ZypeSettings.APP_KEY;
+    }
+
     public static String getTheme(Context context) {
         return getStringPreference(PREFERENCE_THEME, ZypeSettings.THEME, context);
     }
@@ -132,6 +144,10 @@ public class ZypeConfiguration {
 
     public static boolean isNativeToUniversalSubscriptionEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION, ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED, context);
+    }
+
+    public static List<String> getPlanIds() {
+        return Arrays.asList(ZypeSettings.PLAN_IDS);
     }
 
     public static boolean isSubscribeToWatchAdFreeEnabled(Context context) {
@@ -156,6 +172,11 @@ public class ZypeConfiguration {
         return getBooleanPreference(PREFERENCE_BACKGROUND_PLAYBACK, ZypeSettings.BACKGROUND_PLAYBACK_ENABLED, context);
     }
 
+    public static boolean isBackgroundAudioPlaybackEnabled(Context context) {
+        return getBooleanPreference(PREFERENCE_BACKGROUND_AUDIO_PLAYBACK, ZypeSettings.BACKGROUND_AUDIO_PLAYBACK_ENABLED, context);
+    }
+
+
     public static boolean isDeviceLinkingEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_DEVICE_LINKING, ZypeSettings.DEVICE_LINKING, context);
     }
@@ -170,6 +191,18 @@ public class ZypeConfiguration {
 
     public static boolean isDownloadsForGuestsEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_DOWNLOADS_FOR_GUESTS, ZypeSettings.DOWNLOADS_ENABLED_FOR_GUESTS, context);
+    }
+
+    public static boolean playlistGalleryView(Context context) {
+        return getBooleanPreference(PREFERENCE_PLAYLIST_GALLERY_VIEW, ZypeSettings.PLAYLIST_GALLERY_VIEW, context);
+    }
+
+    public static boolean playlistGalleryHeroImages(Context context) {
+        return getBooleanPreference(PREFERENCE_PLAYLIST_GALLERY_HERO_IMAGES, ZypeSettings.PLAYLIST_GALLERY_HERO_IMAGES, context);
+    }
+
+    public static boolean playlistGalleryItemTitles(Context context) {
+        return getBooleanPreference(PREFERENCE_PLAYLIST_GALLERY_ITEM_TITLES, ZypeSettings.PLAYLIST_GALLERY_ITEM_TITLES, context);
     }
 
 }

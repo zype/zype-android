@@ -3,6 +3,7 @@ package com.zype.android.core.provider.helpers;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.utils.Logger;
@@ -331,4 +332,45 @@ public class VideoHelper {
         }
     }
 
+    /**
+     * Find a thumbnail of the video that is most close to specified height
+     *
+     * @param video
+     * @param height
+     * @return
+     */
+    public static Thumbnail getThumbnailByHeight(Video video, int height) {
+        Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
+        List<Thumbnail> thumbnails = new Gson().fromJson(video.thumbnails, thumbnailType);
+        return getThumbnailByHeight(thumbnails, height);
+    }
+
+    // TODO: Remove this method after refactoring to use Room for working with database
+    public static Thumbnail getThumbnailByHeight(Cursor cursor, int height) {
+        Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
+        List<Thumbnail> thumbnails = new Gson().fromJson(cursor.getString(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_THUMBNAILS)), thumbnailType);
+        return getThumbnailByHeight(thumbnails, height);
+    }
+
+    // TODO: Make this private after refactoring to use Room for working with database
+    public static Thumbnail getThumbnailByHeight(List<Thumbnail> thumbnails, int height) {
+        Thumbnail result = null;
+        if (thumbnails != null && thumbnails.size() > 0) {
+            for (Thumbnail thumbnail : thumbnails) {
+                if (result == null) {
+                    result = thumbnail;
+                }
+                else {
+                    if (Math.abs(height - thumbnail.getHeight()) < Math.abs(height - result.getHeight())) {
+                        result = thumbnail;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static boolean isLiveEventOnAir(Video video) {
+        return (video.isZypeLive == 1 && video.onAir == 1);
+    }
 }

@@ -3,6 +3,7 @@ package com.zype.android.core.settings;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.ZypeSettings;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.StorageUtils;
@@ -69,7 +70,7 @@ public class SettingsProvider extends CommonPreferences {
     public static final String SETTINGS_MIGRATION = "SETTINGS_MIGRATION";
     public static final String RESERVED = "RESERVED";
 
-    private static final String CONSUMER_SUBSCRIPTION_COUNT = "CONSUMER_SUBSCRIPTION_COUNT";
+    public static final String CONSUMER_SUBSCRIPTION_COUNT = "CONSUMER_SUBSCRIPTION_COUNT";
     private static final String CONSUMER_ID = "ConsumerId";
     private static final String SUBSCRIBE_URL = "SUBSCRIBE_URL";
     public static final String FILE_LENGTH = "FILE_";
@@ -82,6 +83,10 @@ public class SettingsProvider extends CommonPreferences {
     public static final String PREF_STORAGE = "PREF_STORAGE";
     public static String PREF_ALL_DOWNLOADS_SIZE = "PREF_ALL_DOWNLOADS_SIZE";
     private long ONE_GIGABYTE = 1 * 1024 * 1024 * 1024;
+
+    // Consumer
+    public static final String CONSUMER_EMAIL = "ConsumerEmail";
+    public static final String CONSUMER_PASSWORD = "ConsumerPassword";
 
     // Live stream
     private static final String LIVE_STREAM_LIMIT = "LiveStreamLimit";
@@ -472,7 +477,7 @@ public class SettingsProvider extends CommonPreferences {
 
     // Preference max downloads size
     public void setUserPreferenceMaxSize(String userPreferenceMaxSize) {
-        if (isLogined()) {
+        if (AuthHelper.isLoggedIn()) {
             mUserSettings.setUserPreferenceMaxSize(userPreferenceMaxSize);
         } else {
             set(DEFAULT + PREF_MAX_DOWNLOADS_TOTAL_SIZE, userPreferenceMaxSize);
@@ -481,7 +486,7 @@ public class SettingsProvider extends CommonPreferences {
 
     public String getUserPreferenceMaxSize() {
         String defaultValue = get(DEFAULT + PREF_MAX_DOWNLOADS_TOTAL_SIZE, DEFAULT_MAX_UNLIMITED);
-        if (isLoggedIn()) {
+        if (AuthHelper.isLoggedIn()) {
             return mUserSettings.getUserPreferenceMaxSize(defaultValue);
         } else {
             return defaultValue;
@@ -490,7 +495,7 @@ public class SettingsProvider extends CommonPreferences {
 
     // Preference downloads type
     public void setUserPreferenceDownloadType(String userPreferenceDownloadType) {
-        if (isLogined()) {
+        if (AuthHelper.isLoggedIn()) {
             mUserSettings.setUserPreferenceDownloadType(userPreferenceDownloadType);
         } else {
             set(DEFAULT + DOWNLOAD_TYPE, userPreferenceDownloadType);
@@ -499,7 +504,7 @@ public class SettingsProvider extends CommonPreferences {
 
     public String getUserPreferenceDownloadType() {
         String defaultValue = get(DEFAULT + DOWNLOAD_TYPE, DEFAULT_TYPE_AUDIO);
-        if (isLogined()) {
+        if (AuthHelper.isLoggedIn()) {
             return mUserSettings.getUserPreferenceDownloadType(defaultValue);
         } else {
             return defaultValue;
@@ -508,7 +513,7 @@ public class SettingsProvider extends CommonPreferences {
 
     // Preference max wifi only
     public void setUserPreferenceLoadWiFiOnly(boolean userPreferenceLoadWiFiOnly) {
-        if (isLogined()) {
+        if (AuthHelper.isLoggedIn()) {
             mUserSettings.setUserPreferenceLoadWiFiOnly(userPreferenceLoadWiFiOnly);
         } else {
             set(DEFAULT + DOWNLOAD_WIFI, userPreferenceLoadWiFiOnly);
@@ -517,7 +522,7 @@ public class SettingsProvider extends CommonPreferences {
 
     public boolean isUserPreferenceLoadWifiOnlySet() {
         boolean defaultValue = get(DEFAULT + DOWNLOAD_WIFI, DEFAULT_LOAD_WIFI_ONLY);
-        if (isLoggedIn()) {
+        if (AuthHelper.isLoggedIn()) {
             return mUserSettings.getUserPreferenceLoadWifiOnly(defaultValue);
         } else {
             return defaultValue;
@@ -527,7 +532,7 @@ public class SettingsProvider extends CommonPreferences {
     // Preference AutoRemove content
     public boolean isUserPreferenceAutoRemoveWatchedContentSet() {
         boolean defaultValue = get(DEFAULT + PREF_AUTO_REMOVE_WATCHED_CONTENT, DEFAULT_AUTO_REMOVE_WATCHED_CONTENT);
-        if (isLogined()) {
+        if (AuthHelper.isLoggedIn()) {
             return mUserSettings.getUserPreferenceAutoRemoveWatchedContent(defaultValue);
         } else {
             return defaultValue;
@@ -535,7 +540,7 @@ public class SettingsProvider extends CommonPreferences {
     }
 
     public void setUserPreferenceAutoRemoveWatchedContent(boolean userPreferenceAutoRemoveWatchedContent) {
-        if (isLogined()) {
+        if (AuthHelper.isLoggedIn()) {
             mUserSettings.setUserPreferenceAutoRemoveWatchedContent(userPreferenceAutoRemoveWatchedContent);
         } else {
             set(DEFAULT + PREF_AUTO_REMOVE_WATCHED_CONTENT, userPreferenceAutoRemoveWatchedContent);

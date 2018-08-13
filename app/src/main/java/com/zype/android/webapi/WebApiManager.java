@@ -11,9 +11,9 @@ import android.os.Message;
 import android.util.Log;
 
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.ResponseBody;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.bus.EventBus;
 import com.zype.android.core.events.AuthorizationErrorEvent;
@@ -25,15 +25,19 @@ import com.zype.android.webapi.builder.DownloadAudioParamsBuilder;
 import com.zype.android.webapi.builder.DownloadVideoParamsBuilder;
 import com.zype.android.webapi.builder.EntitlementParamsBuilder;
 import com.zype.android.webapi.builder.FavoriteParamsBuilder;
+import com.zype.android.webapi.builder.MarketplaceConnectParamsBuilder;
 import com.zype.android.webapi.builder.ParamsBuilder;
+import com.zype.android.webapi.builder.PlanParamsBuilder;
 import com.zype.android.webapi.builder.PlayerParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.BaseEvent;
 import com.zype.android.webapi.events.DataEvent;
 import com.zype.android.webapi.events.ErrorEvent;
+import com.zype.android.webapi.events.app.AppEvent;
 import com.zype.android.webapi.events.auth.AccessTokenInfoEvent;
 import com.zype.android.webapi.events.auth.RefreshAccessTokenEvent;
 import com.zype.android.webapi.events.auth.RetrieveAccessTokenEvent;
+import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 import com.zype.android.webapi.events.category.CategoryEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
 import com.zype.android.webapi.events.consumer.ConsumerFavoriteVideoEvent;
@@ -47,6 +51,7 @@ import com.zype.android.webapi.events.linking.DevicePinEvent;
 import com.zype.android.webapi.events.onair.OnAirAudioEvent;
 import com.zype.android.webapi.events.onair.OnAirEvent;
 import com.zype.android.webapi.events.onair.OnAirVideoEvent;
+import com.zype.android.webapi.events.plan.PlanEvent;
 import com.zype.android.webapi.events.player.PlayerAudioEvent;
 import com.zype.android.webapi.events.player.PlayerVideoEvent;
 import com.zype.android.webapi.events.playlist.PlaylistEvent;
@@ -55,12 +60,17 @@ import com.zype.android.webapi.events.settings.ContentSettingsEvent;
 import com.zype.android.webapi.events.settings.LiveStreamSettingsEvent;
 import com.zype.android.webapi.events.settings.SettingsEvent;
 import com.zype.android.webapi.events.video.RetrieveHighLightVideoEvent;
-import com.zype.android.webapi.events.video.RetrieveVideoEvent;
+import com.zype.android.webapi.events.video.VideoEvent;
+import com.zype.android.webapi.events.video.VideoListEvent;
 import com.zype.android.webapi.events.zobject.ZObjectEvent;
 import com.zype.android.webapi.model.ErrorBody;
+import com.zype.android.webapi.model.app.AppResponse;
 import com.zype.android.webapi.model.auth.AccessTokenInfoResponse;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
+import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBodyData;
+import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectResponse;
+import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBody;
 import com.zype.android.webapi.model.category.CategoryResponse;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoResponse;
 import com.zype.android.webapi.model.consumers.ConsumerResponse;
@@ -74,6 +84,7 @@ import com.zype.android.webapi.model.linking.DevicePinResponse;
 import com.zype.android.webapi.model.onair.OnAirAudioResponse;
 import com.zype.android.webapi.model.onair.OnAirResponse;
 import com.zype.android.webapi.model.onair.OnAirVideoResponse;
+import com.zype.android.webapi.model.plan.PlanResponse;
 import com.zype.android.webapi.model.player.PlayerAudioResponse;
 import com.zype.android.webapi.model.player.PlayerVideoResponse;
 import com.zype.android.webapi.model.playlist.PlaylistResponse;
@@ -81,11 +92,10 @@ import com.zype.android.webapi.model.search.SearchResponse;
 import com.zype.android.webapi.model.settings.ContentSettingsResponse;
 import com.zype.android.webapi.model.settings.LiveStreamSettingsResponse;
 import com.zype.android.webapi.model.settings.SettingsResponse;
+import com.zype.android.webapi.model.video.VideoListResponse;
 import com.zype.android.webapi.model.video.VideoResponse;
 import com.zype.android.webapi.model.zobjects.ZObjectResponse;
 
-import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.HashMap;
@@ -94,7 +104,6 @@ import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.OkClient;
-import retrofit.client.Response;
 
 /**
  * @author vasya
@@ -115,6 +124,7 @@ public class WebApiManager {
     private final ZypeApiEndpointInterface mLoginApi;
     private final ZypeApiEndpointInterface mDownloadApi;
     private final ZypeApiEndpointInterface mCookieApi;
+    private final ZypeApiEndpointInterface marketplaceConnectApi;
     private final Context mContext;
     private EventBus mBus;
     private WorkerHandler mHandler;
@@ -165,6 +175,14 @@ public class WebApiManager {
                 .setClient(new OkClient(okHttpClient))
                 .build();
         mCookieApi = cookieRestAdapter.create(ZypeApiEndpointInterface.class);
+
+        RestAdapter marketplaceConnectRestAdapter = new RestAdapter.Builder()
+                .setEndpoint("https://mkt.zype.com")
+                .setRequestInterceptor(new CustomRequestInterceptor())
+                .setLogLevel(logLevel)
+                .setClient(new OkClient(okHttpClient))
+                .build();
+        marketplaceConnectApi = marketplaceConnectRestAdapter.create(ZypeApiEndpointInterface.class);
 
         mContext = contextArg;
 
@@ -226,17 +244,41 @@ public class WebApiManager {
             postParams.put(accessToken, SettingsProvider.getInstance().getAccessToken());
 
         switch (request) {
+            case APP:
+                return new AppEvent(ticket, request, new AppResponse(mApi.getApp(getParams)));
             case AUTH_REFRESH_ACCESS_TOKEN:
                 return new RefreshAccessTokenEvent(ticket, new RefreshAccessToken(mApi.authRefreshAccessToken(postParams)));
             case AUTH_RETRIEVE_ACCESS_TOKEN:
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
+            case MARKETPLACE_CONNECT:
+                MarketplaceConnectBody body = new MarketplaceConnectBody();
+                body.appId = ZypeApp.appData.id;
+                body.consumerId = postParams.get(MarketplaceConnectParamsBuilder.CONSUMER_ID);
+                body.planId = postParams.get(MarketplaceConnectParamsBuilder.PLAN_ID);
+                body.purchaseToken = postParams.get(MarketplaceConnectParamsBuilder.PURCHASE_TOKEN);
+                body.siteId = ZypeApp.appData.siteId;
+                MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
+                bodyData.receipt = postParams.get(MarketplaceConnectParamsBuilder.RECEIPT);
+                bodyData.signature = postParams.get(MarketplaceConnectParamsBuilder.SIGNATURE);
+                body.data = bodyData;
+
+                return new MarketplaceConnectEvent(ticket, new MarketplaceConnectResponse(marketplaceConnectApi.verifySubscription(body)));
+            case CONSUMER_FORGOT_PASSWORD:
+                return new ConsumerEvent(ticket, request, new ConsumerResponse(mApi.consumerForgotPassword(getParams, postParams)));
+            case PLAN:
+                String planId = pathParams.get(PlanParamsBuilder.PLAN_ID);
+                return new PlanEvent(ticket, new PlanResponse(mApi.getPlan(planId, getParams)));
             case TOKEN_INFO:
                 String token = getParams.get(AuthParamsBuilder.ACCESS_TOKEN);
                 return new AccessTokenInfoEvent(ticket, new AccessTokenInfoResponse(mApi.getTokenInfo(token)));
-            case VIDEO_LATEST_GET:
-                return new RetrieveVideoEvent(ticket, new VideoResponse(mApi.getVideoList(getParams)));
+            case VIDEO_LIST:
+                return new VideoListEvent(ticket, new VideoListResponse(mApi.getVideoList(getParams)), null);
+            case VIDEO:
+                videoId = getParams.get(VideoParamsBuilder.VIDEO_ID);
+                getParams.remove(VideoParamsBuilder.VIDEO_ID);
+                return new VideoEvent(ticket, new VideoResponse(mApi.getVideo(videoId, getParams)));
             case VIDEO_HIGHLIGHT_GET:
-                return new RetrieveHighLightVideoEvent(ticket, new VideoResponse(mApi.getVideoList(getParams)));
+                return new RetrieveHighLightVideoEvent(ticket, new VideoListResponse(mApi.getVideoList(getParams)));
             case CONSUMER_FAVORITE_VIDEO_GET:
                 return new ConsumerFavoriteVideoEvent(ticket, new ConsumerFavoriteVideoResponse(mApi.getFavoriteVideoList(SettingsProvider.getInstance().getConsumerId(), getParams)));
             case FAVORITE:
@@ -246,9 +288,9 @@ public class WebApiManager {
                 videoId = pathParams.get(FavoriteParamsBuilder.VIDEO_ID);
                 return new UnfavoriteEvent(ticket, new UnfavoriteResponse(mApi.setUnFavoriteVideo(SettingsProvider.getInstance().getConsumerId(), favoriteId, postParams)), videoId);
             case CONSUMER_CREATE:
-                return new ConsumerEvent(ticket, new ConsumerResponse(mApi.createConsumer(getParams, postParams)));
+                return new ConsumerEvent(ticket, request, new ConsumerResponse(mApi.createConsumer(getParams, postParams)));
             case CONSUMER_GET:
-                return new ConsumerEvent(ticket, new ConsumerResponse(mApi.getConsumer(SettingsProvider.getInstance().getAccessTokenResourceOwnerId(), getParams)));
+                return new ConsumerEvent(ticket, request, new ConsumerResponse(mApi.getConsumer(SettingsProvider.getInstance().getAccessTokenResourceOwnerId(), getParams)));
             case DEVICE_PIN_CREATE:
                 return new DevicePinEvent(ticket, args, new DevicePinResponse(mApi.createDevicePin(getParams, "")));
             case DEVICE_PIN_GET:
@@ -270,7 +312,7 @@ public class WebApiManager {
                 return new PlayerVideoEvent(ticket, new PlayerVideoResponse(mDownloadApi.getVideoPlayer(videoId, getParams)));
             case PLAYER_AUDIO:
                 videoId = getParams.get(PlayerParamsBuilder.VIDEO_ID);
-                return new PlayerAudioEvent(ticket, new PlayerAudioResponse(mApi.getAudioPlayer(videoId, getParams)));
+                return new PlayerAudioEvent(ticket, args, new PlayerAudioResponse(mDownloadApi.getAudioPlayer(videoId, getParams)));
             case PLAYER_DOWNLOAD_VIDEO:
                 videoId = pathParams.get(DownloadVideoParamsBuilder.VIDEO_ID);
                 return new DownloadVideoEvent(ticket, new DownloadVideoResponse(mDownloadApi.getDownloadVideo(videoId, getParams)), videoId);
@@ -292,7 +334,7 @@ public class WebApiManager {
             case VIDEO_FROM_PLAYLIST:
                 if (pathParams.containsKey(VideoParamsBuilder.PLAYLIST_ID)) {
                     playlistId = pathParams.get(VideoParamsBuilder.PLAYLIST_ID);
-                    return new RetrieveVideoEvent(ticket, new VideoResponse(mApi.getVideosFromPlaylist(playlistId, getParams)));
+                    return new VideoListEvent(ticket, new VideoListResponse(mApi.getVideosFromPlaylist(playlistId, getParams)), playlistId);
                 } else {
                     throw new IllegalStateException("VideoParamsBuilder.PLAYLIST_ID can not be null");
                 }
@@ -317,10 +359,15 @@ public class WebApiManager {
     }
 
     public enum Request {
+        APP,
         AUTH_REFRESH_ACCESS_TOKEN,
         AUTH_RETRIEVE_ACCESS_TOKEN,
+        CONSUMER_FORGOT_PASSWORD,
+        MARKETPLACE_CONNECT,
+        PLAN,
         TOKEN_INFO,
-        VIDEO_LATEST_GET,
+        VIDEO,
+        VIDEO_LIST,
         VIDEO_FROM_PLAYLIST,
         VIDEO_HIGHLIGHT_GET,
         CONSUMER_CREATE,
@@ -398,8 +445,10 @@ public class WebApiManager {
 
     public class WorkerHandler extends Handler {
 
+        public static final int BAD_REQUEST = 400;
         public static final int UNAUTHORIZED = 401;
         public static final int FORBIDDEN = 403;
+        public static final int INTERNAL_SERVER_ERROR = 500;
         public static final int UNRESOLVED_HOST = 0;
         private static final int MSG_DO_JOB = 0;
         private Job mCurrentJob;
@@ -469,6 +518,10 @@ public class WebApiManager {
             }
             catch (RetrofitError err) {
                 int statusCode = (err.getResponse() != null) ? err.getResponse().getStatus() : UNRESOLVED_HOST;
+                if (statusCode == INTERNAL_SERVER_ERROR) {
+                    Log.e(TAG, "Request failed: " + job.getRequest(), err.getCause());
+                    return new ErrorEvent(job.getTicket(), job.getRequest(), "(" + statusCode + ") " + mContext.getString(R.string.GENERIC_ERROR), err);
+                }
                 ErrorBody errorBody = parseError(err);
                 if (statusCode == UNAUTHORIZED) {
 //                    BaseModel model = (BaseModel) err.getBodyAs(BaseModel.class);
@@ -482,9 +535,11 @@ public class WebApiManager {
                         return new UnrsolvedHostErrorEvent(job.getTicket(), job.getRequest(), mContext.getString(R.string.connection_error));
                     } else
                         return new UnrsolvedHostErrorEvent(job.getTicket(), job.getRequest(), err.getMessage());
-                } else {
+                }
+                else {
                     Log.d(TAG, "Request failed: " + job.getRequest(), err.getCause());
-                    return new ErrorEvent(job.getTicket(), job.getRequest(), "(" + statusCode + ") " + mContext.getString(R.string.GENERIC_ERROR), err);
+//                    return new ErrorEvent(job.getTicket(), job.getRequest(), "(" + statusCode + ") " + mContext.getString(R.string.GENERIC_ERROR), err);
+                    return new ErrorEvent(job.getTicket(), job.getRequest(), errorBody.message, err);
                 }
             }
         }

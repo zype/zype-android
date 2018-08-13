@@ -7,7 +7,7 @@ package com.zype.android.ui.video_details.fragments.video;
  */
 public interface OnVideoAudioListener {
 
-    void onFullscreenChanged();
+    void onFullscreenChanged(boolean isFullscreen);
 
     void videoFinished();
 
@@ -22,4 +22,6 @@ public interface OnVideoAudioListener {
     void saveCurrentTimeStamp(long currentPosition);
 
     void onSeekToMillis(int ms);
+
+    void onError();
 }

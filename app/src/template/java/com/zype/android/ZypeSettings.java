@@ -27,6 +27,7 @@ public class ZypeSettings {
     // Monetization
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_SUBSCRIPTION_ENABLED>");
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED>");
+    public static final String[] PLAN_IDS = new String[] { <PLAN_IDS> };
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = Boolean.valueOf("<SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED>");
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<UNIVERSAL_SUBSCRIPTION_ENABLED>");
     public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("<UNIVERSAL_TVOD>");
@@ -34,14 +35,16 @@ public class ZypeSettings {
     // Features
     public static final boolean AUTOPLAY = Boolean.valueOf("<AUTOPLAY>");
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = Boolean.valueOf("<BACKGROUND_PLAYBACK_ENABLED>");
+    public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
+    public static final String DEVICE_LINKING_URL = "<DEVICE_LINKING_URL>";
     public static final boolean DOWNLOADS_ENABLED = Boolean.valueOf("<DOWNLOADS_ENABLED>");
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = Boolean.valueOf("<DOWNLOADS_ENABLED_FOR_GUESTS>");
+    public static final boolean PLAYLIST_GALLERY_VIEW = Boolean.valueOf("<PLAYLIST_GALLERY_VIEW>");
+    public static final boolean PLAYLIST_GALLERY_HERO_IMAGES = Boolean.valueOf("<PLAYLIST_GALLERY_HERO_IMAGES>");
+    public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = Boolean.valueOf("<PLAYLIST_GALLERY_ITEM_TITLES>");
     // TODO: 'Share video' is not currently supported by the app builder. Update these flag if needed.
     public static final boolean SHARE_VIDEO_ENABLED = false;
 //    public static final boolean SHARE_VIDEO_ENABLED = Boolean.valueOf("<SHARE_VIDEO_ENABLED>");
-
-    public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
-    public static final String DEVICE_LINKING_URL = "<DEVICE_LINKING_URL>";
 
     /**
      * Theme of the app.

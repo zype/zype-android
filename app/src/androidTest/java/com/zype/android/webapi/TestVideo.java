@@ -8,7 +8,7 @@ import com.zype.android.ui.ActivityForTests;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
-import com.zype.android.webapi.events.video.RetrieveVideoEvent;
+import com.zype.android.webapi.events.video.VideoListEvent;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +61,7 @@ public class TestVideo extends ActivityInstrumentationTestCase2<ActivityForTests
     }
 
     @Subscribe
-    public void handleRetrieveVideo(RetrieveVideoEvent response) {
+    public void handleRetrieveVideo(VideoListEvent response) {
         Logger.d("handleVideo");
         assertTrue(response.getEventData() != null);
         assertTrue(response.getEventData().getModelData() != null);
@@ -76,7 +76,7 @@ public class TestVideo extends ActivityInstrumentationTestCase2<ActivityForTests
                 VideoParamsBuilder builder = new VideoParamsBuilder()
                         .addDateLimit("2015-06-28", "2015-07-04")
                         .addPage(1);
-                mApi.executeRequest(WebApiManager.Request.VIDEO_LATEST_GET, builder.build());
+                mApi.executeRequest(WebApiManager.Request.VIDEO_LIST, builder.build());
             }
         });
         assertTrue(mLock.await(TEST_FAIL_TIME, TimeUnit.MILLISECONDS));
@@ -89,7 +89,7 @@ public class TestVideo extends ActivityInstrumentationTestCase2<ActivityForTests
             public void run() {
                 VideoParamsBuilder builder = new VideoParamsBuilder()
                         .addOnAir(true);
-                mApi.executeRequest(WebApiManager.Request.VIDEO_LATEST_GET, builder.build());
+                mApi.executeRequest(WebApiManager.Request.VIDEO_LIST, builder.build());
             }
         });
         assertTrue(mLock.await(TEST_FAIL_TIME, TimeUnit.MILLISECONDS));
@@ -103,7 +103,7 @@ public class TestVideo extends ActivityInstrumentationTestCase2<ActivityForTests
                 VideoParamsBuilder builder = new VideoParamsBuilder()
                         .addPage(1)
                         .addCategoryHighlight(true);
-                mApi.executeRequest(WebApiManager.Request.VIDEO_LATEST_GET, builder.build());
+                mApi.executeRequest(WebApiManager.Request.VIDEO_LIST, builder.build());
             }
         });
         assertTrue(mLock.await(TEST_FAIL_TIME, TimeUnit.MILLISECONDS));

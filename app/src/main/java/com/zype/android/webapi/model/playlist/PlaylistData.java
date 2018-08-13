@@ -23,6 +23,9 @@ public class PlaylistData {
     @Expose
     private List<String> Keywords = new ArrayList<>();
 
+    @Expose
+    public boolean active;
+
     @SerializedName("created_at")
     @Expose
     private String createdAt;

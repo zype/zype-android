@@ -2,8 +2,12 @@ package com.zype.android.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -18,12 +22,14 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
-import com.zype.android.ui.LoginActivity;
+import com.zype.android.ui.Auth.LoginActivity;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
+import com.zype.android.ui.Widget.CustomViewPager;
 import com.zype.android.ui.base.BaseActivity;
+import com.zype.android.ui.main.Model.Section;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.ui.main.fragments.videos.VideosActivity;
 import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
@@ -50,28 +56,45 @@ import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.File;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MainActivity extends BaseActivity implements OnMainActivityFragmentListener, OnVideoItemAction, OnLoginAction,
-                                                    BillingManager.BillingUpdatesListener {
+public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
+        OnMainActivityFragmentListener, OnVideoItemAction, OnLoginAction,
+        BillingManager.BillingUpdatesListener {
+
+    BottomNavigationView bottomNavigationView;
+
+    CustomViewPager pagerSections;
+    Map<Integer, Section> sections;
+
+    SectionsPagerAdapter adapterSections;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        setTitle(R.string.menu_navigation_home);
 
-        ViewPager mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        bottomNavigationView = findViewById(R.id.navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        setupNavigation();
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
-        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            TabLayout.Tab tab = tabLayout.getTabAt(i);
-            tab.setCustomView(mSectionsPagerAdapter.getTabView(i));
-        }
+        pagerSections = findViewById(R.id.pagerSections);
+        pagerSections.setAdapter(adapterSections);
+        pagerSections.setSwipeEnabled(false);
 
+//        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+//        tabLayout.setupWithViewPager(pagerSections);
+//        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+//            TabLayout.Tab tab = tabLayout.getTabAt(i);
+//            tab.setCustomView(adapterSections.getTabView(i));
+//        }
+//
         SettingsParamsBuilder settingsParamsBuilder = new SettingsParamsBuilder();
         getApi().executeRequest(WebApiManager.Request.GET_SETTINGS, settingsParamsBuilder.build());
 
@@ -83,15 +106,67 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     protected void onStart() {
         super.onStart();
-        if (SettingsProvider.getInstance().isLogined()) {
-            requestConsumerData();
+//        if (SettingsProvider.getInstance().isLogined()) {
+//            requestConsumerData();
+//        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuMainSearch:
+                NavigationHelper.getInstance(this).switchToSearchScreen(this);
+                return true;
         }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setupNavigation() {
+        sections = new LinkedHashMap<>();
+        sections.put(R.id.menuNavigationHome, new Section(getString(R.string.menu_navigation_home)));
+        sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
+        if (ZypeConfiguration.isDownloadsEnabled(this)) {
+            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(true);
+            sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
+        }
+        else {
+            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(false);
+        }
+        sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings)));
+
+        adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        adapterSections.setData(sections);
+    }
+
+    //
+    // 'BottomNavigationView.OnNavigationItemSelectedListener' implementation
+    //
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuNavigationHome:
+            case R.id.menuNavigationFavorites:
+            case R.id.menuNavigationDownloads:
+            case R.id.menuNavigationSettings:
+                Section section = sections.get(item.getItemId());
+                pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()));
+                setTitle(section.title);
+                return true;
+        }
+        return false;
     }
 
     @Override
     public void onLatestVideoClick(String videoId) {
         if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-            onRequestSubscription();
+            onRequestSubscription(videoId);
         } else {
             VideoDetailActivity.startActivity(this, videoId, null);
         }
@@ -100,7 +175,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     public void onDownloadVideo(String videoId) {
         if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-            onRequestSubscription();
+            onRequestSubscription(videoId);
         } else {
             DownloadVideoParamsBuilder downloadVideoParamsBuilder = new DownloadVideoParamsBuilder()
                     .addVideoId(videoId);
@@ -111,7 +186,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     public void onDownloadAudio(String videoId) {
         if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
-            onRequestSubscription();
+            onRequestSubscription(videoId);
         } else {
             DownloadAudioParamsBuilder playerParamsBuilder = new DownloadAudioParamsBuilder()
                     .addAudioId(videoId);
@@ -123,7 +198,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     public void onFavoriteVideoClick(String videoId, boolean isFavorite) {
         if (ZypeConfiguration.isUniversalSubscriptionEnabled(this)) {
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                onRequestSubscription();
+                onRequestSubscription(videoId);
             }
             else {
                 VideoDetailActivity.startActivity(this, videoId, null);
@@ -135,11 +210,11 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     }
 
     @Override
-    public void onDownloadedVideoClick(String videoId) {
+    public void onDownloadedVideoClick(String videoId, int mediaType) {
 //        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
 //            onRequestSubscription();
 //        } else {
-            VideoDetailActivity.startActivity(this, videoId, null);
+            VideoDetailActivity.startActivity(this, videoId, null, mediaType);
 //        }
     }
 
@@ -214,7 +289,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Override
     public void onLogout() {
         SettingsProvider.getInstance().logout();
-        DataHelper.clearAllVideos(getContentResolver());
+//        DataHelper.clearAllVideos(getContentResolver());
         DownloaderService.cancelAllDownloads();
     }
 
@@ -225,9 +300,12 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     }
 
     @Override
-    public void onRequestSubscription() {
+    public void onRequestSubscription(String videoId) {
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
-            NavigationHelper.getInstance(this).switchToSubscriptionScreen(this);
+            Bundle extras = new Bundle();
+            extras.putString(BundleConstants.VIDEO_ID, videoId);
+            extras.putString(BundleConstants.PLAYLIST_ID, null);
+            NavigationHelper.getInstance(this).switchToSubscriptionScreen(this, extras);
         }
         else {
             DialogHelper.showSubscriptionAlertIssue(this);
@@ -266,13 +344,15 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
-        SubscriptionsHelper.updateSubscriptionCount(purchases);
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+            SubscriptionsHelper.updateSubscriptionCount(purchases);
+        }
     }
 
 //    @Override
 //    public void openVideoFragment(String url) {
 //        Logger.d("openVideoFragment " + url);
-////        LatestFragment f = (LatestFragment) mSectionsPagerAdapter.getItem(0);
+////        LatestFragment f = (LatestFragment) adapterPager.getItem(0);
 ////        f.showVideoFragment(url);
 //    }
 
@@ -306,7 +386,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Subscribe
     public void handleDownloadVideo(DownloadVideoEvent event) {
         Logger.d("handleDownloadVideo");
-        File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
+        File file = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
         String url;
         if (file != null) {
             url = file.getUrl();
@@ -322,7 +402,7 @@ public class MainActivity extends BaseActivity implements OnMainActivityFragment
     @Subscribe
     public void handleDownloadAudio(DownloadAudioEvent event) {
         Logger.d("handleDownloadAudio");
-        File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
+        File file = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "m4a");
         String url;
         if (file != null) {
             url = file.getUrl();

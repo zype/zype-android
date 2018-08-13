@@ -12,7 +12,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:id="@+id/toolbar"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            />
+
+<!--
         <android.support.design.widget.TabLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,18 +30,32 @@
             style="@style/TabLayout"
             app:tabMode="scrollable"
             />
+-->
     </android.support.design.widget.AppBarLayout>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="56dp"
         android:id="@+id/root_view"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
-        <android.support.v4.view.ViewPager
-            android:id="@+id/pager"
+        <com.zype.android.ui.Widget.CustomViewPager
+            android:id="@+id/pagerSections"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
     </FrameLayout>
+    <android.support.design.widget.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        android:id="@+id/navigation"
+        app:menu="@menu/menu_navigation"
+        app:itemBackground="?attr/colorPrimary"
+        app:itemIconTint="@color/bottom_navigation"
+        app:itemTextColor="@color/bottom_navigation"
+        app:labelVisibilityMode="labeled"
+        app:elevation="2dp"
+        />
 </android.support.design.widget.CoordinatorLayout>
 

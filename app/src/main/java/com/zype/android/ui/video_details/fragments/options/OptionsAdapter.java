@@ -46,10 +46,16 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHold
             holder.ivOptionsImage.setVisibility(View.GONE);
             holder.tvOptionsText.setVisibility(View.VISIBLE);
             holder.tvOptionsText.setText(item.secondText);
-        } else {
+        }
+        else {
             holder.ivOptionsImage.setVisibility(View.VISIBLE);
             holder.tvOptionsText.setVisibility(View.GONE);
-            holder.ivOptionsImage.setImageResource(item.drawableId);
+            if (item.drawableId != -1) {
+                holder.ivOptionsImage.setImageResource(item.drawableId);
+            }
+            else {
+                holder.ivOptionsImage.setVisibility(View.GONE);
+            }
         }
         if (item.progress > -1) {
             holder.progressBar.setVisibility(View.VISIBLE);
@@ -81,10 +87,10 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHold
 
         public ViewHolder(View itemView) {
             super(itemView);
-            tvOptionsName = ((TextView) itemView.findViewById(R.id.options_title));
-            tvOptionsText = ((TextView) itemView.findViewById(R.id.options_text));
-            ivOptionsImage = (ImageView) itemView.findViewById(R.id.options_image);
-            progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
+            tvOptionsName = itemView.findViewById(R.id.options_title);
+            tvOptionsText = itemView.findViewById(R.id.options_text);
+            ivOptionsImage = itemView.findViewById(R.id.options_image);
+            progressBar = itemView.findViewById(R.id.progressBar);
             itemView.setOnClickListener(this);
         }
 

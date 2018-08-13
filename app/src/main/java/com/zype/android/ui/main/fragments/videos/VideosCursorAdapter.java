@@ -5,16 +5,21 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.SubscriptionsHelper;
+import com.zype.android.Db.Entity.Playlist;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
+import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
+import com.zype.android.ui.Gallery.GalleryRowItemsAdapter;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.dialog.VideoMenuDialogFragment;
@@ -93,7 +98,7 @@ public class VideosCursorAdapter extends CursorAdapter {
 //        viewHolder.episode = ((TextView) view.findViewById(R.id.episode));
         viewHolder.thumbnail = (ImageView) view.findViewById(R.id.icon);
         viewHolder.imageLocked = (ImageView) view.findViewById(R.id.imageLocked);
-        viewHolder.imageUnlocked = (ImageView) view.findViewById(R.id.imageUnlocked);
+//        viewHolder.imageUnlocked = (ImageView) view.findViewById(R.id.imageUnlocked);
         viewHolder.progressBarThumbnail = (ProgressBar) view.findViewById(R.id.progressBarThumbnail);
 //        viewHolder.episodeView = view.findViewById(R.id.episode_view);
 //        viewHolder.detailsView = view.findViewById(R.id.details_view);
@@ -205,23 +210,26 @@ public class VideosCursorAdapter extends CursorAdapter {
         viewHolder.isEntitled = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.IS_ENTITLED)) == 1;
         viewHolder.purchaseRequired = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.PURCHASE_REQUIRED)) == 1;
 
-        if (cursor.getString(COL_VIDEO_THUMBNAILS) != null) {
-            loadImage(context, cursor, viewHolder);
-        }
-        if (viewHolder.subscriptionRequired) {
-            if (hasPermissionToPlayVideo(viewHolder)) {
-                viewHolder.imageLocked.setVisibility(GONE);
-                viewHolder.imageUnlocked.setVisibility(View.VISIBLE);
-            }
-            else {
-                viewHolder.imageLocked.setVisibility(View.VISIBLE);
-                viewHolder.imageUnlocked.setVisibility(View.GONE);
-            }
-        }
-        else {
-            viewHolder.imageLocked.setVisibility(GONE);
-            viewHolder.imageUnlocked.setVisibility(GONE);
-        }
+        loadThumbnail(viewHolder, cursor);
+        updateLockIcon(viewHolder);
+
+//        if (cursor.getString(COL_VIDEO_THUMBNAILS) != null) {
+//            loadImage(context, cursor, viewHolder);
+//        }
+//        if (viewHolder.subscriptionRequired) {
+//            if (hasPermissionToPlayVideo(viewHolder)) {
+//                viewHolder.imageLocked.setVisibility(GONE);
+//                viewHolder.imageUnlocked.setVisibility(View.VISIBLE);
+//            }
+//            else {
+//                viewHolder.imageLocked.setVisibility(View.VISIBLE);
+//                viewHolder.imageUnlocked.setVisibility(View.GONE);
+//            }
+//        }
+//        else {
+//            viewHolder.imageLocked.setVisibility(GONE);
+//            viewHolder.imageUnlocked.setVisibility(GONE);
+//        }
 
 //        final String episodeCreationDate = DateUtils.getConvertedText(cursor.getString(COL_VIDEO_PUBLISHED_AT), context);
 //        if (episodeCreationDate != null) {
@@ -293,7 +301,7 @@ public class VideosCursorAdapter extends CursorAdapter {
                                 case ITEM_DOWNLOAD_VIDEO:
                                     mOnVideoItemAction.onDownloadVideo(viewHolder.videoId);
                                     event = new HitBuilders.EventBuilder()
-                                            .setAction("Download Video")
+                                            .setAction("Download VideoList")
                                             .setLabel("id=" + viewHolder.videoId)
                                             .build();
                                     break;
@@ -309,7 +317,7 @@ public class VideosCursorAdapter extends CursorAdapter {
                                     FileUtils.deleteVideoFile(viewHolder.videoId, context);
                                     DataHelper.setVideoDeleted(context.getContentResolver(), viewHolder.videoId);
                                     event = new HitBuilders.EventBuilder()
-                                            .setAction("Delete Downloaded Video")
+                                            .setAction("Delete Downloaded VideoList")
                                             .setLabel("id=" + viewHolder.videoId)
                                             .build();
                                     break;
@@ -384,14 +392,15 @@ public class VideosCursorAdapter extends CursorAdapter {
     private void loadImage(final Context context, final Cursor cursor, final VideosViewHolder viewHolder) {
         final String thumbnailsString = cursor.getString(COL_VIDEO_THUMBNAILS);
         if (thumbnailsString != null) {
-            Type thumbnailType = new TypeToken<List<Thumbnail>>() {
-            }.getType();
+            Type thumbnailType = new TypeToken<List<Thumbnail>>() {}.getType();
             List<Thumbnail> thumbnails = (new Gson().fromJson(thumbnailsString, thumbnailType));
-            if (thumbnails.size() > 0) {
-                UiUtils.loadImage(context, thumbnails.get(1).getUrl(), R.drawable.placeholder_video, viewHolder.thumbnail, viewHolder.progressBarThumbnail);
+            Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(thumbnails, 240);
+            if (thumbnail != null) {
+                UiUtils.loadImage(thumbnail.getUrl(), R.drawable.outline_play_circle_filled_white_white_48, viewHolder.thumbnail);
             }
             else {
-                viewHolder.thumbnail.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.placeholder_video));
+                viewHolder.thumbnail.setImageDrawable(ContextCompat.getDrawable(context,
+                        R.drawable.outline_play_circle_filled_white_white_48));
             }
         }
     }
@@ -435,6 +444,38 @@ public class VideosCursorAdapter extends CursorAdapter {
             }
         }
         return false;
+    }
+
+    private void loadThumbnail(VideosViewHolder holder, final Cursor cursor) {
+        if (!TextUtils.isEmpty(cursor.getString(COL_VIDEO_THUMBNAILS))) {
+            Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(cursor, 240);
+            if (thumbnail != null) {
+                UiUtils.loadImage(thumbnail.getUrl(), R.drawable.outline_play_circle_filled_white_white_48, holder.thumbnail);
+            }
+            else {
+                holder.thumbnail.setImageDrawable(ContextCompat.getDrawable(holder.thumbnail.getContext(),
+                        R.drawable.outline_play_circle_filled_white_white_48));
+            }
+        }
+    }
+
+    private void updateLockIcon(VideosViewHolder holder) {
+        holder.imageLocked.setVisibility(View.VISIBLE);
+        if (AuthHelper.isVideoRequiredAuthorization(holder.thumbnail.getContext(), holder.videoId)) {
+            if (AuthHelper.isVideoAuthorized(holder.thumbnail.getContext(), holder.videoId)) {
+                holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
+                holder.imageLocked.setColorFilter(ContextCompat.getColor(holder.thumbnail.getContext(),
+                        R.color.icon_unlocked));
+            }
+            else {
+                holder.imageLocked.setImageResource(R.drawable.baseline_lock_white_18);
+                holder.imageLocked.setColorFilter(ContextCompat.getColor(holder.thumbnail.getContext(),
+                        R.color.icon_locked));
+            }
+        }
+        else {
+            holder.imageLocked.setVisibility(GONE);
+        }
     }
 
     public class VideosViewHolder {

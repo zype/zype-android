@@ -14,13 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -34,11 +34,11 @@ import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.consumer.ConsumerFavoriteVideoEvent;
-import com.zype.android.webapi.events.video.RetrieveVideoEvent;
+import com.zype.android.webapi.events.video.VideoListEvent;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideo;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.video.Pagination;
-import com.zype.android.webapi.model.video.Video;
+import com.zype.android.webapi.model.video.VideoList;
 import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.ArrayList;
@@ -49,7 +49,8 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     private static final int LOADER_FAVORITE_VIDEO = 0;
 
     private ListView listFavorites;
-    private TextView textEmpty;
+//    private TextView textEmpty;
+    private LinearLayout layoutEmpty;
 
     private LoaderManager loaderManager;
     private VideosCursorAdapter adapter;
@@ -70,24 +71,26 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.fragment_favorites, null);
+
+        layoutEmpty = rootView.findViewById(R.id.layoutEmpty);
 
         adapter = new VideosCursorAdapter(getActivity(), CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, onVideoItemActionListener, onLoginListener);
-        View view = inflater.inflate(R.layout.fragment_favorites, null);
-        listFavorites = (ListView) view.findViewById(R.id.listFavorites);
-        textEmpty = (TextView) view.findViewById(R.id.empty);
-        listFavorites.setEmptyView(textEmpty);
+        listFavorites = rootView.findViewById(R.id.listFavorites);
+//        textEmpty = (TextView) view.findViewById(R.id.empty);
+//        listFavorites.setEmptyView(layoutEmpty);
         listFavorites.setOnItemClickListener(this);
         listFavorites.setAdapter(adapter);
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-                updateTextEmpty();
+//                updateTextEmpty();
             }
         };
         prefs.registerOnSharedPreferenceChangeListener(prefListener);
 
-        return view;
+        return rootView;
     }
 
     @Override
@@ -140,7 +143,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     @Override
     public void onResume() {
         super.onResume();
-        updateTextEmpty();
+//        updateTextEmpty();
         if (ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())) {
            if (SettingsProvider.getInstance().isLoggedIn()) {
                 requestConsumerFavoriteVideo(1);
@@ -156,14 +159,14 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     // //////////
     // UI
     //
-    private void updateTextEmpty() {
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            textEmpty.setText(SettingsProvider.getInstance().getNoFavoritesMessage());
-        }
-        else {
-            textEmpty.setText(SettingsProvider.getInstance().getNoFavoritesMessageNotLoggedIn());
-        }
-    }
+//    private void updateTextEmpty() {
+//        if (SettingsProvider.getInstance().isLoggedIn()) {
+//            textEmpty.setText(SettingsProvider.getInstance().getNoFavoritesMessage());
+//        }
+//        else {
+//            textEmpty.setText(SettingsProvider.getInstance().getNoFavoritesMessageNotLoggedIn());
+//        }
+//    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -182,7 +185,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     }
 
     protected void startLoadCursors() {
-        if (SettingsProvider.getInstance().isLogined()
+        if (AuthHelper.isLoggedIn()
                 || !ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())) {
             if (loaderManager == null) {
                 loaderManager = getLoaderManager();
@@ -208,12 +211,13 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor != null && cursor.getCount() > 0) {
-            textEmpty.setVisibility(View.GONE);
-        } else {
-            textEmpty.setVisibility(View.VISIBLE);
-        }
         adapter.changeCursor(cursor);
+        if (cursor != null && cursor.getCount() > 0) {
+            layoutEmpty.setVisibility(View.GONE);
+        }
+        else {
+            layoutEmpty.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -236,14 +240,14 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
         for (ConsumerFavoriteVideoData item : favorite.getResponse()) {
             VideoParamsBuilder builder = new VideoParamsBuilder()
                     .addVideoId(item.getVideoId());
-            getApi().executeRequest(WebApiManager.Request.VIDEO_LATEST_GET, builder.build());
+            getApi().executeRequest(WebApiManager.Request.VIDEO_LIST, builder.build());
         }
     }
 
     @Subscribe
-    public void handleRetrieveVideo(RetrieveVideoEvent event) {
+    public void handleRetrieveVideo(VideoListEvent event) {
         Logger.d("handleRetrieveVideo(): size=" + event.getEventData().getModelData().getVideoData().size());
-        Video data = event.getEventData().getModelData();
+        VideoList data = event.getEventData().getModelData();
         if (data.getVideoData().size() > 0) {
             for (VideoData item : data.getVideoData()) {
                 if (!TextUtils.isEmpty(DataHelper.getFavoriteId(getActivity().getContentResolver(), item.getId()))) {

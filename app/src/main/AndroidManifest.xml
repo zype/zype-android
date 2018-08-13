@@ -38,7 +38,7 @@
 
     <application
         android:name=".ZypeApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
@@ -62,6 +62,17 @@
             android:value="AIzaSyAOfxiG4aV66h3XmssCEkP3qCvCqMbDGDI" />
 
         <activity
+            android:name=".ui.Consumer.ConsumerActivity"
+            android:theme="@style/AppThemeWithActionBar"
+            />
+        <activity
+            android:name=".ui.Gallery.GalleryActivity"
+            android:theme="@style/AppTheme"
+            />
+        <activity
+            android:name=".ui.Intro.IntroActivity"
+            />
+        <activity
             android:name=".ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".ui.launch.LaunchActivity">
@@ -78,8 +89,7 @@
             android:label="@string/title_activity_episode_detail"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.main.MainActivity"
-            android:theme="@style/AppTheme"
-            >
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zype.android.ui.main.MainActivity" />
@@ -110,7 +120,7 @@
                 android:value="com.zype.android.ui.main.MainActivity" />
         </activity>
         -->
-<!--
+        <!--
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login"
@@ -118,12 +128,11 @@
             android:windowSoftInputMode="adjustResize|stateVisible"
             android:theme="@style/AppTheme"
             />
--->
+        -->
         <activity
-            android:name=".ui.LoginActivity"
-            android:label="@string/title_activity_login"
+            android:name=".ui.Auth.LoginActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
+            android:theme="@style/AppThemeWithActionBar"
             />
         <activity
             android:name=".ui.settings.SettingsActivity"
@@ -146,8 +155,7 @@
             android:label="@string/title_activity_web"
             android:parentActivityName=".ui.video_details.VideoDetailActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"
-            >
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zype.android.ui.video_details.VideoDetailActivity" />
@@ -175,6 +183,10 @@
                 android:value="com.zype.android.ui.settings.SettingsActivity" />
         </activity>
         <activity
+            android:name=".ui.main.fragments.playlist.PlaylistActivity"
+            android:label="@string/title_activity_playlist"
+            />
+        <activity
             android:name=".ui.search.SearchActivity"
             android:label="@string/title_activity_search"
             android:parentActivityName=".ui.main.MainActivity"
@@ -183,6 +195,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zype.android.ui.main.MainActivity" />
         </activity>
+        <activity
+            android:name=".ui.Subscription.SubscribeOrLoginActivity"
+            android:theme="@style/AppThemeWithActionBar"
+            />
+        <activity
+            android:name=".ui.Subscription.SubscriptionActivity"
+            android:theme="@style/AppThemeWithActionBar"
+            />
+        <activity
+            android:name=".ui.main.fragments.videos.VideosActivity"
+            android:theme="@style/AppTheme"
+            />
 
         <!--
          Optionally, register AnalyticsReceiver and AnalyticsService to support background
@@ -216,30 +240,12 @@
         <receiver android:name=".receiver.RemoteControlReceiver">
             <intent-filter android:priority="2147483647">
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
-                <action android:name="MEDIA_STOP" /> <!-- this constant -->
+                <action android:name="ACTION_STOP" />
             </intent-filter>
         </receiver>
 
         <service android:name=".service.BackgroundSoundService" />
 
-        <activity
-            android:name=".ui.main.fragments.playlist.PlaylistActivity"
-            android:label="@string/title_activity_playlist"
-            />
-        <activity android:name=".ui.main.fragments.videos.VideosActivity"
-            android:theme="@style/AppTheme"
-            />
-        <activity
-            android:name=".ui.Intro.IntroActivity"
-            />
-        <activity
-            android:name=".ui.Consumer.ConsumerActivity"
-            android:theme="@style/AppThemeWithActionBar"
-            />
-        <activity
-            android:name=".ui.Subscription.SubscriptionActivity"
-            android:theme="@style/AppThemeWithActionBar"
-            />
     </application>
 
 </manifest>

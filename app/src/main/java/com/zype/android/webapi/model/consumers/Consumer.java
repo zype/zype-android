@@ -28,7 +28,7 @@ public class Consumer {
      * @param consumerData
      * The response
      */
-    public void setv(ConsumerData consumerData) {
+    public void setConsumerData(ConsumerData consumerData) {
         this.consumerData = consumerData;
     }
 

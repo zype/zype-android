@@ -26,9 +26,11 @@ import java.util.List;
 public class BillingManager implements PurchasesUpdatedListener {
     private static final String TAG = BillingManager.class.getSimpleName();
 
-    private final Activity mActivity;
+    private final Context context;
     private BillingClient mBillingClient;
     private final BillingUpdatesListener mBillingUpdatesListener;
+    private List<Purchase> purchases;
+
     /**
      * True if billing service is connected now.
      */
@@ -45,12 +47,12 @@ public class BillingManager implements PurchasesUpdatedListener {
         void onPurchasesUpdated(List<Purchase> purchases);
     }
 
-    public BillingManager(Activity activity, final BillingUpdatesListener updatesListener) {
+    public BillingManager(Context context, final BillingUpdatesListener updatesListener) {
         Log.d(TAG, "Creating Billing client.");
 
-        mActivity = activity;
+        this.context = context;
         mBillingUpdatesListener = updatesListener;
-        mBillingClient = BillingClient.newBuilder(mActivity).setListener(this).build();
+        mBillingClient = BillingClient.newBuilder(context).setListener(this).build();
 
         Log.d(TAG, "Starting setup.");
         // Start setup. This is asynchronous and the specified listener will be called
@@ -197,14 +199,14 @@ public class BillingManager implements PurchasesUpdatedListener {
     /**
      * Start a purchase flow
      */
-    public void initiatePurchaseFlow(final String skuId, final @SkuType String billingType) {
-        initiatePurchaseFlow(skuId, null, billingType);
+    public void initiatePurchaseFlow(Activity activity, final String skuId, final @SkuType String billingType) {
+        initiatePurchaseFlow(activity, skuId, null, billingType);
     }
 
     /**
      * Start a purchase or subscription replace flow
      */
-    public void initiatePurchaseFlow(final String skuId, final ArrayList<String> oldSkus,
+    public void initiatePurchaseFlow(final Activity activity, final String skuId, final ArrayList<String> oldSkus,
                                      final @SkuType String billingType) {
         Runnable purchaseFlowRequest = new Runnable() {
             @Override
@@ -214,7 +216,7 @@ public class BillingManager implements PurchasesUpdatedListener {
                         .setSku(skuId).setType(billingType)
                         .setOldSkus(oldSkus)
                         .build();
-                mBillingClient.launchBillingFlow(mActivity, purchaseParams);
+                mBillingClient.launchBillingFlow(activity, purchaseParams);
             }
         };
 
@@ -227,10 +229,7 @@ public class BillingManager implements PurchasesUpdatedListener {
     @Override
     public void onPurchasesUpdated(int responseCode, List<Purchase> purchases) {
         if (responseCode == BillingResponse.OK) {
-//            for (Purchase purchase : purchases) {
-//                handlePurchase(purchase);
-//            }
-//            mBillingUpdatesListener.onPurchasesUpdated(mPurchases);
+            this.purchases = purchases;
             mBillingUpdatesListener.onPurchasesUpdated(purchases);
         }
         else if (responseCode == BillingResponse.USER_CANCELED) {
@@ -239,5 +238,9 @@ public class BillingManager implements PurchasesUpdatedListener {
         else {
             Log.w(TAG, "onPurchasesUpdated() got unknown resultCode: " + responseCode);
         }
+    }
+
+    public List<Purchase> getPurchases() {
+        return this.purchases;
     }
 }

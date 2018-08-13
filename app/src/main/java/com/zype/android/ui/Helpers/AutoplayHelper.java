@@ -13,10 +13,10 @@ import com.zype.android.ui.NavigationHelper;
 public class AutoplayHelper {
 
     public static void playNextVideo(Activity activity, String currentVideoId, String playlistId) {
-        String nextVideoId = PlaylistHelper.getNextVideoId(currentVideoId,
-                CursorHelper.getPlaylistVideosCursor(activity.getContentResolver(), playlistId));
+//        String nextVideoId = PlaylistHelper.getNextVideoId(currentVideoId,
+//                CursorHelper.getPlaylistVideosCursor(activity.getContentResolver(), playlistId));
+        String nextVideoId = PlaylistHelper.getNextVideoId(currentVideoId, playlistId, activity.getApplication());
         NavigationHelper.getInstance(activity).switchToVideoDetailsScreen(activity, nextVideoId, playlistId, true);
-//        VideoDetailActivity.startActivity(activity, nextVideoId, playlistId);
     }
 
     public static void playPreviousVideo(Activity activity, String currentVideoId, String playlistId) {

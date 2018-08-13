@@ -1,14 +1,14 @@
 package com.zype.android.ui.player;
 
 import android.annotation.TargetApi;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.media.AudioManager;
@@ -17,6 +17,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.media.app.NotificationCompat.MediaStyle;
+import android.support.v4.media.session.MediaButtonReceiver;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.Display;
@@ -63,13 +70,11 @@ import com.google.android.exoplayer.util.Util;
 import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
-import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.receiver.PhoneCallReceiver;
 import com.zype.android.receiver.RemoteControlReceiver;
-import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.Helpers.IPlaylistVideos;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.base.BaseVideoActivity;
@@ -126,7 +131,7 @@ public class PlayerFragment extends BaseFragment implements
 
     private static final CookieManager defaultCookieManager;
     public static final int MEDIA_STOP_CODE = 115756;
-    public static String MEDIA_STOP = "MEDIA_STOP";
+    public static final String ACTION_STOP = "ACTION_STOP";
 
     static {
         defaultCookieManager = new CookieManager();
@@ -137,6 +142,7 @@ public class PlayerFragment extends BaseFragment implements
     private PlayerControlView mediaController;
     private AspectRatioFrameLayout videoFrame;
     private CustomPlayer player;
+    private MediaSessionCompat mediaSession;
     private SurfaceView surfaceView;
     private SubtitleLayout subtitleLayout;
 
@@ -163,6 +169,7 @@ public class PlayerFragment extends BaseFragment implements
     private boolean isControlsEnabled = true;
 
     private boolean autoplay = false;
+    private boolean fullscreenSelected = false;
 
     //
     // IMA SDK
@@ -187,6 +194,10 @@ public class PlayerFragment extends BaseFragment implements
     private Handler handlerTimer;
     private Runnable runnableTimer;
     private Calendar liveStreamTimeStart;
+
+    // Sensors
+    PlayerViewModel playerViewModel;
+    SensorViewModel sensorViewModel;
 
     public static PlayerFragment newInstance(int mediaType, String filePath, String fileId) {
         PlayerFragment fragment = new PlayerFragment();
@@ -238,6 +249,8 @@ public class PlayerFragment extends BaseFragment implements
             ccTrack = SettingsProvider.getInstance().getString(SettingsProvider.SELECTED_CLOSED_CAPTIONS_TRACK);
         }
 
+        playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
+
         // Listener to detect current playback time
         runnablePlaybackTime = new Runnable() {
             @Override
@@ -281,14 +294,14 @@ public class PlayerFragment extends BaseFragment implements
             }
         });
 
-        videoFrame = (AspectRatioFrameLayout) mainView.findViewById(R.id.video_frame);
+        videoFrame = mainView.findViewById(R.id.video_frame);
 
-        surfaceView = (SurfaceView) mainView.findViewById(R.id.surface_view);
+        surfaceView = mainView.findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(surfaceCallback);
 
-        subtitleLayout = (SubtitleLayout) mainView.findViewById(R.id.subtitles);
+        subtitleLayout = mainView.findViewById(R.id.subtitles);
 
-        thumbnailView = (ImageView) mainView.findViewById(R.id.thumbnailView);
+        thumbnailView = mainView.findViewById(R.id.thumbnailView);
         if (contentType == TYPE_AUDIO_WEB || contentType == TYPE_AUDIO_LOCAL) {
             thumbnailView.setVisibility(View.VISIBLE);
         } else if (contentType == TYPE_AUDIO_LIVE) {
@@ -330,6 +343,8 @@ public class PlayerFragment extends BaseFragment implements
             }
         });
 
+        sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
+
         setHasOptionsMenu(true);
     }
 
@@ -340,7 +355,11 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     private void onScreenOrientationChanged() {
-        mListener.onFullscreenChanged();
+        int rotate = getActivity().getWindowManager().getDefaultDisplay().getRotation();
+        Logger.d("onScreenOrientationChanged(): rotate=" + rotate);
+        boolean fullscreen = UiUtils.isLandscapeOrientation(getActivity());
+        mListener.onFullscreenChanged(fullscreen);
+        mediaController.updateFullscreenButton(fullscreen);
         hideControls();
     }
 
@@ -386,14 +405,14 @@ public class PlayerFragment extends BaseFragment implements
 
         configureSubtitleView();
 
-        mListener.onFullscreenChanged();
+        mListener.onFullscreenChanged(UiUtils.isLandscapeOrientation(getActivity()));
         registerReceivers();
         if (player == null) {
             analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
             preparePlayer(true);
         }
         else {
-            if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
+            if (playerViewModel.isBackgroundPlaybackEnabled()) {
                 player.setBackgrounded(false);
             }
 
@@ -432,7 +451,7 @@ public class PlayerFragment extends BaseFragment implements
         }
         hideControls();
         if (player != null) {
-            if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
+            if (playerViewModel.isBackgroundPlaybackEnabled()) {
                 player.setBackgrounded(true);
             }
             stopTimer();
@@ -455,10 +474,11 @@ public class PlayerFragment extends BaseFragment implements
         if (BuildConfig.DEBUG) {
             Logger.d("onStop()");
         }
-        if (ZypeConfiguration.isBackgroundPlaybackEnabled(getActivity())) {
+        if (playerViewModel.isBackgroundPlaybackEnabled()) {
             if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
                 showNotification(true, contentType);
-            } else {
+            }
+            else {
                 showNotification(false, contentType);
             }
         }
@@ -505,6 +525,52 @@ public class PlayerFragment extends BaseFragment implements
         audioCapabilitiesReceiverUnregister();
         releasePlayer();
         mListener = null;
+    }
+
+    private void initMediaSession() {
+//        ComponentName mediaButtonReceiver = new ComponentName(getContext().getApplicationContext(),
+//                MediaButtonReceiver.class);
+        ComponentName mediaButtonReceiver = new ComponentName(getContext().getApplicationContext(),
+                RemoteControlReceiver.class);
+        mediaSession = new MediaSessionCompat(getContext().getApplicationContext(), "TAG_MEDIA_SESSION",
+                mediaButtonReceiver, null);
+
+        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        mediaButtonIntent.setClass(getActivity(), RemoteControlReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, mediaButtonIntent, 0);
+        mediaSession.setMediaButtonReceiver(pendingIntent);
+
+        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PLAY_PAUSE);
+        mediaSession.setPlaybackState(stateBuilder.build());
+
+        mediaSession.setCallback(new MediaSessionCompat.Callback() {
+            @Override
+            public void onPlay() {
+                super.onPlay();
+            }
+
+            @Override
+            public void onPause() {
+                super.onPause();
+            }
+
+            @Override
+            public void onPlayFromMediaId(String mediaId, Bundle extras) {
+                super.onPlayFromMediaId(mediaId, extras);
+            }
+
+            @Override
+            public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+                return super.onMediaButtonEvent(mediaButtonEvent);
+            }
+        });
+
+        MediaControllerCompat mediaController = new MediaControllerCompat(getActivity(), mediaSession);
+        MediaControllerCompat.setMediaController(getActivity(), mediaController);
     }
 
     // //////////
@@ -612,9 +678,11 @@ public class PlayerFragment extends BaseFragment implements
             case TYPE_VIDEO_LIVE:
             case TYPE_AUDIO_WEB:
             case TYPE_AUDIO_LIVE:
-                if (contentUri.contains(".mp4")) {
+                if (contentUri != null &&
+                        (contentUri.contains(".mp4") || contentUri.contains(".m4a"))) {
                     return new ExtractorRendererBuilder(getContext(), userAgent, Uri.parse(contentUri), new Mp4Extractor());
-                } else {
+                }
+                else {
                     return new HlsRendererBuilder(getContext(), userAgent, contentUri);
                 }
             case TYPE_VIDEO_LOCAL:
@@ -631,12 +699,15 @@ public class PlayerFragment extends BaseFragment implements
             player.addListener(this);
             player.setCaptionListener(this);
             playerNeedsPrepare = true;
+            player.setInfoListener(playerViewModel);
 //            mediaController = new MediaController(getContext());
             mediaController = new PlayerControlView(getContext());
             mediaController.setAnchorView(mainView);
             mediaController.setMediaPlayer(player.getPlayerControl());
             mediaController.setEnabled(true);
             mediaController.setPlayerControlListener(this);
+
+            initMediaSession();
 
             attachPlayerToAnalyticsManager();
 
@@ -646,8 +717,9 @@ public class PlayerFragment extends BaseFragment implements
                     Logger.e("onRendererInitializationError", e);
                     if (!WebApiManager.isHaveActiveNetworkConnection(getActivity())) {
                         UiUtils.showErrorSnackbar(getView(), "Video is not available right now. " + getActivity().getString(R.string.connection_error));
-                    } else {
-                        UiUtils.showErrorSnackbar(getView(), "onRendererInitializationError");
+                    }
+                    else {
+                        mListener.onError();
                     }
                     if (player.getPlaybackState() != ExoPlayer.STATE_ENDED) {
                         mListener.saveCurrentTimeStamp(player.getCurrentPosition());
@@ -683,9 +755,9 @@ public class PlayerFragment extends BaseFragment implements
                 public void onLoadError(int sourceId, IOException e) {
                     Logger.e("onLoadError", e);
                     if (!WebApiManager.isHaveActiveNetworkConnection(getActivity())) {
-                        UiUtils.showErrorSnackbar(getView(), "Video is not available right now. " + getActivity().getString(R.string.connection_error));
+                        UiUtils.showErrorSnackbar(getView(), "VideoList is not available right now. " + getActivity().getString(R.string.connection_error));
                     } else {
-                        UiUtils.showErrorSnackbar(getView(), "Video is not available right now");
+                        UiUtils.showErrorSnackbar(getView(), "VideoList is not available right now");
                     }
                     releasePlayer();
                 }
@@ -766,6 +838,8 @@ public class PlayerFragment extends BaseFragment implements
                 }
                 break;
             case ExoPlayer.STATE_READY:
+                mediaSession.setActive(true);
+
                 if (isNeedToSeekToLatestListenPosition) {
                     long playerPosition = 0;
                     if (contentType != TYPE_AUDIO_LIVE && contentType != TYPE_VIDEO_LIVE) {
@@ -869,6 +943,7 @@ public class PlayerFragment extends BaseFragment implements
 
     private void showControls() {
         if (mediaController != null) {
+            updateClosedCaptionsVisibility();
             if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE) {
                 if (isControlsEnabled) {
                     mediaController.show(5000);
@@ -925,6 +1000,7 @@ public class PlayerFragment extends BaseFragment implements
         if (player != null) {
             attachPlayerToAnalyticsManager();
             player.getPlayerControl().start();
+            mediaSession.setActive(true);
         }
     }
 
@@ -934,6 +1010,7 @@ public class PlayerFragment extends BaseFragment implements
         if (player != null) {
             player.getPlayerControl().pause();
             releasePlayer();
+            mediaSession.setActive(false);
         }
     }
 
@@ -966,6 +1043,9 @@ public class PlayerFragment extends BaseFragment implements
                         player.getPlayerControl().pause();
                     } else {
                         player.getPlayerControl().start();
+                    }
+                    if (player.getBackgrounded()) {
+                        showNotification(false, contentType);
                     }
                 }
                 break;
@@ -1031,7 +1111,11 @@ public class PlayerFragment extends BaseFragment implements
         }
     }
 
-    public void showNotification(boolean isLive, int type) {
+    public void showNotification(boolean isLive, int mediaType) {
+        Logger.d("showNotification()");
+        if (player == null) {
+            return;
+        }
 
         VideoData video = VideoHelper.getVideo(getActivity().getContentResolver(), fileId);
         String title = "";
@@ -1042,50 +1126,66 @@ public class PlayerFragment extends BaseFragment implements
         }
         Intent notificationIntent;
         Bundle bundle = new Bundle();
+        bundle.putInt(BundleConstants.MEDIA_TYPE, mediaType);
+        bundle.putString(BundleConstants.VIDEO_ID, fileId);
         if (isLive) {
             notificationIntent = new Intent(getActivity(), LivePlayerActivity.class);
-            bundle.putInt(BundleConstants.VIDEO_TYPE, type);
             title = "Live";
-        } else {
+        }
+        else {
             notificationIntent = new Intent(getActivity(), VideoDetailActivity.class);
         }
         notificationIntent.putExtras(bundle);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-        PendingIntent intent = PendingIntent.getActivity(getActivity(), 0, notificationIntent, 0);
 
-        Notification.Builder builder = new Notification.Builder(getActivity());
+        PendingIntent intent = PendingIntent.getActivity(getActivity(), 0,
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(),
+                ZypeApp.NOTIFICATION_CHANNEL_ID);
         builder.setContentIntent(intent)
-                .setSmallIcon(R.drawable.ic_notif)
                 .setContentTitle(getActivity().getString(R.string.app_name))
-                .setContentIntent(intent)
-                .setPriority(Notification.PRIORITY_HIGH)
                 .setContentText(title)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setAutoCancel(true)
                 .setOngoing(true)
-                .setWhen(0)
-                .setOngoing(true)
-                .setContentTitle(title);
+                .setWhen(0);
 
-        Intent stopIntent = new Intent();
-        stopIntent.setAction(MEDIA_STOP);
-        PendingIntent pendingIntentStop = PendingIntent.getBroadcast(getActivity(), 12345, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        Intent intentStop = new Intent();
+//        intentStop.setAction(ACTION_STOP);
+//        PendingIntent pendingIntentStop = PendingIntent.getBroadcast(getActivity(), 12345, intentStop, PendingIntent.FLAG_UPDATE_CURRENT);
+//        builder.addAction(R.drawable.ic_stop_black_24px, "Stop", pendingIntentStop);
+        if (player != null) {
+            if (player.getPlayerControl().isPlaying()) {
+                builder.addAction(new NotificationCompat.Action(R.drawable.ic_pause_black_24dp, "Pause",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE)));
+            } else {
+                builder.addAction(new NotificationCompat.Action(R.drawable.ic_play_arrow_black_24dp, "Play",
+                        MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE)));
+            }
+        }
+        builder.setStyle(new MediaStyle()
+                .setMediaSession(mediaSession.getSessionToken())
+                .setShowCancelButton(true)
+                .setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
+                        PlaybackStateCompat.ACTION_STOP)));
 
-        Notification not = builder
-                .setPriority(Notification.PRIORITY_MAX)
-                .addAction(R.drawable.ic_stop_black_24px, "Stop", pendingIntentStop)
-                .setWhen(0)
-                .build();
-        NotificationManager notificationManager =
-                (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(ZypeApp.NOTIFICATION_ID, not);
-
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+        notificationManager.notify(ZypeApp.NOTIFICATION_ID, builder.build());
     }
 
     public void hideNotification() {
-        Logger.d("hideNotification");
-        NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(getActivity().NOTIFICATION_SERVICE);
-        mNotificationManager.cancel(ZypeApp.NOTIFICATION_ID);
+        Logger.d("hideNotification()");
+        if (getActivity() != null) {
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+            notificationManager.cancel(ZypeApp.NOTIFICATION_ID);
+        }
+        else {
+            Logger.d("hideNotification(): Activity is not exist");
+        }
     }
 
     //
@@ -1132,7 +1232,9 @@ public class PlayerFragment extends BaseFragment implements
                 // ad is played.
                 isAdDisplayed = true;
                 hideControls();
-                player.getPlayerControl().pause();
+                if (player != null) {
+                    player.getPlayerControl().pause();
+                }
                 break;
             case CONTENT_RESUME_REQUESTED:
                 // AdEventType.CONTENT_RESUME_REQUESTED is fired when the ad is completed
@@ -1317,7 +1419,6 @@ public class PlayerFragment extends BaseFragment implements
         return customDimensions;
     }
 
-
     //
     // 'PlayerControlView.IPlayerControlListener' implementation
     //
@@ -1332,16 +1433,39 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     @Override
-    public void onClickClosedCaptions() {
+    public void onClosedCaptions() {
         showClosedCaptionsDialog();
     }
 
+    public void onFullscreen() {
+        boolean fullscreen = UiUtils.isLandscapeOrientation(getActivity());
+        if (fullscreen) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+            listenForDeviceRotation(Configuration.ORIENTATION_PORTRAIT);
+        }
+        else {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            listenForDeviceRotation(Configuration.ORIENTATION_LANDSCAPE);
+        }
+        mediaController.updateFullscreenButton(!fullscreen);
+        fullscreenSelected = !fullscreenSelected;
+    }
 
     //
     // Closed captions
     //
     private boolean ccEnabled;
     private String ccTrack;
+
+    private void updateClosedCaptionsVisibility() {
+        if (player != null) {
+            if (player.getTrackCount(CustomPlayer.TYPE_TEXT) > 0) {
+                mediaController.showCC();
+            } else {
+                mediaController.hideCC();
+            }
+        }
+    }
 
     // 'CaptionListener' implementation
     @Override
@@ -1451,4 +1575,19 @@ public class PlayerFragment extends BaseFragment implements
                 });
     }
 
+    //
+    // Sensors
+    //
+    private void listenForDeviceRotation(final int requiredOrientation) {
+        sensorViewModel.getOrientation().observe(this, new android.arch.lifecycle.Observer<Integer>() {
+            @Override
+            public void onChanged(@Nullable Integer orientation) {
+                Logger.d("listenForDeviceRotation(): orientation=" + orientation);
+                if (orientation == requiredOrientation) {
+                    sensorViewModel.stopListeningOrientation();
+                    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+                }
+            }
+        });
+    }
 }

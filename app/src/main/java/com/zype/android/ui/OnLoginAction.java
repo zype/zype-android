@@ -6,5 +6,5 @@ public interface OnLoginAction {
 
     void onRequestLogin();
 
-    void onRequestSubscription();
+    void onRequestSubscription(String videoId);
 }

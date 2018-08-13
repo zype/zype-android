@@ -38,9 +38,9 @@ android {
     }
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
-    def zypeTemplateVersion = "1.10.3"
+    def zypeTemplateVersion = "1.13.0"
 
-    compileSdkVersion 27
+    compileSdkVersion 28
     buildToolsVersion '27.0.3'
 
     dexOptions {
@@ -48,10 +48,16 @@ android {
     }
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 28
         multiDexEnabled true
         versionCode currentCodeVersion
         buildConfigField "String", "ZYPE_TEMPLATE_VERSION", "\"${zypeTemplateVersion}\""
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     buildTypes {
@@ -116,19 +122,39 @@ dependencies {
 
     implementation 'com.android.support:multidex:1.0.3'
 
+    // Android Architecture Components
+
+    // ViewModel
+    def lifecycle_version = "1.1.1"
+    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
+
+    // Room
+    def room_version = "1.1.1"
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
+    testImplementation "android.arch.persistence.room:testing:$room_version"
+
+
     implementation('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
     androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.4.1'
     implementation project(':CastCompanionLibrary')
 //    compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.9.1'
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'com.android.support:support-v4:27.1.1'
-    implementation 'com.android.support:cardview-v7:27.1.1'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.android.support:mediarouter-v7:27.1.1'
-    implementation 'com.android.support:customtabs:27.1.1'
+
+    // Support library
+//    def androidSupportVersion = "27.1.1"
+    def androidSupportVersion = "28.0.0-beta01"
+    implementation "com.android.support:appcompat-v7:$androidSupportVersion"
+    implementation "com.android.support:design:$androidSupportVersion"
+    implementation "com.android.support:support-v4:$androidSupportVersion"
+    implementation "com.android.support:cardview-v7:$androidSupportVersion"
+    implementation "com.android.support:recyclerview-v7:$androidSupportVersion"
+    implementation "com.android.support:mediarouter-v7:28.0.0-alpha4"
+    implementation "com.android.support:support-media-compat:$androidSupportVersion"
+    implementation "com.android.support:customtabs:$androidSupportVersion"
+
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
     implementation 'com.squareup.retrofit:retrofit:1.9.0'
     implementation 'com.squareup.okhttp:okhttp:2.6.0'
@@ -138,14 +164,16 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:r1.5.12'
     implementation 'com.onesignal:OneSignal:3.8.4@aar'
 
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
+
     implementation('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
         transitive = true;
     }
 
     implementation 'com.google.android.gms:play-services-gcm:15.0.1'
-    implementation 'com.google.android.gms:play-services-analytics:16.0.0'
+    implementation 'com.google.android.gms:play-services-analytics:16.0.1'
     implementation 'com.google.android.gms:play-services-location:15.0.1'
-    implementation 'com.google.android.gms:play-services-cast:15.0.1'
+    implementation 'com.google.android.gms:play-services-cast:16.0.1'
 
     // IMA SDK
     implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.6.0'
@@ -160,3 +188,4 @@ dependencies {
 
 // TODO: Uncomment to use In-app Purchases
 //apply plugin: 'com.google.gms.google-services'
+

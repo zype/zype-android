@@ -4,9 +4,10 @@ import android.content.Context;
 
 import com.android.billingclient.api.Purchase;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
+import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.builder.MarketplaceConnectParamsBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

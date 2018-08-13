@@ -25,25 +25,20 @@ import android.widget.TextView;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
-import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.core.provider.DataHelper;
-import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadConstants;
 import com.zype.android.service.DownloadHelper;
-import com.zype.android.ui.Intro.IntroActivity;
-import com.zype.android.ui.LoginActivity;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
-import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.ui.video_details.VideoDetailActivity;
@@ -55,7 +50,6 @@ import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.EntitlementParamsBuilder;
-import com.zype.android.webapi.builder.EntitlementsParamsBuilder;
 import com.zype.android.webapi.builder.ParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
@@ -63,7 +57,7 @@ import com.zype.android.webapi.events.download.DownloadVideoEvent;
 import com.zype.android.webapi.events.entitlements.VideoEntitlementEvent;
 import com.zype.android.webapi.events.favorite.FavoriteEvent;
 import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
-import com.zype.android.webapi.events.video.RetrieveVideoEvent;
+import com.zype.android.webapi.events.video.VideoListEvent;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.entitlements.VideoEntitlement;
 import com.zype.android.webapi.model.player.File;
@@ -75,6 +69,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import retrofit.RetrofitError;
+
+import static com.zype.android.utils.BundleConstants.REQUEST_SUBSCRIBE_OR_LOGIN;
 
 public class VideosActivity extends MainActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor>,
                                                         BillingManager.BillingUpdatesListener {
@@ -97,7 +93,9 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     private TextView mTvEmpty;
     private LoaderManager mLoader;
     private ArrayList<VideoData> mVideoList;
-    private String playlistId = "123";
+    private String playlistId = null;
+    private String selectedVideoId = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +124,8 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         mListView.setAdapter(mAdapter);
         mTvEmpty = (TextView) findViewById(R.id.empty);
 
-        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)
+                || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
             new BillingManager(this, this);
         }
 
@@ -181,6 +180,17 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_SUBSCRIBE_OR_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    NavigationHelper.getInstance(this).switchToVideoDetailsScreen(this, selectedVideoId, playlistId, false);
+                }
+                break;
+        }
     }
 
     // //////////
@@ -245,7 +255,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                     break;
                 case DownloadConstants.PROGRESS_CANCELED_VIDEO:
                     viewHolder.isVideoDownloaded = false;
-                    UiUtils.showWarningSnackbar(view, "Video Download has canceled");
+                    UiUtils.showWarningSnackbar(view, "VideoList Download has canceled");
                     hideProgress(viewHolder);
                     break;
                 case DownloadConstants.PROGRESS_END_AUDIO:
@@ -255,7 +265,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                     break;
                 case DownloadConstants.PROGRESS_END_VIDEO:
                     viewHolder.isVideoDownloaded = true;
-                    UiUtils.showPositiveSnackbar(view, "Video was downloaded");
+                    UiUtils.showPositiveSnackbar(view, "VideoList was downloaded");
                     hideProgress(viewHolder);
                     break;
                 case DownloadConstants.PROGRESS_FAIL_AUDIO:
@@ -277,7 +287,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                     break;
                 case DownloadConstants.PROGRESS_START_VIDEO:
                     viewHolder.isVideoDownloaded = false;
-                    UiUtils.showPositiveSnackbar(view, "Video downloading was started");
+                    UiUtils.showPositiveSnackbar(view, "VideoList downloading was started");
                     updateListView(viewHolder, 0);
                     break;
                 case DownloadConstants.PROGRESS_UPDATE_AUDIO:
@@ -330,26 +340,34 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         Logger.d("onItemClick()");
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
 
-        if (ZypeConfiguration.isUniversalTVODEnabled(this) && holder.purchaseRequired) {
-            if (holder.isEntitled) {
-                VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
-            }
-            else {
-                if (SettingsProvider.getInstance().isLoggedIn()) {
-                    requestEntitled(holder.videoId);
-                }
-                else {
-                    NavigationHelper.getInstance(this).switchToLoginScreen(this);
-                }
-            }
-            return;
-        }
-        if (holder.subscriptionRequired) {
-            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, playlistId, holder.onAir);
+        selectedVideoId = holder.videoId;
+        NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
+        if (AuthHelper.isVideoAuthorized(this, holder.videoId)) {
+            navigationHelper.switchToVideoDetailsScreen(this, holder.videoId, playlistId, false);
         }
         else {
-            VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
+            navigationHelper.handleNotAuthorizedVideo(this, holder.videoId, playlistId);
         }
+//        if (ZypeConfiguration.isUniversalTVODEnabled(this) && holder.purchaseRequired) {
+//            if (holder.isEntitled) {
+//                VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
+//            }
+//            else {
+//                if (SettingsProvider.getInstance().isLoggedIn()) {
+//                    requestEntitled(holder.videoId);
+//                }
+//                else {
+//                    NavigationHelper.getInstance(this).switchToLoginScreen(this);
+//                }
+//            }
+//            return;
+//        }
+//        if (holder.subscriptionRequired) {
+//            NavigationHelper.getInstance(this).checkSubscription(this, holder.videoId, playlistId, holder.onAir);
+//        }
+//        else {
+//            VideoDetailActivity.startActivity(this, holder.videoId, playlistId);
+//        }
     }
 
     //
@@ -365,7 +383,9 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
-        SubscriptionsHelper.updateSubscriptionCount(purchases);
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+            SubscriptionsHelper.updateSubscriptionCount(purchases);
+        }
     }
 
     // //////////
@@ -435,7 +455,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     // Subscriptions
     //
     @Subscribe
-    public void handleRetrieveVideo(RetrieveVideoEvent event) {
+    public void handleRetrieveVideo(VideoListEvent event) {
         List<VideoData> result = event.getEventData().getModelData().getVideoData();
         Pagination pagination = event.getEventData().getModelData().getPagination();
         if (result != null) {
@@ -485,7 +505,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     @Subscribe
     public void handleDownloadVideo(DownloadVideoEvent event) {
         Logger.d("handleDownloadVideo");
-        File file = ListUtils.getStringWith(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
+        File file = ListUtils.getFileByType(event.getEventData().getModelData().getResponse().getBody().getFiles(), "mp4");
         String url;
         if (file != null) {
             url = file.getUrl();

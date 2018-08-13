@@ -3,6 +3,7 @@ package com.zype.android.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -13,6 +14,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.zype.android.R;
@@ -26,6 +29,18 @@ import com.zype.android.webapi.model.video.VideoData;
  *          date 7/1/15
  */
 public class UiUtils {
+
+    public static boolean isLandscapeOrientation(Activity activity) {
+        return (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
+    }
+
+    public static void loadImage(@Nullable String url, int placeholderRes, @NonNull ImageView view) {
+        Glide.with(view.getContext())
+                .load(url)
+                .apply(RequestOptions.centerCropTransform())
+                .into(view);
+    }
+
     public static void loadImage(@Nullable final Context context, @Nullable final String imgUrl, @Nullable final ImageView img) {
         if (context == null) {
             Logger.e("Context is null");
@@ -42,7 +57,9 @@ public class UiUtils {
         Picasso.with(context).load(imgUrl).into(img);
     }
 
-    public static void loadImage(@Nullable final Context context, @Nullable final String imgUrl, final int placeholderRes, @Nullable final ImageView img, final ProgressBar progressBar) {
+    public static void loadImage(@Nullable final Context context, @Nullable final String imgUrl,
+                                 final int placeholderRes, @Nullable final ImageView img,
+                                 @Nullable final ProgressBar progressBar) {
         if (context == null) {
             Logger.e("Context is null");
             return;
@@ -55,20 +72,26 @@ public class UiUtils {
             Logger.e("Image holder is empty");
             return;
         }
-        if (progressBar == null) {
-            Logger.e("Progress bar is empty");
-            return;
+
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
         }
-        progressBar.setVisibility(View.VISIBLE);
+        else {
+            Logger.w("loadImage(): Progress bar is empty");
+        }
         Callback callback = new Callback() {
             @Override
             public void onSuccess() {
-                progressBar.setVisibility(View.GONE);
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public void onError() {
-                progressBar.setVisibility(View.GONE);
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
                 if (placeholderRes > 0) {
                     img.setImageDrawable(ContextCompat.getDrawable(context, placeholderRes));
                 }

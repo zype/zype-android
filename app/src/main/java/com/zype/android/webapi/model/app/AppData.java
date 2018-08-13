@@ -28,7 +28,7 @@ public class AppData {
 
     @SerializedName("_id")
     @Expose
-    public String Id;
+    public String id;
 
     @SerializedName("featured_playlist_id")
     @Expose
@@ -45,6 +45,10 @@ public class AppData {
     @SerializedName("per_page")
     @Expose
     public String perPage;
+
+    @SerializedName("site_id")
+    @Expose
+    public String siteId;
 
     @SerializedName("subscribe_to_watch_ad_free")
     @Expose

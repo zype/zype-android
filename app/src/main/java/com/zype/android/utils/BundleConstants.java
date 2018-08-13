@@ -6,11 +6,15 @@ package com.zype.android.utils;
  *          date 6/25/15
  */
 public class BundleConstants {
+    public static final int REQUEST_CONSUMER = 6600;
     public static final int REQUEST_LOGIN = 6700;
     public static final int REQUEST_SUBSCRIPTION = 6800;
+    public static final int REQUEST_SUBSCRIBE_OR_LOGIN = 6810;
 
+    public static final String MEDIA_TYPE = "MediaType";
     public static final String PLAYLIST_ID = "PlaylistId";
     public static final String VIDEO_ID = "VIDEO_ID";
+
     public static final String WEB_ACTIVITY_TITLE = "WEB_ACTIVITY_TITLE";
     public static final String WEB_ACTIVITY_URL = "WEB_ACTIVITY_URL";
 
@@ -19,6 +23,5 @@ public class BundleConstants {
     public static final String PROGRESS = "PROGRESS";
     public static final String PROGRESS_ERROR_MESSAGE = "PROGRESS_ERROR_MESSAGE";
     public static final String SEARCH_STRING = "SEARCH_STRING";
-    public static final String VIDEO_TYPE = "VIDEO_TYPE";
 
 }
