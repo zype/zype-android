@@ -34,6 +34,7 @@ public class ZypeSettings {
 
     // Features
     public static final boolean AUTOPLAY = Boolean.valueOf("<AUTOPLAY>");
+    public static final boolean BACKGROUND_AUDIO_PLAYBACK_ENABLED = Boolean.valueOf("BACKGROUND_AUDIO_PLAYBACK_ENABLED");
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = Boolean.valueOf("<BACKGROUND_PLAYBACK_ENABLED>");
     public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
     public static final String DEVICE_LINKING_URL = "<DEVICE_LINKING_URL>";

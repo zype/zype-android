@@ -2,17 +2,13 @@ package com.zype.android.ui.video_details;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
 
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
-import com.zype.android.ui.Gallery.Model.HeroImageLiveData;
 import com.zype.android.ui.video_details.Model.VideoLiveData;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
-import com.zype.android.webapi.builder.ZObjectParamsBuilder;
 
 import java.util.Timer;
 import java.util.TimerTask;

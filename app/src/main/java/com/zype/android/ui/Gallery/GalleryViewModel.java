@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.DataRepository;
@@ -180,7 +181,8 @@ public class GalleryViewModel extends AndroidViewModel {
             repo.insertPlaylists(DbHelper.playlistDataToEntity(playlists));
 
             for (PlaylistData playlistData : playlists) {
-                if (playlistData.getParentId().equals(parentPlaylistId)) {
+                if (!TextUtils.isEmpty(playlistData.getParentId())
+                        && playlistData.getParentId().equals(parentPlaylistId)) {
                     // Load playlist videos
                     if (playlistData.getPlaylistItemCount() > 0) {
                         loadPlaylistVideos(playlistData.getId(), 1);

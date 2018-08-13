@@ -10,14 +10,8 @@ public class PlaylistParamsBuilder extends ParamsBuilder {
     private static final String DATE_END = "published_at.lte";
     private static final String DATA_IS_ON_AIR = "on_air";
     private static final String CATEGORY_HIGHLIGHT = "category[" + CategoryParamsBuilder.CATEGORY_HIGHTLIGHT + "]";
-    public static final String VIDEO_ID = "id";
+    public static final String PLAYLIST_ID = "id";
     public static final String PARENT_ID = "parent_id";
-
-//    public VideoParamsBuilder addAppKey() {
-//        addGetParam(API_KEY, WebApiManager.API_KEY);
-//        return this;
-//    }
-
 
     public PlaylistParamsBuilder() {
         addGetParam(APP_KEY, WebApiManager.APP_KEY);
@@ -49,8 +43,8 @@ public class PlaylistParamsBuilder extends ParamsBuilder {
         return this;
     }
 
-    public PlaylistParamsBuilder addVideoId(String videoId) {
-        addGetParam(VIDEO_ID, videoId);
+    public PlaylistParamsBuilder addPlaylistId(String playlistId) {
+        addGetParam(PLAYLIST_ID, playlistId);
         return this;
     }
 

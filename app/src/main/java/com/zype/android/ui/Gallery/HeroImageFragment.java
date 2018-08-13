@@ -56,7 +56,7 @@ public class HeroImageFragment extends Fragment {
             public void onClick(View v) {
                 if (!TextUtils.isEmpty(playlistId)) {
                     Playlist playlist = DataRepository.getInstance(getActivity().getApplication()).getPlaylistSync(playlistId);
-                    if (playlist == null) {
+                    if (playlist == null || playlist.active != 1) {
                         DialogHelper.showErrorAlert(getActivity(), getString(R.string.gallery_hero_image_error_playlist));
                     }
                     else {
