@@ -39,6 +39,7 @@
                     android:layout_margin="20dp"
                     android:id="@+id/layoutEmpty"
                     android:gravity="center"
+                    android:visibility="gone"
                     >
                     <TextView
                         android:layout_width="match_parent"

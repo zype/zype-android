@@ -76,10 +76,10 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
         tabSpec.setContent(R.id.list_tab);
         tabHost.addTab(tabSpec);
 
-        tabHost.setCurrentTabByTag("tag1");
+        tabHost.setCurrentTab(1);
+        tabHost.setCurrentTab(0);
         setTabColors(tabHost);
         tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
-
             @Override
             public void onTabChanged(String arg0) {
                 setTabColors(tabHost);

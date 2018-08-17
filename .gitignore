@@ -42,6 +42,7 @@ release/
 .idea/
 # if you remove the above rule, at least ignore user-specific stuff:
 .idea/libraries
+.idea/modules.xml
 .idea/workspace.xml
 .idea/tasks.xml
 # and these sensitive or high-churn files:
