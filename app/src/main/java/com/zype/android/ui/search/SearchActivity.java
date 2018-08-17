@@ -361,6 +361,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         setProgressBarIndeterminateVisibility(true);
         SearchParamsBuilder searchParamsBuilder = new SearchParamsBuilder()
                 .addSearchText(searchString)
+                .addPlaylistId(ZypeConfiguration.getRootPlaylistId(this), true)
                 .addPage(page);
 
         job = getApi().executeRequest(WebApiManager.Request.SEARCH, searchParamsBuilder.build());
