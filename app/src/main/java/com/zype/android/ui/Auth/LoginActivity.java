@@ -375,7 +375,7 @@ public class LoginActivity extends BaseActivity {
             builder.addUsername(email);
             builder.addPassword(password);
             builder.addClientId();
-            builder.addClientSecret();
+//            builder.addClientSecret();
             builder.addGrandType("password");
             getApi().executeRequest(WebApiManager.Request.AUTH_RETRIEVE_ACCESS_TOKEN, builder.build());
         }
@@ -403,7 +403,7 @@ public class LoginActivity extends BaseActivity {
         builder.addLinkedDeviceId(deviceId);
         builder.addPin(pin);
         builder.addClientId();
-        builder.addClientSecret();
+//        builder.addClientSecret();
         builder.addGrandType("password");
         getApi().executeRequest(WebApiManager.Request.AUTH_RETRIEVE_ACCESS_TOKEN, builder.build());
     }

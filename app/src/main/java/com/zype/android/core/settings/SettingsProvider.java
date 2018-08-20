@@ -201,7 +201,7 @@ public class SettingsProvider extends CommonPreferences {
             WebApiManager webApiManager = WebApiManager.getInstance();
             AuthParamsBuilder builder = new AuthParamsBuilder();
             builder.addClientId();
-            builder.addClientSecret();
+//            builder.addClientSecret();
             builder.addRefreshToken(SettingsProvider.getInstance().getRefreshToken());
             builder.addGrandType("refresh_token");
             webApiManager.executeRequest(WebApiManager.Request.AUTH_REFRESH_ACCESS_TOKEN, builder.build());

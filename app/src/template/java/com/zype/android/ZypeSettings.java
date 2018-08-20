@@ -9,7 +9,7 @@ public class ZypeSettings {
     public static final String APP_KEY = "<APP_KEY>";
     // OAuth credentials
     public static final String CLIENT_ID = "<CLIENT_ID>";
-    public static final String CLIENT_SECRET = "<CLIENT_SECRET>";
+//    public static final String CLIENT_SECRET = "<CLIENT_SECRET>";
     // Playlist
     public static final String ROOT_PLAYLIST_ID = "<ROOT_PLAYLIST_ID>";
 

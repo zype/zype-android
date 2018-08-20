@@ -44,10 +44,10 @@ public class AuthParamsBuilder extends ParamsBuilder {
         return this;
     }
 
-    public AuthParamsBuilder addClientSecret() {
-        addPostParam(CLIENT_SECRET, ZypeSettings.CLIENT_SECRET);
-        return this;
-    }
+//    public AuthParamsBuilder addClientSecret() {
+//        addPostParam(CLIENT_SECRET, ZypeSettings.CLIENT_SECRET);
+//        return this;
+//    }
 
     public AuthParamsBuilder addGrandType(String grandType) {
         addPostParam(CLIENT_GRAND_TYPE, grandType);
