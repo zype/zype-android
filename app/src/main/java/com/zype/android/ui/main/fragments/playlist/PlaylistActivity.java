@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 
 import com.squareup.otto.Subscribe;
+import com.zype.android.DataRepository;
+import com.zype.android.Db.DbHelper;
 import com.zype.android.R;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
@@ -30,6 +32,7 @@ import com.zype.android.webapi.model.playlist.Playlist;
 import com.zype.android.webapi.model.playlist.PlaylistData;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PlaylistActivity extends BaseActivity implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -186,23 +189,29 @@ public class PlaylistActivity extends BaseActivity implements ListView.OnItemCli
     @Subscribe
     public void handleRetrievePlaylist(PlaylistEvent event) {
         Logger.d("Activity handlePlaylistEvent size=" + event.getEventData().getModelData().getResponse().size());
-        Playlist data = event.getEventData().getModelData();
-        if (data.getResponse().size() > 0) {
-            if (mPlaylistList == null) {
-                mPlaylistList = new ArrayList<>();
-            }
-            mPlaylistList.addAll(data.getResponse());
-            // Clear all playlists of the parent from local DB before inserting to be consistent
-            // with platform in case some palylists were deleted
-            if (event.getEventData().getModelData().getPagination().getCurrent() == 1) {
-                DataHelper.deletePlaylistsByParentId(this.getContentResolver(), parentId);
-            }
-            int i = DataHelper.insertPlaylists(this.getContentResolver(), data.getResponse());
-            Logger.d("added " + i + " playlists");
+        List<PlaylistData> playlists = event.getEventData().getModelData().getResponse();
+        if (playlists.size() > 0) {
+            DataRepository.getInstance(getApplication())
+                    .insertPlaylists(DbHelper.playlistDataToEntity(playlists));
         }
-        else {
-            mTvEmpty.setText(R.string.videos_empty);
-        }
+        startLoadCursors(parentId);
+//        Playlist data = event.getEventData().getModelData();
+//        if (data.getResponse().size() > 0) {
+//            if (mPlaylistList == null) {
+//                mPlaylistList = new ArrayList<>();
+//            }
+//            mPlaylistList.addAll(data.getResponse());
+//            // Clear all playlists of the parent from local DB before inserting to be consistent
+//            // with platform in case some palylists were deleted
+//            if (event.getEventData().getModelData().getPagination().getCurrent() == 1) {
+//                DataHelper.deletePlaylistsByParentId(this.getContentResolver(), parentId);
+//            }
+//            int i = DataHelper.insertPlaylists(this.getContentResolver(), data.getResponse());
+//            Logger.d("added " + i + " playlists");
+//        }
+//        else {
+//            mTvEmpty.setText(R.string.videos_empty);
+//        }
     }
 
     protected String getActivityName() {
