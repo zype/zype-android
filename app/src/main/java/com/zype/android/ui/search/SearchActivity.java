@@ -256,7 +256,6 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
 
     @Subscribe
     public void handleConsumer(ConsumerEvent event) {
-        //TODO
         Logger.d("handleConsumer");
         Consumer data = event.getEventData().getModelData();
         int subscriptionCount = data.getConsumerData().getSubscriptionCount();

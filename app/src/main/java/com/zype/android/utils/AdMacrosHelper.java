@@ -69,7 +69,6 @@ public class AdMacrosHelper {
         result.put(DEVICE_MAKE, Build.MANUFACTURER);
         result.put(DEVICE_MODEL, Build.MODEL);
         // Default device type is '7' (set top box device)
-        // TODO: What is the code for mobile?
         result.put(DEVICE_TYPE, "7");
         // Default VPI is 'MP4'
         result.put(VPI, "MP4");

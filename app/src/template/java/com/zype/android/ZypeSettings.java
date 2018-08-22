@@ -14,11 +14,9 @@ public class ZypeSettings {
     public static final String ROOT_PLAYLIST_ID = "<ROOT_PLAYLIST_ID>";
 
     // Google Analytics Tracking Id
-    // TODO: To use Google Analytics provide your GA tracking id
     public static final String GA_TRACKING_ID = "";
 
     // Social
-    // TODO: Add your real social network ids and web url
     public static final String FACEBOOK_ID = "";
     public static final String INSTAGRAM_ID = "";
     public static final String TWITTER_ID = "";

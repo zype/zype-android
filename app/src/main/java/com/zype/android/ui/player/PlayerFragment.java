@@ -1324,7 +1324,7 @@ public class PlayerFragment extends BaseFragment implements
                     String adTag = AdMacrosHelper.updateAdTagParameters(getActivity(), adSchedule.get(nextAdIndex).getTag());
                     Logger.d("Ad tag with macros: " + adTag);
                     requestAds(adTag);
-                    // TODO: Probably it make sense to show progress while the ad is loading
+                    // TODO: Show progress while the ad is loading
                     return true;
                 }
             }

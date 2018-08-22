@@ -201,34 +201,6 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     // //////////
     // In-app billing
     //
-//    private void getSubscriptions(List<Purchase> purchases) {
-//        // TODO: Use purchases to mark owned skus
-//        billingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, SubscriptionsHelper.getSkuList(),
-//                new SkuDetailsResponseListener() {
-//                    @Override
-//                    public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
-//                        if (responseCode != BillingClient.BillingResponse.OK) {
-//                            // TODO: Handle error retrieving subscriptions list
-//                        }
-//                        else {
-//                            if (skuDetailsList != null) {
-//                                List<SubscriptionItem> items = new ArrayList<>();
-//                                for (SkuDetails sku : skuDetailsList) {
-//                                    SubscriptionItem item = new SubscriptionItem();
-//                                    item.title = sku.getTitle();
-//                                    item.description = sku.getDescription();
-//                                    item.price = sku.getPriceAmountMicros() / 1000000;
-//                                    item.sku = sku.getSku();
-//                                    items.add(item);
-//                                }
-//                                adapter.setData(items);
-//                            }
-//                        }
-//                    }
-//                }
-//        );
-//    }
-
     private void purchaseSubscription(Subscription item) {
         billingManager.initiatePurchaseFlow(this, item.getMarketplace().getSku(), BillingClient.SkuType.SUBS);
     }

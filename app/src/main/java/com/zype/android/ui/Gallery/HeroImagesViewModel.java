@@ -28,7 +28,6 @@ import java.util.TimerTask;
  */
 public class HeroImagesViewModel extends AndroidViewModel {
     private MutableLiveData<List<HeroImage>> data;
-    //    private HeroImageLiveData data;
     private MutableLiveData<Integer> currentPage;
     private Timer timer;
     private TimerTask timerTask;

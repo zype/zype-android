@@ -125,7 +125,21 @@ An example of fully functional app that is using a Zype sandbox account.
  - Update your Fabric API key in [AndroidManifest.xml](https://github.com/zype/zype-android/blob/master/app/src/main/AndroidManifest.xml)
  - Uncomment init of Fabric in [ZypeApp.java](https://github.com/zype/zype-android/blob/master/app/src/main/java/com/zype/android/ZypeApp.java)
 
-**8.** To use OneSignal uncomment init of OneSignal in [ZypeApp.java](https://github.com/zype/zype-android/blob/master/app/src/main/java/com/zype/android/ZypeApp.java).
+**8.** To use OneSignal:
+ - Uncomment init of OneSignal in [ZypeApp.java](https://github.com/zype/zype-android/blob/master/app/src/main/java/com/zype/android/ZypeApp.java)
+ - Set `onesignal_app_id` and `onesignal_google_project_number` attributes in the following code in the [build.gradle](https://github.com/zype/zype-android/blob/master/app/build.gradle):
+ ```
+     productFlavors {
+         ...
+         template {
+             ...
+             manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
+                                     // TODO: Provide valid app_id and google_project_number for OneSignal
+                                     onesignal_app_id               : "",
+                                     onesignal_google_project_number: ""]
+         }
+     }
+```
 
 
 
