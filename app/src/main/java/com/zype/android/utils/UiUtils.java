@@ -31,7 +31,12 @@ import com.zype.android.webapi.model.video.VideoData;
 public class UiUtils {
 
     public static boolean isLandscapeOrientation(Activity activity) {
-        return (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
+        if (activity == null) {
+            return false;
+        }
+        else {
+            return (activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
+        }
     }
 
     public static void loadImage(@Nullable String url, int placeholderRes, @NonNull ImageView view) {

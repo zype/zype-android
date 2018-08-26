@@ -263,8 +263,12 @@ public class ConsumerActivity extends BaseActivity {
     public void handleError(ErrorEvent err) {
         Logger.e("handleError");
         hideProgress();
-        if (err.getError().getResponse().getStatus() == 422) {
-            DialogHelper.showErrorAlert(this, getString(R.string.consumer_error_create));
+        if (err.getError() != null) {
+            if (err.getError().getResponse().getStatus() == 422) {
+                DialogHelper.showErrorAlert(this, getString(R.string.consumer_error_create));
+            } else {
+                UiUtils.showErrorSnackbar(buttonUpdate, err.getErrMessage());
+            }
         }
         else {
             UiUtils.showErrorSnackbar(buttonUpdate, err.getErrMessage());

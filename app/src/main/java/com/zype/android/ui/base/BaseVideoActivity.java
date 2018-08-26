@@ -729,9 +729,10 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             Logger.e("VideoId is empty !!");// но тут должен быть путь
         }
         if (mType == TYPE_WEB) {
-            Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
             if (AuthHelper.isVideoAuthorized(this, mVideoId)) {
-                if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
+                Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+                if (video != null &&
+                        (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video))) {
                     requestVideoUrl(mVideoId);
                 }
             }
