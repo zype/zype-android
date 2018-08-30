@@ -150,7 +150,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                 updateDownloadUrls();
             }
             else {
-                showVideoThumbnail();
+//                showVideoThumbnail();
                 videoDetailViewModel = new VideoDetailViewModel(getApplication());
                 final Observer<Video> videoObserver = new Observer<Video>() {
                     @Override
@@ -160,6 +160,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                             showPlayer();
                         }
                         else {
+                            changeFragment(isChromecastConntected());
                             videoDetailViewModel.checkOnAir(mVideoId).observe(VideoDetailActivity.this, new Observer<Video>() {
                                 @Override
                                 public void onChanged(@Nullable Video video) {
@@ -453,7 +454,10 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     public void handleError(ErrorEvent err) {
         Logger.e("handleError");
         if (err.getError() == null) {
-            onError();
+            if (err.getEventData() != WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO
+                    && err.getEventData() != WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO) {
+                onError();
+            }
             return;
         }
         if (err.getError().getResponse().getStatus() == BAD_REQUEST) {

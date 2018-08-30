@@ -41,6 +41,7 @@ import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.Auth.LoginActivity;
 import com.zype.android.ui.chromecast.ChromecastCheckStatusFragment;
 import com.zype.android.ui.chromecast.ChromecastFragment;
+import com.zype.android.ui.player.ThumbnailFragment;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
 import com.zype.android.ui.video_details.fragments.video.MediaControlInterface;
 import com.zype.android.ui.video_details.fragments.video.OnVideoAudioListener;
@@ -226,7 +227,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             downloadAudioParamsBuilder.addAppKey();
         }
         downloadAudioParamsBuilder.addAudioId(videoId);
-            getApi().executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, downloadAudioParamsBuilder.build());
+        getApi().executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, downloadAudioParamsBuilder.build());
     }
 
     private void getVideoDownloadUrl(String videoId) {
@@ -238,7 +239,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             downloadVideoParamsBuilder.addAppKey();
         }
         downloadVideoParamsBuilder.addVideoId(videoId);
-            getApi().executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, downloadVideoParamsBuilder.build());
+        getApi().executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, downloadVideoParamsBuilder.build());
     }
 
     @Nullable
@@ -289,30 +290,40 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     protected void changeFragment(boolean isChromeCastConnected) {
-        Fragment fragment = getFragment(isChromeCastConnected, mVideoId);
+        Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+        Fragment fragment;
+        if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
+            fragment = getFragment(isChromeCastConnected, mVideoId);
+        }
+        else {
+            fragment = ThumbnailFragment.newInstance(mVideoId);
+        }
         if (fragment != null) {
             showFragment(fragment);
         }
     }
 
     private void showFragment(Fragment fragment) {
-        Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
-        if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
-            if (mInterface != null) {
-                mInterface.stop();
-            }
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        hideProgress();
+//        Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+//        if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
+        if (mInterface != null) {
+            mInterface.stop();
+        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        if (fragment instanceof MediaControlInterface) {
             mInterface = (MediaControlInterface) fragment;
-            if (mInterface == null) {
-                throw new IllegalStateException("mInterface is null");
-            }
-            fragmentTransaction.replace(R.id.video_container, fragment, FRAGMENT_TAG_PLAYER);
-            fragmentTransaction.commit();
+//                if (mInterface == null) {
+//                    throw new IllegalStateException("mInterface is null");
+//                }
         }
-        else {
-            Logger.i("showFragment(): Video " + mVideoId + "is live event and isn't on air yet.");
-        }
+        fragmentTransaction.replace(R.id.video_container, fragment, FRAGMENT_TAG_PLAYER);
+        fragmentTransaction.commit();
+//        }
+//        else {
+//            Logger.i("showFragment(): Video " + mVideoId + "is live event and isn't on air yet.");
+//        }
     }
 
     protected void requestVideoUrl(String videoId) {

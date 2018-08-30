@@ -13,6 +13,7 @@ import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.ZypeApp;
 import com.zype.android.ui.Gallery.Model.GalleryRow;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
@@ -90,6 +91,7 @@ public class GalleryViewModel extends AndroidViewModel {
                                         row.videos = videos;
                                         if (allDataLoaded()) {
                                             data.setValue(galleryRows);
+                                            ZypeApp.needToLoadData = false;
                                         }
                                     }
                                 });
@@ -105,10 +107,15 @@ public class GalleryViewModel extends AndroidViewModel {
                                     @Override
                                     public void onChanged(@Nullable List<Playlist> playlists) {
                                         Logger.d("onChanged(): Nested playlists, size=" + playlists.size());
-//                                        List<Playlist> nestedPlaylists = DataRepository.getInstance(getApplication()).getPlaylistsSync(playlist.id);
-                                        row.nestedPlaylists = playlists;
+                                        if (playlists.isEmpty()) {
+                                            galleryRows.remove(row);
+                                        }
+                                        else {
+                                            row.nestedPlaylists = playlists;
+                                        }
                                         if (allDataLoaded()) {
                                             data.setValue(galleryRows);
+                                            ZypeApp.needToLoadData = false;
                                         }
                                     }
                                 });
@@ -125,17 +132,20 @@ public class GalleryViewModel extends AndroidViewModel {
     }
 
     public boolean allDataLoaded() {
-        if (data.getValue() == null || data.getValue().isEmpty()) {
-            return false;
-        }
         boolean result = true;
-        for (GalleryRow item : data.getValue()) {
-            if ((item.videos == null || item.videos.isEmpty())
-                    && (item.nestedPlaylists == null || item.nestedPlaylists.isEmpty())) {
-                result = false;
-                break;
+        if (data.getValue() == null || data.getValue().isEmpty()) {
+            result = false;
+        }
+        else {
+            for (GalleryRow item : data.getValue()) {
+                if ((item.videos == null || item.videos.isEmpty())
+                        && (item.nestedPlaylists == null || item.nestedPlaylists.isEmpty())) {
+                    result = false;
+                    break;
+                }
             }
         }
+        Logger.d("allDataLoaded(): " + result);
         return result;
     }
 
@@ -149,7 +159,8 @@ public class GalleryViewModel extends AndroidViewModel {
     private LiveData<List<Playlist>> getPlaylists(String parentPlaylistId) {
         Logger.d("getPlaylists(): parentPlaylistId=" + parentPlaylistId);
         LiveData<List<Playlist>> result = repo.getPlaylists(parentPlaylistId);
-        if (result.getValue() == null || result.getValue().isEmpty()) {
+        if (result.getValue() == null || result.getValue().isEmpty()
+                || ZypeApp.needToLoadData) {
             loadPlaylists(parentPlaylistId);
         }
         return result;

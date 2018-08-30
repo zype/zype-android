@@ -88,7 +88,6 @@ public class GalleryFragment extends Fragment {
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                Logger.d("onPagerScrollStateChanged(): state=" + state + ", position=" + pagerHeroImages.getCurrentItem());
                 if (state == SCROLL_STATE_IDLE) {
                     if (pagerHeroImages.getCurrentItem() == 0) {
                         pagerHeroImages.setCurrentItem(adapterHeroImages.getCount() - 2, false);
@@ -179,6 +178,7 @@ public class GalleryFragment extends Fragment {
                 break;
             }
         }
+        Logger.d("allDataLoaded(): " + result);
         return result;
     }
 

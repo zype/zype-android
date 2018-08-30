@@ -89,8 +89,9 @@ android {
             applicationId "<APPLICATION_ID>"
             manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
                                     // TODO: Provide valid app_id and google_project_number for OneSignal
-                                    onesignal_app_id               : "",
-                                    onesignal_google_project_number: ""]
+                                    onesignal_app_id: '',
+                                    onesignal_google_project_number: 'REMOTE'
+            ]
         }
     }
 

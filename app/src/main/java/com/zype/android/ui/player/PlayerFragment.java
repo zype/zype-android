@@ -796,15 +796,18 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     private void releasePlayer() {
+        AnalyticsManager manager = AnalyticsManager.getInstance();
+        manager.trackStop();
+
         if (player != null) {
             mediaController.hide();
             if (player.getPlaybackState() != ExoPlayer.STATE_ENDED) {
                 mListener.saveCurrentTimeStamp(player.getCurrentPosition());
             }
 
-            AnalyticsManager manager = AnalyticsManager.getInstance();
-            manager.trackStop();
-
+//            AnalyticsManager manager = AnalyticsManager.getInstance();
+//            manager.trackStop();
+//
             player.release();
             player = null;
             videoFrame = null;

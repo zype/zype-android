@@ -18,15 +18,19 @@ import com.google.android.gms.cast.CastMediaControlIntent;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.onesignal.OneSignal;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.MarketplaceGateway;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.StorageUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.AppParamsBuilder;
+import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.app.AppEvent;
+import com.zype.android.webapi.events.consumer.ConsumerEvent;
 import com.zype.android.webapi.model.app.AppData;
+import com.zype.android.webapi.model.consumers.Consumer;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -49,6 +53,7 @@ public class ZypeApp extends MultiDexApplication {
     // Monitors Memory Leaks
 //    private RefWatcher refWatcher;
 
+    public static boolean needToLoadData = true;
     public static AppData appData;
     public static MarketplaceGateway marketplaceGateway;
 
@@ -86,7 +91,10 @@ public class ZypeApp extends MultiDexApplication {
 
         // OneSignal
         // TODO: Uncomment following line to use OneSignal
-//        OneSignal.startInit(this).init();
+//        OneSignal.startInit(this)
+//                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+//                .unsubscribeWhenNotificationsAreDisabled(true)
+//                .init();
 
 //        AppCompatDelegate.setDefaultNightMode(ZypeSettings.isThemeLight() ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES);
         if (ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_LIGHT)) {
@@ -143,6 +151,10 @@ public class ZypeApp extends MultiDexApplication {
                     ZypeConfiguration.getPlanIds());
             marketplaceGateway.setup();
         }
+
+        if (AuthHelper.isLoggedIn()) {
+            loadConsumer();
+        }
     }
 
     @Override
@@ -175,10 +187,30 @@ public class ZypeApp extends MultiDexApplication {
         WebApiManager.getInstance().executeRequest(WebApiManager.Request.APP, builder.build());
     }
 
+    private void loadConsumer() {
+        ConsumerParamsBuilder builder = new ConsumerParamsBuilder()
+                .addAccessToken();
+        WebApiManager.getInstance().executeRequest(WebApiManager.Request.CONSUMER_GET, builder.build());
+    }
+
     @Subscribe
     public void handleApp(AppEvent event) {
         appData = event.getEventData().getModelData().getAppData();
         Logger.i("handleApp(): App data successfully loaded");
+    }
+
+    @Subscribe
+    public void handleConsumer(ConsumerEvent event) {
+        Logger.d("handleConsumer()");
+        if (event.getRequest() == WebApiManager.Request.CONSUMER_FORGOT_PASSWORD) {
+            return;
+        }
+        Consumer data = event.getEventData().getModelData();
+        int subscriptionCount = data.getConsumerData().getSubscriptionCount();
+        SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
+        String consumerId = data.getConsumerData().getId();
+        SettingsProvider.getInstance().saveConsumerId(consumerId);
+        SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, data.getConsumerData().getEmail());
     }
 
     @Subscribe
