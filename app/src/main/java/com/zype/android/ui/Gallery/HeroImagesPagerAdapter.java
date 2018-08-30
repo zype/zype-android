@@ -37,7 +37,15 @@ public class HeroImagesPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public void setData(List<HeroImage> data) {
-        this.data = data;
+        if (data != null && data.size() > 1) {
+            this.data = new ArrayList<>();
+            this.data.add(data.get(data.size() - 1));
+            this.data.addAll(data);
+            this.data.add(data.get(0));
+        }
+        else {
+            this.data = data;
+        }
         notifyDataSetChanged();
     }
 }

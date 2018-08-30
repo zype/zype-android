@@ -48,9 +48,9 @@ public class ZypeSettings {
     public static final String DEVICE_LINKING_URL = "https://www.zype.com";
     public static final boolean DOWNLOADS_ENABLED = true;
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
-    public static final boolean PLAYLIST_GALLERY_VIEW = false;
-    public static final boolean PLAYLIST_GALLERY_HERO_IMAGES = false;
-    public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = false;
+    public static final boolean PLAYLIST_GALLERY_VIEW = true;
+    public static final boolean PLAYLIST_GALLERY_HERO_IMAGES = true;
+    public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = true;
     public static final boolean SHARE_VIDEO_ENABLED = false;
 
     public static final String THEME = ZypeConfiguration.THEME_LIGHT;

@@ -226,7 +226,7 @@ public class PlayerFragment extends BaseFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            contentUri = getArguments().getString(CONTENT_URL);
+            contentUri = getArguments().getString(CONTENT_URL, "");
             Logger.i("url: " + contentUri);
             contentType = getArguments().getInt(CONTENT_TYPE_TYPE, BaseVideoActivity.TYPE_UNKNOWN);
             fileId = getArguments().getString(CONTENT_ID_EXTRA);
@@ -1324,7 +1324,7 @@ public class PlayerFragment extends BaseFragment implements
                     String adTag = AdMacrosHelper.updateAdTagParameters(getActivity(), adSchedule.get(nextAdIndex).getTag());
                     Logger.d("Ad tag with macros: " + adTag);
                     requestAds(adTag);
-                    // TODO: Probably it make sense to show progress while the ad is loading
+                    // TODO: Show progress while the ad is loading
                     return true;
                 }
             }
@@ -1502,11 +1502,13 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     private void updateClosedCaptionsTrack() {
-        if (ccEnabled) {
-            player.setSelectedTrack(CustomPlayer.TYPE_TEXT, getClosedCaptionsTrackIndex(ccTrack));
-        }
-        else {
-            player.setSelectedTrack(CustomPlayer.TYPE_TEXT, CustomPlayer.TRACK_DISABLED);
+        if (player != null) {
+            if (ccEnabled) {
+                player.setSelectedTrack(CustomPlayer.TYPE_TEXT, getClosedCaptionsTrackIndex(ccTrack));
+            }
+            else {
+                player.setSelectedTrack(CustomPlayer.TYPE_TEXT, CustomPlayer.TRACK_DISABLED);
+            }
         }
     }
 

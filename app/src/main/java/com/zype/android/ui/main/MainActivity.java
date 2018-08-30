@@ -360,27 +360,10 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
     @Subscribe
     public void handleConsumer(ConsumerEvent event) {
-        //TODO
         Logger.d("handleConsumer");
         Consumer data = event.getEventData().getModelData();
         int subscriptionCount = data.getConsumerData().getSubscriptionCount();
         SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
-    }
-
-//    @Subscribe
-//    public void handleError(ErrorEvent err) {
-//        Logger.e("handleError");
-//        if (err.getEventData() == WebApiManager.Request.UN_FAVORITE) {
-//            //IGNORE
-//        } else {
-//            UiUtils.showErrorSnackbar(findViewById(R.id.root_view), err.getErrMessage());
-//        }
-//    }
-
-    @Subscribe
-    public void handlePlayer(PlayerVideoEvent event) {
-        //TODO
-        Logger.d("handlePlayer");
     }
 
     @Subscribe

@@ -28,7 +28,6 @@ import java.util.TimerTask;
  */
 public class HeroImagesViewModel extends AndroidViewModel {
     private MutableLiveData<List<HeroImage>> data;
-    //    private HeroImageLiveData data;
     private MutableLiveData<Integer> currentPage;
     private Timer timer;
     private TimerTask timerTask;
@@ -72,12 +71,12 @@ public class HeroImagesViewModel extends AndroidViewModel {
         timerTask = new TimerTask() {
             @Override
             public void run() {
-                if (currentPage.getValue() == data.getValue().size() - 1) {
-                    currentPage.postValue(0);
-                }
-                else {
+//                if (currentPage.getValue() == data.getValue().size() - 1) {
+//                    currentPage.postValue(0);
+//                }
+//                else {
                     currentPage.postValue(currentPage.getValue() + 1);
-                }
+//                }
             }
         };
         timer.schedule(timerTask, 0, TIMER_PERIOD);

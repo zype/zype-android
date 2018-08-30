@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,8 @@ import com.zype.android.utils.Logger;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
+import static android.support.v4.view.ViewPager.SCROLL_STATE_IDLE;
+import static android.support.v4.view.ViewPager.SCROLL_STATE_SETTLING;
 
 /**
  * Created by Evgeny Cherkasov on 12.06.2018
@@ -74,6 +77,28 @@ public class GalleryFragment extends Fragment {
         else {
             pagerHeroImages.setVisibility(View.GONE);
         }
+        pagerHeroImages.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                Logger.d("onPagerScrollStateChanged(): state=" + state + ", position=" + pagerHeroImages.getCurrentItem());
+                if (state == SCROLL_STATE_IDLE) {
+                    if (pagerHeroImages.getCurrentItem() == 0) {
+                        pagerHeroImages.setCurrentItem(adapterHeroImages.getCount() - 2, false);
+                    }
+                    if (pagerHeroImages.getCurrentItem() == adapterHeroImages.getCount() - 1) {
+                        pagerHeroImages.setCurrentItem(1, false);
+                    }
+                }
+            }
+        });
 
         RecyclerView listGallery = rootView.findViewById(R.id.listGallery);
         adapter = new GalleryRowsAdapter();
@@ -93,18 +118,21 @@ public class GalleryFragment extends Fragment {
             modelHeroImages = ViewModelProviders.of(getActivity()).get(HeroImagesViewModel.class);
             modelHeroImages.getHeroImages().observe(this, new Observer<List<HeroImage>>() {
                 @Override
-                public void onChanged(@Nullable List<HeroImage> heroImages) {
+                public void onChanged(@Nullable final List<HeroImage> heroImages) {
                     Logger.d("onChanged(): Hero images changed, size=" + heroImages.size());
                     modelHeroImages.stopTimer();
                     adapterHeroImages.setData(heroImages);
                     if (heroImages.size() > 0) {
+                        pagerHeroImages.setCurrentItem(1, false);
                         pagerHeroImages.setVisibility(View.VISIBLE);
-                        modelHeroImages.startTimer(0).observe(GalleryFragment.this, new Observer<Integer>() {
-                            @Override
-                            public void onChanged(Integer page) {
-                                pagerHeroImages.setCurrentItem(page);
-                            }
-                        });
+                        if (heroImages.size() > 1) {
+                            modelHeroImages.startTimer(0).observe(GalleryFragment.this, new Observer<Integer>() {
+                                @Override
+                                public void onChanged(Integer page) {
+                                    pagerHeroImages.setCurrentItem(pagerHeroImages.getCurrentItem() + 1, true);
+                                }
+                            });
+                        }
                     }
                     else {
                         pagerHeroImages.setVisibility(View.GONE);
