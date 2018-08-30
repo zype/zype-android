@@ -24,4 +24,8 @@ public class PlanData {
     @SerializedName("third_party_id")
     @Expose
     public String thirdPartyId;
+
+    @SerializedName("marketplace_ids")
+    @Expose
+    public PlanMarketplaceIds marketplaceIds;
 }

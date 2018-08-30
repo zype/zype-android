@@ -29,6 +29,7 @@
 
     <include layout="@layout/layout_playlist"/>
 
+<!--
     <io.codetail.widget.RevealFrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -47,5 +48,6 @@
         app:layout_anchor="@id/layoutFrame"
         app:layout_anchorGravity="top|end|right"
         />
+-->
 
 </android.support.design.widget.CoordinatorLayout>

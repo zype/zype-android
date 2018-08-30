@@ -43,6 +43,7 @@ An example of fully functional app that is using a Zype sandbox account.
 - Midroll ads
 - Universal SVOD via login
 - Native SVOD via In App Purchases
+- Marketplace connect (Native to universal SVOD)
 
 ## Creating Custom App Based on the Template<a name="template"></a>
 
@@ -62,8 +63,6 @@ An example of fully functional app that is using a Zype sandbox account.
 
    `<CLIENT_ID>`
 
-   `<CLIENT_SECRET>`
-
    `<ROOT_PLAYLIST_ID>`
 
    Use `true` or `false` values for:
@@ -80,6 +79,8 @@ An example of fully functional app that is using a Zype sandbox account.
 
    `<AUTOPLAY>`
    
+   `<BACKGROUND_AUDIO_PLAYBACK_ENABLED>`
+
    `<BACKGROUND_PLAYBACK_ENABLED>`
 
    `<DOWNLOADS_ENABLED>`
@@ -90,7 +91,7 @@ An example of fully functional app that is using a Zype sandbox account.
 
    `<DEVICE_LINKING_URL>` - Update with your url for device linking if you set DEVICE_LINKING to true. Otherwise set empty string.
 
-   `<THEME>` - Use constants `ZypeCOnfiguration.THEME_LIGHT` or `ZypeCOnfiguration.THEME_DARK`
+   `<THEME>` - Use constants `ZypeConfiguration.THEME_LIGHT` or `ZypeConfiguration.THEME_DARK`
 
 ####  **[colors.xml](https://github.com/zype/zype-android/blob/master/app/src/template/res/values/colors.xml)**, **[values-night/colors.xml](https://github.com/zype/zype-android/blob/master/app/src/template/res/values-night/colors.xml)**
 

@@ -11,6 +11,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
+import com.zype.android.DataRepository;
+import com.zype.android.Db.DbHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
@@ -43,6 +46,7 @@ import com.zype.android.webapi.model.playlist.PlaylistData;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.codetail.animation.ViewAnimationUtils;
 
@@ -144,88 +148,88 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
 //        int endRadius = (int) Math.hypot(searchField.getWidth(), searchField.getHeight());
 //        Animator anim = ViewAnimationUtils.createCircularReveal(searchField, x, y, startRadius, endRadius);
 //
-        layoutSearch = (CardView) view.findViewById(R.id.layoutSearch);
-        viewSearch = (SearchView) view.findViewById(R.id.viewSearch);
-        viewSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mListener.onSearch(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-        viewSearch.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                hideSearch();
-                return true;
-            }
-        });
-        viewSearch.setIconified(false);
-        viewSearch.setFocusable(true);
-
-        layoutSearch.setVisibility(View.INVISIBLE);
-        buttonSearch = (FloatingActionButton) view.findViewById(R.id.buttonSearch);
-        buttonSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int cx = (layoutSearch.getLeft() + layoutSearch.getRight());
-                int cy = layoutSearch.getTop();
-                int radius = Math.max(layoutSearch.getWidth(), layoutSearch.getHeight());
-                Animator animator = ViewAnimationUtils.createCircularReveal(layoutSearch, cx, cy, 0, radius);
-                animator.setInterpolator(new AccelerateDecelerateInterpolator());
-                animator.setDuration(400);
-                animator.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        onShowSearch();
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
-                    }
-                });
-
-                // Prepare reverse animation to hide search bar later
-                animatorSearchReverse = ViewAnimationUtils.createCircularReveal(layoutSearch, cx, cy, radius, 0);
-                animatorSearchReverse.setInterpolator(new AccelerateDecelerateInterpolator());
-                animatorSearchReverse.setDuration(400);
-                animatorSearchReverse.addListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        layoutSearch.setVisibility(View.INVISIBLE);
-                        buttonSearch.show();
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-                    }
-                });
-                layoutSearch.setVisibility(View.VISIBLE);
-                animator.start();
-                buttonSearch.hide();
-            }
-        });
+//        layoutSearch = (CardView) view.findViewById(R.id.layoutSearch);
+//        viewSearch = (SearchView) view.findViewById(R.id.viewSearch);
+//        viewSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                mListener.onSearch(query);
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//        });
+//        viewSearch.setOnCloseListener(new SearchView.OnCloseListener() {
+//            @Override
+//            public boolean onClose() {
+//                hideSearch();
+//                return true;
+//            }
+//        });
+//        viewSearch.setIconified(false);
+//        viewSearch.setFocusable(true);
+//
+//        layoutSearch.setVisibility(View.INVISIBLE);
+//        buttonSearch = (FloatingActionButton) view.findViewById(R.id.buttonSearch);
+//        buttonSearch.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                int cx = (layoutSearch.getLeft() + layoutSearch.getRight());
+//                int cy = layoutSearch.getTop();
+//                int radius = Math.max(layoutSearch.getWidth(), layoutSearch.getHeight());
+//                Animator animator = ViewAnimationUtils.createCircularReveal(layoutSearch, cx, cy, 0, radius);
+//                animator.setInterpolator(new AccelerateDecelerateInterpolator());
+//                animator.setDuration(400);
+//                animator.addListener(new Animator.AnimatorListener() {
+//                    @Override
+//                    public void onAnimationStart(Animator animator) {
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animator animator) {
+//                        onShowSearch();
+//                    }
+//
+//                    @Override
+//                    public void onAnimationCancel(Animator animator) {
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animator animator) {
+//                    }
+//                });
+//
+//                // Prepare reverse animation to hide search bar later
+//                animatorSearchReverse = ViewAnimationUtils.createCircularReveal(layoutSearch, cx, cy, radius, 0);
+//                animatorSearchReverse.setInterpolator(new AccelerateDecelerateInterpolator());
+//                animatorSearchReverse.setDuration(400);
+//                animatorSearchReverse.addListener(new Animator.AnimatorListener() {
+//                    @Override
+//                    public void onAnimationStart(Animator animation) {
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        layoutSearch.setVisibility(View.INVISIBLE);
+//                        buttonSearch.show();
+//                    }
+//
+//                    @Override
+//                    public void onAnimationCancel(Animator animation) {
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animator animation) {
+//                    }
+//                });
+//                layoutSearch.setVisibility(View.VISIBLE);
+//                animator.start();
+//                buttonSearch.hide();
+//            }
+//        });
 
         return view;
     }
@@ -291,7 +295,7 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
     public void onResume() {
         super.onResume();
         updatePlaylistList();
-        hideSearch();
+//        hideSearch();
     }
 
     @Override
@@ -312,21 +316,21 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
     // //////////
     // UI
     //
-    private void onShowSearch() {
-        UiUtils.showKeyboard(getActivity(), viewSearch);
-    }
-
-    private void hideSearch() {
-        if (animatorSearchReverse != null && layoutSearch.getVisibility() == View.VISIBLE) {
-            try {
-                animatorSearchReverse.start();
-            }
-            catch (Exception e) {
-                layoutSearch.setVisibility(View.INVISIBLE);
-                buttonSearch.show();
-            }
-        }
-    }
+//    private void onShowSearch() {
+//        UiUtils.showKeyboard(getActivity(), viewSearch);
+//    }
+//
+//    private void hideSearch() {
+//        if (animatorSearchReverse != null && layoutSearch.getVisibility() == View.VISIBLE) {
+//            try {
+//                animatorSearchReverse.start();
+//            }
+//            catch (Exception e) {
+//                layoutSearch.setVisibility(View.INVISIBLE);
+//                buttonSearch.show();
+//            }
+//        }
+//    }
 
     protected void startLoadCursors() {
         if (mLoader == null) {
@@ -416,22 +420,29 @@ public class PlaylistFragment extends BaseFragment implements ListView.OnItemCli
     @Subscribe
     public void handleRetrievePlaylist(PlaylistEvent event) {
         Logger.d("handlePlaylistEvent size=" + event.getEventData().getModelData().getResponse().size());
-        Playlist data = event.getEventData().getModelData();
-        if (data.getResponse().size() > 0) {
-            if (mPlaylistList == null) {
-                mPlaylistList = new ArrayList<>();
-            }
-            mPlaylistList.addAll(data.getResponse());
-            // Clear all playlists of the parent from local DB before inserting to be consistent
-            // with platform in case some palylists were deleted
-            if (event.getEventData().getModelData().getPagination().getCurrent() == 1) {
-                DataHelper.deletePlaylistsByParentId(getActivity().getContentResolver(), parentId);
-            }
-            int i = DataHelper.insertPlaylists(getActivity().getContentResolver(), data.getResponse());
-            Logger.d("added " + i + " playlists");
+        List<PlaylistData> playlists = event.getEventData().getModelData().getResponse();
+        if (playlists.size() > 0) {
+            DataRepository.getInstance(getActivity().getApplication())
+                    .insertPlaylists(DbHelper.playlistDataToEntity(playlists));
         }
-        else {
-            mTvEmpty.setText(R.string.videos_empty);
-        }
+        startLoadCursors();
+
+//        Playlist data = event.getEventData().getModelData();
+//        if (data.getResponse().size() > 0) {
+//            if (mPlaylistList == null) {
+//                mPlaylistList = new ArrayList<>();
+//            }
+//            mPlaylistList.addAll(data.getResponse());
+//            // Clear all playlists of the parent from local DB before inserting to be consistent
+//            // with platform in case some palylists were deleted
+//            if (event.getEventData().getModelData().getPagination().getCurrent() == 1) {
+//                DataHelper.deletePlaylistsByParentId(getActivity().getContentResolver(), parentId);
+//            }
+//            int i = DataHelper.insertPlaylists(getActivity().getContentResolver(), data.getResponse());
+//            Logger.d("added " + i + " playlists");
+//        }
+//        else {
+//            mTvEmpty.setText(R.string.videos_empty);
+//        }
     }
 }

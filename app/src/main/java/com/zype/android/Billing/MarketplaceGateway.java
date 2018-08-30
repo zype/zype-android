@@ -1,21 +1,15 @@
 package com.zype.android.Billing;
 
-import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.Context;
-import android.support.annotation.Nullable;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.squareup.otto.Subscribe;
-import com.zype.android.R;
 import com.zype.android.core.settings.SettingsProvider;
-import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.MarketplaceConnectParamsBuilder;
@@ -26,14 +20,11 @@ import com.zype.android.webapi.events.plan.PlanEvent;
 import com.zype.android.webapi.model.plan.PlanData;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import retrofit.RetrofitError;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Evgeny Cherkasov on 22.06.2018
@@ -179,7 +170,11 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
     //
     private void queryGooglePlayProduct(final Subscription subscription) {
         // Get sku details from marketplace (Google Play) for specified sku
-        final String sku = subscription.getZypePlan().thirdPartyId;
+        if (subscription.getZypePlan().marketplaceIds == null) {
+            Logger.d("queryGooglePlayProduct(): marketplaceIds is empty.");
+            return;
+        }
+        final String sku = subscription.getZypePlan().marketplaceIds.googleplay;
         List<String> skuList = new ArrayList<>();
         skuList.add(sku);
         billingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, skuList,
@@ -200,8 +195,6 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
                                                 skuDetailsList.size() + ") in Google Play, sku=" + sku);
                                     }
                                     subscription.setMarketplace(skuDetailsList.get(0));
-//
-//                                    subscriptionsLiveData.setValue(subscriptions);
                                 }
                             }
                         }

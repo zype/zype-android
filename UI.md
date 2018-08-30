@@ -1,5 +1,25 @@
 # UI customization
 
+## Playlist view
+
+You can choose the view for browsing playlists:
+
+- Normal view, that is set up as default
+
+<a href="https://drive.google.com/uc?export=view&id=1ZMJizsTo8Hw-YZaIEKV7y0q-58b-GWqm"><img src="https://drive.google.com/uc?export=view&id=1ZMJizsTo8Hw-YZaIEKV7y0q-58b-GWqm" style="width: auto; height: 108px" title="Click for the larger version." /></a>
+
+- Gallery view
+
+<a href="https://drive.google.com/uc?export=view&id=1adBoFuFb8g_vOPwfNzzc8ZAGruNIQ8G4"><img src="https://drive.google.com/uc?export=view&id=1adBoFuFb8g_vOPwfNzzc8ZAGruNIQ8G4" style="width: auto; height: 108px" title="Click for the larger version." /></a>
+
+Set `PLAYLIST_GALLERY_VIEW` in [ZypeSettings.java](https://github.com/zype/zype-android/blob/master/app/src/template/java/com/zype/android/ZypeSettings.java) to `true` to display playlists in this view.
+
+In the gallery view you can manage following UI options:
+
+- `PLAYLIST_GALLERY_ITEM_TITLES` - When set to `true` the video title will show on the video thumbnails in the gallery view. If the thumbnail images already has the title it is recommended to turn this option off.
+
+- `PLAYLIST_GALLERY_HERO_IMAGES` - Hero images carousel will be displayed above the playlist rows, when this option is set ti `true`. Each hero image is clickable and linked to the specified playlist. The `Top Playlist` zobject in the platform is used to link playlists to hero images.
+
 ## Video placeholders
 
 The placeholder is used for videos that doesn't have thumbnails.
