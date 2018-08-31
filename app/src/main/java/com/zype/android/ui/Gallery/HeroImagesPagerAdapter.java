@@ -23,7 +23,7 @@ public class HeroImagesPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         HeroImage heroImage = data.get(position);
-        return HeroImageFragment.newInstance(heroImage.imageUrl, heroImage.playlistId);
+        return HeroImageFragment.newInstance(heroImage.imageUrl, heroImage.playlistId, heroImage.videoId);
     }
 
     @Override
