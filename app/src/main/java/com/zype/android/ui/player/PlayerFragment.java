@@ -1150,7 +1150,7 @@ public class PlayerFragment extends BaseFragment implements
         builder.setContentIntent(intent)
                 .setContentTitle(getActivity().getString(R.string.app_name))
                 .setContentText(title)
-                .setSmallIcon(R.drawable.ic_launcher)
+                .setSmallIcon(R.drawable.ic_background_playback)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setAutoCancel(true)
                 .setOngoing(true)
