@@ -17,9 +17,11 @@ import java.util.List;
  */
 public class GalleryRowsAdapter extends RecyclerView.Adapter<GalleryRowsAdapter.ViewHolder> {
     private List<GalleryRow> rows;
+    private RecyclerView.RecycledViewPool viewPool;
 
     public GalleryRowsAdapter() {
         rows = new ArrayList<>();
+        viewPool = new RecyclerView.RecycledViewPool();
     }
 
     public void setData(List<GalleryRow> items) {
@@ -30,7 +32,9 @@ public class GalleryRowsAdapter extends RecyclerView.Adapter<GalleryRowsAdapter.
     @Override
     public GalleryRowsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_list_item, parent, false);
-        return new GalleryRowsAdapter.ViewHolder(view);
+        ViewHolder holder = new GalleryRowsAdapter.ViewHolder(view);
+        holder.listPlaylistItems.setRecycledViewPool(viewPool);
+        return holder;
     }
 
     @Override

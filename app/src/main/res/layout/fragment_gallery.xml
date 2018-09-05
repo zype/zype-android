@@ -5,12 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:focusableInTouchMode="true"
         >
-
         <com.zype.android.ui.Widget.CustomViewPager
             android:layout_width="match_parent"
             android:layout_height="0dp"
