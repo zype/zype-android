@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Playlist;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.utils.DialogHelper;
@@ -24,15 +25,18 @@ public class HeroImageFragment extends Fragment {
 
     private static final String ARG_IMAGE_URL = "ImageUrl";
     private static final String ARG_PLAYLIST_ID = "PlaylistId";
+    private static final String ARG_VIDEO_ID = "VideoId";
 
     private String imageUrl;
     private String playlistId;
+    private String videoId;
 
-    public static HeroImageFragment newInstance(String imageUrl, String playlistId) {
+    public static HeroImageFragment newInstance(String imageUrl, String playlistId, String videoId) {
         HeroImageFragment fragment = new HeroImageFragment();
         Bundle args = new Bundle();
         args.putString(ARG_IMAGE_URL, imageUrl);
         args.putString(ARG_PLAYLIST_ID, playlistId);
+        args.putString(ARG_VIDEO_ID, videoId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -43,6 +47,7 @@ public class HeroImageFragment extends Fragment {
 
         imageUrl = getArguments().getString(ARG_IMAGE_URL);
         playlistId = getArguments().getString(ARG_PLAYLIST_ID);
+        videoId = getArguments().getString(ARG_VIDEO_ID);
     }
 
     @Override
@@ -54,7 +59,14 @@ public class HeroImageFragment extends Fragment {
         imageHero.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!TextUtils.isEmpty(playlistId)) {
+                if (!TextUtils.isEmpty(videoId)) {
+                    Video video = DataRepository.getInstance(getActivity().getApplication()).getVideoSync(videoId);
+                    if (video == null || video.active != 1) {
+                        DialogHelper.showErrorAlert(getActivity(), getString(R.string.gallery_hero_image_error_video));
+                    } else {
+                        NavigationHelper.getInstance(getActivity()).switchToVideoDetailsScreen(getActivity(), videoId, null, false);
+                    }
+                } else if (!TextUtils.isEmpty(playlistId)) {
                     Playlist playlist = DataRepository.getInstance(getActivity().getApplication()).getPlaylistSync(playlistId);
                     if (playlist == null || playlist.active != 1) {
                         DialogHelper.showErrorAlert(getActivity(), getString(R.string.gallery_hero_image_error_playlist));

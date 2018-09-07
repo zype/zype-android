@@ -85,6 +85,10 @@ public class ZobjectData {
     @Expose
     public String playlistId;
 
+    @SerializedName("videoid")
+    @Expose
+    public String videoId;
+
     /**
      *
      * @return

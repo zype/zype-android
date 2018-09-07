@@ -8,17 +8,22 @@ import android.arch.lifecycle.MutableLiveData;
 import com.squareup.otto.Subscribe;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.ui.Gallery.Model.HeroImage;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.PlaylistParamsBuilder;
+import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.builder.ZObjectParamsBuilder;
 import com.zype.android.webapi.events.playlist.PlaylistEvent;
+import com.zype.android.webapi.events.video.VideoEvent;
 import com.zype.android.webapi.events.zobject.ZObjectEvent;
 import com.zype.android.webapi.model.playlist.PlaylistData;
+import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.webapi.model.zobjects.ZobjectData;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -105,12 +110,14 @@ public class HeroImagesViewModel extends AndroidViewModel {
         for (ZobjectData item : zobjectData) {
             HeroImage heroImage = new HeroImage();
             heroImage.playlistId = item.playlistId;
+            heroImage.videoId = item.videoId;
             if (item.getPictures() != null && item.getPictures().size() > 0) {
                 heroImage.imageUrl = item.getPictures().get(0).getUrl();
             }
             heroImages.add(heroImage);
 
             loadPlaylist(item.playlistId);
+            loadVideo(item.videoId);
         }
         data.setValue(heroImages);
     }
@@ -129,6 +136,19 @@ public class HeroImagesViewModel extends AndroidViewModel {
     }
 
     /**
+     * Make API request for video with specified id
+     *
+     * @param videoId Video id to load
+     */
+    private void loadVideo(String videoId) {
+        Logger.d("loadVideo): videoId=" + videoId);
+        VideoParamsBuilder builder = new VideoParamsBuilder()
+                .addVideoId(videoId)
+                .addPerPage(1);
+        WebApiManager.getInstance().executeRequest(WebApiManager.Request.VIDEO, builder.build());
+    }
+
+    /**
      * Handles API request for playlists
      *
      * @param event Response event
@@ -139,6 +159,23 @@ public class HeroImagesViewModel extends AndroidViewModel {
         List<PlaylistData> playlists = event.getEventData().getModelData().getResponse();
         if (playlists.size() > 0) {
             repo.insertPlaylists(DbHelper.playlistDataToEntity(playlists));
+        }
+    }
+
+    /**
+     * Handles API request for playlist
+     *
+     * @param event Response event
+     */
+    @Subscribe
+    public void handleVideo(VideoEvent event) {
+        Logger.d("handleVideo()");
+        VideoData data = event.getEventData().getModelData().getVideoData();
+        Video video = DbHelper.videoDataToVideoEntity(data);
+
+        if (video != null) {
+            List<Video> videosList = Arrays.asList(video);
+            repo.insertVideos(videosList);
         }
     }
 

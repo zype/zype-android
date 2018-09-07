@@ -112,6 +112,7 @@
 
     <!-- Gallery -->
     <string name="gallery_hero_image_error_playlist">We’re sorry, that playlist cannot be found.</string>
+    <string name="gallery_hero_image_error_video">We’re sorry, that video cannot be found.</string>
 
     <!--General-->
     <string name="button_sign_in">Sign in</string>
