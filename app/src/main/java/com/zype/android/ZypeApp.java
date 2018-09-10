@@ -3,23 +3,36 @@ package com.zype.android;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AppCompatDelegate;
+import android.text.TextUtils;
 
+import com.amazonaws.mobile.client.AWSMobileClient;
+import com.amazonaws.mobile.client.AWSStartupHandler;
+import com.amazonaws.mobile.client.AWSStartupResult;
+import com.amazonaws.mobileconnectors.pinpoint.PinpointConfiguration;
+import com.amazonaws.mobileconnectors.pinpoint.PinpointManager;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.cast.CastMediaControlIntent;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.onesignal.OneSignal;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.MarketplaceGateway;
+import com.zype.android.aws.PushListenerService;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.StorageUtils;
@@ -56,6 +69,9 @@ public class ZypeApp extends MultiDexApplication {
     public static boolean needToLoadData = true;
     public static AppData appData;
     public static MarketplaceGateway marketplaceGateway;
+
+    // AWS
+    private static PinpointManager pinpointManager;
 
     @NonNull
     public static ZypeApp get(@NonNull Context context) {
@@ -96,7 +112,6 @@ public class ZypeApp extends MultiDexApplication {
 //                .unsubscribeWhenNotificationsAreDisabled(true)
 //                .init();
 
-//        AppCompatDelegate.setDefaultNightMode(ZypeSettings.isThemeLight() ? AppCompatDelegate.MODE_NIGHT_NO : AppCompatDelegate.MODE_NIGHT_YES);
         if (ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_LIGHT)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
@@ -287,5 +302,58 @@ public class ZypeApp extends MultiDexApplication {
 
     private void initDataRepository() {
         DataRepository.getInstance(this).getPlaylistsSync(ZypeConfiguration.getRootPlaylistId(this));
+    }
+
+    //
+    // AWS
+    //
+
+    /**
+     * Connect to AWS and initialize Pinpoint push notifications service.
+     *
+     * Called from the `LaunchActivity` because it is required activity context parameter
+     *
+     * @param context
+     */
+    public void initAWSPinPoint(Context context) {
+        // Initialize the AWS Mobile Client
+        AWSMobileClient.getInstance().initialize(context, new AWSStartupHandler() {
+            @Override
+            public void onComplete(AWSStartupResult awsStartupResult) {
+                Logger.d("AWSMobileClient is instantiated and you are connected to AWS!");
+            }
+        }).execute();
+
+        // Initialize PinpointManager
+        pinpointManager = getPinpointManager(context);
+    }
+
+    public static PinpointManager getPinpointManager(Context context) {
+        // Initialize PinpointManager
+        if (pinpointManager == null
+                || TextUtils.isEmpty(pinpointManager.getNotificationClient().getDeviceToken())) {
+            PinpointConfiguration pinpointConfig = new PinpointConfiguration(
+                    context.getApplicationContext(),
+                    AWSMobileClient.getInstance().getCredentialsProvider(),
+                    AWSMobileClient.getInstance().getConfiguration());
+
+            pinpointManager = new PinpointManager(pinpointConfig);
+
+            FirebaseInstanceId.getInstance().getInstanceId()
+                    .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                            if (task.isSuccessful()) {
+                                final String token = task.getResult().getToken();
+                                Logger.d("Registering push notifications token: " + token);
+                                pinpointManager.getNotificationClient().registerDeviceToken(token);
+                            }
+                            else {
+                                Logger.e("onComplete(): Failed: " + task.getException().getMessage());
+                            }
+                        }
+                    });
+        }
+        return pinpointManager;
     }
 }

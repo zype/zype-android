@@ -1,13 +1,21 @@
 package com.zype.android.ui.launch;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.amazonaws.mobile.client.AWSMobileClient;
+import com.amazonaws.mobile.client.AWSStartupHandler;
+import com.amazonaws.mobile.client.AWSStartupResult;
 import com.squareup.otto.Subscribe;
+import com.zype.android.BuildConfig;
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
+import com.zype.android.aws.PushListenerService;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.base.BaseActivity;
@@ -40,6 +48,20 @@ public class LaunchActivity extends BaseActivity {
         };
         mHandler = new Handler();
         mHandler.postDelayed(mJumpRunnable, SPLASH_TIME);
+
+        //
+        // AWS
+        //
+
+        // Set up AWS Pinpoint
+        if (BuildConfig.AWS_PINPOINT) {
+            // Enable PushListenerService component, that is disabled in manifest by default
+            getPackageManager().setComponentEnabledSetting(new ComponentName(this, PushListenerService.class),
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED, 0);
+            // Initialize AWS
+            ZypeApp.get(this).initAWSPinPoint(this);
+        }
+
     }
 
     @Override

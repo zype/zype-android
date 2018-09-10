@@ -11,6 +11,7 @@ buildscript {
     }
 }
 import java.text.SimpleDateFormat
+import groovy.json.JsonSlurper
 
 apply plugin: 'com.android.application'
 // TODO: Uncomment following line to use Fabric
@@ -53,6 +54,8 @@ android {
         versionCode currentCodeVersion
         buildConfigField "String", "ZYPE_TEMPLATE_VERSION", "\"${zypeTemplateVersion}\""
 
+        buildConfigField "Boolean", "AWS_PINPOINT", "true"
+
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -69,7 +72,7 @@ android {
             def int newVersionCode = currentCodeVersion + 1
             versionProperties[versionCodeKey] = newVersionCode.toString()
             store(versionPropertiesFile, versionProperties)
-        }
+            }
         debug {
             setVersionNameSuffix(".${currentCodeVersion} DEBUG [${date}]")
         }
@@ -80,17 +83,18 @@ android {
         zype {
             versionName zypeTemplateVersion
             applicationId 'com.zype.android.template'
-            manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
-                                    onesignal_app_id               : "",
-                                    onesignal_google_project_number: ""]
+            manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
+                                     onesignal_app_id: "",
+                                     onesignal_google_project_number: 'REMOTE'
+            ]
         }
         template {
             versionName '1.0.0'
             applicationId "<APPLICATION_ID>"
-            manifestPlaceholders = [manifestApplicationId          : "${applicationId}",
-                                    // TODO: Provide valid app_id and google_project_number for OneSignal
-                                    onesignal_app_id: '',
-                                    onesignal_google_project_number: 'REMOTE'
+            manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
+                                     // TODO: Provide valid app_id for OneSignal
+                                     onesignal_app_id: '',
+                                     onesignal_google_project_number: 'REMOTE'
             ]
         }
     }
@@ -185,5 +189,17 @@ dependencies {
 
     implementation files('libs/libAkamaiExoPlayerLoader.jar')
     implementation files('libs/libAndroidMediaAnalytics.jar')
+
+    // AWS
+    implementation 'com.amazonaws:aws-android-sdk-core:2.6.+'
+    implementation 'com.google.android.gms:play-services-auth:15.0.1'
+    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-messaging:17.3.0'
+    implementation 'com.amazonaws:aws-android-sdk-pinpoint:2.6.+'
+    implementation ('com.amazonaws:aws-android-sdk-mobile-client:2.6.+@aar') {
+        transitive = true
+    }
+
 }
 
+apply plugin: 'com.google.gms.google-services'
