@@ -125,8 +125,8 @@ An example of fully functional app that is using a Zype sandbox account.
  - Update your Fabric API key in [AndroidManifest.xml](https://github.com/zype/zype-android/blob/master/app/src/main/AndroidManifest.xml)
  - Uncomment init of Fabric in [ZypeApp.java](https://github.com/zype/zype-android/blob/master/app/src/main/java/com/zype/android/ZypeApp.java)
 
-**8.** To use OneSignal:
- - Uncomment init of OneSignal in [ZypeApp.java](https://github.com/zype/zype-android/blob/master/app/src/main/java/com/zype/android/ZypeApp.java)
+**8.** Integration of OneSignal push notification:
+ - Set `OneSignal` attribute in [zype_app_configuration.json](https://github.com/zype/zype-android/blob/master/app/src/template/res/raw/zype_app_configuration.json) file to `true`
  - Set `onesignal_app_id` attribute in the following code in the [build.gradle](https://github.com/zype/zype-android/blob/master/app/build.gradle):
  ```
      productFlavors {
@@ -141,6 +141,9 @@ An example of fully functional app that is using a Zype sandbox account.
      }
 ```
 
+**9.** Integration of Amazon Pinpoint push notification:
+ - Set `AWSPinpoint` attribute in [zype_app_configuration.json](https://github.com/zype/zype-android/blob/master/app/src/template/res/raw/zype_app_configuration.json) file to `true`
+ - Set up your project in the Amazon Mobile Hub, turn on Pinpoint service for the project and generate AWS configuration file for your app. Then put `awsconfiguration.json` file to the [app/src/template/res/raw](https://github.com/zype/zype-android/blob/master/app/src/template/res/raw/) folder
 
 
 ## Built With

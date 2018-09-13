@@ -106,11 +106,12 @@ public class ZypeApp extends MultiDexApplication {
 //        initFabric();
 
         // OneSignal
-        // TODO: Uncomment following line to use OneSignal
-//        OneSignal.startInit(this)
-//                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
-//                .unsubscribeWhenNotificationsAreDisabled(true)
-//                .init();
+        if (BuildConfig.ONESIGNAL) {
+            OneSignal.startInit(this)
+                    .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                    .unsubscribeWhenNotificationsAreDisabled(true)
+                    .init();
+        }
 
         if (ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_LIGHT)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -329,7 +330,6 @@ public class ZypeApp extends MultiDexApplication {
     }
 
     public static PinpointManager getPinpointManager(Context context) {
-        // Initialize PinpointManager
         if (pinpointManager == null
                 || TextUtils.isEmpty(pinpointManager.getNotificationClient().getDeviceToken())) {
             PinpointConfiguration pinpointConfig = new PinpointConfiguration(

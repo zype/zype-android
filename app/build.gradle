@@ -54,8 +54,6 @@ android {
         versionCode currentCodeVersion
         buildConfigField "String", "ZYPE_TEMPLATE_VERSION", "\"${zypeTemplateVersion}\""
 
-        buildConfigField "Boolean", "AWS_PINPOINT", "true"
-
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -100,6 +98,12 @@ android {
     }
 
     applicationVariants.all { variant ->
+//        readZypeAppConfiguration(variant)
+        def file = project.file("src/" + variant.getFlavorName() + "/res/raw/zype_app_configuration.json")
+        def json = new JsonSlurper().parseText(file.text)
+        variant.buildConfigField "Boolean", "ONESIGNAL", json.OneSignal
+        variant.buildConfigField "Boolean", "AWS_PINPOINT", json.AWSPinpoint
+
         variant.outputs.all { output ->
             def outputNameNew = "Zype-Android" + "-" + variant.productFlavors.name + "-" + variant.buildType.name +
                     "-" + variant.productFlavors.versionName + "-" + getDate() + ".apk"
