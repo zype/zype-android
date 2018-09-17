@@ -171,14 +171,17 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
             if (AuthHelper.isVideoRequiredAuthorization(holder.view.getContext(), video.id)) {
                 holder.imageLocked.setVisibility(View.VISIBLE);
                 if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
-                    holder.imageLocked.setVisibility(GONE);
                     holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
                     holder.imageLocked.setColorFilter(ContextCompat.getColor(holder.view.getContext(),
+                            R.color.icon_unlocked));
+                    holder.imageLocked.setImageAlpha(ContextCompat.getColor(holder.view.getContext(),
                             R.color.icon_unlocked));
                 }
                 else {
                     holder.imageLocked.setImageResource(R.drawable.baseline_lock_white_18);
                     holder.imageLocked.setColorFilter(ContextCompat.getColor(holder.view.getContext(),
+                            R.color.icon_locked));
+                    holder.imageLocked.setImageAlpha(ContextCompat.getColor(holder.view.getContext(),
                             R.color.icon_locked));
                 }
             }
