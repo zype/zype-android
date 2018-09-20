@@ -3,12 +3,15 @@ package com.zype.android.ui.player;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.android.exoplayer.TimeRange;
 import com.google.android.exoplayer.chunk.Format;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
@@ -194,18 +197,32 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
      *
      * @param videoId Video id
      */
-    private void loadAudioPlayerUrl(String videoId) {
+    private void loadAudioPlayerUrl(final String videoId) {
         Logger.d("loadAudioPlayerUrl(): videoId=" + videoId);
-        PlayerParamsBuilder builder = new PlayerParamsBuilder();
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            builder.addAccessToken();
+
+        if (AuthHelper.isLoggedIn()) {
+            AuthHelper.onLoggedIn(new Observer<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean isLoggedIn) {
+                    PlayerParamsBuilder builder = new PlayerParamsBuilder();
+                    if (isLoggedIn) {
+                        builder.addAccessToken();
+                    } else {
+                        builder.addAppKey();
+                    }
+                    builder.addVideoId(videoId);
+                    builder.addAudio();
+                    api.executeRequest(WebApiManager.Request.PLAYER_AUDIO, builder.build());
+                }
+            });
         }
         else {
+            PlayerParamsBuilder builder = new PlayerParamsBuilder();
             builder.addAppKey();
+            builder.addVideoId(videoId);
+            builder.addAudio();
+            api.executeRequest(WebApiManager.Request.PLAYER_AUDIO, builder.build());
         }
-        builder.addVideoId(videoId);
-        builder.addAudio();
-        api.executeRequest(WebApiManager.Request.PLAYER_AUDIO, builder.build());
     }
 
     /**

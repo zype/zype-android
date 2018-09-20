@@ -464,17 +464,13 @@ public class VideosCursorAdapter extends CursorAdapter {
             holder.imageLocked.setVisibility(View.VISIBLE);
             if (AuthHelper.isVideoAuthorized(holder.thumbnail.getContext(), holder.videoId)) {
                 holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
-                holder.imageLocked.setColorFilter(ContextCompat.getColor(holder.thumbnail.getContext(),
-                        R.color.icon_unlocked));
-                holder.imageLocked.setImageAlpha(ContextCompat.getColor(holder.thumbnail.getContext(),
-                        R.color.icon_unlocked));
+                UiUtils.setImageColor(holder.imageLocked,
+                        ContextCompat.getColor(holder.thumbnail.getContext(), R.color.icon_unlocked));
             }
             else {
                 holder.imageLocked.setImageResource(R.drawable.baseline_lock_white_18);
-                holder.imageLocked.setColorFilter(ContextCompat.getColor(holder.thumbnail.getContext(),
-                        R.color.icon_locked));
-                holder.imageLocked.setImageAlpha(ContextCompat.getColor(holder.thumbnail.getContext(),
-                        R.color.icon_locked));
+                UiUtils.setImageColor(holder.imageLocked,
+                        ContextCompat.getColor(holder.thumbnail.getContext(), R.color.icon_locked));
             }
         }
         else {

@@ -3,12 +3,14 @@ package com.zype.android;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.arch.lifecycle.Observer;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
@@ -168,9 +170,14 @@ public class ZypeApp extends MultiDexApplication {
             marketplaceGateway.setup();
         }
 
-        if (AuthHelper.isLoggedIn()) {
-            loadConsumer();
-        }
+        AuthHelper.onLoggedIn(new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean isLoggedIn) {
+                if (isLoggedIn) {
+                    loadConsumer();
+                }
+            }
+        });
     }
 
     @Override

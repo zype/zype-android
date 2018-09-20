@@ -1,18 +1,17 @@
 package com.zype.android.Auth;
 
 import android.app.Application;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
-import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.Subscription.SubscriptionHelper;
-import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.utils.Logger;
-import com.zype.android.webapi.model.video.VideoData;
+
+import java.util.Date;
 
 /**
  * Created by Evgeny Cherkasov on 21.05.2018.
@@ -20,8 +19,25 @@ import com.zype.android.webapi.model.video.VideoData;
 
 public class AuthHelper {
 
+    public static void onLoggedIn(Observer<Boolean> observer) {
+        AuthLiveData.getInstance().observeForever(observer);
+    }
+
     public static boolean isLoggedIn() {
         return SettingsProvider.getInstance().isLoggedIn();
+    }
+
+    public static boolean isAccessTokenExpired() {
+        long currentTimeInSeconds = new Date().getTime() / 1000L;
+        long expirationDateInSeconds = SettingsProvider.getInstance().getAccessTokenExpirationDate();
+        long acceptableBuffer = 60; // 1 minute
+        long interval = expirationDateInSeconds - currentTimeInSeconds;
+
+        if (interval < acceptableBuffer) {
+            return true;
+        }
+
+        return false;
     }
 
     public static boolean isVideoRequiredAuthorization(Context context, String videoId) {

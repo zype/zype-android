@@ -20,6 +20,7 @@ import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.events.UnrsolvedHostErrorEvent;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.utils.Logger;
 import com.zype.android.webapi.builder.AuthParamsBuilder;
 import com.zype.android.webapi.builder.DownloadAudioParamsBuilder;
 import com.zype.android.webapi.builder.DownloadVideoParamsBuilder;
@@ -471,11 +472,11 @@ public class WebApiManager {
             synchronized (this) {
                 // check if job was canceled during execution
                 if (!job.isCanceled()) {
-                    // We are handling refresh access token on this thread so no need to post an event
-                    if (data instanceof RefreshAccessTokenEvent) {
-                        mCurrentJob = null;
-                        return;
-                    }
+//                    // We are handling refresh access token on this thread so no need to post an event
+//                    if (data instanceof RefreshAccessTokenEvent) {
+//                        mCurrentJob = null;
+//                        return;
+//                    }
 
                     mBus.post(data);
                 }
@@ -488,6 +489,8 @@ public class WebApiManager {
         }
 
         private void handleRefreshAccessTokenEvent(RefreshAccessTokenEvent refreshAccessTokenEvent) {
+            Logger.d("handleRefreshAccessTokenEvent()");
+
             RefreshAccessToken.RefreshAccessTokenData data = refreshAccessTokenEvent.getEventData().getModelData();
             SettingsProvider.getInstance().saveAccessToken(data.getAccessToken());
             SettingsProvider.getInstance().saveExpiresIn(data.getExpiresIn());
@@ -504,7 +507,8 @@ public class WebApiManager {
                     return new ErrorEvent(job.getTicket(), job.getRequest(), mContext.getString(R.string.GENERIC_ERROR), null);
                 }
 
-                // Handling refresh token event on the same thread that all request are made on. This way we no the refresh will be complete before making any other calls
+                // Handling refresh token event on the same thread that all request are made on.
+                // This way we know the refresh will be complete before making any other calls
                 if (data instanceof RefreshAccessTokenEvent)
                     handleRefreshAccessTokenEvent((RefreshAccessTokenEvent) data);
 

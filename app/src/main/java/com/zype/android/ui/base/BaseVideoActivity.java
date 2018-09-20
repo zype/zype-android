@@ -1,5 +1,6 @@
 package com.zype.android.ui.base;
 
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -326,17 +327,31 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
 //        }
     }
 
-    protected void requestVideoUrl(String videoId) {
+    protected void requestVideoUrl(final String videoId) {
         showProgress();
-        PlayerParamsBuilder playerParamsBuilder = new PlayerParamsBuilder();
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            playerParamsBuilder.addAccessToken();
+        if (AuthHelper.isLoggedIn()) {
+            AuthHelper.onLoggedIn(new Observer<Boolean>() {
+                @Override
+                public void onChanged(@Nullable Boolean isLoggedIn) {
+                    PlayerParamsBuilder playerParamsBuilder = new PlayerParamsBuilder();
+                    if (isLoggedIn) {
+                        playerParamsBuilder.addAccessToken();
+                    }
+                    else {
+                        playerParamsBuilder.addAppKey();
+                    }
+                    playerParamsBuilder.addVideoId(videoId);
+                    getApi().executeRequest(WebApiManager.Request.PLAYER_VIDEO, playerParamsBuilder.build());
+                }
+            });
+
         }
         else {
+            PlayerParamsBuilder playerParamsBuilder = new PlayerParamsBuilder();
             playerParamsBuilder.addAppKey();
+            playerParamsBuilder.addVideoId(videoId);
+            getApi().executeRequest(WebApiManager.Request.PLAYER_VIDEO, playerParamsBuilder.build());
         }
-        playerParamsBuilder.addVideoId(videoId);
-        getApi().executeRequest(WebApiManager.Request.PLAYER_VIDEO, playerParamsBuilder.build());
     }
 
     protected void requestAudioUrl(String audioId) {

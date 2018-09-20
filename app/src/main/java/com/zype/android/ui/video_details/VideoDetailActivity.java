@@ -198,6 +198,18 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     }
 
     @Override
+    protected void onDestroy() {
+        Logger.d("onDestroy()");
+
+        Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+        video.playerAudioUrl = null;
+        video.playerVideoUrl = null;
+        DataRepository.getInstance(getApplication()).updateVideo(video);
+
+        super.onDestroy();
+    }
+
+    @Override
     protected Class<?> getActivityClass() {
         return VideoDetailActivity.class;
     }

@@ -320,6 +320,10 @@ public class SettingsProvider extends CommonPreferences {
         set(ACCESS_TOKEN_EXPIRATION_DATE, (Long)(createdAt + expiresInSeconds));
     }
 
+    public long getAccessTokenExpirationDate() {
+        return get(ACCESS_TOKEN_EXPIRATION_DATE, DEFAULT_LONG);
+    }
+
     private boolean isAccessTokenExpiring() {
         long currentTimeInSeconds = new Date().getTime()/1000L;
         long expirationDateInSeconds = get(ACCESS_TOKEN_EXPIRATION_DATE, DEFAULT_LONG);

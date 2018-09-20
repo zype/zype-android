@@ -105,6 +105,12 @@ public class UiUtils {
         Picasso.with(context).load(imgUrl).into(img, callback);
     }
 
+    public static void setImageColor(ImageView imageView, int color) {
+        imageView.clearColorFilter();
+        imageView.setColorFilter(color);
+        imageView.setImageAlpha(0xFF & (color >> 24));
+    }
+
     public static void showErrorSnackbar(@Nullable final View view, @NonNull final String text) {
         if (view == null) {
             return;
