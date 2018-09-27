@@ -194,12 +194,12 @@ dependencies {
     implementation files('libs/libAndroidMediaAnalytics.jar')
 
     // AWS
-    implementation 'com.amazonaws:aws-android-sdk-core:2.6.+'
+    implementation 'com.amazonaws:aws-android-sdk-core:2.7.+'
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
     implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation 'com.google.firebase:firebase-messaging:17.3.0'
-    implementation 'com.amazonaws:aws-android-sdk-pinpoint:2.6.+'
-    implementation ('com.amazonaws:aws-android-sdk-mobile-client:2.6.+@aar') {
+    implementation 'com.amazonaws:aws-android-sdk-pinpoint:2.7.+'
+    implementation ('com.amazonaws:aws-android-sdk-mobile-client:2.7.+@aar') {
         transitive = true
     }
 

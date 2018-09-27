@@ -229,7 +229,6 @@
         <!-- AWS -->
         <service
             android:name=".aws.PushListenerService"
-            android:enabled="false"
             >
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>

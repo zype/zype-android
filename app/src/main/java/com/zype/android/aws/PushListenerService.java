@@ -23,6 +23,13 @@ public class PushListenerService extends FirebaseMessagingService {
     public static final String INTENT_SNS_NOTIFICATION_DATA = "data";
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+
+        ZypeApp.get(this).initAWSPinPoint(this);
+    }
+
+    @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
 
