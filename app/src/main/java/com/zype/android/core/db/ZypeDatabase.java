@@ -79,6 +79,7 @@ public class ZypeDatabase extends SQLiteOpenHelper {
                 + Contract.Video.COLUMN_UPDATED_AT + TYPE_TEXT + COMMA_SEP
                 + Contract.Video.COLUMN_TRANSCODED + TYPE_INTEGER + COMMA_SEP
                 + Contract.Video.COLUMN_THUMBNAILS + TYPE_TEXT + COMMA_SEP
+                + Contract.Video.COLUMN_IMAGES + TYPE_TEXT + COMMA_SEP
                 + Contract.Video.COLUMN_HULU_ID + TYPE_TEXT + COMMA_SEP
                 + Contract.Video.COLUMN_YOUTUBE_ID + TYPE_TEXT + COMMA_SEP
                 + Contract.Video.COLUMN_CRUNCHYROLL_ID + TYPE_TEXT + COMMA_SEP
@@ -113,6 +114,7 @@ public class ZypeDatabase extends SQLiteOpenHelper {
                 + Contract.Playlist.COLUMN_PRIORITY + TYPE_INTEGER + COMMA_SEP
                 + Contract.Playlist.COLUMN_PLAYLIST_ITEM_COUNT + TYPE_INTEGER + COMMA_SEP
                 + Contract.Playlist.COLUMN_THUMBNAILS + TYPE_TEXT + COMMA_SEP
+                + Contract.Playlist.COLUMN_THUMBNAIL_LAYOUT + TYPE_TEXT + COMMA_SEP
                 + Contract.Playlist.COLUMN_IMAGES + TYPE_TEXT
                 + ");";
     }

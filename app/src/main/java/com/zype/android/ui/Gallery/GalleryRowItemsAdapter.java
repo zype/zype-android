@@ -31,6 +31,7 @@ import com.zype.android.ui.main.fragments.videos.VideosCursorAdapter;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
+import com.zype.android.webapi.model.video.Image;
 import com.zype.android.webapi.model.video.Thumbnail;
 
 import java.lang.reflect.Type;
@@ -45,14 +46,16 @@ import static android.view.View.GONE;
 public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItemsAdapter.ViewHolder> {
     private List<? extends PlaylistItem> items;
     private String playlistId;
+    private Boolean usePoster;
 
     public GalleryRowItemsAdapter() {
         items = new ArrayList<>();
     }
 
-    public void setData(List<? extends PlaylistItem> items, String playlistId) {
+    public void setData(List<? extends PlaylistItem> items, String playlistId, Boolean usePoster) {
         this.items = items;
         this.playlistId = playlistId;
+        this.usePoster = usePoster;
         notifyDataSetChanged();
     }
 
@@ -127,7 +130,19 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
     private void loadThumbnail(ViewHolder holder) {
         if (holder.item instanceof Video) {
             Video video = (Video) holder.item;
-            if (video.thumbnails != null) {
+
+            Boolean thumbnailAssigned = false;
+            if (usePoster && video.images != null) {
+                Image posterThumbnail = VideoHelper.getPosterThumbnail(video);
+                if (posterThumbnail != null) {
+                    thumbnailAssigned = true;
+                    UiUtils.loadImage(posterThumbnail.getUrl(), R.drawable.placeholder_video, holder.imageThumbnail);
+
+                    // TODO: - add logic for changing to poster thumbnail size
+                }
+            }
+
+            if (video.thumbnails != null && thumbnailAssigned == false) {
                 Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 240);
                 if (thumbnail != null) {
                     UiUtils.loadImage(thumbnail.getUrl(), R.drawable.placeholder_video, holder.imageThumbnail);

@@ -65,6 +65,7 @@ public class VideosCursorAdapter extends CursorAdapter {
     private int COL_VIDEO_TITLE = -1;
     private int COL_VIDEO_EPISODE = -1;
     private int COL_VIDEO_THUMBNAILS = -1;
+    private int COL_VIDEO_IMAGES = -1;
     private int COL_VIDEO_PUBLISHED_AT = -1;
     private int COL_VIDEO_IS_FAVORITE = -1;
     private int COL_VIDEO_IS_PLAY_STARTED = -1;
@@ -414,6 +415,7 @@ public class VideosCursorAdapter extends CursorAdapter {
         COL_VIDEO_TITLE = cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_TITLE);
         COL_VIDEO_EPISODE = cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_EPISODE);
         COL_VIDEO_THUMBNAILS = cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_THUMBNAILS);
+        COL_VIDEO_IMAGES = cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IMAGES);
         COL_VIDEO_PUBLISHED_AT = cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_PUBLISHED_AT);
         COL_VIDEO_IS_FAVORITE = cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_FAVORITE);
         COL_VIDEO_IS_PLAY_STARTED = cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_PLAY_STARTED);

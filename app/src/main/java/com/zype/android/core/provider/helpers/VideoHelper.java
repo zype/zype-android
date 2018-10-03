@@ -12,6 +12,7 @@ import com.zype.android.webapi.model.player.Analytics;
 import com.zype.android.webapi.model.player.AnalyticsDimensions;
 import com.zype.android.webapi.model.search.Segment;
 import com.zype.android.webapi.model.video.Category;
+import com.zype.android.webapi.model.video.Image;
 import com.zype.android.webapi.model.video.Thumbnail;
 import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.webapi.model.video.VideoZobject;
@@ -69,6 +70,7 @@ public class VideoHelper {
         contentValues.put(Contract.Video.COLUMN_TITLE, videoData.getTitle());
         contentValues.put(Contract.Video.COLUMN_UPDATED_AT, videoData.getUpdatedAt());
         contentValues.put(Contract.Video.COLUMN_THUMBNAILS, new Gson().toJson(videoData.getThumbnails()));
+        contentValues.put(Contract.Video.COLUMN_IMAGES, new Gson().toJson(videoData.getImages()));
         contentValues.put(Contract.Video.COLUMN_TRANSCODED, videoData.isTranscoded() ? 1 : 0);
         contentValues.put(Contract.Video.COLUMN_HULU_ID, videoData.getHuluId());
         contentValues.put(Contract.Video.COLUMN_YOUTUBE_ID, videoData.getYoutubeId());
@@ -135,6 +137,16 @@ public class VideoHelper {
                 Type thumbnailType = new TypeToken<List<Thumbnail>>() {
                 }.getType();
                 video.setThumbnails(gson.<List<Thumbnail>>fromJson(cursor.getString(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_THUMBNAILS)), thumbnailType));
+            }
+        } catch (IllegalStateException e) {
+            Logger.e("objectFromCursor", e);
+        }
+
+        try {
+            if (cursor.getString(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IMAGES)) != null) {
+                Type imageType = new TypeToken<List<Image>>() {
+                }.getType();
+                video.setImages(gson.<List<Image>>fromJson(cursor.getString(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IMAGES)), imageType));
             }
         } catch (IllegalStateException e) {
             Logger.e("objectFromCursor", e);
@@ -364,6 +376,26 @@ public class VideoHelper {
                     if (Math.abs(height - thumbnail.getHeight()) < Math.abs(height - result.getHeight())) {
                         result = thumbnail;
                     }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static Image getPosterThumbnail(Video video) {
+        Type imageType = new TypeToken<List<Image>>(){}.getType();
+        List<Image> images = new Gson().fromJson(video.images, imageType);
+
+        return getPosterFromImages(images);
+    }
+
+    public static Image getPosterFromImages(List<Image> images) {
+        Image result = null;
+        if (images != null && images.size() > 0) {
+            for (Image image : images) {
+                if (image.getLayout().equals("poster")) {
+                    result = image;
+                    break;
                 }
             }
         }

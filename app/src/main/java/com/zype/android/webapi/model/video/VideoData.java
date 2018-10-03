@@ -159,6 +159,10 @@ public class VideoData {
     private List<Thumbnail> thumbnails = new ArrayList<>();
 
     @Nullable
+    @Expose
+    private List<Image> images = new ArrayList<>();
+
+    @Nullable
     @SerializedName("hulu_id")
     @Expose
     private String huluId;
@@ -657,6 +661,21 @@ public class VideoData {
      */
     public void setThumbnails(@Nullable List<Thumbnail> thumbnails) {
         this.thumbnails = thumbnails;
+    }
+
+    /**
+     * @return The video images
+     */
+    @Nullable
+    public List<Image> getImages() {
+        return images;
+    }
+
+    /**
+     * @param images The video images
+     */
+    public void setImages(@Nullable List<Image> images) {
+        this.images = images;
     }
 
     /**
