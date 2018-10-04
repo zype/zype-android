@@ -47,13 +47,13 @@ import static android.view.View.GONE;
 public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItemsAdapter.ViewHolder> {
     private List<? extends PlaylistItem> items;
     private String playlistId;
-    private Boolean usePoster;
+    private boolean usePoster;
 
     public GalleryRowItemsAdapter() {
         items = new ArrayList<>();
     }
 
-    public void setData(List<? extends PlaylistItem> items, String playlistId, Boolean usePoster) {
+    public void setData(List<? extends PlaylistItem> items, String playlistId, boolean usePoster) {
         this.items = items;
         this.playlistId = playlistId;
         this.usePoster = usePoster;
@@ -132,7 +132,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
         if (holder.item instanceof Video) {
             Video video = (Video) holder.item;
 
-            Boolean thumbnailAssigned = false;
+            boolean thumbnailAssigned = false;
             if (usePoster && video.images != null) {
                 Image posterThumbnail = VideoHelper.getPosterThumbnail(video);
                 if (posterThumbnail != null) {
