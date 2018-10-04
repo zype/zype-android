@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -138,7 +139,18 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                     thumbnailAssigned = true;
                     UiUtils.loadImage(posterThumbnail.getUrl(), R.drawable.placeholder_video, holder.imageThumbnail);
 
-                    // TODO: - add logic for changing to poster thumbnail size
+                    // TODO: Add a way to programmatically set the poster thumbnail size
+                    float density = holder.view.getResources()
+                            .getDisplayMetrics()
+                            .density;
+                    // calculate pixels from dp
+                    int posterWidth = Math.round((float) 90 * density);
+                    int posterHeight = Math.round((float) 160 * density);
+
+                    CardView cardView = holder.view.findViewById(R.id.galleryItemCardView);
+                    ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
+                    layoutParams.width = posterWidth;
+                    layoutParams.height = posterHeight;
                 }
             }
 
