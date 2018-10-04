@@ -51,7 +51,7 @@ public class AuthHelper {
         }
         if (Integer.valueOf(video.purchaseRequired) == 1) {
             if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
-                if (video.isEntitled == 1) {
+                if (Integer.valueOf(video.isEntitled) == 1) {
                     return true;
                 }
                 else {

@@ -32,6 +32,9 @@ public class Playlist implements PlaylistItem {
     @ColumnInfo(name = "images")
     public String images;
 
+    @ColumnInfo(name = "thumbnail_layout")
+    public String thumbnailLayout;
+
     @ColumnInfo(name = "parent_id")
     public String parentId;
 

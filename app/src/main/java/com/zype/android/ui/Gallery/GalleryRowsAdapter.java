@@ -41,11 +41,14 @@ public class GalleryRowsAdapter extends RecyclerView.Adapter<GalleryRowsAdapter.
     public void onBindViewHolder(final GalleryRowsAdapter.ViewHolder holder, int position) {
         holder.item = rows.get(position);
         holder.textTitle.setText(holder.item.playlist.title);
+
+        Boolean usePoster = holder.item.playlist.thumbnailLayout.equals("poster");
+
         if (holder.item.playlist.playlistItemCount > 0) {
-            holder.itemsAdapter.setData(holder.item.videos, holder.item.playlist.id);
+            holder.itemsAdapter.setData(holder.item.videos, holder.item.playlist.id, usePoster);
         }
         else {
-            holder.itemsAdapter.setData(holder.item.nestedPlaylists, holder.item.playlist.id);
+            holder.itemsAdapter.setData(holder.item.nestedPlaylists, holder.item.playlist.id, usePoster);
         }
     }
 

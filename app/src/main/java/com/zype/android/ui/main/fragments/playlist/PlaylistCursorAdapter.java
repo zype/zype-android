@@ -37,6 +37,7 @@ public class PlaylistCursorAdapter extends CursorAdapter {
     private int COL_PLAYLIST_PARENT_ID = -1;
     private int COL_PLAYLIST_ITEM_COUNT = -1;
     private int COL_PLAYLIST_IMAGES = -1;
+    private int COL_THUMBNAIL_LAYOUT = -1;
 
     // Title of playlist thumbnail
     private String PLAYLIST_THUMBNAIL_TITLE = "mobile";
@@ -111,6 +112,7 @@ public class PlaylistCursorAdapter extends CursorAdapter {
         viewHolder.playlistId = cursor.getString(COL_PLAYLIST_ID);
         viewHolder.parentId = cursor.getString(COL_PLAYLIST_PARENT_ID);
         viewHolder.playlistItemCount = cursor.getInt(COL_PLAYLIST_ITEM_COUNT);
+        viewHolder.thumbnailLayout = cursor.getString(COL_THUMBNAIL_LAYOUT);
        /* viewHolder.isFavorite = cursor.getInt(COL_VIDEO_IS_FAVORITE) == 1;
 //        viewHolder.isDownloaded = cursor.getInt(COL_VIDEO_IS_DOWNLOADED) == 1;
         viewHolder.isVideoDownloaded = cursor.getInt(COL_VIDEO_IS_VIDEO_DOWNLOADED) == 1;
@@ -215,6 +217,7 @@ public class PlaylistCursorAdapter extends CursorAdapter {
         COL_PLAYLIST_PARENT_ID = cursor.getColumnIndexOrThrow(Contract.Playlist.COLUMN_PARENT_ID);
         COL_PLAYLIST_ITEM_COUNT = cursor.getColumnIndexOrThrow(Contract.Playlist.COLUMN_PLAYLIST_ITEM_COUNT);
         COL_PLAYLIST_IMAGES = cursor.getColumnIndexOrThrow(Contract.Playlist.COLUMN_IMAGES);
+        COL_THUMBNAIL_LAYOUT = cursor.getColumnIndexOrThrow(Contract.Playlist.COLUMN_THUMBNAIL_LAYOUT);
     }
 
     public class PlaylistViewHolder {
@@ -224,6 +227,7 @@ public class PlaylistCursorAdapter extends CursorAdapter {
         public ProgressBar progressBar;
         public String parentId;
         public int playlistItemCount;
+        public String thumbnailLayout;
     }
 
 }

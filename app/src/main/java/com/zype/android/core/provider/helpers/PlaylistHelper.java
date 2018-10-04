@@ -33,6 +33,7 @@ public class PlaylistHelper {
         contentValues.put(Contract.Playlist.COLUMN_PRIORITY, playlistData.getPriority());
         contentValues.put(Contract.Playlist.COLUMN_PARENT_ID, playlistData.getParentId());
         contentValues.put(Contract.Playlist.COLUMN_THUMBNAILS, new Gson().toJson(playlistData.getThumbnails()));
+        contentValues.put(Contract.Playlist.COLUMN_THUMBNAIL_LAYOUT, playlistData.getThumbnailLayout());
         contentValues.put(Contract.Playlist.COLUMN_PLAYLIST_ITEM_COUNT, playlistData.getPlaylistItemCount() );
         contentValues.put(Contract.Playlist.COLUMN_IMAGES, new Gson().toJson(playlistData.getImages()));
 

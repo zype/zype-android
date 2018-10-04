@@ -58,6 +58,10 @@ public class PlaylistData {
     @Expose
     private int playlistItemCount;
 
+    @SerializedName("thumbnail_layout")
+    @Expose
+    private String thumbnailLayout;
+
     @Expose
     private List<String> values = new ArrayList<>();
 
@@ -245,6 +249,17 @@ public class PlaylistData {
     public void setPlaylistItemCount(int playlistItemCount) {
         this.playlistItemCount = playlistItemCount;
     }
+
+    /**
+     * @return The thumbnail_layout
+     */
+    public String getThumbnailLayout() { return thumbnailLayout; }
+
+    /**
+     * @param thumbnailLayout
+     * The thumbnail layout
+     */
+    public void setThumbnailLayout(String thumbnailLayout) { this.thumbnailLayout = thumbnailLayout; }
 
     /**
      *
