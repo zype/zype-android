@@ -77,6 +77,7 @@ public class Contract {
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_UPDATED_AT = "updated_at";
         public static final String COLUMN_THUMBNAILS = "thumbnails";
+        public static final String COLUMN_IMAGES = "images";
         public static final String COLUMN_TRANSCODED = "transcoded";
         public static final String COLUMN_HULU_ID = "hulu_id";
         public static final String COLUMN_YOUTUBE_ID = "youtube_id";
@@ -109,13 +110,14 @@ public class Contract {
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_THUMBNAILS = "thumbnails";
+        public static final String COLUMN_IMAGES = "images";
         public static final String COLUMN_PARENT_ID = "parent_id";
         public static final String COLUMN_CREATED_AT = "created_at";
         public static final String COLUMN_DELETED_AT = "deleted_at";
         public static final String COLUMN_UPDATED_AT = "updated_at";
         public static final String COLUMN_PRIORITY = "priority";
         public static final String COLUMN_PLAYLIST_ITEM_COUNT = "playlist_item_count";
-        public static final String COLUMN_IMAGES = "images";
+        public static final String COLUMN_THUMBNAIL_LAYOUT = "thumbnail_layout";
 
     }
 

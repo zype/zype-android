@@ -5,6 +5,7 @@ import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.webapi.model.playlist.PlaylistData;
+import com.zype.android.webapi.model.video.Image;
 import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class DbHelper {
             playlistEntity.playlistItemCount = item.getPlaylistItemCount();
             playlistEntity.priority = item.getPriority();
             playlistEntity.thumbnails = new Gson().toJson(item.getThumbnails());
+            playlistEntity.thumbnailLayout = item.getThumbnailLayout();
             playlistEntity.title = item.getTitle();
             playlistEntity.updatedAt = item.getUpdatedAt();
             result.add(playlistEntity);
@@ -82,6 +84,7 @@ public class DbHelper {
         entity.status = videoData.getStatus();
         entity.subscriptionRequired = String.valueOf(videoData.isSubscriptionRequired() ? 1 : 0);
         entity.thumbnails = new Gson().toJson(videoData.getThumbnails());
+        entity.images = new Gson().toJson(videoData.getImages());
         entity.title = videoData.getTitle();
         entity.transcoded = videoData.isTranscoded() ? 1 : 0;
         entity.updatedAt = videoData.getUpdatedAt();

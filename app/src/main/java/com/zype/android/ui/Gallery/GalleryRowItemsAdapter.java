@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,7 @@ import com.zype.android.ui.main.fragments.videos.VideosCursorAdapter;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
+import com.zype.android.webapi.model.video.Image;
 import com.zype.android.webapi.model.video.Thumbnail;
 
 import java.lang.reflect.Type;
@@ -45,14 +47,16 @@ import static android.view.View.GONE;
 public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItemsAdapter.ViewHolder> {
     private List<? extends PlaylistItem> items;
     private String playlistId;
+    private boolean usePoster;
 
     public GalleryRowItemsAdapter() {
         items = new ArrayList<>();
     }
 
-    public void setData(List<? extends PlaylistItem> items, String playlistId) {
+    public void setData(List<? extends PlaylistItem> items, String playlistId, boolean usePoster) {
         this.items = items;
         this.playlistId = playlistId;
+        this.usePoster = usePoster;
         notifyDataSetChanged();
     }
 
@@ -127,7 +131,30 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
     private void loadThumbnail(ViewHolder holder) {
         if (holder.item instanceof Video) {
             Video video = (Video) holder.item;
-            if (video.thumbnails != null) {
+
+            boolean thumbnailAssigned = false;
+            if (usePoster && video.images != null) {
+                Image posterThumbnail = VideoHelper.getPosterThumbnail(video);
+                if (posterThumbnail != null) {
+                    thumbnailAssigned = true;
+                    UiUtils.loadImage(posterThumbnail.getUrl(), R.drawable.placeholder_video, holder.imageThumbnail);
+
+                    // TODO: Add a way to programmatically set the poster thumbnail size
+                    float density = holder.view.getResources()
+                            .getDisplayMetrics()
+                            .density;
+                    // calculate pixels from dp
+                    int posterWidth = Math.round((float) 90 * density);
+                    int posterHeight = Math.round((float) 160 * density);
+
+                    CardView cardView = holder.view.findViewById(R.id.galleryItemCardView);
+                    ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
+                    layoutParams.width = posterWidth;
+                    layoutParams.height = posterHeight;
+                }
+            }
+
+            if (video.thumbnails != null && thumbnailAssigned == false) {
                 Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 240);
                 if (thumbnail != null) {
                     UiUtils.loadImage(thumbnail.getUrl(), R.drawable.placeholder_video, holder.imageThumbnail);

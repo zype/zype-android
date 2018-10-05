@@ -180,6 +180,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "thumbnails")
     public String thumbnails;
 
+    @ColumnInfo(name = "images")
+    public String images;
+
     @ColumnInfo(name = "transcoded")
     public Integer transcoded;
 
