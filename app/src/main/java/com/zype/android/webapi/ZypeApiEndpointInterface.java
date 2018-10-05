@@ -131,7 +131,7 @@ public interface ZypeApiEndpointInterface {
     @GET("/plans/{plan_id}")
     Plan getPlan(@Path("plan_id") String planId, @QueryMap HashMap<String, String> getParams);
 
-    // VideoList entitlements
+    // Video entitlements
     @GET("/videos/{video_id}/entitled/")
     VideoEntitlement checkVideoEntitlement(@Path("video_id") String videoId, @QueryMap HashMap<String, String> getParams);
 

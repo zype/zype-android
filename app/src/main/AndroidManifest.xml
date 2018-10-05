@@ -234,6 +234,12 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+        <receiver
+            android:name="com.amazonaws.mobileconnectors.pinpoint.targeting.notification.PinpointNotificationReceiver">
+            <intent-filter>
+                <action android:name="com.amazonaws.intent.baidu.NOTIFICATION_OPEN" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
