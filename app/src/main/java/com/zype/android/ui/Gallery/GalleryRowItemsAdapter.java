@@ -62,7 +62,12 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
 
     @Override
     public GalleryRowItemsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_row_list_item, parent, false);
+        View view;
+        if (usePoster) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_row_poster_list_item, parent, false);
+        } else {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_row_list_item, parent, false);
+        }
         return new GalleryRowItemsAdapter.ViewHolder(view);
     }
 
@@ -138,19 +143,6 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                 if (posterThumbnail != null) {
                     thumbnailAssigned = true;
                     UiUtils.loadImage(posterThumbnail.getUrl(), R.drawable.placeholder_video, holder.imageThumbnail);
-
-                    // TODO: Add a way to programmatically set the poster thumbnail size
-                    float density = holder.view.getResources()
-                            .getDisplayMetrics()
-                            .density;
-                    // calculate pixels from dp
-                    int posterWidth = Math.round((float) 90 * density);
-                    int posterHeight = Math.round((float) 160 * density);
-
-                    CardView cardView = holder.view.findViewById(R.id.galleryItemCardView);
-                    ViewGroup.LayoutParams layoutParams = cardView.getLayoutParams();
-                    layoutParams.width = posterWidth;
-                    layoutParams.height = posterHeight;
                 }
             }
 
