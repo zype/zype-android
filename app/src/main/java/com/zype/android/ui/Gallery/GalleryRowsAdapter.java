@@ -33,7 +33,7 @@ public class GalleryRowsAdapter extends RecyclerView.Adapter<GalleryRowsAdapter.
     public GalleryRowsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_list_item, parent, false);
         ViewHolder holder = new GalleryRowsAdapter.ViewHolder(view);
-        holder.listPlaylistItems.setRecycledViewPool(viewPool);
+//        holder.listPlaylistItems.setRecycledViewPool(viewPool);
         return holder;
     }
 
@@ -43,12 +43,14 @@ public class GalleryRowsAdapter extends RecyclerView.Adapter<GalleryRowsAdapter.
         holder.textTitle.setText(holder.item.playlist.title);
 
         Boolean usePoster = holder.item.playlist.thumbnailLayout.equals("poster");
+        holder.itemsAdapter = new GalleryRowItemsAdapter(usePoster);
+        holder.listPlaylistItems.setAdapter(holder.itemsAdapter);
 
         if (holder.item.playlist.playlistItemCount > 0) {
-            holder.itemsAdapter.setData(holder.item.videos, holder.item.playlist.id, usePoster);
+            holder.itemsAdapter.setData(holder.item.videos, holder.item.playlist.id);
         }
         else {
-            holder.itemsAdapter.setData(holder.item.nestedPlaylists, holder.item.playlist.id, usePoster);
+            holder.itemsAdapter.setData(holder.item.nestedPlaylists, holder.item.playlist.id);
         }
     }
 
@@ -69,9 +71,6 @@ public class GalleryRowsAdapter extends RecyclerView.Adapter<GalleryRowsAdapter.
             this.view = view;
             textTitle = view.findViewById(R.id.textTitle);
             listPlaylistItems = view.findViewById(R.id.listPlaylistItems);
-
-            itemsAdapter = new GalleryRowItemsAdapter();
-            listPlaylistItems.setAdapter(itemsAdapter);
         }
     }
 

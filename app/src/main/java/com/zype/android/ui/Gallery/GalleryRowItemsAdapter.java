@@ -49,14 +49,14 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
     private String playlistId;
     private boolean usePoster;
 
-    public GalleryRowItemsAdapter() {
+    public GalleryRowItemsAdapter(boolean usePoster) {
         items = new ArrayList<>();
+         this.usePoster = usePoster;
     }
 
-    public void setData(List<? extends PlaylistItem> items, String playlistId, boolean usePoster) {
+    public void setData(List<? extends PlaylistItem> items, String playlistId) {
         this.items = items;
         this.playlistId = playlistId;
-        this.usePoster = usePoster;
         notifyDataSetChanged();
     }
 
