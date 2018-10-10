@@ -205,4 +205,5 @@ dependencies {
 
 }
 
-apply plugin: 'com.google.gms.google-services'
+// Uncomment below line if using AWS Pinpoint
+// apply plugin: 'com.google.gms.google-services'

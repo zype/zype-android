@@ -8,6 +8,7 @@ import com.amazonaws.mobileconnectors.pinpoint.targeting.notification.Notificati
 import com.amazonaws.mobileconnectors.pinpoint.targeting.notification.NotificationDetails;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.zype.android.BuildConfig;
 import com.zype.android.ZypeApp;
 import com.zype.android.utils.Logger;
 
@@ -26,7 +27,9 @@ public class PushListenerService extends FirebaseMessagingService {
     public void onCreate() {
         super.onCreate();
 
-        ZypeApp.get(this).initAWSPinPoint(this);
+        if (BuildConfig.AWS_PINPOINT) {
+            ZypeApp.get(this).initAWSPinPoint(this);
+        }
     }
 
     @Override
