@@ -268,7 +268,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     @Override
     public void onVideoFormatEnabled(Format format, int trigger, long mediaTimeMs) {
         Logger.i("onVideoFormatEnabled()");
-        if (getPlayerMode().getValue() == PlayerMode.VIDEO && format.codecs.equals("mp4a.40.2")) {
+        if (getPlayerMode().getValue() == PlayerMode.VIDEO && format.codecs != null && format.codecs.equals("mp4a.40.2")) {
             Video video = repo.getVideoSync(videoId);
             video.playerVideoUrl = null;
             repo.updateVideo(video);

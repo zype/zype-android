@@ -142,6 +142,7 @@ An example of fully functional app that is using a Zype sandbox account.
 ```
 
 **9.** Integration of Amazon Pinpoint push notification:
+ - Uncomment `apply plugin: 'com.google.gms.google-services'` in [app/build.gradle](https://github.com/zype/zype-android/blob/master/app/build.gradle)
  - Set `AWSPinpoint` attribute in [zype_app_configuration.json](https://github.com/zype/zype-android/blob/master/app/src/template/res/raw/zype_app_configuration.json) file to `true`
  - Set up your project in the Amazon Mobile Hub, turn on Pinpoint service for the project and generate AWS configuration file for your app. Then put `awsconfiguration.json` file to the [app/src/template/res/raw](https://github.com/zype/zype-android/blob/master/app/src/template/res/raw/) folder
 
