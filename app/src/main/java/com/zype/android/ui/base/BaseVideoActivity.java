@@ -306,8 +306,6 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
 
     private void showFragment(Fragment fragment) {
         hideProgress();
-//        Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
-//        if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
         if (mInterface != null) {
             mInterface.stop();
         }
@@ -315,16 +313,9 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (fragment instanceof MediaControlInterface) {
             mInterface = (MediaControlInterface) fragment;
-//                if (mInterface == null) {
-//                    throw new IllegalStateException("mInterface is null");
-//                }
         }
         fragmentTransaction.replace(R.id.video_container, fragment, FRAGMENT_TAG_PLAYER);
         fragmentTransaction.commit();
-//        }
-//        else {
-//            Logger.i("showFragment(): Video " + mVideoId + "is live event and isn't on air yet.");
-//        }
     }
 
     protected void requestVideoUrl(final String videoId) {
@@ -597,7 +588,6 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
                 } else {
                     url = videoData.getPlayerAudioUrl();
                 }
-//                url = videoData.getPlayerAudioUrl();
                 break;
             case PlayerFragment.TYPE_AUDIO_LOCAL:
                 url = videoData.getDownloadAudioUrl();
@@ -703,20 +693,12 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PLAYER);
-//        if (fragment instanceof PlayerFragment) {
-//            ((PlayerFragment) fragment).onBackPressed();
-//        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-//                FragmentManager fragmentManager = getSupportFragmentManager();
-//                Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PLAYER);
-//                ((PlayerFragment) fragment).onBackPressed();
                 onBackPressed();
                 return true;
             default:
@@ -749,7 +731,6 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             if (mType == TYPE_UNKNOWN) {
                 mType = getMediaType(VideoHelper.getFullData(getContentResolver(), mVideoId));
             }
-//            getDownloadUrls(mVideoId);
         } else {
             mType = TYPE_WEB;
             Logger.e("VideoId is empty !!");// но тут должен быть путь
@@ -764,21 +745,6 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             }
         }
     }
-
-//    @Override
-//    public void onFullscreenChanged(boolean isFullscreen) {
-//        if (isFullscreen) {
-//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-//            mActionBar.hide();
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-//        } else {
-//            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-//            mActionBar.show();
-//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-//        }
-//    }
 
     // //////////
     // UI

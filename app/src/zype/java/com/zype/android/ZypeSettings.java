@@ -5,21 +5,21 @@ package com.zype.android;
  */
 
 public class ZypeSettings {
-//    // Zype app key
-//    public static final String APP_KEY = "iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l";
-//    // OAuth credentials
-//    public static final String CLIENT_ID = "62f1d247b4c5e77b6111d9a9ed8b3b64bab6be66cc8b7513a928198083cd1c72";
-//    public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
-//    // Playlist
-//    public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
-
     // Zype app key
-    public static final String APP_KEY = "DV8vhDumvxPh2ieCfjOzuQQdn0zSOZ-otnGALBnzFAqtIO-feZbsSwKXy3DA_JhK";
+    public static final String APP_KEY = "iBjj-jnjT12tQGmyeOR9op8_RjsGmT1Nq5OEETkbxOXnNmDE1m9MrB0wpti0__9l";
     // OAuth credentials
-    public static final String CLIENT_ID = "fb40dd8a2bc4ae7c7d66054936f185b04d21b8165990ed27c3d64eaaa9146bb6";
-//    public static final String CLIENT_SECRET = "068b42f2487e00dde76707668a9edd9dd2fe16e3b5c34ac450419bf43c61034e";
+    public static final String CLIENT_ID = "62f1d247b4c5e77b6111d9a9ed8b3b64bab6be66cc8b7513a928198083cd1c72";
+//    public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "5807ccdc849e2d0d11000146";
+    public static final String ROOT_PLAYLIST_ID = "577e65c85577de0d1000c1ee";
+
+//    // Zype app key
+//    public static final String APP_KEY = "DV8vhDumvxPh2ieCfjOzuQQdn0zSOZ-otnGALBnzFAqtIO-feZbsSwKXy3DA_JhK";
+//    // OAuth credentials
+//    public static final String CLIENT_ID = "fb40dd8a2bc4ae7c7d66054936f185b04d21b8165990ed27c3d64eaaa9146bb6";
+////    public static final String CLIENT_SECRET = "068b42f2487e00dde76707668a9edd9dd2fe16e3b5c34ac450419bf43c61034e";
+//    // Playlist
+//    public static final String ROOT_PLAYLIST_ID = "5807ccdc849e2d0d11000146";
 
 
     // Google Analytics Tracking Id
