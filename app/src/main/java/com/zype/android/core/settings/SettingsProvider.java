@@ -613,7 +613,7 @@ public class SettingsProvider extends CommonPreferences {
     }
 
     public int getLiveStreamLimit() {
-        return get(LIVE_STREAM_LIMIT, 600);
+        return get(LIVE_STREAM_LIMIT, 0);
     }
 
     public void saveLiveStreamMessage(String message) {

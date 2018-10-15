@@ -1339,6 +1339,9 @@ public class PlayerFragment extends BaseFragment implements
     // Limiting live stream
     //
     private void startTimer() {
+        // Live stream limit is 0 means limit live stream feature is turned off
+        if (SettingsProvider.getInstance().getLiveStreamLimit() == 0) return;
+
         if (handlerTimer != null) {
             runnableTimer = new Runnable() {
                 @Override
