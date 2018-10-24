@@ -20,6 +20,8 @@ In the gallery view you can manage following UI options:
 
 - `PLAYLIST_GALLERY_HERO_IMAGES` - Hero images carousel will be displayed above the playlist rows, when this option is set ti `true`. Each hero image is clickable and linked to the specified playlist. The `Top Playlist` zobject in the platform is used to link playlists to hero images.
 
+- **Poster style thumbnails** - When Gallery View is set, "poster" style thumbnails are available if they have been configured on the Zype Admin. For more information see **[here](https://support.zype.com/hc/en-us/articles/115011367848)**
+
 ## Video placeholders
 
 The placeholder is used for videos that doesn't have thumbnails.
