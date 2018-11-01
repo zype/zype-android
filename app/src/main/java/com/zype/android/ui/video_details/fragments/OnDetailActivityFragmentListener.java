@@ -15,9 +15,9 @@ public interface OnDetailActivityFragmentListener {
 
     void onDownloadAudio(String videoId);
 
-    void onShowAudio();
+//    void onShowAudio();
 
-    void onShowVideo();
+//    void onShowVideo();
 
     void onFavorite(String videoId);
 

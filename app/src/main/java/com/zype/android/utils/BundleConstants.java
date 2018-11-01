@@ -13,7 +13,7 @@ public class BundleConstants {
 
     public static final String MEDIA_TYPE = "MediaType";
     public static final String PLAYLIST_ID = "PlaylistId";
-    public static final String VIDEO_ID = "VIDEO_ID";
+    public static final String VIDEO_ID = "VideoId";
 
     public static final String WEB_ACTIVITY_TITLE = "WEB_ACTIVITY_TITLE";
     public static final String WEB_ACTIVITY_URL = "WEB_ACTIVITY_URL";

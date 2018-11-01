@@ -14,6 +14,7 @@ import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.ui.dialog.VideoMenuDialogFragment;
 import com.zype.android.ui.player.PlayerViewModel;
+import com.zype.android.ui.video_details.VideoDetailViewModel;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
 import com.zype.android.ui.main.fragments.videos.VideosMenuItem;
 import com.zype.android.ui.player.PlayerFragment;
@@ -71,6 +72,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     private boolean playAsVideo = true;
 
     private PlayerViewModel playerViewModel;
+    private VideoDetailViewModel videoDetailViewModel;
 
     private OnDetailActivityFragmentListener mListener;
 
@@ -220,6 +222,9 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                     }
                 }
             });
+
+            videoDetailViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
+
         }
         else
             {
@@ -478,7 +483,8 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                 isFavorite = !isFavorite;
                 if (isFavorite) {
                     mListener.onFavorite(videoId);
-                } else {
+                }
+                else {
                     mListener.onUnFavorite(videoId);
                 }
                 mAdapter.changeList(getOptionsList(playerViewModel.getAvailablePlayerModes().getValue()));

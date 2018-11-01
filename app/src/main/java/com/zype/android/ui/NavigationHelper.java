@@ -149,7 +149,8 @@ public class NavigationHelper {
     }
 
     public void switchToVideoDetailsScreen(Activity activity, String videoId, String playlistId, boolean autoplay) {
-        Intent intent = new Intent(activity, VideoDetailActivity.class);
+//        Intent intent = new Intent(activity, VideoDetailActivity.class);
+        Intent intent = new Intent(activity, com.zype.android.ui.video_details.v2.VideoDetailActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(BundleConstants.VIDEO_ID, videoId);
         bundle.putString(BundleConstants.PLAYLIST_ID, playlistId);

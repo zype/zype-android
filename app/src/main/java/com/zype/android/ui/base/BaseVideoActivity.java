@@ -361,43 +361,43 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         }
     }
 
-    @Override
-    public void onShowVideo() {
-        if (mInterface != null) {
-            mInterface.stop();
-        }
-        VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
-        if (!TextUtils.isEmpty(videoData.getDownloadVideoPath())) {
-            mType = PlayerFragment.TYPE_VIDEO_LOCAL;
-        } else if (!TextUtils.isEmpty(videoData.getPlayerVideoUrl())) {
-            mType = PlayerFragment.TYPE_VIDEO_WEB;
-        } else {
-            requestVideoUrl(mVideoId);
-        }
-        changeFragment(false);
-    }
-
+//    @Override
+//    public void onShowVideo() {
+//        if (mInterface != null) {
+//            mInterface.stop();
+//        }
+//        VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
+//        if (!TextUtils.isEmpty(videoData.getDownloadVideoPath())) {
+//            mType = PlayerFragment.TYPE_VIDEO_LOCAL;
+//        } else if (!TextUtils.isEmpty(videoData.getPlayerVideoUrl())) {
+//            mType = PlayerFragment.TYPE_VIDEO_WEB;
+//        } else {
+//            requestVideoUrl(mVideoId);
+//        }
+//        changeFragment(false);
+//    }
+//
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
 
-    @Override
-    public void onShowAudio() {
-        if (mInterface != null) {
-            mInterface.stop();
-        }
-        VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
-        if (!TextUtils.isEmpty(videoData.getDownloadAudioPath())) {
-            mType = PlayerFragment.TYPE_AUDIO_LOCAL;
-        } else if (!TextUtils.isEmpty(videoData.getPlayerAudioUrl())) {
-            mType = PlayerFragment.TYPE_AUDIO_WEB;
-        } else {
-            requestAudioUrl(mVideoId);
-        }
-        changeFragment(false);
-    }
-
+//    @Override
+//    public void onShowAudio() {
+//        if (mInterface != null) {
+//            mInterface.stop();
+//        }
+//        VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
+//        if (!TextUtils.isEmpty(videoData.getDownloadAudioPath())) {
+//            mType = PlayerFragment.TYPE_AUDIO_LOCAL;
+//        } else if (!TextUtils.isEmpty(videoData.getPlayerAudioUrl())) {
+//            mType = PlayerFragment.TYPE_AUDIO_WEB;
+//        } else {
+//            requestAudioUrl(mVideoId);
+//        }
+//        changeFragment(false);
+//    }
+//
     @Override
     public void videoStarted() {
         hideProgress();

@@ -6,6 +6,8 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import com.zype.android.Db.Entity.AdSchedule;
+import com.zype.android.Db.Entity.AnalyticBeacon;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
@@ -58,5 +60,27 @@ public interface ZypeDao {
 
     @Insert(onConflict = IGNORE)
     public void insertVideos(List<Video> videos);
+
+    // Ad schedule
+
+    @Query("SELECT * FROM ad_schedule WHERE ad_schedule.video_id = :videoId ORDER BY ad_schedule.'offset'")
+    public List<AdSchedule> getAdScheduleSync(String videoId);
+
+    @Query("DELETE FROM ad_schedule WHERE ad_schedule.video_id = :videoId")
+    public void deleteAdSchedule(String videoId);
+
+    @Insert(onConflict = IGNORE)
+    public void insertAdSchedule(List<AdSchedule> schedule);
+
+    // Analytics beacon
+
+    @Query("SELECT * FROM analytic_beacon WHERE analytic_beacon.video_id = :videoId LIMIT 1")
+    public AnalyticBeacon getAnalyticsBeaconSync(String videoId);
+
+    @Query("DELETE FROM analytic_beacon WHERE analytic_beacon.video_id = :videoId")
+    public void deleteAnalyticsBeacon(String videoId);
+
+    @Insert(onConflict = IGNORE)
+    public void insertAnalyticsBeacon(AnalyticBeacon beacon);
 
 }

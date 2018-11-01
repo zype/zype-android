@@ -1,9 +1,14 @@
 package com.zype.android.Db;
 
 import com.google.gson.Gson;
+import com.zype.android.Db.Entity.AdSchedule;
+import com.zype.android.Db.Entity.AnalyticBeacon;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.webapi.model.player.AdvertisingSchedule;
+import com.zype.android.webapi.model.player.Analytics;
+import com.zype.android.webapi.model.player.AnalyticsDimensions;
 import com.zype.android.webapi.model.playlist.PlaylistData;
 import com.zype.android.webapi.model.video.Image;
 import com.zype.android.webapi.model.video.VideoData;
@@ -103,4 +108,26 @@ public class DbHelper {
         return result;
     }
 
+    public static List<AdSchedule> adScheduleDataToEntity(List<AdvertisingSchedule> schedule, String videoId) {
+        List<AdSchedule> result = new ArrayList<>();
+        for (AdvertisingSchedule item : schedule) {
+            AdSchedule entity = new AdSchedule();
+            entity.videoId = videoId;
+            entity.offset = item.getOffset();
+            entity.tag = item.getTag();
+            result.add(entity);
+        }
+        return result;
+    }
+
+    public static AnalyticBeacon analyticsToEntity(Analytics analytics) {
+        AnalyticBeacon result = new AnalyticBeacon();
+        result.beacon = analytics.getBeacon();
+        AnalyticsDimensions dimensions = analytics.getDimensions();
+        result.device = dimensions.getDevice();
+        result.playerId = dimensions.getPlayerId();
+        result.siteId = dimensions.getSiteId();
+        result.videoId = dimensions.getVideoId();
+        return result;
+    }
 }
