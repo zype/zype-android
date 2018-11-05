@@ -29,6 +29,7 @@ import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
+import com.zype.android.core.provider.helpers.PlaylistHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.PlayerParamsBuilder;
@@ -95,6 +96,14 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     public PlayerViewModel setVideoId(String videoId) {
         this.videoId = videoId;
         return this;
+    }
+
+    public String getVideoId() {
+        return videoId;
+    }
+
+    public String getPlaylistId() {
+        return playlistId;
     }
 
     public PlayerViewModel setPlaylistId(String playlistId) {
@@ -262,6 +271,14 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         video.isPlayStarted = 1;
         video.isPlayFinished = 1;
         repo.updateVideo(video);
+    }
+
+    public boolean isThereNextVideo() {
+        return !(PlaylistHelper.getNextVideoId(videoId, repo.getPlaylistVideosSync(playlistId)) == null);
+    }
+
+    public boolean isTherePreviousVideo() {
+        return !(PlaylistHelper.getPreviousVideoId(videoId, repo.getPlaylistVideosSync(playlistId)) == null);
     }
 
     // Ad schedule
@@ -553,9 +570,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
 
 
-    //
     // 'CustomPlayer.InfoListener' implementation
-    //
 
     @Override
     public void onVideoFormatEnabled(Format format, int trigger, long mediaTimeMs) {
@@ -599,27 +614,27 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     public void onAvailableRangeChanged(TimeRange availableRange) {
     }
 
-    //
     // ExoPlayer 2 related staff
     // TODO: Mode this to helper class
-    //
 
     public MediaSource getMediaSource(Context context, String contentUri) {
         MediaSource result = null;
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
                 Util.getUserAgent(context, WebApiManager.CUSTOM_HEADER_VALUE));
-        if (!contentUri.contains("http:")) {
-            result = new ExtractorMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(Uri.parse(contentUri));
-        }
-        else if (contentUri.contains(".mp4")
-                || contentUri.contains(".m4a")
-                || contentUri.contains(".mp3")) {
-            result = new ExtractorMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(Uri.parse(contentUri));
+        if (contentUri.contains("http:") || contentUri.contains("https:")) {
+            if (contentUri.contains(".mp4")
+                    || contentUri.contains(".m4a")
+                    || contentUri.contains(".mp3")) {
+                result = new ExtractorMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(Uri.parse(contentUri));
+            }
+            else {
+                result = new HlsMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(Uri.parse(contentUri));
+            }
         }
         else {
-            result = new HlsMediaSource.Factory(dataSourceFactory)
+            result = new ExtractorMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(contentUri));
         }
         return result;

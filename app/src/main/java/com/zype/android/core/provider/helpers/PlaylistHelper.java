@@ -40,10 +40,8 @@ public class PlaylistHelper {
         return contentValues;
     }
 
-    public static String getNextVideoId(String currentVideoId, String playlistId, Application application) {
+    public static String getNextVideoId(String currentVideoId, List<Video> playlistVideos) {
         Video nextVideo = null;
-        List<Video> playlistVideos = DataRepository.getInstance(application)
-                .getPlaylistVideosSync(playlistId);
         if (playlistVideos != null && !playlistVideos.isEmpty()) {
             for (int i = 0; i < playlistVideos.size(); i++) {
                 Video video = playlistVideos.get(i);
@@ -66,6 +64,12 @@ public class PlaylistHelper {
         }
     }
 
+    public static String getNextVideoId(String currentVideoId, String playlistId, Application application) {
+        List<Video> playlistVideos = DataRepository.getInstance(application)
+                .getPlaylistVideosSync(playlistId);
+        return getNextVideoId(currentVideoId, playlistVideos);
+    }
+
     public static String getNextVideoId(String currentVideoId, Cursor playlistVideosCursor) {
         String result = null;
         boolean nextVideoFound = false;
@@ -84,6 +88,30 @@ public class PlaylistHelper {
             playlistVideosCursor.close();
         }
         return result;
+    }
+
+    public static String getPreviousVideoId(String currentVideoId, List<Video> playlistVideos) {
+        String result = null;
+        String previousVideoId = null;
+        if (playlistVideos != null && !playlistVideos.isEmpty()) {
+            for (int i = 0; i < playlistVideos.size(); i++) {
+                Video video = playlistVideos.get(i);
+                if (video.id.equals(currentVideoId)) {
+                    result = previousVideoId;
+                    break;
+                }
+                else {
+                    previousVideoId = video.id;
+                }
+            }
+        }
+        return result;
+    }
+
+    public static final String getPreviousVideoId(String currentVideoId, String playlistId, Application application) {
+        List<Video> playlistVideos = DataRepository.getInstance(application)
+                .getPlaylistVideosSync(playlistId);
+        return getPreviousVideoId(currentVideoId, playlistVideos);
     }
 
     public static String getPreviousVideoId(String currentVideoId, Cursor playlistVideosCursor) {

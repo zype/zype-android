@@ -83,8 +83,30 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String videoId = getIntent().getStringExtra(EXTRA_VIDEO_ID);
-        String playlistId = getIntent().getStringExtra(EXTRA_PLAYLIST_ID);
+        initialize(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        initialize(intent);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Logger.d("onConfigurationChanged()");
+        onScreenOrientationChanged();
+    }
+
+    @Override
+    protected String getActivityName() {
+        return VideoDetailActivity.class.getSimpleName();
+    }
+
+    private void initialize(Intent intent) {
+        String videoId = intent.getStringExtra(EXTRA_VIDEO_ID);
+        String playlistId = intent.getStringExtra(EXTRA_PLAYLIST_ID);
 
         layoutPlayer = findViewById(R.id.layoutPlayer);
 
@@ -97,8 +119,8 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         progressPlayer = findViewById(R.id.progressPlayer);
 
         model = ViewModelProviders.of(this).get(VideoDetailViewModel.class)
-            .setVideoId(videoId)
-            .setPlaylistId(playlistId);
+                .setVideoId(videoId)
+                .setPlaylistId(playlistId);
         model.init();
         model.getVideo().observe(this, new Observer<Video>() {
             @Override
@@ -108,8 +130,8 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         });
 
         playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class)
-            .setVideoId(videoId)
-            .setPlaylistId(playlistId);
+                .setVideoId(videoId)
+                .setPlaylistId(playlistId);
         playerViewModel.init();
 
         playerViewModel.getPlaybackState().observe(this, state -> {
@@ -129,18 +151,6 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         });
 
         showPlayerFragment();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Logger.d("onConfigurationChanged()");
-        onScreenOrientationChanged();
-    }
-
-    @Override
-    protected String getActivityName() {
-        return VideoDetailActivity.class.getSimpleName();
     }
 
 

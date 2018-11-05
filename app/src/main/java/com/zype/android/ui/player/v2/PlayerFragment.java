@@ -53,10 +53,12 @@ import com.zype.android.Db.Entity.AdSchedule;
 import com.zype.android.Db.Entity.AnalyticBeacon;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.receiver.PhoneCallReceiver;
 import com.zype.android.receiver.RemoteControlReceiver;
+import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.dialog.ErrorDialogFragment;
 import com.zype.android.ui.player.PlayerViewModel;
 import com.zype.android.ui.player.SensorViewModel;
@@ -90,6 +92,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
     private PlayerView playerView;
     private ImageButton buttonFullscreen;
+    private ImageButton buttonNext;
+    private ImageButton buttonPrevious;
 
     private Handler handlerTimer;
 
@@ -168,6 +172,18 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             }
         });
 
+//        buttonNext = playerView.findViewById(R.id.exo_next);
+        buttonNext = playerView.findViewById(R.id.buttonNext);
+        buttonNext.setOnClickListener(v -> {
+            onNext();
+        });
+
+//        buttonPrevious = playerView.findViewById(R.id.exo_prev);
+        buttonPrevious = playerView.findViewById(R.id.buttonPrevious);
+        buttonPrevious.setOnClickListener(v -> {
+            onPrevious();
+        });
+
         return rootView;
     }
 
@@ -191,6 +207,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         });
 
         sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
+
+        updateNextPreviousButtons();
     }
 
     @Override
@@ -248,6 +266,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             }
             else {
                 stop();
+                Logger.d("onStop(): Player released");
                 player = null;
             }
         }
@@ -267,6 +286,20 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
     private boolean isPlayerControlsEnabled() {
         return playerView.getUseController();
+    }
+
+    private void updateNextPreviousButtons() {
+        if (ZypeConfiguration.autoplayEnabled(getActivity())
+                && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
+            buttonNext.setVisibility(View.VISIBLE);
+            buttonPrevious.setVisibility(View.VISIBLE);
+            buttonNext.setEnabled(playerViewModel.isThereNextVideo());
+            buttonPrevious.setEnabled(playerViewModel.isTherePreviousVideo());
+        }
+        else {
+            buttonNext.setVisibility(View.GONE);
+            buttonPrevious.setVisibility(View.GONE);
+        }
     }
 
     private void updateFullscreenButton(boolean fullscreen) {
@@ -367,6 +400,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
                     playerViewModel.savePlaybackPosition(0);
                     playerViewModel.onPlaybackFinished();
+
+                    if (ZypeConfiguration.autoplayEnabled(getActivity())
+                            && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
+                        onNext();
+                    }
                     break;
                 }
             }
@@ -466,6 +504,16 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         MediaControllerCompat mediaController = new MediaControllerCompat(getActivity(), mediaSession);
         MediaControllerCompat.setMediaController(getActivity(), mediaController);
+    }
+
+    private void onNext() {
+        AutoplayHelper.playNextVideo(getActivity(),
+                playerViewModel.getVideoId(), playerViewModel.getPlaylistId());
+    }
+
+    private void onPrevious() {
+        AutoplayHelper.playPreviousVideo(getActivity(),
+                playerViewModel.getVideoId(), playerViewModel.getPlaylistId());
     }
 
 
