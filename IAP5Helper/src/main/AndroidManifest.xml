@@ -1,0 +1,33 @@
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.samsung.android.sdk.iap.lib"
+    android:versionCode="510101003"
+    android:versionName="5.1.1">
+
+    <application>
+        <!-- IAP 라이브러리 내 Activity 선언 시작-->
+
+        <activity
+            android:name="com.samsung.android.sdk.iap.lib.activity.DialogActivity"
+            android:theme="@style/Theme.Empty"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="com.samsung.android.sdk.iap.lib.activity.CheckPackageActivity"
+            android:theme="@style/Theme.Empty"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="com.samsung.android.sdk.iap.lib.activity.AccountActivity"
+            android:theme="@style/Theme.Transparent"
+            android:configChanges="orientation|screenSize"/>
+
+        <activity
+            android:name="com.samsung.android.sdk.iap.lib.activity.PaymentActivity"
+            android:theme="@style/Theme.Empty"
+            android:configChanges="orientation|screenSize"/>
+
+        <!-- IAP 라이브러리 내 Activity 선언 끝-->
+    </application>
+
+</manifest>

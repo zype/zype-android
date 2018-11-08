@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CastCompanionLibrary/CastCompanionLibrary.iml" filepath="$PROJECT_DIR$/CastCompanionLibrary/CastCompanionLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/IAP5Helper/IAP5Helper.iml" filepath="$PROJECT_DIR$/IAP5Helper/IAP5Helper.iml" />
       <module fileurl="file://$PROJECT_DIR$/Zype-Android.iml" filepath="$PROJECT_DIR$/Zype-Android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/base_dialog_custom_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/base_dialog_message_bottom_margin"
+        android:layout_marginLeft="@dimen/base_dialog_message_left_right_margin"
+        android:layout_marginRight="@dimen/base_dialog_message_left_right_margin"
+        android:layout_marginTop="@dimen/base_dialog_message_top_margin"
+        android:gravity="start"
+        android:lineSpacingExtra="@dimen/base_dialog_body_lineSpacingExtra"
+        android:textColor="@color/text_common"
+        android:textSize="@dimen/style_textview_dialog_body_textsize"
+        android:visibility="gone" />
+
+    <!-- ROOM for CUSTOM VIEW -->
+    <FrameLayout
+        android:id="@+id/base_dialog_custom_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+</LinearLayout>

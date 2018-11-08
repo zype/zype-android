@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="page_loading_textview_textsize">15dp</dimen>
+    <dimen name="style_textview_dialog_body_textsize">19dp</dimen>
+
+    <!-- Base Dialog에 사용되는 dimen -->
+    <dimen name="base_dialog_checkbox_text_margin">19dp</dimen>
+    <dimen name="base_dialog_checkbox_text_padding">8dp</dimen>
+    <dimen name="base_dialog_checkbox_bottom_margin">24dp</dimen>
+    <dimen name="base_dialog_message_bottom_margin">8dp</dimen>
+    <dimen name="base_dialog_message_top_margin">24dp</dimen>
+    <dimen name="base_dialog_message_left_right_margin">24dp</dimen>
+    <dimen name="base_dialog_title_paddingTop">3dp</dimen>
+    <dimen name="base_dialog_body_lineSpacingExtra">4dp</dimen>
+</resources>
