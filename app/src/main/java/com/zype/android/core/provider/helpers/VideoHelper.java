@@ -3,6 +3,7 @@ package com.zype.android.core.provider.helpers;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.CursorHelper;
@@ -385,6 +386,13 @@ public class VideoHelper {
     public static Image getPosterThumbnail(Video video) {
         Type imageType = new TypeToken<List<Image>>(){}.getType();
         List<Image> images = new Gson().fromJson(video.images, imageType);
+
+        return getPosterFromImages(images);
+    }
+
+    public static Image getPosterThumbnail(Playlist playlist) {
+        Type imageType = new TypeToken<List<Image>>(){}.getType();
+        List<Image> images = new Gson().fromJson(playlist.images, imageType);
 
         return getPosterFromImages(images);
     }
