@@ -25,9 +25,10 @@ public class WebActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_web);
         WebView webView = (WebView) findViewById(R.id.webview);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setDomStorageEnabled(true);
 //        webView.getSettings().setUserAgentString(WebApiManager.CUSTOM_HEADER_VALUE);
         webView.loadUrl(extras.getString(BundleConstants.WEB_ACTIVITY_URL));
-        webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient());
         setTitle(extras.getString(BundleConstants.WEB_ACTIVITY_TITLE));
     }
