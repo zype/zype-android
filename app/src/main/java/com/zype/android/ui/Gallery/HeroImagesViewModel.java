@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.text.TextUtils;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.DataRepository;
@@ -115,8 +116,9 @@ public class HeroImagesViewModel extends AndroidViewModel {
                 heroImage.imageUrl = item.getPictures().get(0).getUrl();
             }
             heroImages.add(heroImage);
-
-            loadPlaylist(item.playlistId);
+            if (!TextUtils.isEmpty(item.playlistId)) {
+                loadPlaylist(item.playlistId);
+            }
             loadVideo(item.videoId);
         }
         data.setValue(heroImages);
@@ -128,7 +130,7 @@ public class HeroImagesViewModel extends AndroidViewModel {
      * @param playlistId Playlist id to load
      */
     private void loadPlaylist(String playlistId) {
-        Logger.d("loadPlaylists): playlistId=" + playlistId);
+        Logger.d("loadPlaylists(): playlistId=" + playlistId);
         PlaylistParamsBuilder builder = new PlaylistParamsBuilder()
                 .addPlaylistId(playlistId)
                 .addPerPage(1);
@@ -141,7 +143,7 @@ public class HeroImagesViewModel extends AndroidViewModel {
      * @param videoId Video id to load
      */
     private void loadVideo(String videoId) {
-        Logger.d("loadVideo): videoId=" + videoId);
+        Logger.d("loadVideo(): videoId=" + videoId);
         VideoParamsBuilder builder = new VideoParamsBuilder()
                 .addVideoId(videoId)
                 .addPerPage(1);

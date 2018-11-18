@@ -30,6 +30,7 @@ import com.zype.android.webapi.builder.MarketplaceConnectParamsBuilder;
 import com.zype.android.webapi.builder.ParamsBuilder;
 import com.zype.android.webapi.builder.PlanParamsBuilder;
 import com.zype.android.webapi.builder.PlayerParamsBuilder;
+import com.zype.android.webapi.builder.PlaylistParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.BaseEvent;
 import com.zype.android.webapi.events.DataEvent;
@@ -331,7 +332,8 @@ public class WebApiManager {
                 getParams.remove(PlayerParamsBuilder.VIDEO_ID);
                 return new OnAirAudioEvent(ticket, new OnAirAudioResponse(mCookieApi.getOnAirAudio(videoId, getParams)));
             case PLAYLIST_GET:
-                return new PlaylistEvent(ticket, new PlaylistResponse(mApi.getPlaylists(getParams)));
+                String parentId = getParams.get(PlaylistParamsBuilder.PARENT_ID);
+                return new PlaylistEvent(ticket, new PlaylistResponse(mApi.getPlaylists(getParams)), parentId);
             case VIDEO_FROM_PLAYLIST:
                 if (pathParams.containsKey(VideoParamsBuilder.PLAYLIST_ID)) {
                     playlistId = pathParams.get(VideoParamsBuilder.PLAYLIST_ID);

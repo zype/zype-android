@@ -83,7 +83,9 @@ public class DialogHelper {
             }
         });
         AlertDialog alert = alertDialog.create();
-        alert.show();
+        if (!activity.isFinishing()) {
+            alert.show();
+        }
     }
 
 }
