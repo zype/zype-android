@@ -10,6 +10,7 @@ import com.android.billingclient.api.Purchase;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.settings.SettingsProvider;
@@ -225,7 +226,9 @@ public class NavigationHelper {
                 }
             }
             else {
-                Logger.e("handleNotAuthorizedVideo(): Failed to handle not authorized video, videoId=" + videoId);
+                DialogHelper.showAlert(activity,
+                        context.getString(R.string.dialog_update_app_title),
+                        context.getString(R.string.dialog_update_app_message));
             }
         }
     }

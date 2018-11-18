@@ -93,6 +93,13 @@ public class ZypeApp extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
 
+        if (ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_LIGHT)) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+        else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
+
         createNotificationChannel();
 
         StorageUtils.initStorage(this);
@@ -113,13 +120,6 @@ public class ZypeApp extends MultiDexApplication {
                     .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
                     .unsubscribeWhenNotificationsAreDisabled(true)
                     .init();
-        }
-
-        if (ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_LIGHT)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        }
-        else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
 
         // This is used to create database via Room, but not Content provider. Need to be removed

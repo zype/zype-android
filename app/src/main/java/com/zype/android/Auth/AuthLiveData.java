@@ -28,7 +28,7 @@ public class AuthLiveData extends LiveData<Boolean> {
         WebApiManager.getInstance().subscribe(this);
 
         if (AuthHelper.isLoggedIn()) {
-            if (AuthHelper.isAccessTokenExpired() || true) {
+            if (AuthHelper.isAccessTokenExpired()) {
                 refreshToken();
             }
             else {
