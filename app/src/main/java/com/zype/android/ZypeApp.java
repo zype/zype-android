@@ -7,6 +7,7 @@ import android.arch.lifecycle.Observer;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,6 +31,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.gson.Gson;
 import com.onesignal.OneSignal;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
@@ -44,8 +46,12 @@ import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.app.AppEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
+import com.zype.android.webapi.model.app.App;
 import com.zype.android.webapi.model.app.AppData;
 import com.zype.android.webapi.model.consumers.Consumer;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -70,6 +76,7 @@ public class ZypeApp extends MultiDexApplication {
 
     public static boolean needToLoadData = true;
     public static AppData appData;
+    private AppConfiguration appConfiguration;
     public static MarketplaceGateway marketplaceGateway;
 
     // AWS
@@ -205,9 +212,27 @@ public class ZypeApp extends MultiDexApplication {
     }
 
     private void initApp() {
+        appConfiguration = readAppConfiguration();
+
         appData = null;
         AppParamsBuilder builder = new AppParamsBuilder();
         WebApiManager.getInstance().executeRequest(WebApiManager.Request.APP, builder.build());
+    }
+
+    private AppConfiguration readAppConfiguration() {
+        AppConfiguration result = null;
+
+        String jsonAppConfiguration = readAssetsFile("zype_app_configuration.json");
+        if (!TextUtils.isEmpty(jsonAppConfiguration)) {
+            Gson gson = new Gson();
+            result = gson.fromJson(jsonAppConfiguration, AppConfiguration.class);
+        }
+
+        return result;
+    }
+
+    public AppConfiguration getAppConfiguration() {
+        return appConfiguration;
     }
 
     private void loadConsumer() {
@@ -312,9 +337,8 @@ public class ZypeApp extends MultiDexApplication {
         DataRepository.getInstance(this).getPlaylistsSync(ZypeConfiguration.getRootPlaylistId(this));
     }
 
-    //
+
     // AWS
-    //
 
     /**
      * Connect to AWS and initialize Pinpoint push notifications service.
@@ -362,5 +386,29 @@ public class ZypeApp extends MultiDexApplication {
                     });
         }
         return pinpointManager;
+    }
+
+
+    // Util
+
+    private String readAssetsFile(String fileName) {
+        String result;
+
+        AssetManager am = getAssets();
+        byte[] buffer = null;
+        InputStream is;
+        try {
+            is = getAssets().open(fileName);
+            int size = is.available();
+            buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        result = new String(buffer);
+        return result;
     }
 }

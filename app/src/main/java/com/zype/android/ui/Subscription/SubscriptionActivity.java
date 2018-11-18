@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
-import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.Subscription;
 import com.zype.android.Billing.SubscriptionsHelper;
@@ -29,9 +28,6 @@ import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
-import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.events.ErrorEvent;
-import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +83,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             public void onChanged(@Nullable Map<String, Subscription> subscriptions) {
                 List<Subscription> subscriptionList = new ArrayList<>();
                 for (Map.Entry<String, Subscription> entry : subscriptions.entrySet()) {
-                    if (entry.getValue().getMarketplace() != null) {
+                    if (entry.getValue().getMarketplaceProduct() != null) {
                         subscriptionList.add(entry.getValue());
                     }
                 }
@@ -202,7 +198,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     // In-app billing
     //
     private void purchaseSubscription(Subscription item) {
-        billingManager.initiatePurchaseFlow(this, item.getMarketplace().getSku(), BillingClient.SkuType.SUBS);
+        billingManager.initiatePurchaseFlow(this, item.getMarketplaceProduct().getSku(), BillingClient.SkuType.SUBS);
     }
 
     //
@@ -283,11 +279,11 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.item = items.get(position);
-            if (holder.item.getMarketplace() != null) {
-                holder.textTitle.setText(holder.item.getMarketplace().getTitle());
-                holder.textPrice.setText(String.valueOf(holder.item.getMarketplace().getPrice()));
-                holder.textDescription.setText(holder.item.getMarketplace().getDescription());
-                holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.getMarketplace().getTitle()));
+            if (holder.item.getMarketplaceProduct() != null) {
+                holder.textTitle.setText(holder.item.getMarketplaceProduct().getTitle());
+                holder.textPrice.setText(String.valueOf(holder.item.getMarketplaceProduct().getPrice()));
+                holder.textDescription.setText(holder.item.getMarketplaceProduct().getDescription());
+                holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.getMarketplaceProduct().getTitle()));
                 holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

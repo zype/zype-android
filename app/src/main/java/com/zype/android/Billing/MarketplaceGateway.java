@@ -3,12 +3,15 @@ package com.zype.android.Billing;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.squareup.otto.Subscribe;
+import com.zype.android.AppConfiguration;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
@@ -29,8 +32,12 @@ import retrofit.RetrofitError;
 /**
  * Created by Evgeny Cherkasov on 22.06.2018
  */
-public class MarketplaceGateway implements BillingManager.BillingUpdatesListener {
+public class MarketplaceGateway implements BillingManager.BillingUpdatesListener, IMarketplaceManager {
+    public static final String MARKETPLACE_GOOGLE = "Google";
+    public static final String MARKETPLACE_SAMSUNG = "Samsung";
+
     private Context context;
+    private AppConfiguration appConfiguration;
     private String appKey;
     private List<String> planIds;
 
@@ -38,11 +45,14 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
     private MutableLiveData<Boolean> subscriptionVerified = null;
 
     private BillingManager billingManager;
+    private MarketplaceManager marketplaceManager;
 
     private WebApiManager api;
 
-    public MarketplaceGateway(Context context, String appKey, List<String> planIds) {
+    public MarketplaceGateway(Context context, @NonNull AppConfiguration appConfiguration,
+                              String appKey, List<String> planIds) {
         this.context = context.getApplicationContext();
+        this.appConfiguration = appConfiguration;
         this.appKey = appKey;
         this.planIds = planIds;
 
@@ -51,20 +61,29 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
     }
 
     public void setup() {
-        // Start setup marketplace (Google Play) client
-        billingManager = new BillingManager(context, this);
+        // Setup marketplace client
+        if (appConfiguration.marketplace.equals(MARKETPLACE_GOOGLE)) {
+            // TODO: Use subclass of MarketplaceManager instead of BillingManager
+            billingManager = new BillingManager(context, this);
+        }
+        else if (appConfiguration.marketplace.equals(MARKETPLACE_SAMSUNG)) {
+            marketplaceManager = new SamsungMarketplaceManager(context, this);
+        }
+        else {
+            Logger.e("setup(): Invalid marketplace: " + appConfiguration.marketplace);
+            throw new IllegalArgumentException();
+        }
 
         // Load Zype plans
         subscriptionsLiveData = new MutableLiveData<>();
-        final Map<String, Subscription> subscriptions = new LinkedHashMap<>();
-        subscriptionsLiveData.setValue(subscriptions);
+        subscriptionsLiveData.setValue(new LinkedHashMap<String, Subscription>());
 
         for (final String planId : planIds) {
             loadPlan(planId);
         }
     }
 
-    public void loadPlan(String planId) {
+    private void loadPlan(String planId) {
         PlanParamsBuilder builder = new PlanParamsBuilder(planId);
         api.executeRequest(WebApiManager.Request.PLAN, builder.build());
     }
@@ -78,7 +97,9 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
 
     private boolean setupCompleted() {
         for (Map.Entry<String, Subscription> entry : subscriptionsLiveData.getValue().entrySet()) {
-            if (entry.getValue().getZypePlan() == null || entry.getValue().getMarketplace() == null) {
+            Subscription subscription = entry.getValue();
+            if (subscription.getZypePlan() == null
+                    || (subscription.getMarketplaceProduct() == null && subscription.getMarketplaceProductDetails() == null)) {
                 return false;
             }
         }
@@ -89,10 +110,28 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
         return billingManager;
     }
 
+    public MarketplaceManager getMarketplaceManager() {
+        return marketplaceManager;
+    }
+
+
+    // Subscriptions
+
     public Subscription findSubscriptionBySku(String sku) {
         for (Map.Entry<String, Subscription> entry : subscriptionsLiveData.getValue().entrySet()) {
-            if (entry.getValue().getZypePlan().thirdPartyId.equals(sku)) {
-                return entry.getValue();
+            if (appConfiguration.marketplace.equals(MARKETPLACE_GOOGLE)) {
+                if (entry.getValue().getZypePlan().marketplaceIds.googleplay.equals(sku)) {
+                    return entry.getValue();
+                }
+            }
+            else if (appConfiguration.marketplace.equals(MARKETPLACE_SAMSUNG)) {
+                if (entry.getValue().getZypePlan().marketplaceIds.samsung.equals(sku)) {
+                    return entry.getValue();
+                }
+            }
+            else {
+                Logger.e("findSubscriptionBySku(): Invalid marketplace: " + appConfiguration.marketplace);
+                throw new IllegalArgumentException();
             }
         }
         return null;
@@ -107,7 +146,7 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
             return null;
         }
 
-        String sku = subscription.getMarketplace().getSku();
+        String sku = subscription.getMarketplaceProduct().getSku();
         for (Purchase item : billingManager.getPurchases()) {
             if (item.getSku().equals(sku)) {
                 SubscriptionLiveData result = new SubscriptionLiveData(subscription);
@@ -125,9 +164,8 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
         return subscriptionVerified;
     }
 
-    //
+
     // Zype API
-    //
 
     @Subscribe
     public void handlePlan(PlanEvent event) {
@@ -138,7 +176,13 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
 
         subscriptionsLiveData.getValue().put(data.id, subscription);
 
-        queryGooglePlayProduct(subscription);
+        // Remove 'appConfiguration.marketplace' checking after refactoring Google marketplace
+        if (appConfiguration.marketplace.equals(MARKETPLACE_GOOGLE)) {
+            queryGooglePlayProduct(subscription);
+        }
+        else if (appConfiguration.marketplace.equals(MARKETPLACE_SAMSUNG)) {
+            marketplaceManager.getProductDetails(subscription);
+        }
     }
 
     @Subscribe
@@ -164,6 +208,7 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
         }
         // TODO: Add retrieve plan error handling
     }
+
 
     //
     // Google Play
@@ -194,7 +239,7 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
                                         Logger.w("onSkuDetailsResponse(): Unexpected number of items (" +
                                                 skuDetailsList.size() + ") in Google Play, sku=" + sku);
                                     }
-                                    subscription.setMarketplace(skuDetailsList.get(0));
+                                    subscription.setMarketplaceProduct(skuDetailsList.get(0));
                                 }
                             }
                         }
@@ -215,6 +260,37 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
+    }
 
+
+    // 'IMarketplaceManager' implementation
+
+    @Override
+    public void onPurchasesUpdated(MarketplaceManager.Response response) {
+    }
+
+    @Override
+    public void onProductDetails(Object zypeProduct, MarketplaceManager.Response response) {
+        if (response.isSuccessful()) {
+            if (response.getResponseData() != null) {
+                if (zypeProduct instanceof Subscription) {
+                    ((Subscription) zypeProduct).setMarketplaceProductDetails((ProductDetails) response.getResponseData());
+                }
+                else if (zypeProduct instanceof Video) {
+
+                }
+            }
+            else {
+                Logger.e("onProductDetails(): Error retrieving sku details for " + zypeProduct.toString());
+            }
+        }
+        else {
+            Logger.e("onProductDetails(): Error retrieving sku details for " + zypeProduct.toString()
+                    + ", errorMessage=" + response.getErrorMessage());
+        }
+    }
+
+    @Override
+    public void onPurchase(MarketplaceManager.Response response) {
     }
 }

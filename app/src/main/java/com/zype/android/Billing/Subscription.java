@@ -6,9 +6,11 @@ import com.zype.android.webapi.model.plan.PlanData;
 /**
  * Created by Evgeny Cherkasov on 22.06.2018
  */
+
 public class Subscription {
     private PlanData zypePlan;
-    private SkuDetails marketplace;
+    private SkuDetails marketplaceProduct;
+    private ProductDetails marketplaceProductDetails;
     private boolean verified = false;
 
     public PlanData getZypePlan() {
@@ -19,12 +21,20 @@ public class Subscription {
         zypePlan = data;
     }
 
-    public SkuDetails getMarketplace() {
-        return marketplace;
+    public SkuDetails getMarketplaceProduct() {
+        return marketplaceProduct;
     }
 
-    public void setMarketplace(SkuDetails skuDetails) {
-        marketplace = skuDetails;
+    public void setMarketplaceProduct(SkuDetails skuDetails) {
+        marketplaceProduct = skuDetails;
+    }
+
+    public ProductDetails getMarketplaceProductDetails() {
+        return marketplaceProductDetails;
+    }
+
+    public void setMarketplaceProductDetails(ProductDetails productDetails) {
+        this.marketplaceProductDetails = productDetails;
     }
 
     public boolean isVerified() {

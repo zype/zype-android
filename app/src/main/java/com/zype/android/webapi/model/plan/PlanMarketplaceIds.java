@@ -14,4 +14,8 @@ public class PlanMarketplaceIds {
     @SerializedName("googleplay")
     @Expose
     public String googleplay;
+
+    @SerializedName("samsung")
+    @Expose
+    public String samsung;
 }

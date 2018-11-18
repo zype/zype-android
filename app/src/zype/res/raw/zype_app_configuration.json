@@ -1,4 +1,7 @@
 {
   "OneSignal": "false",
-  "AWSPinpoint": "false"
+  "AWSPinpoint": "false",
+
+  "Marketplace": "Samsung"
+
 }
