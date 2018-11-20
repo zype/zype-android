@@ -467,7 +467,9 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         Logger.e("handleError");
         if (err.getError() == null) {
             if (err.getEventData() != WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO
-                    && err.getEventData() != WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO) {
+                    && err.getEventData() != WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO
+                    && !playerViewModel.isVideoDownloaded()
+                    && !playerViewModel.isAudioDownloaded()) {
                 onError();
             }
             return;
