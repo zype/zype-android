@@ -38,6 +38,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     private String videoId;
 
+    private long playbackPosition = 0;
+    private boolean isPlaybackPositionRestored = false;
+
     public enum PlayerMode {
         AUDIO,
         VIDEO
@@ -80,6 +83,31 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
             }
         }
     }
+
+    // Playback position
+
+    public long getPlaybackPosition() {
+        return playbackPosition;
+    }
+
+    public void savePlaybackPosition(long position) {
+        this.playbackPosition = position;
+
+//        Video video = repo.getVideoSync(videoId);
+//        video.playTime = position;
+//        repo.updateVideo(video);
+
+        isPlaybackPositionRestored = false;
+    }
+
+    public boolean playbackPositionRestored() {
+        return isPlaybackPositionRestored;
+    }
+
+    public void onPlaybackPositionRestored() {
+        isPlaybackPositionRestored = true;
+    }
+
 
     public MutableLiveData<String> getPlayerUrl() {
         if (playerUrl == null) {

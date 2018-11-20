@@ -721,8 +721,10 @@ public class PlayerFragment extends BaseFragment implements
                     else {
                         mListener.onError();
                     }
-                    if (player.getPlaybackState() != ExoPlayer.STATE_ENDED) {
+                    if (player.getPlaybackState() != ExoPlayer.STATE_ENDED
+                            && playerViewModel.playbackPositionRestored()) {
                         mListener.saveCurrentTimeStamp(player.getCurrentPosition());
+                        playerViewModel.savePlaybackPosition(player.getCurrentPosition());
                     }
                     player.getPlayerControl().pause();
                 }
@@ -801,8 +803,10 @@ public class PlayerFragment extends BaseFragment implements
 
         if (player != null) {
             mediaController.hide();
-            if (player.getPlaybackState() != ExoPlayer.STATE_ENDED) {
+            if (player.getPlaybackState() != ExoPlayer.STATE_ENDED
+                    && playerViewModel.playbackPositionRestored()) {
                 mListener.saveCurrentTimeStamp(player.getCurrentPosition());
+                playerViewModel.savePlaybackPosition(player.getCurrentPosition());
             }
 
 //            AnalyticsManager manager = AnalyticsManager.getInstance();
@@ -852,6 +856,7 @@ public class PlayerFragment extends BaseFragment implements
                     player.seekTo(playerPosition);
                     isNeedToSeekToLatestListenPosition = false;
                 }
+                playerViewModel.onPlaybackPositionRestored();
 
                 updateClosedCaptionsTrack();
 

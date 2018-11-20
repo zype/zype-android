@@ -305,6 +305,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     private void showFragment(Fragment fragment) {
+        Logger.d("showFragment()");
         hideProgress();
         if (mInterface != null) {
             mInterface.stop();
