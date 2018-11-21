@@ -429,6 +429,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
 
     @Override
     public void audioStarted() {
+        hideProgress();
         DataHelper.setVideoPlaying(getContentResolver(), mVideoId);
     }
 

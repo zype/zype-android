@@ -154,10 +154,12 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     }
 
     private void showProgress(String message) {
-        dialogProgress = new ProgressDialog(this);
-        dialogProgress.setMessage(message);
-        dialogProgress.setCancelable(false);
-        dialogProgress.show();
+        if (!isFinishing()) {
+            dialogProgress = new ProgressDialog(this);
+            dialogProgress.setMessage(message);
+            dialogProgress.setCancelable(false);
+            dialogProgress.show();
+        }
     }
 
     private void hideProgress() {

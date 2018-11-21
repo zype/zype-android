@@ -115,8 +115,10 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
             playerUrl = new MutableLiveData<>();
         }
         Video video = repo.getVideoSync(videoId);
-        if (TextUtils.isEmpty(video.playerAudioUrl)) {
-            loadAudioPlayerUrl(videoId);
+        if (ZypeApp.get(getApplication()).getAppConfiguration().audioOnlyPlaybackEnabled) {
+            if (TextUtils.isEmpty(video.playerAudioUrl)) {
+                loadAudioPlayerUrl(videoId);
+            }
         }
         if (TextUtils.isEmpty(video.playerVideoUrl)) {
 //                    loadVideoPlayerUrl(videoId);

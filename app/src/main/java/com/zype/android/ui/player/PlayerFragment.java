@@ -679,7 +679,7 @@ public class PlayerFragment extends BaseFragment implements
             case TYPE_AUDIO_WEB:
             case TYPE_AUDIO_LIVE:
                 if (contentUri != null &&
-                        (contentUri.contains(".mp4") || contentUri.contains(".m4a"))) {
+                        (contentUri.contains(".mp4") || contentUri.contains(".m4a") || contentUri.contains(".mp3"))) {
                     return new ExtractorRendererBuilder(getContext(), userAgent, Uri.parse(contentUri), new Mp4Extractor());
                 }
                 else {
@@ -870,9 +870,13 @@ public class PlayerFragment extends BaseFragment implements
                             stopTimer();
                         }
                     }
-                    mListener.videoStarted();
+                    if (mListener != null) {
+                        mListener.videoStarted();
+                    }
                 } else if (contentType == TYPE_AUDIO_LOCAL || contentType == TYPE_AUDIO_WEB) {
-                    mListener.audioStarted();
+                    if (mListener != null) {
+                        mListener.audioStarted();
+                    }
                 } else if (contentType == TYPE_AUDIO_LIVE || contentType == TYPE_VIDEO_LIVE) {
                     //IGNORE
                     Logger.d("onStateChanged(): ExoPlayer.STATE_READY ready live");
