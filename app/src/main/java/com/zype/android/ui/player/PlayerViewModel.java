@@ -14,6 +14,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
@@ -168,9 +169,11 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
         Video video = repo.getVideoSync(videoId);
         if (video != null) {
-            if (!TextUtils.isEmpty(video.playerAudioUrl)
-                    || video.isDownloadedAudio == 1) {
-                result.add(PlayerMode.AUDIO);
+            if (ZypeApp.get(getApplication()).getAppConfiguration().audioOnlyPlaybackEnabled) {
+                if (!TextUtils.isEmpty(video.playerAudioUrl)
+                        || video.isDownloadedAudio == 1) {
+                    result.add(PlayerMode.AUDIO);
+                }
             }
             if (!TextUtils.isEmpty(video.playerVideoUrl)
                     || video.isDownloadedVideo == 1) {
