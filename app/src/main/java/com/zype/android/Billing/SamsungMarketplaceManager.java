@@ -31,8 +31,11 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
 
     private IapHelper iapHelper  = null;
 
-    public SamsungMarketplaceManager(Context context, IMarketplaceManager listener) {
-        super(context, listener);
+    private List<PurchaseDetails> purchases;
+
+
+    public SamsungMarketplaceManager(Context context) {
+        super();
 
         iapHelper = IapHelper.getInstance(context);
 
@@ -41,11 +44,11 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
         else
             iapHelper.setOperationMode(HelperDefine.OperationMode.OPERATION_MODE_TEST);
 
-
+        purchases = new ArrayList<>();
     }
 
     @Override
-    public void getPurchases(int productType) {
+    public void getPurchases(int productType, final PurchasesUpdatedListener listener) {
         String samsungProductType = null;
         switch (productType) {
             case PRODUCT_TYPE_ALL:
@@ -67,7 +70,7 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
             @Override
             public void onGetOwnedProducts(ErrorVo _errorVO, ArrayList<OwnedProductVo> _ownedList) {
                 boolean isSuccessful;
-                List<Bundle> purchases = new ArrayList<>();
+                purchases = new ArrayList<>();
                 String errorMessage = null;
 
                 if (_errorVO != null) {
@@ -75,25 +78,26 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
                         isSuccessful = true;
                         if (_ownedList != null && !_ownedList.isEmpty()) {
                             for (OwnedProductVo item : _ownedList) {
-                                Bundle purchase = new Bundle();
-                                purchase.putString(PURCHASE_DEESCRIPTION, item.getItemDesc());
-                                purchase.putString(PURCHASE_ORIGINAL_DATA, item.getJsonString());
-                                purchase.putString(PURCHASE_PRICE, item.getItemPriceString());
-                                purchase.putString(PURCHASE_SKU, item.getItemId());
-                                purchase.putString(PURCHASE_TITLE, item.getItemName());
+                                PurchaseDetails purchase = new PurchaseDetails();
+                                purchase.setDescription(item.getItemDesc());
+                                purchase.setOriginalData(item.getJsonString());
+                                purchase.setPrice(item.getItemPriceString());
+                                purchase.setSku(item.getItemId());
+                                purchase.setTitle(item.getItemName());
                                 if (item.getType().equals("Item")) {
-                                    purchase.putInt(PURCHASE_TYPE, PRODUCT_TYPE_ENTITLEMENT);
+                                    purchase.setType(PRODUCT_TYPE_ENTITLEMENT);
                                 }
                                 else if (item.getType().equals("Subscription")) {
-                                    purchase.putInt(PURCHASE_TYPE, PRODUCT_TYPE_SUBSCRIPTION);
+                                    purchase.setType(PRODUCT_TYPE_SUBSCRIPTION);
                                 }
                                 else {
-                                    purchase.putInt(PURCHASE_TYPE, PRODUCT_TYPE_ALL);
+                                    purchase.setType(PRODUCT_TYPE_ALL);
                                 }
 
                                 purchases.add(purchase);
                             }
                         }
+
                     }
                     else {
                         isSuccessful = false;
@@ -105,13 +109,13 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
                     errorMessage = "ErrorVo is null";
                 }
 
-                listener.onPurchasesUpdated(new Response(isSuccessful, purchases, errorMessage));
+                listener.onPurchasesUpdated(new PurchasesUpdatedResponse(isSuccessful, errorMessage, purchases));
             }
         });
     }
 
     @Override
-    public void getProductDetails(final Object zypeProduct) {
+    public void getProductDetails(final Object zypeProduct, final ProductDetailsListener listener) {
         String sku = null;
         if (zypeProduct instanceof Subscription) {
             Subscription subscription = (Subscription) zypeProduct;
@@ -161,7 +165,7 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
                         errorMessage = "ErrorVo is null";
                     }
 
-                    listener.onProductDetails(zypeProduct, new Response(isSuccessful, productDetails, errorMessage));
+                    listener.onProductDetails(zypeProduct, new ProductDetailsResponse(isSuccessful, errorMessage, productDetails));
                 }
             });
         }
@@ -171,7 +175,7 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
     }
 
     @Override
-    public void makePurchase(String sku) {
+    public void makePurchase(String sku, final int productType, final PurchaseListener listener) {
         // Transaction id
         String passThroughParam = UUID.randomUUID().toString();
 
@@ -179,28 +183,20 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
             @Override
             public void onPayment(ErrorVo _errorVO, PurchaseVo _purchaseVO) {
                 boolean isSuccessful;
-                Bundle purchase = null;
+                PurchaseDetails purchase = null;
                 String errorMessage = null;
 
                 if (_errorVO != null) {
                     // Purchase successful
                     if (_errorVO.getErrorCode() == IapHelper.IAP_ERROR_NONE) {
                         isSuccessful = true;
-                        purchase = new Bundle();
-                        purchase.putString(PURCHASE_DEESCRIPTION, _purchaseVO.getItemDesc());
-                        purchase.putString(PURCHASE_ORIGINAL_DATA, _purchaseVO.getJsonString());
-                        purchase.putString(PURCHASE_PRICE, _purchaseVO.getItemPriceString());
-                        purchase.putString(PURCHASE_SKU, _purchaseVO.getItemId());
-                        purchase.putString(PURCHASE_TITLE, _purchaseVO.getItemName());
-                        if (_purchaseVO.getType().equals("Item")) {
-                            purchase.putInt(PURCHASE_TYPE, PRODUCT_TYPE_ENTITLEMENT);
-                        }
-                        else if (_purchaseVO.getType().equals("Subscription")) {
-                            purchase.putInt(PURCHASE_TYPE, PRODUCT_TYPE_SUBSCRIPTION);
-                        }
-                        else {
-                            purchase.putInt(PURCHASE_TYPE, PRODUCT_TYPE_ALL);
-                        }
+                        purchase = new PurchaseDetails();
+                        purchase.setDescription(_purchaseVO.getItemDesc());
+                        purchase.setOriginalData(_purchaseVO.getJsonString());
+                        purchase.setPrice(_purchaseVO.getItemPriceString());
+                        purchase.setSku(_purchaseVO.getItemId());
+                        purchase.setTitle(_purchaseVO.getItemName());
+                        purchase.setType(productType);
                     }
                     else {
                         isSuccessful = false;
@@ -212,7 +208,7 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
                     errorMessage = "ErrorVo is null";
                 }
 
-                listener.onPurchase(new Response(isSuccessful, purchase, errorMessage));
+                listener.onPurchase(new PurchaseResponse(isSuccessful, errorMessage, purchase));
             }
         });
     }

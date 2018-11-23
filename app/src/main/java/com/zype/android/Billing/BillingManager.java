@@ -23,13 +23,17 @@ import java.util.List;
  * Created by Evgeny Cherkasov on 01.07.2017.
  */
 
-public class BillingManager implements PurchasesUpdatedListener {
+public class BillingManager extends MarketplaceManager implements PurchasesUpdatedListener {
     private static final String TAG = BillingManager.class.getSimpleName();
+
+    public static final String KEY_PURCHASE_TOKEN = "PurchaseToken";
+    public static final String KEY_SIGNATURE = "Signature";
 
     private final Context context;
     private BillingClient mBillingClient;
     private final BillingUpdatesListener mBillingUpdatesListener;
-    private List<Purchase> purchases;
+
+    private List<PurchaseDetails> purchases;
 
     /**
      * True if billing service is connected now.
@@ -229,7 +233,15 @@ public class BillingManager implements PurchasesUpdatedListener {
     @Override
     public void onPurchasesUpdated(int responseCode, List<Purchase> purchases) {
         if (responseCode == BillingResponse.OK) {
-            this.purchases = purchases;
+            this.purchases = new ArrayList<>();
+            for (Purchase item : purchases) {
+                PurchaseDetails purchase = new PurchaseDetails();
+                purchase.setOriginalData(item.getOriginalJson());
+                purchase.setSku(item.getSku());
+                purchase.setString(KEY_PURCHASE_TOKEN, item.getPurchaseToken());
+                purchase.setString(KEY_SIGNATURE, item.getSignature());
+                this.purchases.add(purchase);
+            }
             mBillingUpdatesListener.onPurchasesUpdated(purchases);
         }
         else if (responseCode == BillingResponse.USER_CANCELED) {
@@ -240,7 +252,20 @@ public class BillingManager implements PurchasesUpdatedListener {
         }
     }
 
-    public List<Purchase> getPurchases() {
-        return this.purchases;
+
+    @Override
+    public void getPurchases(int productType, PurchasesUpdatedListener listener) {
+
     }
+
+    @Override
+    public void getProductDetails(Object zypeProduct, ProductDetailsListener listener) {
+
+    }
+
+    @Override
+    public void makePurchase(String sku, int productType, PurchaseListener listener) {
+
+    }
+
 }

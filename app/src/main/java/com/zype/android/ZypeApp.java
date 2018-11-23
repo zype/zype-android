@@ -172,8 +172,8 @@ public class ZypeApp extends MultiDexApplication {
 
         // Setup marketplace connect
         if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
-            marketplaceGateway = new MarketplaceGateway(this, ZypeConfiguration.getAppKey(),
-                    ZypeConfiguration.getPlanIds());
+            marketplaceGateway = new MarketplaceGateway(this, appConfiguration,
+                    ZypeConfiguration.getAppKey(), ZypeConfiguration.getPlanIds());
             marketplaceGateway.setup();
         }
 
@@ -222,7 +222,7 @@ public class ZypeApp extends MultiDexApplication {
     private AppConfiguration readAppConfiguration() {
         AppConfiguration result = null;
 
-        String jsonAppConfiguration = readAssetsFile("zype_app_configuration.json");
+        String jsonAppConfiguration = readRawFile(R.raw.zype_app_configuration);
         if (!TextUtils.isEmpty(jsonAppConfiguration)) {
             Gson gson = new Gson();
             result = gson.fromJson(jsonAppConfiguration, AppConfiguration.class);
@@ -391,14 +391,14 @@ public class ZypeApp extends MultiDexApplication {
 
     // Util
 
-    private String readAssetsFile(String fileName) {
+    private String readRawFile(int fileResId) {
         String result;
 
         AssetManager am = getAssets();
         byte[] buffer = null;
         InputStream is;
         try {
-            is = getAssets().open(fileName);
+            is = getResources().openRawResource(fileResId);
             int size = is.available();
             buffer = new byte[size];
             is.read(buffer);

@@ -11,20 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.android.billingclient.api.Purchase;
-import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Billing.MarketplaceManager;
+import com.zype.android.Billing.PurchaseDetails;
 import com.zype.android.Billing.Subscription;
-import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
-import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.events.ErrorEvent;
-import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 
 import java.util.List;
 
@@ -75,49 +71,30 @@ public class SubscribeOrLoginFragment extends Fragment {
             }
         });
 
-        final List<Purchase> purchases = ZypeApp.marketplaceGateway.getBillingManager().getPurchases();
-        Button buttonRestorePurchases = rootView.findViewById(R.id.buttonRestorePurchases);
-        buttonRestorePurchases.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (AuthHelper.isLoggedIn()) {
-                    // Get first purchase from the purchase list and try to validate it
-                    Subscription subscription = ZypeApp.marketplaceGateway.findSubscriptionBySku(purchases.get(0).getSku());
-                    if (subscription != null) {
-                        showProgress(getString(R.string.subscription_verify));
-                        ZypeApp.marketplaceGateway.verifySubscription(subscription).observe(SubscribeOrLoginFragment.this, new Observer<Boolean>() {
+        final Button buttonRestorePurchases = rootView.findViewById(R.id.buttonRestorePurchases);
+        ZypeApp.marketplaceGateway.getMarketplaceManager()
+                .getPurchases(MarketplaceManager.PRODUCT_TYPE_SUBSCRIPTION,
+                        new MarketplaceManager.PurchasesUpdatedListener() {
                             @Override
-                            public void onChanged(@Nullable Boolean result) {
-                                hideProgress();
-                                if (result) {
-                                    getActivity().setResult(RESULT_OK);
-                                    getActivity().finish();
+                            public void onPurchasesUpdated(MarketplaceManager.PurchasesUpdatedResponse response) {
+                                if (response.isSuccessful()) {
+                                    List<PurchaseDetails> purchases = response.getPurchases();
+                                    buttonRestorePurchases.setOnClickListener(createRestorePurchasesOnClickListener(purchases.get(0).getSku()));
+                                    if (!purchases.isEmpty()) {
+                                        Logger.d("There are purchases, size=" + purchases.size());
+                                        buttonRestorePurchases.setVisibility(View.VISIBLE);
+                                    }
+                                    else {
+                                        Logger.d("There are no purchases on the device");
+                                        buttonRestorePurchases.setVisibility(View.GONE);
+                                    }
                                 }
                                 else {
-                                    DialogHelper.showErrorAlert(getActivity(),
-                                            getString(R.string.subscribe_or_login_error_validation));
+                                    Logger.d("There are no purchases on the device");
+                                    buttonRestorePurchases.setVisibility(View.GONE);
                                 }
                             }
                         });
-                    }
-                    else {
-                        Logger.e("Not found Zype Plan for existing in-app purchase, sku=" + purchases.get(0).getSku());
-                        DialogHelper.showErrorAlert(getActivity(), getString(R.string.subscribe_or_login_error_restore_purchase_zype));
-                    }
-                }
-                else {
-                    navigationHelper.switchToConsumerScreen(getActivity());
-                }
-            }
-        });
-        if (purchases != null && purchases.size() > 0) {
-            Logger.d("There are purchases, size=" + purchases.size());
-            buttonRestorePurchases.setVisibility(View.VISIBLE);
-        }
-        else {
-            Logger.d("There are no purchases on the device");
-            buttonRestorePurchases.setVisibility(View.GONE);
-        }
 
         api.subscribe(this);
 
@@ -144,4 +121,39 @@ public class SubscribeOrLoginFragment extends Fragment {
         }
     }
 
+    private View.OnClickListener createRestorePurchasesOnClickListener(final String sku) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (AuthHelper.isLoggedIn()) {
+                    // Get first purchase from the purchase list and try to validate it
+                    Subscription subscription = ZypeApp.marketplaceGateway.findSubscriptionBySku(sku);
+                    if (subscription != null) {
+                        showProgress(getString(R.string.subscription_verify));
+                        ZypeApp.marketplaceGateway.verifySubscription(subscription).observe(SubscribeOrLoginFragment.this, new Observer<Boolean>() {
+                            @Override
+                            public void onChanged(@Nullable Boolean result) {
+                                hideProgress();
+                                if (result) {
+                                    getActivity().setResult(RESULT_OK);
+                                    getActivity().finish();
+                                }
+                                else {
+                                    DialogHelper.showErrorAlert(getActivity(),
+                                            getString(R.string.subscribe_or_login_error_validation));
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        Logger.e("Not found Zype Plan for existing in-app purchase, sku=" + sku);
+                        DialogHelper.showErrorAlert(getActivity(), getString(R.string.subscribe_or_login_error_restore_purchase_zype));
+                    }
+                }
+                else {
+                    NavigationHelper.getInstance(getActivity()).switchToConsumerScreen(getActivity());
+                }
+            }
+        };
+    }
 }

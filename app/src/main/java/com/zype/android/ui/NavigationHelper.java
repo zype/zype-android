@@ -6,8 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.android.billingclient.api.Purchase;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Billing.MarketplaceManager;
+import com.zype.android.Billing.PurchaseDetails;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeApp;
@@ -189,9 +190,9 @@ public class NavigationHelper {
     }
 
     //
-    public void handleNotAuthorizedVideo(Activity activity, String videoId, String playlistId) {
+    public void handleNotAuthorizedVideo(final Activity activity, String videoId, String playlistId) {
         Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
-        Bundle extras = new Bundle();
+        final Bundle extras = new Bundle();
         extras.putString(BundleConstants.VIDEO_ID, videoId);
         extras.putString(BundleConstants.PLAYLIST_ID, playlistId);
         if (video == null) {
@@ -212,13 +213,25 @@ public class NavigationHelper {
             }
             else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
                 if (AuthHelper.isLoggedIn()) {
-                    List<Purchase> purchases = ZypeApp.marketplaceGateway.getBillingManager().getPurchases();
-                    if (purchases != null && purchases.size() > 0) {
-                        switchToSubscribeOrLoginScreen(activity, extras);
-                    }
-                    else {
-                        switchToSubscriptionScreen(activity, extras);
-                    }
+                    ZypeApp.marketplaceGateway.getMarketplaceManager()
+                            .getPurchases(MarketplaceManager.PRODUCT_TYPE_SUBSCRIPTION,
+                                new MarketplaceManager.PurchasesUpdatedListener() {
+                                    @Override
+                                    public void onPurchasesUpdated(MarketplaceManager.PurchasesUpdatedResponse response) {
+                                        if (response.isSuccessful()) {
+                                            List<PurchaseDetails> purchases = response.getPurchases();
+                                            if (purchases != null && purchases.size() > 0) {
+                                                switchToSubscribeOrLoginScreen(activity, extras);
+                                            }
+                                            else {
+                                                switchToSubscriptionScreen(activity, extras);
+                                            }
+                                        }
+                                        else {
+                                            switchToSubscriptionScreen(activity, extras);
+                                        }
+                                    }
+                                });
                 }
                 else {
                     switchToSubscribeOrLoginScreen(activity, extras);

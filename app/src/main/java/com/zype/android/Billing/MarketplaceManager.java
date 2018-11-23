@@ -2,6 +2,8 @@ package com.zype.android.Billing;
 
 import android.content.Context;
 
+import java.util.List;
+
 /**
  * Created by Evgeny Cherkasov on 08.11.2018
  */
@@ -13,17 +15,19 @@ public abstract class MarketplaceManager {
     public static final int PRODUCT_TYPE_ENTITLEMENT = 1;
     public static final int PRODUCT_TYPE_SUBSCRIPTION = 2;
 
-    public static final String PURCHASE_DEESCRIPTION = "Description";
-    public static final String PURCHASE_ORIGINAL_DATA = "OriginalData";
-    public static final String PURCHASE_PRICE = "Price";
-    public static final String PURCHASE_SKU = "Sku";
-    public static final String PURCHASE_TITLE = "Title";
-    public static final String PURCHASE_TYPE = "Type";
+    public interface PurchasesUpdatedListener {
+        void onPurchasesUpdated(MarketplaceManager.PurchasesUpdatedResponse response);
+    }
 
-    protected IMarketplaceManager listener;
+    public interface ProductDetailsListener {
+        void onProductDetails(Object zypeProduct, MarketplaceManager.ProductDetailsResponse response);
+    }
 
-    public MarketplaceManager(Context context, IMarketplaceManager listener) {
-        this.listener = listener;
+    public interface PurchaseListener {
+        void onPurchase(MarketplaceManager.PurchaseResponse response);
+    }
+
+    public MarketplaceManager() {
     }
 
     /**
@@ -33,7 +37,7 @@ public abstract class MarketplaceManager {
      * @param productType Product type value, must be one of 'PRODUCT_TYPE_xxx' constants.
      *
      */
-    public abstract void getPurchases(int productType);
+    public abstract void getPurchases(int productType, PurchasesUpdatedListener listener);
 
     /**
      * Request product details from the marketplace for specified object (subscription or video).
@@ -42,24 +46,22 @@ public abstract class MarketplaceManager {
      * @param zypeProduct must be Subscription or Video
      *
      */
-    public abstract void getProductDetails(Object zypeProduct);
+    public abstract void getProductDetails(Object zypeProduct, ProductDetailsListener listener);
 
     /**
      * Start purchasing process for scecified sku
      *
      * @param sku Marketplace product id
      */
-    public abstract void makePurchase(String sku);
+    public abstract void makePurchase(String sku, int productType, PurchaseListener listener);
 
 
     public class Response {
         private boolean isSuccessful;
-        private Object responseData;
         private String errorMessage;
 
-        public Response(boolean isSuccessful, Object responseData, String errorMessage) {
+        public Response(boolean isSuccessful, String errorMessage) {
             this.isSuccessful = isSuccessful;
-            this.responseData = responseData;
             this.errorMessage = errorMessage;
         }
 
@@ -67,12 +69,47 @@ public abstract class MarketplaceManager {
             return isSuccessful;
         }
 
-        public Object getResponseData() {
-            return responseData;
-        }
-
         public String getErrorMessage() {
             return errorMessage;
+        }
+    }
+
+    public class PurchasesUpdatedResponse extends Response {
+        private List<PurchaseDetails> purchases;
+
+        public PurchasesUpdatedResponse(boolean isSuccessful, String errorMessage, List<PurchaseDetails> purchases) {
+            super(isSuccessful, errorMessage);
+            this.purchases = purchases;
+        }
+
+        public List<PurchaseDetails> getPurchases() {
+            return purchases;
+        }
+    }
+
+    public class ProductDetailsResponse extends Response {
+        private ProductDetails productDetails;
+
+        public ProductDetailsResponse(boolean isSuccessful, String errorMessage, ProductDetails productDetails) {
+            super(isSuccessful, errorMessage);
+            this.productDetails = productDetails;
+        }
+
+        public ProductDetails getProductDetails() {
+            return productDetails;
+        }
+    }
+
+    public class PurchaseResponse extends Response {
+        private PurchaseDetails purchaseDetails;
+
+        public PurchaseResponse(boolean isSuccessful, String errorMessage, PurchaseDetails purchaseDetails) {
+            super(isSuccessful, errorMessage);
+            this.purchaseDetails = purchaseDetails;
+        }
+
+        public PurchaseDetails getPurchaseDetails() {
+            return purchaseDetails;
         }
     }
 }

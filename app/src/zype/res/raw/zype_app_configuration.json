@@ -2,6 +2,6 @@
   "OneSignal": "false",
   "AWSPinpoint": "false",
 
-  "Marketplace": "Samsung"
+  "marketplace": "Samsung"
 
 }

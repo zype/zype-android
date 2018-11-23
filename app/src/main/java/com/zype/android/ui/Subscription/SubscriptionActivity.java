@@ -17,6 +17,8 @@ import android.widget.TextView;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.zype.android.Billing.BillingManager;
+import com.zype.android.Billing.MarketplaceManager;
+import com.zype.android.Billing.PurchaseDetails;
 import com.zype.android.Billing.Subscription;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
@@ -91,7 +93,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             }
         });
 
-        billingManager = new BillingManager(this, this);
+//        billingManager = new BillingManager(this, this);
         hideProgress();
         updateViews();
     }
@@ -198,7 +200,57 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     // In-app billing
     //
     private void purchaseSubscription(Subscription item) {
-        billingManager.initiatePurchaseFlow(this, item.getMarketplaceProduct().getSku(), BillingClient.SkuType.SUBS);
+//        billingManager.initiatePurchaseFlow(this, item.getMarketplaceProduct().getSku(), BillingClient.SkuType.SUBS);
+        ZypeApp.marketplaceGateway.getMarketplaceManager()
+                .makePurchase(item.getMarketplaceProduct().getSku(), MarketplaceManager.PRODUCT_TYPE_SUBSCRIPTION,
+                        new MarketplaceManager.PurchaseListener() {
+                            @Override
+                            public void onPurchase(MarketplaceManager.PurchaseResponse response) {
+                                if (response.isSuccessful()) {
+                                   onPurchaseCompleted(response.getPurchaseDetails());
+                                }
+                                else {
+                                    Logger.e("purchaseSubscription(): Failed");
+                                }
+                            }
+                        });
+    }
+
+    private void onPurchaseCompleted(PurchaseDetails purchaseDetails) {
+        boolean result = false;
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
+            if (purchaseDetails != null) {
+                result = true;
+            }
+//            SubscriptionsHelper.updateSubscriptionCount(purchases);
+        }
+        else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
+            if (purchaseDetails != null) {
+                if (selectedSubscription != null) {
+                    showProgress(getString(R.string.subscription_verify));
+                    ZypeApp.marketplaceGateway.verifySubscription(selectedSubscription).observe(this, new Observer<Boolean>() {
+                        @Override
+                        public void onChanged(@Nullable Boolean result) {
+                            hideProgress();
+                            if (result) {
+                                setResult(RESULT_OK);
+                                finish();
+                            }
+                            else {
+                                DialogHelper.showErrorAlert(SubscriptionActivity.this,
+                                        getString(R.string.subscribe_or_login_error_validation));
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        if (result) {
+            if (selectedSubscription != null) {
+                setResult(RESULT_OK);
+                finish();
+            }
+        }
     }
 
     //
