@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;

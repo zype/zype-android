@@ -291,6 +291,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     protected void changeFragment(boolean isChromeCastConnected) {
+        Logger.d("changeFragment(): videoId=" + mVideoId);
         Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
         Fragment fragment;
         if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
