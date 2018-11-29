@@ -1,5 +1,6 @@
 package com.zype.android.ui.player.v2;
 
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -22,6 +23,7 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,14 +42,21 @@ import com.google.ads.interactivemedia.v3.api.AdsRequest;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.player.ContentProgressProvider;
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.TrackSelectionView;
 import com.zype.android.BuildConfig;
 import com.zype.android.Db.Entity.AdSchedule;
 import com.zype.android.Db.Entity.AnalyticBeacon;
@@ -83,6 +92,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private static final String ARG_VIDEO_ID = "VideoId";
 
     private SimpleExoPlayer player;
+    private DefaultTrackSelector trackSelector;
+
     private MediaSessionCompat mediaSession;
 
     private PlayerViewModel playerViewModel;
@@ -94,6 +105,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private ImageButton buttonFullscreen;
     private ImageButton buttonNext;
     private ImageButton buttonPrevious;
+    private ImageButton buttonSubtitles;
 
     private Handler handlerTimer;
 
@@ -182,6 +194,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         buttonPrevious = playerView.findViewById(R.id.buttonPrevious);
         buttonPrevious.setOnClickListener(v -> {
             onPrevious();
+        });
+
+        buttonSubtitles = playerView.findViewById(R.id.buttonSubtitles);
+        buttonSubtitles.setOnClickListener(v -> {
+            onSubtitles();
         });
 
         return rootView;
@@ -311,6 +328,17 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         }
     }
 
+    private void updateSubtitlesButton(int subtitlesTrackIndex) {
+        if (subtitlesTrackIndex != -1) {
+            buttonSubtitles.setVisibility(View.VISIBLE);
+            buttonSubtitles.setTag(subtitlesTrackIndex);
+        }
+        else {
+            buttonSubtitles.setVisibility(View.GONE);
+            buttonSubtitles.setTag(null);
+        }
+    }
+
     private void showThumbnail() {
         if (thumbnail != null) {
             UiUtils.loadImage(getActivity(), thumbnail.getUrl(), R.drawable.placeholder_video,
@@ -346,8 +374,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         Logger.d("preparePlayer()");
 
         if (player == null) {
-            player = ExoPlayerFactory.newSimpleInstance(getActivity());
+            trackSelector = new DefaultTrackSelector();
+
+            player = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
             player.addListener(new PlayerEventListener());
+
             playerView.setPlayer(player);
         }
 
@@ -362,6 +393,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             @Override
             public void onChanged(@Nullable String contentUri) {
                 Logger.d("getContentUri(): contentUri=" + contentUri);
+//                contentUri = "http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8";
                 if (!TextUtils.isEmpty(contentUri)) {
                     attachPlayerToAnalyticsManager(contentUri);
 
@@ -384,6 +416,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         if (player != null) {
             player.release();
+            player = null;
+            trackSelector = null;
         }
     }
 
@@ -392,7 +426,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             switch (playbackState) {
                 case Player.STATE_READY: {
-                    playerViewModel.onPlaybackStarted();
+                    if (player.getPlayWhenReady()) {
+                        playerViewModel.onPlaybackStarted();
+                        updateSubtitlesButton(getSubtitlesTrack());
+                    }
                     break;
                 }
                 case Player.STATE_ENDED: {
@@ -514,6 +551,31 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private void onPrevious() {
         AutoplayHelper.playPreviousVideo(getActivity(),
                 playerViewModel.getVideoId(), playerViewModel.getPlaylistId());
+    }
+
+    private void onSubtitles() {
+        Pair<AlertDialog, TrackSelectionView> dialog = TrackSelectionView
+                .getDialog(getActivity(), "Subtitles", trackSelector, (Integer) buttonSubtitles.getTag());
+        dialog.second.setShowDisableOption(true);
+        dialog.first.show();
+    }
+
+    /**
+     * Find subtitles track
+     *
+     * @return Subtitles track index, -1 if there is no subtitles track
+     */
+    private int getSubtitlesTrack() {
+        MappingTrackSelector.MappedTrackInfo info = trackSelector.getCurrentMappedTrackInfo();
+        if (info == null) {
+            return -1;
+        }
+        for (int i = 0; i < info.getRendererCount(); i++) {
+            if (player.getRendererType(i) == C.TRACK_TYPE_TEXT) {
+                return i;
+            }
+        }
+        return -1;
     }
 
 
