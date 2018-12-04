@@ -111,6 +111,14 @@ public class VideoDetailViewModel extends AndroidViewModel {
         return videoLiveData;
     }
 
+    public Video getVideoSync() {
+        if (videoLiveData != null) {
+            return videoLiveData.getValue();
+        }
+        else {
+            return null;
+        }
+    }
 
     // On air
 

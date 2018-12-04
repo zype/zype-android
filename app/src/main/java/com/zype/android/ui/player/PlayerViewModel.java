@@ -66,6 +66,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private long playbackPosition = 0;
     private boolean isPlaybackPositionRestored;
     private boolean isUrlLoaded = false;
+    private boolean inBackground = false;
 
     public enum PlayerMode {
         AUDIO,
@@ -410,6 +411,14 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         else {
             return false;
         }
+    }
+
+    public void setToBackground(boolean value) {
+        inBackground = value;
+    }
+
+    public boolean isInBackground() {
+        return inBackground;
     }
 
     /**
