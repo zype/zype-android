@@ -20,7 +20,7 @@ import com.zype.android.Db.Entity.Video;
  */
 
 @Database(entities = {AdSchedule.class, AnalyticBeacon.class, FavoriteVideo.class, Playlist.class, PlaylistVideo.class, Video.class},
-            version = 6)
+            version = 7)
 public abstract class ZypeDb extends RoomDatabase {
     public abstract ZypeDao zypeDao();
 
@@ -32,7 +32,7 @@ public abstract class ZypeDb extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room
                             .databaseBuilder(application, ZypeDb.class, "zype.db")
-                            .addMigrations(MIGRATION_5_6)
+                            .fallbackToDestructiveMigration()
                             .allowMainThreadQueries()
                             .build();
                 }
@@ -40,10 +40,4 @@ public abstract class ZypeDb extends RoomDatabase {
         }
         return INSTANCE;
     }
-
-    static final Migration MIGRATION_5_6 = new Migration(5, 6) {
-        @Override
-        public void migrate(SupportSQLiteDatabase database) {
-        }
-    };
 }
