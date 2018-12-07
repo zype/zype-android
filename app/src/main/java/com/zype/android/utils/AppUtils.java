@@ -40,7 +40,7 @@ public class AppUtils {
             if (TextUtils.isEmpty(twitterId)) {
                 intent = new Intent(Intent.ACTION_VIEW, Uri.parse(twitterUrl));
             } else {
-                intent = new Intent(Intent.ACTION_VIEW, Uri.parse("twitter://user?user_id=" + twitterId));
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse("twitter://user?screen_name=" + twitterId));
             }
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
@@ -67,7 +67,7 @@ public class AppUtils {
 
     public static void openInstagram(Context context, @Nullable String instagramId, @NonNull String instagramUrl) {
         try {
-            Uri uri = Uri.parse("http://instagram.com/_u/" + instagramId);
+            Uri uri = Uri.parse("https://instagram.com/_u/" + instagramId);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             intent.setPackage("com.instagram.android");
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -129,7 +129,7 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
                 break;
             case ITEM_INSTAGRAM:
                 if (!TextUtils.isEmpty(ZypeSettings.INSTAGRAM_ID)) {
-                    AppUtils.openInstagram(getContext(), ZypeSettings.INSTAGRAM_ID, String.format("http://www.instagram.com/%1$s", ZypeSettings.INSTAGRAM_ID));
+                    AppUtils.openInstagram(getContext(), ZypeSettings.INSTAGRAM_ID, String.format("https://www.instagram.com/%1$s", ZypeSettings.INSTAGRAM_ID));
                 }
                 break;
         }
