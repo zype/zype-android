@@ -53,7 +53,7 @@ public class ZypeSettings {
     public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = true;
     public static final boolean SHARE_VIDEO_ENABLED = false;
 
-    public static final String THEME = ZypeConfiguration.THEME_LIGHT;
+    public static final String THEME = ZypeConfiguration.THEME_DARK;
 
 //    /**
 //     * Google client id and secret are required for native to universal subscription feature.

@@ -1,4 +1,6 @@
 {
+  "audioOnlyPlayback": true,
+
   "OneSignal": "false",
   "AWSPinpoint": "false"
 }

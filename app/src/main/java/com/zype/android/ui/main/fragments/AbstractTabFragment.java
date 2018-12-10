@@ -16,11 +16,14 @@ import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.main.fragments.videos.VideosCursorAdapter;
+
+import static android.view.View.GONE;
 
 /**
  * @author vasya
@@ -86,6 +89,9 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
                 startLoadCursors(selectedTab);
             }
         });
+        if (!ZypeApp.get(getActivity()).getAppConfiguration().audioOnlyPlaybackEnabled) {
+            rootView.findViewById(android.R.id.tabs).setVisibility(GONE);
+        }
         return rootView;
     }
 
@@ -141,7 +147,7 @@ public abstract class AbstractTabFragment extends BaseFragment implements ListVi
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mAdapter.changeCursor(cursor);
         if (cursor != null && cursor.getCount() > 0) {
-            layoutEmpty.setVisibility(View.GONE);
+            layoutEmpty.setVisibility(GONE);
         }
         else {
             layoutEmpty.setVisibility(View.VISIBLE);

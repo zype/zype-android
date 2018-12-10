@@ -146,7 +146,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                 }
             }
 
-            if (video.thumbnails != null && thumbnailAssigned == false) {
+            if (video.thumbnails != null && !thumbnailAssigned) {
                 Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 240);
                 if (thumbnail != null) {
                     UiUtils.loadImage(thumbnail.getUrl(), R.drawable.placeholder_video, holder.imageThumbnail);
@@ -159,12 +159,22 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
         }
         else if (holder.item instanceof Playlist) {
             Playlist playlist = (Playlist) holder.item;
-            if (playlist.thumbnails != null) {
+
+            boolean thumbnailAssigned = false;
+            if (usePoster && playlist.images != null) {
+                Image posterThumbnail = VideoHelper.getPosterThumbnail(playlist);
+                if (posterThumbnail != null) {
+                    thumbnailAssigned = true;
+                    UiUtils.loadImage(posterThumbnail.getUrl(), R.drawable.outline_video_library_white_48, holder.imageThumbnail);
+                }
+            }
+
+            if (playlist.thumbnails != null && !thumbnailAssigned) {
                 Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
                 List<Thumbnail> thumbnails = new Gson().fromJson(playlist.thumbnails, thumbnailType);
-                if (thumbnails.size() > 0) {
-                    UiUtils.loadImage(holder.view.getContext(), thumbnails.get(1).getUrl(),
-                            R.drawable.outline_video_library_white_48, holder.imageThumbnail, null);
+                Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(thumbnails, 240);
+                if (thumbnail != null) {
+                    UiUtils.loadImage(thumbnail.getUrl(), R.drawable.outline_video_library_white_48, holder.imageThumbnail);
                 }
                 else {
                     holder.imageThumbnail.setImageDrawable(ContextCompat.getDrawable(holder.view.getContext(),

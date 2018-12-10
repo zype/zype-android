@@ -14,6 +14,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
@@ -37,6 +38,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private MutableLiveData<String> playerUrl;
 
     private String videoId;
+
+    private long playbackPosition = 0;
+    private boolean isPlaybackPositionRestored = false;
 
     public enum PlayerMode {
         AUDIO,
@@ -81,13 +85,40 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
     }
 
+    // Playback position
+
+    public long getPlaybackPosition() {
+        return playbackPosition;
+    }
+
+    public void savePlaybackPosition(long position) {
+        this.playbackPosition = position;
+
+//        Video video = repo.getVideoSync(videoId);
+//        video.playTime = position;
+//        repo.updateVideo(video);
+
+        isPlaybackPositionRestored = false;
+    }
+
+    public boolean playbackPositionRestored() {
+        return isPlaybackPositionRestored;
+    }
+
+    public void onPlaybackPositionRestored() {
+        isPlaybackPositionRestored = true;
+    }
+
+
     public MutableLiveData<String> getPlayerUrl() {
         if (playerUrl == null) {
             playerUrl = new MutableLiveData<>();
         }
         Video video = repo.getVideoSync(videoId);
-        if (TextUtils.isEmpty(video.playerAudioUrl)) {
-            loadAudioPlayerUrl(videoId);
+        if (ZypeApp.get(getApplication()).getAppConfiguration().audioOnlyPlaybackEnabled) {
+            if (TextUtils.isEmpty(video.playerAudioUrl)) {
+                loadAudioPlayerUrl(videoId);
+            }
         }
         if (TextUtils.isEmpty(video.playerVideoUrl)) {
 //                    loadVideoPlayerUrl(videoId);
@@ -140,9 +171,11 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
         Video video = repo.getVideoSync(videoId);
         if (video != null) {
-            if (!TextUtils.isEmpty(video.playerAudioUrl)
-                    || video.isDownloadedAudio == 1) {
-                result.add(PlayerMode.AUDIO);
+            if (ZypeApp.get(getApplication()).getAppConfiguration().audioOnlyPlaybackEnabled) {
+                if (!TextUtils.isEmpty(video.playerAudioUrl)
+                        || video.isDownloadedAudio == 1) {
+                    result.add(PlayerMode.AUDIO);
+                }
             }
             if (!TextUtils.isEmpty(video.playerVideoUrl)
                     || video.isDownloadedVideo == 1) {

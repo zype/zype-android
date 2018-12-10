@@ -14,6 +14,19 @@ import android.text.TextUtils;
 
 public class DialogHelper {
 
+    public static void showAlert(final Context context, String title, String message) {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setPositiveButton(context.getString(R.string.dialog_button_ok), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = alertDialog.create();
+        alert.show();
+    }
+
     public static void showSubscriptionAlertIssue(final Context context) {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
         alertDialog.setTitle(context.getString(R.string.dialog_subscribe_title));
@@ -83,7 +96,9 @@ public class DialogHelper {
             }
         });
         AlertDialog alert = alertDialog.create();
-        alert.show();
+        if (!activity.isFinishing()) {
+            alert.show();
+        }
     }
 
 }

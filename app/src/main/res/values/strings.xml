@@ -101,6 +101,8 @@
     <string name="dialog_login_title">Sign In Required</string>
     <string name="dialog_login_message">You do not have access to this video. Please sign in with your account to watch this video.</string>
     <string name="dialog_login_button_login">Sign in</string>
+    <string name="dialog_update_app_title">Update your app</string>
+    <string name="dialog_update_app_message">You\'ve selected premium content. Please download the latest version of this app in order to purchase access to this content.</string>
 
     <!-- Downloads -->
     <string name="downloads_empty_title">It looks like you haven’t downloaded any videos yet</string>

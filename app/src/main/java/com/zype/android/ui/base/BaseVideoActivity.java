@@ -291,6 +291,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     protected void changeFragment(boolean isChromeCastConnected) {
+        Logger.d("changeFragment(): videoId=" + mVideoId);
         Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
         Fragment fragment;
         if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
@@ -305,6 +306,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     }
 
     private void showFragment(Fragment fragment) {
+        Logger.d("showFragment()");
         hideProgress();
         if (mInterface != null) {
             mInterface.stop();
@@ -428,6 +430,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
 
     @Override
     public void audioStarted() {
+        hideProgress();
         DataHelper.setVideoPlaying(getContentResolver(), mVideoId);
     }
 
