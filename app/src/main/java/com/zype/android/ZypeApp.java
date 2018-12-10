@@ -15,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
+import android.webkit.WebView;
 
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.AWSStartupHandler;
@@ -122,12 +123,20 @@ public class ZypeApp extends MultiDexApplication {
                     .init();
         }
 
-        if (ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_LIGHT)) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        int nightMode = AppCompatDelegate.MODE_NIGHT_NO;
+        if (ZypeConfiguration.getTheme(this).equals(ZypeConfiguration.THEME_DARK)) {
+            nightMode = AppCompatDelegate.MODE_NIGHT_YES;
         }
-        else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        if (nightMode != AppCompatDelegate.MODE_NIGHT_NO) {
+            Logger.d("Manually instantiating WebView to avoid night mode issue.");
+            try {
+                new WebView(getApplicationContext());
+            }
+            catch (Exception e) {
+                Logger.e("Got exception while trying to instantiate WebView to avoid night mode issue. Ignoring problem.", e);
+            }
         }
+        AppCompatDelegate.setDefaultNightMode(nightMode);
 
         // This is used to create database via Room, but not Content provider. Need to be removed
         // after refactoring to use Room for working with database.
