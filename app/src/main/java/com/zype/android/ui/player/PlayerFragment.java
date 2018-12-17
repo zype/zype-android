@@ -618,7 +618,7 @@ public class PlayerFragment extends BaseFragment implements
         if (!isReceiversRegistered) {
             IntentFilter filter = new IntentFilter();
             filter.addAction(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
-            filter.addAction("android.intent.action.NEW_OUTGOING_CALL");
+//            filter.addAction("android.intent.action.NEW_OUTGOING_CALL");
             getActivity().registerReceiver(callReceiver, filter);
 
             if (audioCapabilitiesReceiver == null) {
