@@ -83,9 +83,11 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         ZypeApp.marketplaceGateway.getSubscriptions().observe(this, new Observer<Map<String, Subscription>>() {
             @Override
             public void onChanged(@Nullable Map<String, Subscription> subscriptions) {
+                Logger.i("getSubscriptions(): size=" + subscriptions.size());
                 List<Subscription> subscriptionList = new ArrayList<>();
                 for (Map.Entry<String, Subscription> entry : subscriptions.entrySet()) {
-                    if (entry.getValue().getMarketplaceProduct() != null) {
+                    if (entry.getValue().getMarketplaceProduct() != null ||
+                            entry.getValue().getMarketplaceProductDetails() != null) {
                         subscriptionList.add(entry.getValue());
                     }
                 }
@@ -124,7 +126,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
 
     // //////////
     // UI
-    // 
+    //
     private void updateViews() {
 //        if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
 //            layoutLogin.setVisibility(View.VISIBLE);
@@ -152,10 +154,12 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     }
 
     private void showProgress(String message) {
-        dialogProgress = new ProgressDialog(this);
-        dialogProgress.setMessage(message);
-        dialogProgress.setCancelable(false);
-        dialogProgress.show();
+        if (!isFinishing()) {
+            dialogProgress = new ProgressDialog(this);
+            dialogProgress.setMessage(message);
+            dialogProgress.setCancelable(false);
+            dialogProgress.show();
+        }
     }
 
     private void hideProgress() {
@@ -201,13 +205,27 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     //
     private void purchaseSubscription(Subscription item) {
 //        billingManager.initiatePurchaseFlow(this, item.getMarketplaceProduct().getSku(), BillingClient.SkuType.SUBS);
+//        ZypeApp.marketplaceGateway.getMarketplaceManager()
+//                .makePurchase(item.getMarketplaceProduct().getSku(), MarketplaceManager.PRODUCT_TYPE_SUBSCRIPTION,
+//                        new MarketplaceManager.PurchaseListener() {
+//                            @Override
+//                            public void onPurchase(MarketplaceManager.PurchaseResponse response) {
+//                                if (response.isSuccessful()) {
+//                                   onPurchaseCompleted(response.getPurchaseDetails());
+//                                }
+//                                else {
+//                                    Logger.e("purchaseSubscription(): Failed");
+//                                }
+//                            }
+//                        });
         ZypeApp.marketplaceGateway.getMarketplaceManager()
-                .makePurchase(item.getMarketplaceProduct().getSku(), MarketplaceManager.PRODUCT_TYPE_SUBSCRIPTION,
+                .makePurchase(item.getMarketplaceProductDetails().sku, MarketplaceManager.PRODUCT_TYPE_SUBSCRIPTION,
                         new MarketplaceManager.PurchaseListener() {
                             @Override
                             public void onPurchase(MarketplaceManager.PurchaseResponse response) {
                                 if (response.isSuccessful()) {
-                                   onPurchaseCompleted(response.getPurchaseDetails());
+                                    Logger.i("purchaseSubscription(): Purchase successful, originalData=" + response.getPurchaseDetails().getOriginalData());
+                                    onPurchaseCompleted(response.getPurchaseDetails());
                                 }
                                 else {
                                     Logger.e("purchaseSubscription(): Failed");
@@ -336,6 +354,20 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
                 holder.textPrice.setText(String.valueOf(holder.item.getMarketplaceProduct().getPrice()));
                 holder.textDescription.setText(holder.item.getMarketplaceProduct().getDescription());
                 holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.getMarketplaceProduct().getTitle()));
+                holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        selectedSubscription = holder.item;
+                        purchaseSubscription(selectedSubscription);
+                    }
+                });
+            }
+            else if (holder.item.getMarketplaceProductDetails() != null) {
+                holder.textTitle.setText(holder.item.getMarketplaceProductDetails().title);
+                holder.textPrice.setText(holder.item.getMarketplaceProductDetails().price);
+                holder.textDescription.setText(holder.item.getMarketplaceProductDetails().description);
+                holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue),
+                        holder.item.getMarketplaceProductDetails().title));
                 holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

@@ -20,7 +20,7 @@ public abstract class MarketplaceManager {
     }
 
     public interface ProductDetailsListener {
-        void onProductDetails(Object zypeProduct, MarketplaceManager.ProductDetailsResponse response);
+        void onProductDetails(MarketplaceManager.ProductDetailsResponse response);
     }
 
     public interface PurchaseListener {
@@ -40,13 +40,13 @@ public abstract class MarketplaceManager {
     public abstract void getPurchases(int productType, PurchasesUpdatedListener listener);
 
     /**
-     * Request product details from the marketplace for specified object (subscription or video).
+     * Request product details from the marketplace by product id.
      * 'onProductDetails()' method of the listener will be called on response from the marketplace.
      *
-     * @param zypeProduct must be Subscription or Video
+     * @param sku Product id in the marketplace
      *
      */
-    public abstract void getProductDetails(Object zypeProduct, ProductDetailsListener listener);
+    public abstract void getProductDetails(String sku, ProductDetailsListener listener);
 
     /**
      * Start purchasing process for scecified sku

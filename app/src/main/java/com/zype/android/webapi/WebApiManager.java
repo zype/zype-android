@@ -30,6 +30,7 @@ import com.zype.android.webapi.builder.MarketplaceConnectParamsBuilder;
 import com.zype.android.webapi.builder.ParamsBuilder;
 import com.zype.android.webapi.builder.PlanParamsBuilder;
 import com.zype.android.webapi.builder.PlayerParamsBuilder;
+import com.zype.android.webapi.builder.PlaylistParamsBuilder;
 import com.zype.android.webapi.builder.VideoParamsBuilder;
 import com.zype.android.webapi.events.BaseEvent;
 import com.zype.android.webapi.events.DataEvent;
@@ -49,6 +50,7 @@ import com.zype.android.webapi.events.entitlements.VideoEntitlementsEvent;
 import com.zype.android.webapi.events.favorite.FavoriteEvent;
 import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
 import com.zype.android.webapi.events.linking.DevicePinEvent;
+import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectSamsungEvent;
 import com.zype.android.webapi.events.onair.OnAirAudioEvent;
 import com.zype.android.webapi.events.onair.OnAirEvent;
 import com.zype.android.webapi.events.onair.OnAirVideoEvent;
@@ -82,6 +84,7 @@ import com.zype.android.webapi.model.entitlements.VideoEntitlementsResponse;
 import com.zype.android.webapi.model.favorite.FavoriteResponse;
 import com.zype.android.webapi.model.favorite.UnfavoriteResponse;
 import com.zype.android.webapi.model.linking.DevicePinResponse;
+import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectSamsungResponse;
 import com.zype.android.webapi.model.onair.OnAirAudioResponse;
 import com.zype.android.webapi.model.onair.OnAirResponse;
 import com.zype.android.webapi.model.onair.OnAirVideoResponse;
@@ -119,6 +122,9 @@ public class WebApiManager {
     private static final String ENDPOINT_API = "https://api.zype.com";
     private static final String ENDPOINT_PLAYER = "https://player.zype.com";
     private static final String ENDPOINT_LOGIN = "https://login.zype.com";
+//    private static final String ENDPOINT_API = "https://api-core-2531.stage.zy.pe";
+//    private static final String ENDPOINT_PLAYER = "https://player-core-2531.stage.zy.pe";
+//    private static final String ENDPOINT_LOGIN = "https://login-core-2531.stage.zy.pe";
     public static String CUSTOM_HEADER_VALUE = "Dalvik/2.1.0 (Zype Android; Linux; U; Android 5.0.2; One X Build/LRX22G)";
     private static WebApiManager sInstance;
     private final ZypeApiEndpointInterface mApi;
@@ -144,7 +150,8 @@ public class WebApiManager {
         if (BuildConfig.DEBUG) {
             logLevel = RestAdapter.LogLevel.FULL;
         } else {
-            logLevel = RestAdapter.LogLevel.NONE;
+            // TODO: Change log level to NONE for release
+            logLevel = RestAdapter.LogLevel.FULL;
         }
         mBus = new EventBus();
         RestAdapter apiRestAdapter = new RestAdapter.Builder()
@@ -178,7 +185,7 @@ public class WebApiManager {
         mCookieApi = cookieRestAdapter.create(ZypeApiEndpointInterface.class);
 
         RestAdapter marketplaceConnectRestAdapter = new RestAdapter.Builder()
-                .setEndpoint("https://mkt.zype.com")
+                .setEndpoint("https://mkt.stg.zype.com")
                 .setRequestInterceptor(new CustomRequestInterceptor())
                 .setLogLevel(logLevel)
                 .setClient(new OkClient(okHttpClient))
@@ -251,7 +258,7 @@ public class WebApiManager {
                 return new RefreshAccessTokenEvent(ticket, new RefreshAccessToken(mApi.authRefreshAccessToken(postParams)));
             case AUTH_RETRIEVE_ACCESS_TOKEN:
                 return new RetrieveAccessTokenEvent(ticket, new RetrieveAccessToken(mApi.authRetrieveAccessToken(postParams)));
-            case MARKETPLACE_CONNECT:
+            case MARKETPLACE_CONNECT: {
                 MarketplaceConnectBody body = new MarketplaceConnectBody();
                 body.appId = ZypeApp.appData.id;
                 body.consumerId = postParams.get(MarketplaceConnectParamsBuilder.CONSUMER_ID);
@@ -264,6 +271,16 @@ public class WebApiManager {
                 body.data = bodyData;
 
                 return new MarketplaceConnectEvent(ticket, new MarketplaceConnectResponse(marketplaceConnectApi.verifySubscription(body)));
+            }
+            case MARKETPLACE_CONNECT_SAMSUNG: {
+                MarketplaceConnectBody body = new MarketplaceConnectBody();
+                body.appId = ZypeApp.appData.id;
+                body.consumerId = postParams.get(MarketplaceConnectParamsBuilder.CONSUMER_ID);
+                body.planId = postParams.get(MarketplaceConnectParamsBuilder.PLAN_ID);
+                body.purchaseId = postParams.get(MarketplaceConnectParamsBuilder.PURCHASE_ID);
+                body.siteId = ZypeApp.appData.siteId;
+                return new MarketplaceConnectSamsungEvent(ticket, new MarketplaceConnectSamsungResponse(marketplaceConnectApi.verifySubscriptionSamsung(body)));
+            }
             case CONSUMER_FORGOT_PASSWORD:
                 return new ConsumerEvent(ticket, request, new ConsumerResponse(mApi.consumerForgotPassword(getParams, postParams)));
             case PLAN:
@@ -331,7 +348,8 @@ public class WebApiManager {
                 getParams.remove(PlayerParamsBuilder.VIDEO_ID);
                 return new OnAirAudioEvent(ticket, new OnAirAudioResponse(mCookieApi.getOnAirAudio(videoId, getParams)));
             case PLAYLIST_GET:
-                return new PlaylistEvent(ticket, new PlaylistResponse(mApi.getPlaylists(getParams)));
+                String parentId = getParams.get(PlaylistParamsBuilder.PARENT_ID);
+                return new PlaylistEvent(ticket, new PlaylistResponse(mApi.getPlaylists(getParams)), parentId);
             case VIDEO_FROM_PLAYLIST:
                 if (pathParams.containsKey(VideoParamsBuilder.PLAYLIST_ID)) {
                     playlistId = pathParams.get(VideoParamsBuilder.PLAYLIST_ID);
@@ -365,6 +383,7 @@ public class WebApiManager {
         AUTH_RETRIEVE_ACCESS_TOKEN,
         CONSUMER_FORGOT_PASSWORD,
         MARKETPLACE_CONNECT,
+        MARKETPLACE_CONNECT_SAMSUNG,
         PLAN,
         TOKEN_INFO,
         VIDEO,

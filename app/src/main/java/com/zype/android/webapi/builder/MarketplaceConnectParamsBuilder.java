@@ -12,6 +12,7 @@ import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBody;
 public class MarketplaceConnectParamsBuilder extends ParamsBuilder {
     public static final String CONSUMER_ID = "consumer_id";
     public static final String PLAN_ID = "plan_id";
+    public static final String PURCHASE_ID = "purchase_id";
     public static final String PURCHASE_TOKEN = "purchase_token";
     public static final String RECEIPT = "receipt";
     public static final String SIGNATURE = "signature";
@@ -41,6 +42,11 @@ public class MarketplaceConnectParamsBuilder extends ParamsBuilder {
 
     public MarketplaceConnectParamsBuilder addPlanId(String planId) {
         addPostParam(PLAN_ID, planId);
+        return this;
+    }
+
+    public MarketplaceConnectParamsBuilder addPurchaseId(String purchaseId) {
+        addPostParam(PURCHASE_ID, purchaseId);
         return this;
     }
 

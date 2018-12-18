@@ -14,14 +14,11 @@ public class MarketplaceConnectBody implements Serializable{
     @SerializedName("consumer_id")
     public String consumerId;
 
-//    @SerializedName("consumer_token")
-//    public String consumerToken;
-
     @SerializedName("plan_id")
     public String planId;
 
-//    @SerializedName("receipt")
-//    public String receipt;
+    @SerializedName("purchase_id")
+    public String purchaseId;
 
     @SerializedName("site_id")
     public String siteId;

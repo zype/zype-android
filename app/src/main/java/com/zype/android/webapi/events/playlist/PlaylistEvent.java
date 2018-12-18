@@ -6,7 +6,10 @@ import com.zype.android.webapi.model.playlist.PlaylistResponse;
 
 public class PlaylistEvent extends DataEvent<PlaylistResponse> {
 
-    public PlaylistEvent(RequestTicket ticket, PlaylistResponse data) {
+    public String parentId;
+
+    public PlaylistEvent(RequestTicket ticket, PlaylistResponse data, String parentId) {
         super(ticket, data);
+        this.parentId = parentId;
     }
 }

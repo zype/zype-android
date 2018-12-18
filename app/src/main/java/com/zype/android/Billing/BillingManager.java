@@ -259,7 +259,7 @@ public class BillingManager extends MarketplaceManager implements PurchasesUpdat
     }
 
     @Override
-    public void getProductDetails(Object zypeProduct, ProductDetailsListener listener) {
+    public void getProductDetails(String sku, ProductDetailsListener listener) {
 
     }
 

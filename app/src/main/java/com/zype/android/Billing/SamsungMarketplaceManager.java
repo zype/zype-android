@@ -2,6 +2,7 @@ package com.zype.android.Billing;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.samsung.android.sdk.iap.lib.BuildConfig;
@@ -29,6 +30,8 @@ import java.util.UUID;
 
 public class SamsungMarketplaceManager extends MarketplaceManager {
 
+    public static final String KEY_PURCHASE_ID = "PurchaseId";
+
     private IapHelper iapHelper  = null;
 
     private List<PurchaseDetails> purchases;
@@ -39,10 +42,9 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
 
         iapHelper = IapHelper.getInstance(context);
 
-        if (!BuildConfig.DEBUG)
-            iapHelper.setOperationMode(HelperDefine.OperationMode.OPERATION_MODE_PRODUCTION);
-        else
-            iapHelper.setOperationMode(HelperDefine.OperationMode.OPERATION_MODE_TEST);
+        // TODO: Set operation mode to PRODUCTION for release build
+//        iapHelper.setOperationMode(HelperDefine.OperationMode.OPERATION_MODE_PRODUCTION);
+        iapHelper.setOperationMode(HelperDefine.OperationMode.OPERATION_MODE_TEST);
 
         purchases = new ArrayList<>();
     }
@@ -93,6 +95,7 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
                                 else {
                                     purchase.setType(PRODUCT_TYPE_ALL);
                                 }
+                                purchase.setString(KEY_PURCHASE_ID, item.getPurchaseId());
 
                                 purchases.add(purchase);
                             }
@@ -115,24 +118,7 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
     }
 
     @Override
-    public void getProductDetails(final Object zypeProduct, final ProductDetailsListener listener) {
-        String sku = null;
-        if (zypeProduct instanceof Subscription) {
-            Subscription subscription = (Subscription) zypeProduct;
-            if (subscription.getZypePlan().marketplaceIds == null) {
-                Logger.e("getProductDetails(): marketplaceIds is empty.");
-                return;
-            }
-            sku = subscription.getZypePlan().marketplaceIds.samsung;
-        }
-        else if (zypeProduct instanceof Video) {
-            Video video = (Video) zypeProduct;
-            sku = video.id;
-        }
-        else {
-            Logger.e("getProductDetails(): Invalid type of 'productObhject' argument. It must be 'Subscription' or 'Video'");
-            throw new IllegalArgumentException("Invalid 'productObject' type");
-        }
+    public void getProductDetails(@NonNull String sku, final ProductDetailsListener listener) {
         if (!TextUtils.isEmpty(sku)) {
             iapHelper.getProductsDetails(sku, new OnGetProductsDetailsListener() {
                 @Override
@@ -142,6 +128,7 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
                     String errorMessage;
 
                     if (_errorVO != null) {
+                        Logger.i("onGetProducts(): _errorVO=" + _errorVO.toString());
                         if (_errorVO.getErrorCode() == IapHelper.IAP_ERROR_NONE) {
                             isSuccessful = true;
                             for (ProductVo vo : _productList) {
@@ -161,16 +148,18 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
                         }
                     }
                     else {
+                        Logger.e("onGetProducts(): _errorVO is null");
                         isSuccessful = false;
                         errorMessage = "ErrorVo is null";
                     }
 
-                    listener.onProductDetails(zypeProduct, new ProductDetailsResponse(isSuccessful, errorMessage, productDetails));
+                    listener.onProductDetails(new ProductDetailsResponse(isSuccessful, errorMessage, productDetails));
                 }
             });
         }
         else {
             Logger.e("getProductDetails(): Product sku is empty");
+            throw new IllegalArgumentException("Product sku is empty");
         }
     }
 
@@ -197,6 +186,7 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
                         purchase.setSku(_purchaseVO.getItemId());
                         purchase.setTitle(_purchaseVO.getItemName());
                         purchase.setType(productType);
+                        purchase.setString(KEY_PURCHASE_ID, _purchaseVO.getPurchaseId());
                     }
                     else {
                         isSuccessful = false;

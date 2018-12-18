@@ -14,6 +14,7 @@ import com.zype.android.webapi.model.entitlements.VideoEntitlements;
 import com.zype.android.webapi.model.favorite.DeleteFavorite;
 import com.zype.android.webapi.model.favorite.FavoriteVideo;
 import com.zype.android.webapi.model.linking.DevicePin;
+import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectSamsung;
 import com.zype.android.webapi.model.onair.OnAirAudioResponseData;
 import com.zype.android.webapi.model.onair.OnAirData;
 import com.zype.android.webapi.model.onair.OnAirVideoResponseData;
@@ -126,6 +127,9 @@ public interface ZypeApiEndpointInterface {
     // Marketplace Connect
     @POST("/v1/googleplay/")
     MarketplaceConnect verifySubscription(@Body MarketplaceConnectBody body);
+
+    @POST("/v1/samsung/")
+    MarketplaceConnectSamsung verifySubscriptionSamsung(@Body MarketplaceConnectBody body);
 
     // Plans
     @GET("/plans/{plan_id}")
