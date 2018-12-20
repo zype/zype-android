@@ -185,7 +185,7 @@ public class WebApiManager {
         mCookieApi = cookieRestAdapter.create(ZypeApiEndpointInterface.class);
 
         RestAdapter marketplaceConnectRestAdapter = new RestAdapter.Builder()
-                .setEndpoint("https://mkt.stg.zype.com")
+                .setEndpoint("https://mkt.zype.com")
                 .setRequestInterceptor(new CustomRequestInterceptor())
                 .setLogLevel(logLevel)
                 .setClient(new OkClient(okHttpClient))
