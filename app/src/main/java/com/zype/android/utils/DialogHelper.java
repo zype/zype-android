@@ -87,6 +87,9 @@ public class DialogHelper {
     }
 
     public static void showErrorAlert(final Activity activity, String message) {
+        if (activity == null || activity.isFinishing()) {
+            return;
+        }
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
         alertDialog.setMessage(message);
         alertDialog.setNegativeButton(activity.getString(R.string.dialog_button_close), new DialogInterface.OnClickListener() {

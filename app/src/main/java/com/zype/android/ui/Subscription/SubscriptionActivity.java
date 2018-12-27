@@ -126,7 +126,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
 
     // //////////
     // UI
-    // 
+    //
     private void updateViews() {
 //        if (ZypeSettings.NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED) {
 //            layoutLogin.setVisibility(View.VISIBLE);
@@ -163,8 +163,10 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     }
 
     private void hideProgress() {
-        if (dialogProgress != null) {
-            dialogProgress.dismiss();
+        if (!isFinishing()) {
+            if (dialogProgress != null) {
+                dialogProgress.dismiss();
+            }
         }
     }
 
