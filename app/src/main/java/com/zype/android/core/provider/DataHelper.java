@@ -449,8 +449,18 @@ public class DataHelper {
             value.put(Contract.AnalyticBeacon.VIDEO_ID, videoId);
 
             if (siteId != null) { value.put(Contract.AnalyticBeacon.SITE_ID, siteId); }
-            if (playerId != null) { value.put(Contract.AnalyticBeacon.PLAYER_ID, playerId); }
-            if (device != null) { value.put(Contract.AnalyticBeacon.DEVICE, device); }
+            if (playerId != null) {
+                value.put(Contract.AnalyticBeacon.PLAYER_ID, playerId);
+            }
+            else {
+                value.put(Contract.AnalyticBeacon.PLAYER_ID, "");
+            }
+            if (device != null) {
+                value.put(Contract.AnalyticBeacon.DEVICE, device);
+            }
+            else {
+                value.put(Contract.AnalyticBeacon.DEVICE, "");
+            }
 
             return contentResolver.insert(uri, value);
         } else {
