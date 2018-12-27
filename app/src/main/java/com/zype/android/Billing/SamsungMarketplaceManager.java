@@ -42,9 +42,9 @@ public class SamsungMarketplaceManager extends MarketplaceManager {
 
         iapHelper = IapHelper.getInstance(context);
 
-        // TODO: Set operation mode to PRODUCTION for release build
-//        iapHelper.setOperationMode(HelperDefine.OperationMode.OPERATION_MODE_PRODUCTION);
-        iapHelper.setOperationMode(HelperDefine.OperationMode.OPERATION_MODE_TEST);
+        // To test IAP flow use Test operation mode of IAP Helper
+        iapHelper.setOperationMode(HelperDefine.OperationMode.OPERATION_MODE_PRODUCTION);
+//        iapHelper.setOperationMode(HelperDefine.OperationMode.OPERATION_MODE_TEST);
 
         purchases = new ArrayList<>();
     }

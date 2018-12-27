@@ -176,20 +176,22 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
     // Subscriptions
 
     public Subscription findSubscriptionBySku(String sku) {
-        for (Map.Entry<String, Subscription> entry : subscriptionsLiveData.getValue().entrySet()) {
-            if (appConfiguration.marketplace.equals(MARKETPLACE_GOOGLE)) {
-                if (entry.getValue().getZypePlan().marketplaceIds.googleplay.equals(sku)) {
-                    return entry.getValue();
+        if (subscriptionsLiveData.getValue() != null) {
+            for (Map.Entry<String, Subscription> entry : subscriptionsLiveData.getValue().entrySet()) {
+                if (entry.getValue().getZypePlan() != null) {
+                    if (appConfiguration.marketplace.equals(MARKETPLACE_GOOGLE)) {
+                        if (entry.getValue().getZypePlan().marketplaceIds.googleplay.equals(sku)) {
+                            return entry.getValue();
+                        }
+                    } else if (appConfiguration.marketplace.equals(MARKETPLACE_SAMSUNG)) {
+                        if (entry.getValue().getZypePlan().marketplaceIds.samsung.equals(sku)) {
+                            return entry.getValue();
+                        }
+                    } else {
+                        Logger.e("findSubscriptionBySku(): Invalid marketplace: " + appConfiguration.marketplace);
+                        throw new IllegalArgumentException();
+                    }
                 }
-            }
-            else if (appConfiguration.marketplace.equals(MARKETPLACE_SAMSUNG)) {
-                if (entry.getValue().getZypePlan().marketplaceIds.samsung.equals(sku)) {
-                    return entry.getValue();
-                }
-            }
-            else {
-                Logger.e("findSubscriptionBySku(): Invalid marketplace: " + appConfiguration.marketplace);
-                throw new IllegalArgumentException();
             }
         }
         return null;
@@ -200,8 +202,8 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
             subscriptionVerified = new MutableLiveData<>();
         }
         else {
-            Logger.w("validateSubscription(): Can't verify subscription now.");
-            return null;
+//            Logger.w("verifySubscription(): Can't verify subscription now.");
+//            return subscriptionVerified;
         }
 
         if (appConfiguration.marketplace.equals(MARKETPLACE_GOOGLE)) {
