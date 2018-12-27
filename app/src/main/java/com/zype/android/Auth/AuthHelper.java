@@ -21,6 +21,11 @@ public class AuthHelper {
 
     public static void onLoggedIn(Observer<Boolean> observer) {
         AuthLiveData.getInstance().observeForever(observer);
+        AuthLiveData.getInstance().updateLoginState();
+    }
+
+    public static void onLoginStateChanged() {
+        AuthLiveData.getInstance().updateLoginState();
     }
 
     public static boolean isLoggedIn() {

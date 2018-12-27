@@ -326,6 +326,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             AuthHelper.onLoggedIn(new Observer<Boolean>() {
                 @Override
                 public void onChanged(@Nullable Boolean isLoggedIn) {
+                    Logger.d("onLoggedIn(): " + isLoggedIn);
                     PlayerParamsBuilder playerParamsBuilder = new PlayerParamsBuilder();
                     if (isLoggedIn) {
                         playerParamsBuilder.addAccessToken();

@@ -19,31 +19,37 @@ public class AuthLiveData extends LiveData<Boolean> {
     public static synchronized AuthLiveData getInstance(){
         if (instance == null){
             instance = new AuthLiveData();
+            instance.updateLoginState();
         }
         return instance;
     }
 
     @Override
     protected void onActive() {
+        Logger.d("onActive()");
         WebApiManager.getInstance().subscribe(this);
+    }
 
+    @Override
+    protected void onInactive() {
+        Logger.d("onInactive()");
+        WebApiManager.getInstance().unsubscribe(this);
+    }
+
+    public void updateLoginState() {
+        Logger.d("updateLoginState()");
         if (AuthHelper.isLoggedIn()) {
             if (AuthHelper.isAccessTokenExpired()) {
                 refreshToken();
             }
             else {
-                setValue(true);
+                instance.setValue(true);
             }
 
         }
         else {
-            setValue(false);
+            instance.setValue(false);
         }
-    }
-
-    @Override
-    protected void onInactive() {
-        WebApiManager.getInstance().unsubscribe(this);
     }
 
     private void refreshToken() {
@@ -61,7 +67,7 @@ public class AuthLiveData extends LiveData<Boolean> {
     public void handleRefreshAccessTokenEvent(RefreshAccessTokenEvent refreshAccessTokenEvent) {
         Logger.d("handleRefreshAccessTokenEvent()");
 
-        setValue(true);
+        instance.setValue(true);
     }
 
     @Subscribe
@@ -70,7 +76,7 @@ public class AuthLiveData extends LiveData<Boolean> {
             Logger.d("handleErrorEvent()");
 
             SettingsProvider.getInstance().logout();
-            setValue(false);
+            instance.setValue(false);
         }
     }
 

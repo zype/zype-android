@@ -24,6 +24,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Auth.AuthLiveData;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;
@@ -433,6 +435,7 @@ public class LoginActivity extends BaseActivity {
     //
     @Subscribe
     public void handleRetrieveAccessToken(RetrieveAccessTokenEvent event) {
+        Logger.d("handleRetrieveAccessToken");
 
         RetrieveAccessToken.RetrieveAccessTokenData data = event.getEventData().getModelData();
         SettingsProvider.getInstance().saveAccessToken(data.getAccessToken());
@@ -440,7 +443,6 @@ public class LoginActivity extends BaseActivity {
         SettingsProvider.getInstance().saveRefreshToken(data.getRefreshToken());
         SettingsProvider.getInstance().saveScope(data.getScope());
         SettingsProvider.getInstance().saveTokenType(data.getTokenType());
-        Logger.d("handleRetrieveAccessToken");
 
         AuthParamsBuilder authParamsBuilder = new AuthParamsBuilder();
         authParamsBuilder.addToken(data.getAccessToken());
@@ -491,6 +493,9 @@ public class LoginActivity extends BaseActivity {
         String consumerId = data.getConsumerData().getId();
         SettingsProvider.getInstance().saveConsumerId(consumerId);
         SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, data.getConsumerData().getEmail());
+
+        AuthHelper.onLoginStateChanged();
+
         setResult(RESULT_OK);
         finish();
     }
