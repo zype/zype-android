@@ -54,6 +54,8 @@ public class HeroImageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_hero_image, container, false);
 
+        final NavigationHelper navigationHelper = NavigationHelper.getInstance(getActivity());
+
         ImageView imageHero = rootView.findViewById(R.id.imageHero);
         UiUtils.loadImage(getActivity(), imageUrl, imageHero);
         imageHero.setOnClickListener(new View.OnClickListener() {
@@ -63,20 +65,22 @@ public class HeroImageFragment extends Fragment {
                     Video video = DataRepository.getInstance(getActivity().getApplication()).getVideoSync(videoId);
                     if (video == null || video.active != 1) {
                         DialogHelper.showErrorAlert(getActivity(), getString(R.string.gallery_hero_image_error_video));
-                    } else {
-                        NavigationHelper.getInstance(getActivity()).switchToVideoDetailsScreen(getActivity(), videoId, null, false);
                     }
-                } else if (!TextUtils.isEmpty(playlistId)) {
+                    else {
+                        navigationHelper.handleVideoClick(getActivity(), video, null, false);
+                    }
+                }
+                else if (!TextUtils.isEmpty(playlistId)) {
                     Playlist playlist = DataRepository.getInstance(getActivity().getApplication()).getPlaylistSync(playlistId);
                     if (playlist == null || playlist.active != 1) {
                         DialogHelper.showErrorAlert(getActivity(), getString(R.string.gallery_hero_image_error_playlist));
                     }
                     else {
                         if (playlist.playlistItemCount > 0) {
-                            NavigationHelper.getInstance(getActivity()).switchToPlaylistVideosScreen(getActivity(), playlistId);
+                            navigationHelper.switchToPlaylistVideosScreen(getActivity(), playlistId);
                         }
                         else {
-                            NavigationHelper.getInstance(getActivity()).switchToPlaylistScreen(getActivity(), playlistId);
+                            navigationHelper.switchToPlaylistScreen(getActivity(), playlistId);
                         }
                     }
                 }

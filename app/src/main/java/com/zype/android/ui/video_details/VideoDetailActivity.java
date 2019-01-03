@@ -145,6 +145,9 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                         changeFragment(isChromecastConntected());
                         hideProgress();
                     }
+                    else {
+                        requestVideoUrl(mVideoId);
+                    }
                 }
             });
 

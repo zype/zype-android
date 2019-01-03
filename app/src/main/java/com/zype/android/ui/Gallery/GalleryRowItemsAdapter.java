@@ -85,13 +85,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                 NavigationHelper navigationHelper = NavigationHelper.getInstance(holder.view.getContext());
                 if (holder.item instanceof Video) {
                     Video video = (Video) holder.item;
-                    if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
-                        navigationHelper.switchToVideoDetailsScreen((Activity) holder.view.getContext(), video.id,
-                                playlistId, false);
-                    }
-                    else {
-                        navigationHelper.handleNotAuthorizedVideo((Activity) holder.view.getContext(), video.id, playlistId);
-                    }
+                    navigationHelper.handleVideoClick((Activity) holder.view.getContext(), video, playlistId, false);
                 }
                 else if (holder.item instanceof Playlist) {
                     Playlist playlist = (Playlist) holder.item;

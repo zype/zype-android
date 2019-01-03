@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.android.billingclient.api.Purchase;
 import com.zype.android.Auth.AuthHelper;
@@ -189,7 +190,57 @@ public class NavigationHelper {
         activity.startActivityForResult(intent, BundleConstants.REQUEST_SUBSCRIBE_OR_LOGIN);
     }
 
-    //
+    // Video
+
+    public void handleVideoClick(Activity activity, @NonNull Video video, String playlistId, boolean autoplay) {
+        if (AuthHelper.isVideoAuthorized(activity, video.id)) {
+            switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
+        }
+        else {
+            handleUnauthorizedVideo(activity, video, null);
+        }
+    }
+
+    public void handleUnauthorizedVideo(Activity activity, Video video, String playlistId) {
+        Bundle extras = new Bundle();
+        extras.putString(BundleConstants.VIDEO_ID, video.id);
+        extras.putString(BundleConstants.PLAYLIST_ID, playlistId);
+
+        if (Integer.valueOf(video.subscriptionRequired) == 1) {
+            if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
+                switchToSubscriptionScreen(activity, extras);
+            }
+            else if (ZypeConfiguration.isUniversalSubscriptionEnabled(activity)) {
+                if (AuthHelper.isLoggedIn()) {
+                    DialogHelper.showSubscriptionAlertIssue(activity);
+                }
+                else {
+                    DialogHelper.showLoginAlert(activity);
+                }
+            }
+            else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
+                if (AuthHelper.isLoggedIn()) {
+                    // TODO: Update getting purchases
+                    List<Purchase> purchases = ZypeApp.marketplaceGateway.getBillingManager().getPurchases();
+                    if (purchases != null && purchases.size() > 0) {
+                        switchToSubscribeOrLoginScreen(activity, extras);
+                    }
+                    else {
+                        switchToSubscriptionScreen(activity, extras);
+                    }
+                }
+                else {
+                    switchToSubscribeOrLoginScreen(activity, extras);
+                }
+            }
+            else {
+                DialogHelper.showAlert(activity,
+                        context.getString(R.string.dialog_update_app_title),
+                        context.getString(R.string.dialog_update_app_message));
+            }
+        }
+    }
+
     public void handleNotAuthorizedVideo(Activity activity, String videoId, String playlistId) {
         Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
         Bundle extras = new Bundle();
