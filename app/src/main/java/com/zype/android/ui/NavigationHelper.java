@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import com.android.billingclient.api.Purchase;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
@@ -280,6 +281,22 @@ public class NavigationHelper {
                 DialogHelper.showAlert(activity,
                         context.getString(R.string.dialog_update_app_title),
                         context.getString(R.string.dialog_update_app_message));
+            }
+        }
+    }
+
+    // Playlist
+
+    public void handlePlaylistClick(Activity activity, Playlist playlist) {
+        if (playlist.playlistItemCount > 0) {
+            switchToPlaylistVideosScreen(activity, playlist.id);
+        }
+        else {
+            if (ZypeConfiguration.playlistGalleryView(activity)) {
+                switchToGalleryScreen(activity, playlist.id);
+            }
+            else {
+                switchToPlaylistScreen(activity, playlist.id);
             }
         }
     }

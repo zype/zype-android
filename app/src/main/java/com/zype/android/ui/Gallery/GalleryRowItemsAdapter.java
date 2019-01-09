@@ -89,11 +89,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
                 }
                 else if (holder.item instanceof Playlist) {
                     Playlist playlist = (Playlist) holder.item;
-                    if (playlist.playlistItemCount > 0) {
-                        navigationHelper.switchToPlaylistVideosScreen((Activity) holder.view.getContext(), playlist.id);                    }
-                    else {
-                        navigationHelper.switchToGalleryScreen((Activity) holder.view.getContext(), playlist.id);
-                    }
+                    navigationHelper.handlePlaylistClick((Activity) holder.view.getContext(), playlist);
                 }
             }
         });

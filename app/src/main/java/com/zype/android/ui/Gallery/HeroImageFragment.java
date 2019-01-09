@@ -76,12 +76,7 @@ public class HeroImageFragment extends Fragment {
                         DialogHelper.showErrorAlert(getActivity(), getString(R.string.gallery_hero_image_error_playlist));
                     }
                     else {
-                        if (playlist.playlistItemCount > 0) {
-                            navigationHelper.switchToPlaylistVideosScreen(getActivity(), playlistId);
-                        }
-                        else {
-                            navigationHelper.switchToPlaylistScreen(getActivity(), playlistId);
-                        }
+                        navigationHelper.handlePlaylistClick(getActivity(), playlist);
                     }
                 }
             }
