@@ -76,6 +76,8 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     VideoDetailViewModel videoDetailViewModel;
     PlayerViewModel playerViewModel;
 
+    Observer<String> playerUrlObserver = null;
+
     public static void startActivity(Activity activity, String videoId, String playlistId) {
         Intent intent = new Intent(activity, VideoDetailActivity.class);
         Bundle bundle = new Bundle();
@@ -101,86 +103,9 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         super.onCreate(savedInstanceState);
 
         initUI();
-        final Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
-        if (video != null) {
-            // Load player urls
-            playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class);
-            PlayerViewModel.PlayerMode mediaType = null;
-            switch (mType) {
-                case PlayerFragment.TYPE_AUDIO_LOCAL:
-                case PlayerFragment.TYPE_AUDIO_WEB:
-                    mediaType = PlayerViewModel.PlayerMode.AUDIO;
-                    break;
-                case PlayerFragment.TYPE_VIDEO_LOCAL:
-                case PlayerFragment.TYPE_VIDEO_WEB:
-                case BaseVideoActivity.TYPE_WEB:
-                    mediaType = PlayerViewModel.PlayerMode.VIDEO;
-                    break;
-            }
-            playerViewModel.init(video.id, mediaType);
-            playerViewModel.getPlayerUrl().observe(this, new Observer<String>() {
-                @Override
-                public void onChanged(@Nullable String url) {
-                    Logger.d("getPlayerUrl(): onChanged(): url=" + url);
-                    if (!TextUtils.isEmpty(url)) {
-                        switch (playerViewModel.getPlayerMode().getValue()) {
-                            case AUDIO:
-                                if (playerViewModel.isAudioDownloaded()) {
-                                    mType = PlayerFragment.TYPE_AUDIO_LOCAL;
-                                }
-                                else {
-                                    mType = PlayerFragment.TYPE_AUDIO_WEB;
-                                }
-                                break;
-                            case VIDEO:
-                                if (playerViewModel.isVideoDownloaded()) {
-                                    mType = PlayerFragment.TYPE_VIDEO_LOCAL;
-                                }
-                                else {
-                                    mType = PlayerFragment.TYPE_VIDEO_WEB;
-                                }
-                                break;
-                        }
-                        hideVideoThumbnail();
-                        changeFragment(isChromecastConntected());
-                        hideProgress();
-                    }
-                    else {
-                        requestVideoUrl(mVideoId);
-                    }
-                }
-            });
 
-            if (video.isZypeLive == 0) {
-                updateDownloadUrls();
-            }
-            else {
-//                showVideoThumbnail();
-                videoDetailViewModel = new VideoDetailViewModel(getApplication());
-                final Observer<Video> videoObserver = new Observer<Video>() {
-                    @Override
-                    public void onChanged(@Nullable Video video) {
-                        if (VideoHelper.isLiveEventOnAir(video)) {
-                            videoDetailViewModel.updateVideoOnAir(video);
-                            showPlayer();
-                        }
-                        else {
-                            changeFragment(isChromecastConntected());
-                            videoDetailViewModel.checkOnAir(mVideoId).observe(VideoDetailActivity.this, new Observer<Video>() {
-                                @Override
-                                public void onChanged(@Nullable Video video) {
-                                    videoDetailViewModel.onCleared();
-                                    videoDetailViewModel.updateVideoOnAir(video);
-                                    showPlayer();
-                                }
-                            });
-                        }
-                        videoDetailViewModel.getVideo(mVideoId).removeObserver(this);
-                    }
-                };
-                videoDetailViewModel.getVideo(mVideoId).observe(this, videoObserver);
-            }
-        }
+        playerUrlObserver = createPlayerUrlObserver();
+        initModel();
     }
 
     @Override
@@ -188,6 +113,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         Logger.d("onNewIntent()");
         super.onNewIntent(intent);
         initUI();
+        initModel();
         checkVideoAuthorization();
     }
 
@@ -391,6 +317,58 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     // //////////
     // Data
     //
+    private void initModel() {
+        final Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+        if (video != null) {
+            // Load player urls
+            playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class);
+            PlayerViewModel.PlayerMode mediaType = null;
+            switch (mType) {
+                case PlayerFragment.TYPE_AUDIO_LOCAL:
+                case PlayerFragment.TYPE_AUDIO_WEB:
+                    mediaType = PlayerViewModel.PlayerMode.AUDIO;
+                    break;
+                case PlayerFragment.TYPE_VIDEO_LOCAL:
+                case PlayerFragment.TYPE_VIDEO_WEB:
+                case BaseVideoActivity.TYPE_WEB:
+                    mediaType = PlayerViewModel.PlayerMode.VIDEO;
+                    break;
+            }
+            playerViewModel.init(video.id, mediaType);
+            playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
+
+            if (video.isZypeLive == 0) {
+                updateDownloadUrls();
+            }
+            else {
+//                showVideoThumbnail();
+                videoDetailViewModel = new VideoDetailViewModel(getApplication());
+                final Observer<Video> videoObserver = new Observer<Video>() {
+                    @Override
+                    public void onChanged(@Nullable Video video) {
+                        if (VideoHelper.isLiveEventOnAir(video)) {
+                            videoDetailViewModel.updateVideoOnAir(video);
+                            showPlayer();
+                        }
+                        else {
+                            changeFragment(isChromecastConntected());
+                            videoDetailViewModel.checkOnAir(mVideoId).observe(VideoDetailActivity.this, new Observer<Video>() {
+                                @Override
+                                public void onChanged(@Nullable Video video) {
+                                    videoDetailViewModel.onCleared();
+                                    videoDetailViewModel.updateVideoOnAir(video);
+                                    showPlayer();
+                                }
+                            });
+                        }
+                        videoDetailViewModel.getVideo(mVideoId).removeObserver(this);
+                    }
+                };
+                videoDetailViewModel.getVideo(mVideoId).observe(this, videoObserver);
+            }
+        }
+    }
+
     private void updateDownloadUrls() {
         VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
         if (!videoData.isOnAir()) {
@@ -406,6 +384,41 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
             showVideoThumbnail();
             NavigationHelper.getInstance(this).handleNotAuthorizedVideo(this, mVideoId, playlistId);
         }
+    }
+
+    private Observer<String> createPlayerUrlObserver() {
+        return new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String url) {
+                Logger.d("getPlayerUrl(): onChanged(): url=" + url);
+                if (!TextUtils.isEmpty(url)) {
+                    switch (playerViewModel.getPlayerMode().getValue()) {
+                        case AUDIO:
+                            if (playerViewModel.isAudioDownloaded()) {
+                                mType = PlayerFragment.TYPE_AUDIO_LOCAL;
+                            }
+                            else {
+                                mType = PlayerFragment.TYPE_AUDIO_WEB;
+                            }
+                            break;
+                        case VIDEO:
+                            if (playerViewModel.isVideoDownloaded()) {
+                                mType = PlayerFragment.TYPE_VIDEO_LOCAL;
+                            }
+                            else {
+                                mType = PlayerFragment.TYPE_VIDEO_WEB;
+                            }
+                            break;
+                    }
+                    hideVideoThumbnail();
+                    changeFragment(isChromecastConntected());
+                    hideProgress();
+                }
+                else {
+                    requestVideoUrl(mVideoId);
+                }
+            }
+        };
     }
 
     // //////////

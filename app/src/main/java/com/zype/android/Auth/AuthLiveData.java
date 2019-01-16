@@ -37,18 +37,22 @@ public class AuthLiveData extends LiveData<Boolean> {
     }
 
     public void updateLoginState() {
-        Logger.d("updateLoginState()");
         if (AuthHelper.isLoggedIn()) {
             if (AuthHelper.isAccessTokenExpired()) {
+                Logger.d("updateLoginState(): Refreshing token");
                 refreshToken();
             }
             else {
-                instance.setValue(true);
+                Logger.d("updateLoginState(): true");
+                if (instance.getValue() == null || !instance.getValue())
+                    instance.setValue(true);
             }
 
         }
         else {
-            instance.setValue(false);
+            Logger.d("updateLoginState(): false");
+            if (instance.getValue() == null || instance.getValue())
+                instance.setValue(false);
         }
     }
 

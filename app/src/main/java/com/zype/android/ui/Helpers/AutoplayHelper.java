@@ -20,9 +20,11 @@ public class AutoplayHelper {
     }
 
     public static void playPreviousVideo(Activity activity, String currentVideoId, String playlistId) {
-        String nextVideoId = PlaylistHelper.getPreviousVideoId(currentVideoId,
-                CursorHelper.getPlaylistVideosCursor(activity.getContentResolver(), playlistId));
-        VideoDetailActivity.startActivity(activity, nextVideoId, playlistId);
+//        String nextVideoId = PlaylistHelper.getPreviousVideoId(currentVideoId,
+//                CursorHelper.getPlaylistVideosCursor(activity.getContentResolver(), playlistId));
+//        VideoDetailActivity.startActivity(activity, nextVideoId, playlistId);
+        String previousVideoId = PlaylistHelper.getPreviousVideoId(currentVideoId, playlistId, activity.getApplication());
+        NavigationHelper.getInstance(activity).switchToVideoDetailsScreen(activity, previousVideoId, playlistId, true);
     }
 
 }

@@ -494,10 +494,13 @@ public class PlayerFragment extends BaseFragment implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (BuildConfig.DEBUG) {
-            Logger.d("onDestroy()");
-        }
+        Logger.d("onDestroy()");
+
         hideNotification();
+        if (mediaController != null) {
+            mediaController.hide();
+            mediaController = null;
+        }
         audioCapabilitiesReceiverUnregister();
         releasePlayer();
         if (callReceiver != null) {
@@ -802,7 +805,7 @@ public class PlayerFragment extends BaseFragment implements
         manager.trackStop();
 
         if (player != null) {
-            mediaController.hide();
+//            mediaController.hide();
             if (player.getPlaybackState() != ExoPlayer.STATE_ENDED
                     && playerViewModel.playbackPositionRestored()) {
                 mListener.saveCurrentTimeStamp(player.getCurrentPosition());
@@ -947,7 +950,9 @@ public class PlayerFragment extends BaseFragment implements
                 mediaController.post(new Runnable() {
                     @Override
                     public void run() {
-                        mediaController.show(0);
+                        if (mediaController != null) {
+                            mediaController.show(0);
+                        }
                     }
                 });
             }
