@@ -44,6 +44,9 @@ public class PushListenerService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
         Logger.d("onMessageReceived(): data=" + remoteMessage.getData());
+        if (!BuildConfig.AWS_PINPOINT) {
+            return;
+        }
 
         final NotificationClient notificationClient = ZypeApp.getPinpointManager(this).getNotificationClient();
 
