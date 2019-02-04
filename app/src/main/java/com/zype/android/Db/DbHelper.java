@@ -52,7 +52,10 @@ public class DbHelper {
     }
 
     public static Video videoDataToVideoEntity(VideoData videoData) {
-        Video entity = new Video();
+        return updateVideoEntityByVideoData(new Video(), videoData);
+    }
+
+    public static Video updateVideoEntityByVideoData(Video entity, VideoData videoData) {
         entity.id = videoData.getId();
         entity.active = videoData.isActive() ? 1 : 0;
         entity.category = new Gson().toJson(videoData.getCategories());

@@ -56,7 +56,7 @@ public interface ZypeDao {
     @Update(onConflict = REPLACE)
     public void updateVideo(Video video);
 
-    @Insert(onConflict = IGNORE)
+    @Insert(onConflict = REPLACE)
     public void insertVideos(List<Video> videos);
 
 }

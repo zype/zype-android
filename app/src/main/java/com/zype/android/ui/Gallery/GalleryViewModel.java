@@ -285,7 +285,18 @@ public class GalleryViewModel extends AndroidViewModel {
         if (videoData != null) {
             Logger.d("handleRetrieveVideo(): size=" + videoData.size());
             if (videoData.size() > 0) {
-                repo.insertVideos(DbHelper.videoDataToVideoEntity(videoData));
+                List<Video> videos = new ArrayList<>(videoData.size());
+                for (VideoData item : videoData) {
+                    Video video = repo.getVideoSync(item.getId());
+                    if (video != null) {
+                        video = DbHelper.updateVideoEntityByVideoData(video, item);
+                    }
+                    else {
+                        video = DbHelper.videoDataToVideoEntity(item);
+                    }
+                    videos.add(video);
+                }
+                repo.insertVideos(videos);
                 repo.deletePlaylistVideos(event.getPlaylistId());
                 repo.insertPlaylistVideos(DbHelper.videoDataToPlaylistVideoEntity(videoData, event.getPlaylistId()));
             }
