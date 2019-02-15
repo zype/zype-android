@@ -5,7 +5,6 @@ import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.webapi.model.playlist.PlaylistData;
-import com.zype.android.webapi.model.video.Image;
 import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.ArrayList;
@@ -106,4 +105,72 @@ public class DbHelper {
         return result;
     }
 
+    public static List<PlaylistVideo> videosToPlaylistVideos(List<Video> videos, String playlistId) {
+        List<PlaylistVideo> result = new ArrayList<>(videos.size());
+        int number = 1;
+        for (Video item : videos) {
+            PlaylistVideo entity = new PlaylistVideo();
+            entity.number = number;
+            entity.playlistId = playlistId;
+            entity.videoId = item.id;
+            result.add(entity);
+            number++;
+        }
+        return result;
+    }
+
+    public static Video apiVideoToVideoEntity(com.zype.android.zypeapi.model.VideoData videoData) {
+        return updateVideoEntityByApiVideo(new Video(), videoData);
+    }
+
+    public static Video updateVideoEntityByApiVideo(Video entity, com.zype.android.zypeapi.model.VideoData videoData) {
+        entity.id = videoData.id;
+        entity.active = videoData.active ? 1 : 0;
+        entity.category = new Gson().toJson(videoData.categories);
+        entity.country = videoData.country;
+        entity.createdAt = videoData.createdAt;
+        entity.crunchyrollId = videoData.crunchyrollId;
+        entity.description = (videoData.description == null) ? "" : videoData.description;
+        entity.discoveryUrl = videoData.discoveryUrl;
+        entity.duration = videoData.duration;
+        entity.episode = String.valueOf(videoData.episode);
+        entity.expireAt = videoData.expireAt;
+        entity.featured = String.valueOf(videoData.featured ? 1 : 0);
+        entity.foreignId = videoData.foreignId;
+        entity.huluId = videoData.huluId;
+        entity.isZypeLive = videoData.isZypeLive ? 1 : 0;
+        entity.keywords = new Gson().toJson(videoData.keywords);
+        entity.matureContent = String.valueOf(videoData.matureContent ? 1 : 0);
+        entity.onAir = videoData.onAir ? 1 : 0;
+        entity.publishedAt = videoData.publishedAt;
+        entity.purchaseRequired = String.valueOf(videoData.purchaseRequired ? 1 : 0);
+        entity.rating = String.valueOf(videoData.rating);
+        entity.relatedPlaylistIds = new Gson().toJson(videoData.relatedPlaylistIds);
+        entity.requestCount = String.valueOf(videoData.requestCount);
+        entity.season = videoData.season;
+        entity.segments = new Gson().toJson(videoData.segments);
+        entity.shortDescription = videoData.shortDescription;
+        entity.siteId = videoData.siteId;
+        entity.startAt = videoData.startAt;
+        entity.status = videoData.status;
+        entity.subscriptionRequired = String.valueOf(videoData.subscriptionRequired ? 1 : 0);
+        entity.thumbnails = new Gson().toJson(videoData.thumbnails);
+        entity.images = new Gson().toJson(videoData.images);
+        entity.title = videoData.title;
+        entity.transcoded = videoData.transcoded ? 1 : 0;
+        entity.updatedAt = videoData.updatedAt;
+        entity.videoZObject = new Gson().toJson(videoData.videoZobjects);
+        entity.youtubeId = videoData.youtubeId;
+        entity.zobjectIds = new Gson().toJson(videoData.zobjectIds);
+        return entity;
+    }
+
+    public static List<Video> apiVideosToVideoEntities(List<com.zype.android.zypeapi.model.VideoData> videoData) {
+        List<Video> result = new ArrayList<>(videoData.size());
+        for (com.zype.android.zypeapi.model.VideoData item : videoData) {
+            Video entity = apiVideoToVideoEntity(item);
+            result.add(entity);
+        }
+        return result;
+    }
 }

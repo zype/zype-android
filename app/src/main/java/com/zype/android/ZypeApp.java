@@ -50,6 +50,7 @@ import com.zype.android.webapi.events.consumer.ConsumerEvent;
 import com.zype.android.webapi.model.app.App;
 import com.zype.android.webapi.model.app.AppData;
 import com.zype.android.webapi.model.consumers.Consumer;
+import com.zype.android.zypeapi.ZypeApi;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -222,6 +223,8 @@ public class ZypeApp extends MultiDexApplication {
 
     private void initApp() {
         appConfiguration = readAppConfiguration();
+
+        ZypeApi.getInstance().init(ZypeConfiguration.getAppKey());
 
         appData = null;
         AppParamsBuilder builder = new AppParamsBuilder();

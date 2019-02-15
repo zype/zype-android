@@ -162,6 +162,9 @@
                 android:value="com.zype.android.ui.settings.SettingsActivity" />
         </activity>
         <activity
+            android:name=".ui.v2.videos.PlaylistActivity"
+            />
+        <activity
             android:name=".ui.main.fragments.playlist.PlaylistActivity"
             android:label="@string/title_activity_playlist"
             />

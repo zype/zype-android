@@ -170,9 +170,9 @@ public class NavigationHelper {
     }
 
     public void switchToPlaylistVideosScreen(Activity activity, String playlistId) {
-        Intent intent = new Intent(activity, VideosActivity.class);
+        Intent intent = new Intent(activity, com.zype.android.ui.v2.videos.PlaylistActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(BundleConstants.PARENT_ID, playlistId);
+        bundle.putString(BundleConstants.PLAYLIST_ID, playlistId);
         intent.putExtras(bundle);
         activity.startActivity(intent);
     }
