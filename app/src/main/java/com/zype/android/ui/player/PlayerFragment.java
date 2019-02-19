@@ -1287,7 +1287,12 @@ public class PlayerFragment extends BaseFragment implements
         Logger.e("Ad error: " + adErrorEvent.getError().getMessage());
         updateNextAd();
         isControlsEnabled = true;
-        player.getPlayerControl().start();
+        if (player != null) {
+            player.getPlayerControl().start();
+        }
+        else {
+            preparePlayer(true);
+        }
     }
 
 //    private void showAd() {
@@ -1339,6 +1344,7 @@ public class PlayerFragment extends BaseFragment implements
                     // Request the ad
                     Logger.d("checkNextAd(): Requesting ad");
                     String adTag = AdMacrosHelper.updateAdTagParameters(getActivity(), adSchedule.get(nextAdIndex).getTag());
+                    adTag = "https://arena.altitude-arena.com/vast?uid=VH8VCSU6H13P74FMEF38GPSJMS&page_url=[url]&cb=[random]&player_width=640&player_height=480&video_duration=[duration]&media_file_title=[title]&media_description=[description]&media_file_id=[id]";
                     Logger.d("Ad tag with macros: " + adTag);
                     requestAds(adTag);
                     // TODO: Show progress while the ad is loading
