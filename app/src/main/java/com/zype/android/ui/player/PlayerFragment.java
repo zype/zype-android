@@ -697,6 +697,9 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     private void preparePlayer(boolean playWhenReady) {
+        if (getActivity() == null) {
+            return;
+        }
         if (player == null) {
             player = new CustomPlayer(getActivity().getApplicationContext(), getRendererBuilder());
             player.addListener(this);
