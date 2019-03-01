@@ -432,7 +432,12 @@ public class PlayerFragment extends BaseFragment implements
                 display.getSize(size);
                 int width = size.x;
                 int position = getNearestPosition(width, mThumbnailList);
-                UiUtils.loadImage(getActivity().getApplicationContext(), mThumbnailList.get(position).getUrl(), thumbnailView);
+                if (position >= 0) {
+                    UiUtils.loadImage(getActivity().getApplicationContext(), mThumbnailList.get(position).getUrl(), thumbnailView);
+                }
+                else {
+                    UiUtils.loadImage(getActivity().getApplicationContext(), SettingsProvider.getInstance().getOnAirPictureUrl(), thumbnailView);
+                }
             } else {
                 UiUtils.loadImage(getActivity().getApplicationContext(), SettingsProvider.getInstance().getOnAirPictureUrl(), thumbnailView);
             }
@@ -946,10 +951,11 @@ public class PlayerFragment extends BaseFragment implements
     }
 
     private void hideControls() {
-        if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE) {
-            mediaController.hide();
-        } else {
-            if (mediaController != null) {
+        if (mediaController != null) {
+            if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE) {
+                mediaController.hide();
+            }
+            else {
                 mediaController.post(new Runnable() {
                     @Override
                     public void run() {
@@ -1337,7 +1343,8 @@ public class PlayerFragment extends BaseFragment implements
     private boolean checkNextAd(long position) {
         if (nextAdIndex >= 0) {
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0 || BuildConfig.DEBUG) {
-                Logger.d("checkNextAd(): position=" + position);
+                Logger.d("checkNextAd(): next ad " + adSchedule.get(nextAdIndex).getOffset()
+                        +", current position " + position);
                 if (position >= adSchedule.get(nextAdIndex).getOffset()) {
                     // Disable media controls and pause the video
                     isControlsEnabled = false;
