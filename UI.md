@@ -44,3 +44,20 @@ Update values of following color resources to change lock icon colors:
 `icon_locked` - Color of the locked icon
 
 `icon_unlocked` - Color of the unlocked icon. If set to transparent color, the unlocked icon will not display.
+
+## Social links
+
+To remove web site and/or social media links (Facebook, Twitter, Instagram) from the Settings page you can comment out corresponding lines in the `onCreate()` method in  [SettingsFragment.java](https://github.com/zype/zype-android/tree/master/app/src/main/java/com/zype/android/ui/main/fragments/settings/SettingsFragment.java):
+```
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        List<SettingsItem> settingsItems = new ArrayList<>();
+        settingsItems.add(new SettingsItem(getActivity(), ITEM_SETTINGS, R.drawable.icn_settings, R.color.black_38, R.string.settings));
+//        settingsItems.add(new SettingsItem(getActivity(), ITEM_WEB, String.format(getString(R.string.settings_web), getString(R.string.app_name))));
+//        settingsItems.add(new SettingsItem(getActivity(), ITEM_FACEBOOK, R.drawable.icn_facebook, R.color.facebook_bg_color, String.format(getString(R.string.settings_facebook), getString(R.string.app_name))));
+//        settingsItems.add(new SettingsItem(getActivity(), ITEM_TWITTER, R.drawable.icn_twitter, R.color.twitter_bg_color, String.format(getString(R.string.settings_twitter), getString(R.string.app_name))));
+//        settingsItems.add(new SettingsItem(getActivity(), ITEM_INSTAGRAM, R.drawable.instagram, R.color.instagram, String.format(getString(R.string.settings_instagram), getString(R.string.app_name))));
+        mAdapter = new SettingsListAdapter(getActivity(), R.layout.list_item_settings, settingsItems);
+    }
+```
