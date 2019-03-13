@@ -62,10 +62,10 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         mApi.unsubscribe(this);
         BusProvider.getBus().unregister(mNetworkEventHandler);
         NetworkStateObserver.getInstance().unregister(this);
+        super.onPause();
     }
 
     protected void handleAuthorizationError(AuthorizationErrorEvent event) {
