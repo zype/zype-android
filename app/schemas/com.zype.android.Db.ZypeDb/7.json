@@ -1,0 +1,649 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 7,
+    "identityHash": "20a1dd4204f57f496a0126045497432d",
+    "entities": [
+      {
+        "tableName": "ad_schedule",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ad_schedule_id` INTEGER NOT NULL, `offset` INTEGER NOT NULL, `tag` TEXT NOT NULL, `video_id` TEXT NOT NULL, PRIMARY KEY(`ad_schedule_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "ad_schedule_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "offset",
+            "columnName": "offset",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tag",
+            "columnName": "tag",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "videoId",
+            "columnName": "video_id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "ad_schedule_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "analytic_beacon",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`beacon_id` INTEGER NOT NULL, `beacon` TEXT NOT NULL, `device` TEXT NOT NULL, `player_id` TEXT NOT NULL, `site_id` TEXT NOT NULL, `video_id` TEXT NOT NULL, PRIMARY KEY(`beacon_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "beacon_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "beacon",
+            "columnName": "beacon",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "device",
+            "columnName": "device",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "playerId",
+            "columnName": "player_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "siteId",
+            "columnName": "site_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "videoId",
+            "columnName": "video_id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "beacon_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "favorite",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `consumer_id` TEXT NOT NULL, `created_at` TEXT NOT NULL, `deleted_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, `video_id` TEXT NOT NULL, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "consumerId",
+            "columnName": "consumer_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deletedAt",
+            "columnName": "deleted_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "videoId",
+            "columnName": "video_id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "playlist",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `active` INTEGER NOT NULL, `created_at` TEXT, `deleted_at` TEXT, `images` TEXT, `thumbnail_layout` TEXT, `parent_id` TEXT, `playlist_item_count` INTEGER, `priority` INTEGER, `thumbnails` TEXT, `title` TEXT, `updated_at` TEXT, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "active",
+            "columnName": "active",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "deletedAt",
+            "columnName": "deleted_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "images",
+            "columnName": "images",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbnailLayout",
+            "columnName": "thumbnail_layout",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "parentId",
+            "columnName": "parent_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "playlistItemCount",
+            "columnName": "playlist_item_count",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "priority",
+            "columnName": "priority",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbnails",
+            "columnName": "thumbnails",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "playlist_video",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`playlist_video_id` INTEGER, `number` INTEGER, `playlist_id` TEXT, `video_id` TEXT, PRIMARY KEY(`playlist_video_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "playlist_video_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "number",
+            "columnName": "number",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "playlistId",
+            "columnName": "playlist_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "videoId",
+            "columnName": "video_id",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "playlist_video_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "video",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `active` INTEGER NOT NULL, `ad_video_tag` TEXT, `category` TEXT, `country` TEXT, `createdAt` TEXT NOT NULL, `crunchyroll_id` TEXT, `data_source` TEXT, `description` TEXT NOT NULL, `download_audio_path` TEXT, `download_audio_url` TEXT, `download_video_path` TEXT, `download_video_url` TEXT, `discovery_url` TEXT, `duration` INTEGER NOT NULL, `guest` TEXT, `EntitlementUpdatedAt` TEXT, `episode` TEXT, `expire_at` TEXT, `featured` TEXT, `foreign_id` TEXT, `hulu_id` TEXT, `is_downloaded_video` INTEGER, `is_downloaded_audio` INTEGER, `is_downloaded_video_should_be` INTEGER, `is_downloaded_audio_should_be` INTEGER, `IsEntitled` INTEGER, `is_favorite` INTEGER, `is_highlight` INTEGER, `is_play_started` INTEGER, `is_play_finished` INTEGER, `is_zype_live` INTEGER, `keywords` TEXT, `mature_content` TEXT, `on_air` INTEGER, `play_time` INTEGER, `player_audio_url` TEXT, `player_video_url` TEXT, `playlists` TEXT, `published_at` TEXT, `PurchaseRequired` TEXT, `rating` TEXT, `related_playlist_ids` TEXT, `request_count` TEXT, `season` TEXT, `segment` INTEGER, `segments` TEXT, `short_description` TEXT, `site_id` TEXT, `start_at` TEXT, `status` TEXT, `subscription_required` TEXT, `title` TEXT, `thumbnails` TEXT, `images` TEXT, `transcoded` INTEGER, `updated_at` TEXT, `video_zobject` TEXT, `youtube_id` TEXT, `zobjectIds` TEXT, PRIMARY KEY(`_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "active",
+            "columnName": "active",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "adVideoTag",
+            "columnName": "ad_video_tag",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "country",
+            "columnName": "country",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crunchyrollId",
+            "columnName": "crunchyroll_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dataSource",
+            "columnName": "data_source",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "downloadAudioPath",
+            "columnName": "download_audio_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadAudioUrl",
+            "columnName": "download_audio_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadVideoPath",
+            "columnName": "download_video_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadVideoUrl",
+            "columnName": "download_video_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "discoveryUrl",
+            "columnName": "discovery_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "guest",
+            "columnName": "guest",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "entitlementUpdatedAt",
+            "columnName": "EntitlementUpdatedAt",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "episode",
+            "columnName": "episode",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "expireAt",
+            "columnName": "expire_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "featured",
+            "columnName": "featured",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "foreignId",
+            "columnName": "foreign_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "huluId",
+            "columnName": "hulu_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isDownloadedVideo",
+            "columnName": "is_downloaded_video",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isDownloadedAudio",
+            "columnName": "is_downloaded_audio",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isDownloadedVideoShouldBe",
+            "columnName": "is_downloaded_video_should_be",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isDownloadedAudioShouldBe",
+            "columnName": "is_downloaded_audio_should_be",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isEntitled",
+            "columnName": "IsEntitled",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "is_favorite",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isHighlight",
+            "columnName": "is_highlight",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isPlayStarted",
+            "columnName": "is_play_started",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isPlayFinished",
+            "columnName": "is_play_finished",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isZypeLive",
+            "columnName": "is_zype_live",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "keywords",
+            "columnName": "keywords",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "matureContent",
+            "columnName": "mature_content",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "onAir",
+            "columnName": "on_air",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "playTime",
+            "columnName": "play_time",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "playerAudioUrl",
+            "columnName": "player_audio_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "playerVideoUrl",
+            "columnName": "player_video_url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "playlists",
+            "columnName": "playlists",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "publishedAt",
+            "columnName": "published_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "purchaseRequired",
+            "columnName": "PurchaseRequired",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "relatedPlaylistIds",
+            "columnName": "related_playlist_ids",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "requestCount",
+            "columnName": "request_count",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "season",
+            "columnName": "season",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "segment",
+            "columnName": "segment",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "segments",
+            "columnName": "segments",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "shortDescription",
+            "columnName": "short_description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "siteId",
+            "columnName": "site_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "startAt",
+            "columnName": "start_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "subscriptionRequired",
+            "columnName": "subscription_required",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumbnails",
+            "columnName": "thumbnails",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "images",
+            "columnName": "images",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "transcoded",
+            "columnName": "transcoded",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "videoZObject",
+            "columnName": "video_zobject",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "youtubeId",
+            "columnName": "youtube_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "zobjectIds",
+            "columnName": "zobjectIds",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"20a1dd4204f57f496a0126045497432d\")"
+    ]
+  }
+}

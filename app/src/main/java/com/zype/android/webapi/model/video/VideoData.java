@@ -133,6 +133,10 @@ public class VideoData {
     @Expose
     private boolean subscriptionRequired;
 
+    @SerializedName("registration_required")
+    @Expose
+    private boolean registrationRequired;
+
     @Nullable
     @Expose
     private String title;
@@ -855,4 +859,13 @@ public class VideoData {
     public void setPurchaseRequired(@Nullable boolean purchaseRequired) {
         this.purchaseRequired = purchaseRequired;
     }
+
+    public boolean isRegistrationRequired() {
+        return registrationRequired;
+    }
+
+    public void setRegistrationRequired(boolean registrationRequired) {
+        this.registrationRequired = registrationRequired;
+    }
+
 }
