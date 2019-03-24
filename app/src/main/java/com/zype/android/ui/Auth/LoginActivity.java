@@ -246,6 +246,7 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onClick(View widget) {
                 NavigationHelper.getInstance(LoginActivity.this).switchToConsumerScreen(LoginActivity.this);
+                finish();
             }
         };
         int indexSignUp = signUp.indexOf(signUpLink);

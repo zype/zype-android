@@ -68,7 +68,6 @@ public class VideoHelper {
         contentValues.put(Contract.Video.COLUMN_START_AT, videoData.getStartAt());
         contentValues.put(Contract.Video.COLUMN_STATUS, videoData.getStatus());
         contentValues.put(Contract.Video.COLUMN_SUBSCRIPTION_REQUIRED, videoData.isSubscriptionRequired() ? 1 : 0);
-
         contentValues.put(Contract.Video.COLUMN_TITLE, videoData.getTitle());
         contentValues.put(Contract.Video.COLUMN_UPDATED_AT, videoData.getUpdatedAt());
         contentValues.put(Contract.Video.COLUMN_THUMBNAILS, new Gson().toJson(videoData.getThumbnails()));
@@ -92,9 +91,9 @@ public class VideoHelper {
     public static VideoData objectFromCursor(@NonNull Cursor cursor) {
         Gson gson = new Gson();
         VideoData video = VideoData.newVideo(
-                cursor.getString(cursor.getColumnIndex(Contract.Video.COLUMN_ID)),
-                cursor.getInt(cursor.getColumnIndex(Contract.Video.COLUMN_ACTIVE)) == 1,
-                cursor.getString(cursor.getColumnIndex(Contract.Video.COLUMN_COUNTRY))
+            cursor.getString(cursor.getColumnIndex(Contract.Video.COLUMN_ID)),
+            cursor.getInt(cursor.getColumnIndex(Contract.Video.COLUMN_ACTIVE)) == 1,
+            cursor.getString(cursor.getColumnIndex(Contract.Video.COLUMN_COUNTRY))
         );
         if (cursor.getString(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_CATEGORY)) != null) {
             Type categoryType = new TypeToken<List<Category>>() {
@@ -184,13 +183,13 @@ public class VideoHelper {
 
         video.setPurchaseRequired(cursor.getInt(cursor.getColumnIndex(Contract.Video.PURCHASE_REQUIRED)) == 1);
 
-        try {
+        try
+        {
             video.setRegistrationRequired(cursor.getInt(cursor.getColumnIndex(Contract.Video.COLUMN_REGISTRATION_REQUIRED)) == 1);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-
 
         return video;
     }
@@ -210,7 +209,7 @@ public class VideoHelper {
     }
 
     public static List<AdvertisingSchedule> getAdSchedule(ContentResolver contentResolver, String videoId) {
-       List<AdvertisingSchedule> result = new ArrayList<>();
+        List<AdvertisingSchedule> result = new ArrayList<>();
         Cursor cursor = CursorHelper.getAdScheduleCursorByVideoId(contentResolver, videoId);
         if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -424,3 +423,4 @@ public class VideoHelper {
         return (video.isZypeLive == 1 && video.onAir == 1);
     }
 }
+

@@ -172,9 +172,8 @@ public class ConsumerActivity extends BaseActivity {
     }
 
     private void switchToLoginScreen() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        finish();
+        NavigationHelper.getInstance(this).switchToLoginScreen(this);
+
     }
 
     private void switchToTermsScreen() {
