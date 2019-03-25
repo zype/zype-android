@@ -102,19 +102,47 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         Logger.d("onCreate()");
         super.onCreate(savedInstanceState);
 
+        if (registrationNotRequired()) {
+            initialize();
+        }
+    }
+
+    private void initialize() {
         initUI();
 
-        playerUrlObserver = createPlayerUrlObserver();
+        if (playerUrlObserver == null) {
+            playerUrlObserver = createPlayerUrlObserver();
+        }
+
         initModel();
+        checkVideoAuthorization();
+
+    }
+
+    private boolean registrationNotRequired() {
+        VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
+
+        if (videoData != null) {
+            if (videoData.isRegistrationRequired()) {
+                if (!SettingsProvider.getInstance().isLoggedIn()) {
+                    NavigationHelper.getInstance(this).switchToConsumerScreen(this);
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         Logger.d("onNewIntent()");
         super.onNewIntent(intent);
-        initUI();
-        initModel();
-        checkVideoAuthorization();
+
+        if (registrationNotRequired()) {
+            initialize();
+        }
+
     }
 
     @Override
@@ -272,6 +300,15 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
+            case BundleConstants.REQUEST_CONSUMER: {
+                if (resultCode == RESULT_OK) {
+                    initialize();
+                }
+                else {
+                    finish();
+                }
+            }
+            break;
             case BundleConstants.REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     hideVideoThumbnail();

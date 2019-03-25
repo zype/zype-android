@@ -32,6 +32,8 @@ import com.zype.android.utils.Logger;
 
 import java.util.List;
 
+import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
+
 /**
  * Created by Evgeny Cherkasov on 11.07.2017.
  */
@@ -120,6 +122,7 @@ public class NavigationHelper {
 
     public void switchToConsumerScreen(Activity activity) {
         Intent intent = new Intent(activity, ConsumerActivity.class);
+        intent.setFlags(FLAG_ACTIVITY_REORDER_TO_FRONT);
         activity.startActivityForResult(intent, BundleConstants.REQUEST_CONSUMER);
     }
 

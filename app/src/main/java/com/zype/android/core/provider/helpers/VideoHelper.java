@@ -82,6 +82,7 @@ public class VideoHelper {
         contentValues.put(Contract.Video.COLUMN_SEGMENTS, new Gson().toJson(videoData.getSegments()));
 
         contentValues.put(Contract.Video.PURCHASE_REQUIRED, videoData.isPurchaseRequired() ? 1 : 0);
+        contentValues.put(Contract.Video.COLUMN_REGISTRATION_REQUIRED, videoData.isRegistrationRequired() ? 1 : 0);
 
         return contentValues;
     }
@@ -181,6 +182,7 @@ public class VideoHelper {
         }
 
         video.setPurchaseRequired(cursor.getInt(cursor.getColumnIndex(Contract.Video.PURCHASE_REQUIRED)) == 1);
+        video.setRegistrationRequired(cursor.getInt(cursor.getColumnIndex(Contract.Video.COLUMN_REGISTRATION_REQUIRED)) == 1);
 
         return video;
     }

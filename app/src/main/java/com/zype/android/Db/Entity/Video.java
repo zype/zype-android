@@ -198,6 +198,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "zobjectIds")
     public String zobjectIds;
 
+    @ColumnInfo(name = "registration_required")
+    public int registrationRequired;
+
 
     @Override
     public String getTitle() {

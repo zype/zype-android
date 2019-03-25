@@ -133,6 +133,18 @@ public class VideoData {
     @Expose
     private boolean subscriptionRequired;
 
+    public boolean isRegistrationRequired() {
+        return registrationRequired;
+    }
+
+    public void setRegistrationRequired(boolean registrationRequired) {
+        this.registrationRequired = registrationRequired;
+    }
+
+    @SerializedName("registration_required")
+    @Expose
+    private boolean registrationRequired;
+
     @Nullable
     @Expose
     private String title;

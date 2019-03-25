@@ -89,6 +89,7 @@ public class Contract {
         public static final String ENTITLEMENT_UPDATED_AT = "EntitlementUpdatedAt";
         public static final String IS_ENTITLED = "IsEntitled";
         public static final String PURCHASE_REQUIRED = "PurchaseRequired";
+        public static final String COLUMN_REGISTRATION_REQUIRED = "registration_required";
     }
 
     public static class Favorite implements BaseColumns {
