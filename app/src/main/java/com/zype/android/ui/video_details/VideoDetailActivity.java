@@ -102,9 +102,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         Logger.d("onCreate()");
         super.onCreate(savedInstanceState);
 
-        if (registrationNotRequired()) {
-            initialize();
-        }
+       checkForRegistration();
     }
 
     private void initialize() {
@@ -116,33 +114,22 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
 
         initModel();
         checkVideoAuthorization();
-
     }
 
-    private boolean registrationNotRequired() {
-        VideoData videoData = VideoHelper.getFullData(getContentResolver(), mVideoId);
-
-        if (videoData != null) {
-            if (videoData.isRegistrationRequired()) {
-                if (!SettingsProvider.getInstance().isLoggedIn()) {
-                    NavigationHelper.getInstance(this).switchToConsumerScreen(this);
-                    return false;
-                }
-            }
+    private void checkForRegistration() {
+        if (AuthHelper.isRegistrationRequired(getApplicationContext(), mVideoId)) {
+            NavigationHelper.getInstance(this).switchToConsumerScreen(this);
         }
-
-        return true;
+        else {
+            initialize();
+        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         Logger.d("onNewIntent()");
         super.onNewIntent(intent);
-
-        if (registrationNotRequired()) {
-            initialize();
-        }
-
+        checkForRegistration();
     }
 
     @Override

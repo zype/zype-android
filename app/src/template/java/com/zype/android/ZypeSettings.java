@@ -6,12 +6,12 @@ package com.zype.android;
 
 public class ZypeSettings {
     // Zype app key
-    public static final String APP_KEY = "eIqvZ7K4fJLZgQvWGH8oolqKq5G-J1oUPtY07nTunWlZnuOeahcPhqATaXr3zmi_";
+    public static final String APP_KEY = "<APP_KEY>";
     // OAuth credentials
-    public static final String CLIENT_ID = "57cc5ab74d238d644523311362c6ccdb4ab4b163c02d703d9d10df1753195912";
-//    public static final String CLIENT_SECRET = "<CLIENT_SECRET>";
+    public static final String CLIENT_ID = "<CLIENT_ID>";
+    //    public static final String CLIENT_SECRET = "<CLIENT_SECRET>";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
+    public static final String ROOT_PLAYLIST_ID = "<ROOT_PLAYLIST_ID>";
 
     // Google Analytics Tracking Id
     public static final String GA_TRACKING_ID = "";
@@ -23,22 +23,22 @@ public class ZypeSettings {
     public static final String WEB_URL = "";
 
     // Monetization
-    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("false");
+    public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_SUBSCRIPTION_ENABLED>");
     // NOTE: This is a gated feature that REQUIRES Zype to configure. Please reach out to Zype Support for help on setting up this feature.
-    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("false");
-    public static final String[] PLAN_IDS = new String[] { "" };
-    public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = Boolean.valueOf("false");
-    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("false");
-    public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("false");
+    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED>");
+    public static final String[] PLAN_IDS = new String[] { "<PLAN_IDS>" };
+    public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = Boolean.valueOf("<SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED>");
+    public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<UNIVERSAL_SUBSCRIPTION_ENABLED>");
+    public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("<UNIVERSAL_TVOD>");
 
     // Features
-    public static final boolean AUTOPLAY = Boolean.valueOf("true");
-    public static final boolean BACKGROUND_AUDIO_PLAYBACK_ENABLED = Boolean.valueOf("true");
-    public static final boolean BACKGROUND_PLAYBACK_ENABLED = Boolean.valueOf("true");
-    public static final boolean DEVICE_LINKING = Boolean.valueOf("false");
-    public static final String DEVICE_LINKING_URL = "";
-    public static final boolean DOWNLOADS_ENABLED = Boolean.valueOf("false");
-    public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = Boolean.valueOf("false");
+    public static final boolean AUTOPLAY = Boolean.valueOf("<AUTOPLAY>");
+    public static final boolean BACKGROUND_AUDIO_PLAYBACK_ENABLED = Boolean.valueOf("BACKGROUND_AUDIO_PLAYBACK_ENABLED");
+    public static final boolean BACKGROUND_PLAYBACK_ENABLED = Boolean.valueOf("<BACKGROUND_PLAYBACK_ENABLED>");
+    public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
+    public static final String DEVICE_LINKING_URL = "<DEVICE_LINKING_URL>";
+    public static final boolean DOWNLOADS_ENABLED = Boolean.valueOf("<DOWNLOADS_ENABLED>");
+    public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = Boolean.valueOf("<DOWNLOADS_ENABLED_FOR_GUESTS>");
 
     // Following options are not supported by platform app builder.
     public static final boolean PLAYLIST_GALLERY_VIEW = false;
@@ -52,7 +52,7 @@ public class ZypeSettings {
      * @see ZypeConfiguration#THEME_LIGHT
      * @see ZypeConfiguration#THEME_DARK
      */
-    public static final String THEME = "THEME_LIGHT";
+    public static final String THEME = "<THEME>";
 
 }
 
