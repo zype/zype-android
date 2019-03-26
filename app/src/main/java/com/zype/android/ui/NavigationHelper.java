@@ -130,6 +130,10 @@ public class NavigationHelper {
         switchToLoginScreen(activity, null);
     }
 
+    public void handleUnAuthorizedVideo(Activity activity) {
+        switchToConsumerScreen(activity);
+    }
+
     public void switchToLoginScreen(Activity activity, Bundle extras) {
         Intent intent = new Intent(context, LoginActivity.class);
         if (extras != null) {

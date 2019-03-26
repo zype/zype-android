@@ -118,7 +118,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
 
     private void checkForRegistration() {
         if (AuthHelper.isRegistrationRequired(getApplicationContext(), mVideoId)) {
-            NavigationHelper.getInstance(this).switchToConsumerScreen(this);
+            NavigationHelper.getInstance(this).handleUnAuthorizedVideo(this);
         }
         else {
             initialize();
