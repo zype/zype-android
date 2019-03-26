@@ -7,9 +7,12 @@ import android.content.Context;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.Subscription.SubscriptionHelper;
 import com.zype.android.utils.Logger;
+import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.Date;
 
@@ -60,6 +63,21 @@ public class AuthHelper {
         }
 
         return result;
+
+    }
+
+    public static boolean isRegistrationRequired(Context context, String videoId) {
+        VideoData videoData = VideoHelper.getFullData(context.getContentResolver(), videoId);
+
+        if (videoData != null) {
+            if (videoData.isRegistrationRequired()) {
+                if (!SettingsProvider.getInstance().isLoggedIn()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
 
     }
 

@@ -94,6 +94,7 @@ public class DbHelper {
         entity.videoZObject = new Gson().toJson(videoData.getVideoZobjects());
         entity.youtubeId = videoData.getYoutubeId();
         entity.zobjectIds = new Gson().toJson(videoData.getZobjectIds());
+        entity.registrationRequired = videoData.isRegistrationRequired() ? 1 : 0;
         return entity;
     }
 

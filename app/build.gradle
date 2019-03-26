@@ -96,6 +96,7 @@ android {
         template {
             versionName '1.0.0'
             applicationId "<APPLICATION_ID>"
+
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      // TODO: Provide valid app_id for OneSignal
                                      onesignal_app_id: '',
