@@ -87,7 +87,7 @@ android {
     productFlavors {
         zype {
             versionName zypeTemplateVersion
-            applicationId 'com.zype.android.template'
+            applicationId 'com.zyperegistration.android'
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      onesignal_app_id: "",
                                      onesignal_google_project_number: 'REMOTE'

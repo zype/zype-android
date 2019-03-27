@@ -1,0 +1,63 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp"
+    android:id="@+id/root_view"
+    tools:context="com.zype.android.ui.Consumer.UnAuthorizedUserActivity"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_gravity="center_vertical"
+        android:id="@+id/layoutAuthMethod"
+        tools:visibility="visible"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="120dp"
+            android:layout_margin="20dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/splash_logo"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:text="@string/login_signup_sign_msg"
+            android:textSize="20sp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:gravity="center_horizontal"
+            />
+
+        <Button
+            android:onClick="signUp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:id="@+id/sign_up"
+            android:textAllCaps="false"
+            android:text="@string/login_sign_up_link"
+            style="@style/Widget.AppCompat.Button.Colored"
+            />
+        <Button
+            android:onClick="signIn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:layout_marginBottom="20dp"
+            android:id="@+id/sign_in"
+            android:text="@string/login_title"
+            style="@style/Widget.AppCompat.Button.Colored"
+            />
+    </LinearLayout>
+
+</FrameLayout>
+

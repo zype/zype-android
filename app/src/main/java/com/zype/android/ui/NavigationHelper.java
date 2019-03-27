@@ -17,6 +17,7 @@ import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Auth.LoginActivity;
+import com.zype.android.ui.Consumer.UnAuthorizedUserActivity;
 import com.zype.android.ui.Subscription.SubscribeOrLoginActivity;
 import com.zype.android.ui.Consumer.ConsumerActivity;
 import com.zype.android.ui.Gallery.GalleryActivity;
@@ -131,7 +132,8 @@ public class NavigationHelper {
     }
 
     public void handleUnAuthorizedVideo(Activity activity) {
-        switchToConsumerScreen(activity);
+        Intent intent = new Intent(activity, UnAuthorizedUserActivity.class);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_USER);
     }
 
     public void switchToLoginScreen(Activity activity, Bundle extras) {
