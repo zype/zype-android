@@ -60,6 +60,7 @@ import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.zype.android.utils.BundleConstants.REQUEST_USER;
 import static com.zype.android.webapi.WebApiManager.WorkerHandler.BAD_REQUEST;
 
 public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistVideos {
@@ -287,6 +288,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
+            case REQUEST_USER:
             case BundleConstants.REQUEST_CONSUMER: {
                 if (resultCode == RESULT_OK) {
                     initialize();
