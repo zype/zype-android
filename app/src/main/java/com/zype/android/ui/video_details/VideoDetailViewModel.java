@@ -79,9 +79,15 @@ public class VideoDetailViewModel extends AndroidViewModel {
         WebApiManager.getInstance().executeRequest(WebApiManager.Request.VIDEO, builder.build());
     }
 
-    public void updateVideoOnAir(Video video) {
+    public boolean updateVideoOnAir(Video video) {
         Video dbVideo = repo.getVideoSync(video.id);
-        dbVideo.onAir = video.onAir;
-        repo.updateVideo(dbVideo);
+        if (dbVideo.onAir != video.onAir) {
+            dbVideo.onAir = video.onAir;
+            repo.updateVideo(dbVideo);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

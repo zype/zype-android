@@ -373,8 +373,9 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                     @Override
                     public void onChanged(@Nullable Video video) {
                         if (VideoHelper.isLiveEventOnAir(video)) {
-                            videoDetailViewModel.updateVideoOnAir(video);
-                            showPlayer();
+                            if (videoDetailViewModel.updateVideoOnAir(video)) {
+                                showPlayer();
+                            }
                         }
                         else {
                             changeFragment(isChromecastConntected());
