@@ -41,6 +41,7 @@ import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.accessibility.CaptioningManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -349,6 +350,19 @@ public class PlayerFragment extends BaseFragment implements
 
         sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
         videoDetailViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
+
+        if (playerViewModel.isPlayTrailer()) {
+            ImageButton buttonCloseTrailer = getView().findViewById(R.id.buttonCloseTrailer);
+            buttonCloseTrailer.setVisibility(View.VISIBLE);
+            buttonCloseTrailer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    stop();
+                    videoDetailViewModel.onVideoFinished(true);
+                    playerViewModel.setTrailerVideoId(null);
+                }
+            });
+        }
 
         setHasOptionsMenu(true);
     }
