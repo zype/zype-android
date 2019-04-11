@@ -67,6 +67,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private boolean isPlaybackPositionRestored;
     private boolean isUrlLoaded = false;
     private boolean inBackground = false;
+    private boolean playTrailer = false;
+
     private static final String APP_BUNDLE = "app_bundle";
     private static final String APP_DOMAIN = "app_domain";
     private static final String APP_ID = "app_id";
@@ -77,6 +79,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private static final String DEVICE_MODEL = "device_model";
     private static final String UUID = "uuid";
     private static final String VPI = "vpi";
+
     public enum PlayerMode {
         AUDIO,
         VIDEO
@@ -126,6 +129,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         Video video = repo.getVideoSync(videoId);
         playbackPosition = video.playTime;
         isPlaybackPositionRestored = false;
+
+        playTrailer = false;
 
         updateAvailablePlayerModes();
         if (mediaType != null || isMediaTypeAvailable(mediaType)) {
@@ -409,6 +414,23 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         return error;
     }
 
+    // Trailer
+
+    public boolean isPlayTrailer() {
+        return playTrailer;
+    }
+
+    public void setTrailerVideoId(String trailerVideoId) {
+        if (TextUtils.isEmpty(trailerVideoId)) {
+            playTrailer = false;
+            updateContentUri(repo.getVideoSync(videoId));
+        }
+        else {
+            playTrailer = true;
+            loadVideoPlayerUrl(trailerVideoId);
+        }
+    }
+
     //
 
     public void loadPlayer() {
@@ -438,6 +460,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 // Take first source in the list
                 String url = files.get(0).url;
                 Logger.d("loadVideoPlayer()::onCompleted(): url=" + url);
+
+                // In play trailer mode just update content uri
+                if (playTrailer) {
+                    contentUri.setValue(url);
+                    return;
+                }
 
                 // Ad tags
                 repo.deleteAdSchedule(videoId);

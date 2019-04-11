@@ -234,17 +234,22 @@ public class NavigationHelper {
     // Video
 
     public void handleVideoClick(Activity activity, @NonNull Video video, String playlistId, boolean autoplay) {
-        Playlist playlist = null;
-        if (!TextUtils.isEmpty(playlistId)) {
-            playlist = DataRepository.getInstance(activity.getApplication())
-                    .getPlaylistSync(playlistId);
-        }
-
-        if (AuthHelper.isVideoUnlocked(activity, video.id, playlistId)) {
+        if (ZypeApp.get(activity).getAppConfiguration().updatedPaywalls) {
+            // New paywall flow
             switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
         }
         else {
-            handleLockedVideo(activity, video, playlist);
+            Playlist playlist = null;
+            if (!TextUtils.isEmpty(playlistId)) {
+                playlist = DataRepository.getInstance(activity.getApplication())
+                        .getPlaylistSync(playlistId);
+            }
+
+            if (AuthHelper.isVideoUnlocked(activity, video.id, playlistId)) {
+                switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
+            } else {
+                handleLockedVideo(activity, video, playlist);
+            }
         }
     }
 

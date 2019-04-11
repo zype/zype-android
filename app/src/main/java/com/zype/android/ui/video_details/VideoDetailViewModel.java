@@ -155,6 +155,13 @@ public class VideoDetailViewModel extends AndroidViewModel {
         }
     }
 
+    public void onVideoFinished(boolean isTrailer) {
+        if (isTrailer) {
+            // When trailer playback is finished just fire video detail event with existing data
+            videoLiveData.setValue(videoLiveData.getValue());
+        }
+    }
+
     // On air
 
     public MutableLiveData<Boolean> getOnAir() {
