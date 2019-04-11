@@ -213,11 +213,16 @@ public class NavigationHelper {
     // Video
 
     public void handleVideoClick(Activity activity, @NonNull Video video, String playlistId, boolean autoplay) {
-        if (AuthHelper.isVideoUnlocked(activity, video.id, playlistId)) {
+        if (ZypeApp.get(activity).getAppConfiguration().updatedPaywalls) {
+            // New paywall flow
             switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
         }
         else {
-            handleUnauthorizedVideo(activity, video, null);
+            if (AuthHelper.isVideoUnlocked(activity, video.id, playlistId)) {
+                switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
+            } else {
+                handleUnauthorizedVideo(activity, video, null);
+            }
         }
     }
 

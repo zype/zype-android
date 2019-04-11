@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
-import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;
@@ -142,6 +141,13 @@ public class VideoDetailViewModel extends AndroidViewModel {
         }
         else {
             return null;
+        }
+    }
+
+    public void onVideoFinished(boolean isTrailer) {
+        if (isTrailer) {
+            // When trailer playback is finished just fire video detail event with existing data
+            videoLiveData.setValue(videoLiveData.getValue());
         }
     }
 

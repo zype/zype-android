@@ -348,6 +348,18 @@ public class VideoHelper {
     }
 
     /**
+     * Parses value of "previewIds" and returns the result as a list of ids.
+     *
+     * @param video
+     * @return
+     */
+    public static List<String> getPreviewIdsList(Video video) {
+        Type idType = new TypeToken<List<String>>(){}.getType();
+        List<String> previewIds = new Gson().fromJson(video.previewIds, idType);
+        return previewIds;
+    }
+
+    /**
      * Find a thumbnail of the video that is most close to specified height
      *
      * @param video

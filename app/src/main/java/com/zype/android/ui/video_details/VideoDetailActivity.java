@@ -5,6 +5,7 @@ import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.events.ForbiddenErrorEvent;
@@ -17,6 +18,7 @@ import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
 import com.zype.android.ui.player.PlayerViewModel;
+import com.zype.android.ui.player.ThumbnailFragment;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
@@ -48,6 +50,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
@@ -78,7 +81,9 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     PlayerViewModel playerViewModel;
 
     Observer<PlayerViewModel.Error> playerErrorObserver = null;
+    Observer<String> contentUriObserver;    // Used in updated paywall flow
     Observer<String> playerUrlObserver = null;
+    Observer<Video> videoDetailObserver;
 
     public static void startActivity(Activity activity, String videoId, String playlistId) {
         Intent intent = new Intent(activity, VideoDetailActivity.class);
@@ -104,21 +109,46 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         Logger.d("onCreate()");
         super.onCreate(savedInstanceState);
 
-       checkForRegistration();
+        if (ZypeApp.get(this).getAppConfiguration().updatedPaywalls) {
+            initObservers();
+            initModels();
+        }
+        else {
+            checkForRegistration();
+        }
     }
 
     private void initialize() {
         initUI();
+        initObservers();
+        initModel();
+        checkVideoAuthorization();
+    }
 
+    private void initObservers() {
+        if (contentUriObserver == null) {
+            contentUriObserver = createContentUriObserver();
+        }
         if (playerErrorObserver == null) {
             playerErrorObserver = createPlayerErrorObserver();
         }
         if (playerUrlObserver == null) {
             playerUrlObserver = createPlayerUrlObserver();
         }
+        if  (videoDetailObserver == null) {
+            videoDetailObserver = createVideoDetailObserver();
+        }
+    }
 
-        initModel();
-        checkVideoAuthorization();
+    private void initModels() {
+        videoDetailViewModel = ViewModelProviders.of(this).get(VideoDetailViewModel.class);
+        videoDetailViewModel.getVideo(mVideoId).observe(this, videoDetailObserver);
+
+        playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class)
+            .setVideoId(mVideoId)
+            .setPlaylistId(playlistId);
+        playerViewModel.initialize();
+        playerViewModel.getContentUri().observe(this, contentUriObserver);
     }
 
     private void checkForRegistration() {
@@ -230,15 +260,18 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     // //////////
     // UI
     //
-    private void initUI() {
-
-        getSupportActionBar().setTitle(VideoHelper.getFullData(getContentResolver(), mVideoId).getTitle());
-
+    private void updateTabs() {
         VideoDetailPagerAdapter videoDetailPagerAdapter = new VideoDetailPagerAdapter(this, getSupportFragmentManager(), mVideoId);
         mViewPager = findViewById(R.id.pagerSections);
         mViewPager.setAdapter(videoDetailPagerAdapter);
         mTabLayout = findViewById(R.id.tabs);
         mTabLayout.setupWithViewPager(mViewPager);
+    }
+
+    private void initUI() {
+
+        getSupportActionBar().setTitle(VideoHelper.getFullData(getContentResolver(), mVideoId).getTitle());
+        updateTabs();
 
         layoutImage = findViewById(R.id.layoutImage);
         imageVideo = findViewById(R.id.imageVideo);
@@ -433,6 +466,75 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         };
     }
 
+    private Observer<String> createContentUriObserver() {
+        return new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String url) {
+                Logger.d("getContentUri(): onChanged(): url=" + url);
+                if (!TextUtils.isEmpty(url)) {
+                    if (playerViewModel.isPlayTrailer()) {
+                        Logger.d("getContentUri(): onChanged(): playing trailer");
+                        mType = PlayerFragment.TYPE_VIDEO_TRAILER;
+                        Fragment fragment = PlayerFragment.newInstance(mType, url, null);
+                        showFragment(fragment);
+                    }
+                    else {
+                        switch (playerViewModel.getPlayerMode().getValue()) {
+                            case AUDIO:
+                                if (playerViewModel.isAudioDownloaded()) {
+                                    mType = PlayerFragment.TYPE_AUDIO_LOCAL;
+                                }
+                                else {
+                                    mType = PlayerFragment.TYPE_AUDIO_WEB;
+                                }
+                                break;
+                            case VIDEO:
+                                if (playerViewModel.isVideoDownloaded()) {
+                                    mType = PlayerFragment.TYPE_VIDEO_LOCAL;
+                                }
+                                else {
+                                    mType = PlayerFragment.TYPE_VIDEO_WEB;
+                                }
+                                break;
+                        }
+                        hideProgress();
+                        changeFragment(isChromecastConntected());
+                    }
+                }
+                else {
+                    showThumbnailView(videoDetailViewModel.getVideo().getValue());
+                }
+            }
+        };
+    }
+
+    private Observer<Video> createVideoDetailObserver() {
+        return new Observer<Video>() {
+            @Override
+            public void onChanged(@Nullable Video video) {
+                Logger.d("getVideo(): onChanged()");
+                if (video == null) {
+                    // Show no video view
+                }
+                else {
+                    // Update title
+                    getSupportActionBar().setTitle(video.title);
+                    // Update video details
+                    updateTabs();
+                    // Check video authorization
+                    if (AuthHelper.isVideoAuthorized(VideoDetailActivity.this, video)) {
+                        // Show player view and request player data
+                        showPlayerView(video);
+                    }
+                    else {
+                        // Show paywall view
+                        showThumbnailView(video);
+                    }
+                }
+            }
+        };
+    }
+
     private Observer<String> createPlayerUrlObserver() {
         return new Observer<String>() {
             @Override
@@ -466,6 +568,18 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                 }
             }
         };
+    }
+
+    private void showPlayerView(Video video) {
+        playerViewModel.setVideoId(video.id);
+        playerViewModel.setPlaylistId(playlistId);
+        playerViewModel.initialize();
+    }
+
+    private void showThumbnailView(Video video) {
+        Logger.d("showThumbnailView()");
+        Fragment fragment = ThumbnailFragment.newInstance(video.id);
+        showFragment(fragment);
     }
 
     // //////////
@@ -529,7 +643,11 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
 
     @Subscribe
     public void handleError(ErrorEvent err) {
-        Logger.e("handleError");
+        Logger.e("handleError()");
+        if (ZypeApp.get(this).getAppConfiguration().updatedPaywalls) {
+            Logger.e("handleError(): Updated paywall is used, skipping this error handling");
+            return;
+        }
         if (err.getError() == null) {
             if (err.getEventData() != WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO
                     && err.getEventData() != WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO
