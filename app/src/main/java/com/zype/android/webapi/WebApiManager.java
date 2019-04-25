@@ -542,6 +542,9 @@ public class WebApiManager {
                     } else
                         return new UnrsolvedHostErrorEvent(job.getTicket(), job.getRequest(), err.getMessage());
                 }
+                else if (statusCode == 200 && job.getRequest() == Request.MARKETPLACE_CONNECT) {
+                    return new MarketplaceConnectEvent(job.getTicket(), null);
+                }
                 else {
                     Log.d(TAG, "Request failed: " + job.getRequest(), err.getCause());
 //                    return new ErrorEvent(job.getTicket(), job.getRequest(), "(" + statusCode + ") " + mContext.getString(R.string.GENERIC_ERROR), err);

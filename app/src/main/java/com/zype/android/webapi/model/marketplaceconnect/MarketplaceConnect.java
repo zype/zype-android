@@ -8,7 +8,4 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class MarketplaceConnect {
-    @SerializedName("response")
-    @Expose
-    public MarketplaceConnectData data;
 }
