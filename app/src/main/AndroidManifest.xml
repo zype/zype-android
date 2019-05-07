@@ -195,6 +195,9 @@
             android:theme="@style/AppTheme"
             />
 
+        <activity android:name=".ui.epg.EpgActivity"
+            android:screenOrientation="landscape" />
+
         <!--
          Optionally, register AnalyticsReceiver and AnalyticsService to support background
          dispatching on non-Google Play devices

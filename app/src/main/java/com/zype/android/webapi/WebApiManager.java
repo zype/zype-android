@@ -70,6 +70,10 @@ import com.zype.android.webapi.model.app.AppResponse;
 import com.zype.android.webapi.model.auth.AccessTokenInfoResponse;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
+import com.zype.android.webapi.model.epg.Channel;
+import com.zype.android.webapi.model.epg.ChannelResponse;
+import com.zype.android.webapi.model.epg.Program;
+import com.zype.android.webapi.model.epg.ProgramResponse;
 import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBodyData;
 import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectResponse;
 import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBody;
@@ -98,14 +102,19 @@ import com.zype.android.webapi.model.video.VideoListResponse;
 import com.zype.android.webapi.model.video.VideoResponse;
 import com.zype.android.webapi.model.zobjects.ZObjectResponse;
 
+import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.OkClient;
+import retrofit.client.Response;
 
 /**
  * @author vasya
@@ -130,7 +139,7 @@ public class WebApiManager {
     private final Context mContext;
     private EventBus mBus;
     private WorkerHandler mHandler;
-
+    public static final String APP_KEY_PARAM = "app_key";
 
     private WebApiManager(Context contextArg) {
 
@@ -346,6 +355,7 @@ public class WebApiManager {
                 return new VideoEntitlementEvent(ticket, args, new VideoEntitlementResponse(mApi.checkVideoEntitlement(videoId, getParams)));
             case VIDEO_ENTITLEMENTS:
                 return new VideoEntitlementsEvent(ticket, new VideoEntitlementsResponse(mApi.getVideoEntitlements(getParams)));
+
             default:
                 throw new RuntimeException("Unknown request:" + request);
         }
@@ -396,7 +406,7 @@ public class WebApiManager {
         PLAYER_ON_AIR_AUDIO,
         PLAYLIST_GET,
         CHECK_VIDEO_ENTITLEMENT,
-        VIDEO_ENTITLEMENTS
+        VIDEO_ENTITLEMENTS,
     }
 
     private static class CustomRequestInterceptor implements RequestInterceptor {
@@ -580,5 +590,36 @@ public class WebApiManager {
             result.message = error.getMessage();
         }
         return result;
+    }
+
+    public ChannelResponse loadEpgChannels() {
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put(APP_KEY_PARAM, ZypeSettings.APP_KEY);
+        params.put("page", String.valueOf(1));
+        params.put("per_page", "100");
+        try {
+          return   mApi.epgChannels(params);
+        }
+        catch (Exception e) {
+          return null;
+        }
+    }
+
+    public ProgramResponse loadEpgEvents(Channel channel, String startDate, String endDate) {
+          HashMap<String, String> params = new HashMap<>();
+          params.put(APP_KEY_PARAM, ZypeSettings.APP_KEY);
+          params.put("per_page", "500");
+          params.put("sort", "start_time");
+          params.put("order", "asc");
+          params.put("start_time.gte", startDate);
+          params.put("end_time.lte", endDate);
+
+          try {
+            return mApi.epgEvents(channel.id, params);
+          }
+          catch (Exception e) {
+            return null;
+          }
     }
 }

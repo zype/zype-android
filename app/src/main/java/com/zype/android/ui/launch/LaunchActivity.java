@@ -11,10 +11,12 @@ import com.zype.android.BuildConfig;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.ZypeSettings;
 import com.zype.android.aws.PushListenerService;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.base.BaseActivity;
+import com.zype.android.ui.epg.EPGDataManager;
 import com.zype.android.ui.main.MainActivity;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
@@ -66,6 +68,9 @@ public class LaunchActivity extends BaseActivity {
 
         SettingsParamsBuilder settingsParamsBuilder = new SettingsParamsBuilder();
         getApi().executeRequest(WebApiManager.Request.GET_SETTINGS, settingsParamsBuilder.build());
+        if(ZypeSettings.EPG_ENABLED) {
+            EPGDataManager.getInstance().load();
+        }
     }
 
     private void jump() {

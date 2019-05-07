@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/black_12"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/epgTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="4dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        tools:text="EPG" />
+
+    <android.support.v7.widget.CardView
+        android:layout_width="160dp"
+        android:layout_height="90dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        app:cardBackgroundColor="@color/black_12"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="true">
+
+        <ImageView
+            android:id="@+id/epgImg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:scaleType="centerCrop"
+            android:src="@drawable/splash_logo" />
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

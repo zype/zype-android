@@ -14,14 +14,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Gallery.Model.GalleryRow;
 import com.zype.android.ui.Gallery.Model.HeroImage;
 import com.zype.android.ui.Widget.CustomViewPager;
+import com.zype.android.ui.epg.EpgActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.Logger;
 
@@ -48,6 +52,9 @@ public class GalleryFragment extends Fragment {
 
     CustomViewPager pagerHeroImages;
     ProgressBar progressBar;
+    View epgLay;
+    TextView epgTitle;
+    ImageView epgImg;
 
     public static GalleryFragment newInstance(String parentPlaylistId) {
         GalleryFragment fragment = new GalleryFragment();
@@ -104,6 +111,20 @@ public class GalleryFragment extends Fragment {
         listGallery.setAdapter(adapter);
 
         progressBar = rootView.findViewById(R.id.progress);
+        epgLay = rootView.findViewById(R.id.epgLay);
+        epgTitle = rootView.findViewById(R.id.epgLay).findViewById(R.id.epgTitle);
+        epgTitle.setText("Guide");
+        epgLay.setVisibility(View.GONE);
+        epgImg = rootView.findViewById(R.id.epgLay).findViewById(R.id.epgImg);
+        epgImg.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+            if(ZypeSettings.EPG_ENABLED) {
+              startActivity(new Intent(getActivity(), EpgActivity.class));
+            }
+
+          }
+       });
 
         return rootView;
     }
@@ -157,6 +178,7 @@ public class GalleryFragment extends Fragment {
 
     private void updateGalleryRows() {
         showProgress();
+        epgLay.setVisibility(View.GONE);
         model.getGalleryRows(parentPlaylistId).observe(this, new Observer<List<GalleryRow>>() {
             @Override
             public void onChanged(@Nullable List<GalleryRow> galleryRows) {
@@ -164,6 +186,7 @@ public class GalleryFragment extends Fragment {
                 if (allDataLoaded(galleryRows)) {
                     adapter.setData(galleryRows);
                     hideProgress();
+                    epgLay.setVisibility(View.VISIBLE);
                 }
             }
         });

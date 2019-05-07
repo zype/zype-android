@@ -1,5 +1,9 @@
 package com.zype.android.webapi;
 
+import com.zype.android.webapi.model.epg.Channel;
+import com.zype.android.webapi.model.epg.ChannelResponse;
+import com.zype.android.webapi.model.epg.Program;
+import com.zype.android.webapi.model.epg.ProgramResponse;
 import com.zype.android.webapi.model.app.App;
 import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnect;
 import com.zype.android.webapi.model.auth.RefreshAccessToken;
@@ -30,8 +34,10 @@ import com.zype.android.webapi.model.video.VideoList;
 import com.zype.android.webapi.model.zobjects.ZObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.FieldMap;
@@ -164,5 +170,13 @@ public interface ZypeApiEndpointInterface {
 
     @GET("/playlists/{playlist_id}/videos")
     VideoList getVideosFromPlaylist(@Path("playlist_id") String playlistId, @QueryMap Map<String, String> getParams);
+
+    // EPG Channels
+    @GET("/program_guides")
+    ChannelResponse epgChannels(@QueryMap HashMap<String, String> params);
+
+    // EPG events
+    @GET("/program_guides/{id}/entries")
+    ProgramResponse epgEvents(@Path("id") String id, @QueryMap HashMap<String, String> params);
 
 }
