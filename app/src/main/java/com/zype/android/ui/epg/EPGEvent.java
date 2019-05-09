@@ -28,6 +28,10 @@ public class EPGEvent implements Serializable {
     private EPGEvent previousEvent;
     private EPGEvent nextEvent;
 
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     //is this the current selected event?
     public boolean selected;
 
@@ -86,4 +90,14 @@ public class EPGEvent implements Serializable {
     public EPGEvent getPreviousEvent() {
         return previousEvent;
     }
+
+    public boolean isPressed() {
+        return pressed;
+    }
+
+    public void setPressed(boolean pressed) {
+        this.pressed = pressed;
+    }
+
+    private boolean pressed;
 }

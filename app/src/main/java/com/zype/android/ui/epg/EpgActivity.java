@@ -1,9 +1,10 @@
 package com.zype.android.ui.epg;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ProgressBar;
+
 import com.zype.android.R;
 import com.zype.android.ui.base.BaseActivity;
 
@@ -13,10 +14,12 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
 
 public class EpgActivity extends BaseActivity {
+  private static final String TAG = EpgActivity.class.getSimpleName();
   private EPG epg;
   private CompositeSubscription compositeSubscription = new CompositeSubscription();
   private ProgressBar progressBar;
-  private static final String TAG = EpgActivity.class.getSimpleName();
+  private EPGData epgData;
+
   /**
    * Called when the activity is first created.
    */
@@ -38,8 +41,8 @@ public class EpgActivity extends BaseActivity {
       }
 
       @Override
-      public void onEventClicked(EPGEvent epgEvent) {
-        //launch player activity
+      public void onEventClicked(int channelPosition, int programPosition, EPGEvent epgEvent) {
+
       }
 
       @Override
@@ -51,17 +54,29 @@ public class EpgActivity extends BaseActivity {
       @Override
       public void onResetButtonClicked() {
         // Reset button clicked
-        epg.recalculateAndRedraw(null, true);
+        if (epgData != null) {
+          epg.setEPGData(epgData);
+        }
       }
     });
 
-   compositeSubscription.add(EPGDataManager.getInstance().epgDataSubject
+    compositeSubscription.add(EPGDataManager.getInstance().epgDataSubject
         .delay(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(epgData -> {
+          this.epgData = epgData;
           epg.setEPGData(epgData);
           progressBar.setVisibility(View.GONE);
         }, throwable -> {
           progressBar.setVisibility(View.GONE);
         }));
+  }
+
+  @Override
+  public void onBackPressed() {
+
+    if (epg != null) {
+      epg.reset();
+    }
+    super.onBackPressed();
   }
 
 
@@ -80,7 +95,7 @@ public class EpgActivity extends BaseActivity {
     return TAG;
   }
 
-  @Override
+ /* @Override
   public boolean dispatchKeyEvent(KeyEvent event) {
     switch (event.getKeyCode()) {
       case KeyEvent.KEYCODE_BACK:
@@ -89,5 +104,11 @@ public class EpgActivity extends BaseActivity {
         }
     }
     return super.dispatchKeyEvent(event);
+  }*/
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+
   }
 }

@@ -64,6 +64,7 @@ public class EPG extends ViewGroup {
   private final int mEventLayoutBackground;
   private final int mEventLayoutBackgroundCurrent;
   private final int mEventLayoutBackgroundSelected;
+  private final int mEventLayoutBackgroundPressed;
   private final int mEventLayoutTextColor;
   private final int mEventLayoutTextSize;
   private final int mTimeBarLineWidth;
@@ -90,8 +91,11 @@ public class EPG extends ViewGroup {
   //TODO: find out why grid is shifted -> because of channels bar?
   private long mMargin = 200000;
   private EPGData epgData = null;
-  private EPGEvent selectedEvent = null;
+  //private EPGEvent selectedEvent = null;
   private int orientation;
+
+  private EPGEvent lastSelectedEvent;
+  private EPGEvent lastPressedEvent;
 
   public EPG(Context context) {
     this(context, null);
@@ -132,6 +136,7 @@ public class EPG extends ViewGroup {
     mEventLayoutBackground = getResources().getColor(R.color.epg_event_layout_background);
     mEventLayoutBackgroundCurrent = getResources().getColor(R.color.epg_event_layout_background_current);
     mEventLayoutBackgroundSelected = getResources().getColor(R.color.epg_event_layout_background_selected);
+    mEventLayoutBackgroundPressed = getResources().getColor(R.color.epg_event_layout_background_pressed);
     mEventLayoutTextColor = getResources().getColor(R.color.epg_event_layout_text);
     mEventLayoutTextSize = getResources().getDimensionPixelSize(R.dimen.epg_event_layout_text);
 
@@ -158,7 +163,6 @@ public class EPG extends ViewGroup {
   public Parcelable onSaveInstanceState() {
     Parcelable superState = super.onSaveInstanceState();
     EPGState epgState = new EPGState(superState);
-    epgState.setCurrentEvent(this.selectedEvent);
     return epgState;
   }
 
@@ -171,7 +175,6 @@ public class EPG extends ViewGroup {
     }
     EPGState epgState = (EPGState) state;
     super.onRestoreInstanceState(epgState.getSuperState());
-    this.selectedEvent = epgState.getCurrentEvent();
   }
 
   private int getChannelAreaWidth() {
@@ -211,11 +214,17 @@ public class EPG extends ViewGroup {
   @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
-    recalculateAndRedraw(this.selectedEvent, false);
+    recalculateAndRedraw(true);
   }
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
+    if (event.getAction() == MotionEvent.ACTION_UP) {
+      if (lastPressedEvent != null) {
+        lastPressedEvent.setPressed(false);
+        invalidate();
+      }
+    }
     return mGestureDetector.onTouchEvent(event);
   }
 
@@ -226,20 +235,6 @@ public class EPG extends ViewGroup {
     return false;
   }
 
-  @Override
-  public boolean dispatchKeyEvent(KeyEvent event) {
-    //return mGame.handleKeyEvent(event);
-
-    if (event.getAction() == KeyEvent.ACTION_DOWN) {
-      boolean procssed = processKeyCode(event.getKeyCode());
-
-      if (procssed) {
-        return true;
-      }
-    }
-
-    return super.dispatchKeyEvent(event);
-  }
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -271,7 +266,7 @@ public class EPG extends ViewGroup {
   }
 
   private void drawTimebarBottomStroke(Canvas canvas, Rect drawingRect) {
-    drawingRect.left =  getScrollX() + mChannelLayoutWidth + mChannelLayoutMargin;
+    drawingRect.left = getScrollX() + mChannelLayoutWidth + mChannelLayoutMargin;
     drawingRect.top = getScrollY() + mTimeBarHeight;
     drawingRect.right = drawingRect.left + getWidth();
     drawingRect.bottom = drawingRect.top + mChannelLayoutMargin;
@@ -280,9 +275,11 @@ public class EPG extends ViewGroup {
     mPaint.setColor(mEPGBottomStrokeBackground);
     canvas.drawRect(drawingRect, mPaint);
 
-    mPaint.setColor(mEventLayoutBackgroundSelected);
-    drawingRect.right = getXFrom(DateTime.now().getMillis());
-    canvas.drawRect(drawingRect, mPaint);
+    if (shouldDrawTimeLine(DateTime.now().getMillis())) {
+      mPaint.setColor(mEventLayoutBackgroundSelected);
+      drawingRect.right = getXFrom(DateTime.now().getMillis());
+      canvas.drawRect(drawingRect, mPaint);
+    }
   }
 
   private void drawTimebar(Canvas canvas, Rect drawingRect) {
@@ -401,6 +398,8 @@ public class EPG extends ViewGroup {
     // Background
     if (event.isSelected()) {
       mPaint.setColor(mEventLayoutBackgroundSelected);
+    } else if (event.isPressed()) {
+      mPaint.setColor(mEventLayoutBackgroundPressed);
     } else if (event.isCurrent()) {
       mPaint.setColor(mEventLayoutBackgroundCurrent);
       mPaint.setAlpha(70);
@@ -459,13 +458,12 @@ public class EPG extends ViewGroup {
     drawingRect.right = drawingRect.left + mChannelLayoutWidth;
     drawingRect.bottom = drawingRect.top + mChannelLayoutHeight;
 
-    if (this.selectedEvent != null) {
-      if (this.selectedEvent.getChannel().getChannelID() == position) {
+    if (this.lastSelectedEvent != null) {
+      if (this.lastSelectedEvent.getChannel().getChannelID() == position) {
         tPaint.setColor(mEventLayoutBackgroundSelected);
         canvas.drawRect(drawingRect, tPaint);
       }
     }
-
 
     //local changes for setup channel name
     TextPaint textPaint = new TextPaint();
@@ -607,11 +605,12 @@ public class EPG extends ViewGroup {
   private Rect calculateProgramsHitArea() {
     mMeasuringRect.top = mTimeBarHeight;
     int visibleChannelsHeight = epgData.getChannelCount() * (mChannelLayoutHeight + mChannelLayoutMargin);
-    mMeasuringRect.bottom = visibleChannelsHeight < getHeight() ? visibleChannelsHeight : getHeight();
+    mMeasuringRect.bottom = mTimeBarHeight + (visibleChannelsHeight < getHeight() ? visibleChannelsHeight : getHeight());
     mMeasuringRect.left = mChannelLayoutWidth;
     mMeasuringRect.right = getWidth();
     return mMeasuringRect;
   }
+
 
   private Rect calculateResetButtonHitArea() {
     mMeasuringRect.left = getScrollX() + getWidth() - mResetButtonSize - mResetButtonMargin;
@@ -636,7 +635,6 @@ public class EPG extends ViewGroup {
 
       for (int eventPos = 0; eventPos < events.size(); eventPos++) {
         EPGEvent event = events.get(eventPos);
-
         if (event.getStart() <= time && event.getEnd() >= time) {
           return eventPos;
         }
@@ -671,15 +669,32 @@ public class EPG extends ViewGroup {
     mClickListener = epgClickListener;
   }
 
+  public void reset() {
+    if (lastSelectedEvent != null) {
+      lastSelectedEvent.setPressed(false);
+      lastSelectedEvent.setSelected(false);
+    }
+
+    lastSelectedEvent = null;
+
+    if (lastPressedEvent != null) {
+      lastPressedEvent.setPressed(false);
+      lastPressedEvent.setSelected(false);
+    }
+
+    lastPressedEvent = null;
+  }
+
   /**
    * Add data to EPG. This must be set for EPG to able to draw something.
    *
    * @param epgData pass in any implementation of EPGData.
    */
   public void setEPGData(EPGData epgData) {
+    reset();
     this.epgData = epgData; //mergeEPGData(this.epgData, epgData);
     //this.epgData = epgData;
-    recalculateAndRedraw(this.selectedEvent, true);
+    recalculateAndRedraw(true);
   }
 
   /**
@@ -688,38 +703,25 @@ public class EPG extends ViewGroup {
    *
    * @param withAnimation true if scroll to current position should be animated.
    */
-  public void recalculateAndRedraw(EPGEvent selectedEvent, boolean withAnimation) {
+  public void recalculateAndRedraw(boolean withAnimation) {
     if (epgData != null && epgData.hasData()) {
       resetBoundaries();
-
       calculateMaxVerticalScroll();
       calculateMaxHorizontalScroll();
 
-      //Select initial event
-      if (selectedEvent != null) {
-        selectEvent(selectedEvent, withAnimation, true);
-      } else {
-        int position = getProgramPosition(0, getTimeFrom(getXPositionStart() + (getWidth() / 2)));
-        if (position == -1) {
-          position = 0;
-        }
+      int scrollX = getXFrom(getMostRecentHourTimeWithOffset()) -(mChannelLayoutWidth + mChannelLayoutMargin);
+      new Handler().post(() -> {
+        mScroller.startScroll(0, getScrollY(),
+            scrollX,
+            0, withAnimation ? 600 : 0);
 
-        selectEvent(epgData.getEvent(0, position), withAnimation, false);
-
-        int scrollX = getXFrom(getMostRecentHourTimeWithOffset());
-
-        new Handler().post(() -> {
-          mScroller.startScroll(0, getScrollY(),
-              scrollX,
-              0, withAnimation ? 600 : 0);
-
-          redraw();
-        });
-      }
-
-      redraw();
+        redraw();
+      });
     }
+
+    redraw();
   }
+
 
   private long getMostRecentHourTime() {
     DateTime dateTime = DateTime.now().withSecondOfMinute(0);
@@ -734,7 +736,7 @@ public class EPG extends ViewGroup {
   }
 
   private long getMostRecentHourTimeWithOffset() {
-    return getMostRecentHourTime() - 15 * 60 * 1000;
+    return getMostRecentHourTime() ; //- 20 * 60 * 1000;
   }
 
 
@@ -754,29 +756,18 @@ public class EPG extends ViewGroup {
     mChannelImageCache.clear();
   }
 
+  public void setSelectedProgram(EPGEvent epgEvent) {
+    epgEvent.setSelected(true);
+    lastSelectedEvent = epgEvent;
+  }
+
+
   private void loadProgramDetails(EPGEvent epgEvent) {
     // load program details
     if (mClickListener != null) {
       mClickListener.onEventSelected(epgEvent);
     }
   }
-
-  public void selectEvent(EPGEvent epgEvent, boolean withAnimation, boolean optimizeVisibility) {
-    if (this.selectedEvent != null) {
-      this.selectedEvent.selected = false;
-    }
-    epgEvent.selected = true;
-    this.selectedEvent = epgEvent;
-
-    if (optimizeVisibility) {
-      optimizeVisibility(epgEvent, withAnimation);
-    }
-
-    loadProgramDetails(epgEvent);
-    //redraw to get the coloring of the selected event
-    redraw();
-  }
-
 
   // Configuration.ORIENTATION_PORTRAIT or Configuration.ORIENTATION_LANDSCAPE
   public void setOrientation(int orientation) {
@@ -786,80 +777,6 @@ public class EPG extends ViewGroup {
     screenHeight = dm.heightPixels;
   }
 
-  public boolean processKeyCode(int keyCode) {
-    //TODO: select a default eventItem when none is selected.
-
-    mTimeLowerBoundary = getTimeFrom(getScrollX());
-    mTimeUpperBoundary = getTimeFrom(getScrollX() + getWidth());
-
-    boolean processed = true;
-
-    if (keyCode == KeyEvent.KEYCODE_BACK) {
-      recalculateAndRedraw(null, true);
-    } else if (this.selectedEvent != null) {
-      if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
-        if (mClickListener != null) {
-          mClickListener.onEventClicked(this.selectedEvent);
-        }
-      } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-        if (this.selectedEvent.getNextEvent() != null) {
-          this.selectedEvent.selected = false;
-          this.selectedEvent = this.selectedEvent.getNextEvent();
-          this.selectedEvent.selected = true;
-          optimizeVisibility(this.selectedEvent, true);
-        }
-      } else if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
-        if (this.selectedEvent.getPreviousEvent() != null) {
-          this.selectedEvent.selected = false;
-          this.selectedEvent = this.selectedEvent.getPreviousEvent();
-          this.selectedEvent.selected = true;
-          optimizeVisibility(this.selectedEvent, true);
-        }
-      } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-        if (this.selectedEvent.getChannel().getPreviousChannel() != null) {
-          long lowerBoundary = Math.max(mTimeLowerBoundary, this.selectedEvent.getStart());
-          long upperBoundary = Math.min(mTimeUpperBoundary, this.selectedEvent.getEnd());
-          long eventMiddleTime = (lowerBoundary + upperBoundary) / 2;
-          EPGEvent previousChannelEvent = getProgramAtTime(this.selectedEvent.getChannel().getPreviousChannel().getChannelID(), eventMiddleTime);
-          if (previousChannelEvent != null) {
-            this.selectedEvent.selected = false;
-            this.selectedEvent = previousChannelEvent;
-            this.selectedEvent.selected = true;
-          } else {
-            processed = false;
-          }
-          optimizeVisibility(this.selectedEvent, true);
-        } else {
-          processed = false;
-        }
-      } else if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-        if (this.selectedEvent.getChannel().getNextChannel() != null) {
-          long lowerBoundary = Math.max(mTimeLowerBoundary, this.selectedEvent.getStart());
-          long upperBoundary = Math.min(mTimeUpperBoundary, this.selectedEvent.getEnd());
-          long eventMiddleTime = (lowerBoundary + upperBoundary) / 2;
-
-          EPGEvent nextChannelEvent = getProgramAtTime(this.selectedEvent.getChannel().getNextChannel().getChannelID(), eventMiddleTime);
-
-          if (nextChannelEvent != null) {
-            this.selectedEvent.selected = false;
-            this.selectedEvent = nextChannelEvent;
-            this.selectedEvent.selected = true;
-          }
-
-          optimizeVisibility(this.selectedEvent, true);
-        }
-      } else if (keyCode == KeyEvent.KEYCODE_BUTTON_R1 || keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD) {
-        gotoNextDay(this.selectedEvent);
-      } else if (keyCode == KeyEvent.KEYCODE_BUTTON_L1 || keyCode == KeyEvent.KEYCODE_MEDIA_REWIND) {
-        gotoPreviousDay(this.selectedEvent);
-      }
-
-      loadProgramDetails(this.selectedEvent);
-      redraw();
-    }
-
-    return processed;
-  }
 
   private void gotoPreviousDay(EPGEvent currentEvent) {
     //TODO
@@ -867,50 +784,6 @@ public class EPG extends ViewGroup {
 
   private void gotoNextDay(EPGEvent currentEvent) {
     //TODO
-  }
-
-  public void optimizeVisibility(EPGEvent epgEvent, boolean withAnimation) {
-
-    long dT = 0;
-    int dX = 0;
-    int dY = 0;
-
-    // calculate optimal Y position
-
-    int minYVisible = getScrollY(); // is 0 when scrolled completely to top (first channel fully visible)
-    int maxYVisible = minYVisible + getHeight();
-
-    int currentChannelPosition = epgEvent.getChannel().getChannelID();
-    int currentChannelTop = mTimeBarHeight + (currentChannelPosition * (mChannelLayoutHeight + mChannelLayoutMargin));
-    int currentChannelBottom = currentChannelTop + mChannelLayoutHeight;
-
-    if (currentChannelTop < minYVisible) {
-      dY = currentChannelTop - minYVisible - mTimeBarHeight;
-    } else if (currentChannelBottom > maxYVisible) {
-      dY = currentChannelBottom - maxYVisible;
-    }
-
-    // calculate optimal X position
-
-    mTimeLowerBoundary = getTimeFrom(getScrollX());
-    mTimeUpperBoundary = getTimeFrom(getScrollX() + getProgramAreaWidth());
-    if (epgEvent.getEnd() > mTimeUpperBoundary) {
-      //we need to scroll the grid to the left
-      dT = (mTimeUpperBoundary - epgEvent.getEnd() - mMargin) * -1;
-      dX = Math.round(dT / mMillisPerPixel);
-    }
-    mTimeLowerBoundary = getTimeFrom(getScrollX());
-    mTimeUpperBoundary = getTimeFrom(getScrollX() + getWidth());
-    if (epgEvent.getStart() < mTimeLowerBoundary) {
-      //we need to scroll the grid to the right
-      dT = (this.selectedEvent.getStart() - mTimeLowerBoundary - mMargin);
-      dX = Math.round(dT / mMillisPerPixel);
-    }
-
-    if (dX != 0 || dY != 0) {
-      mScroller.startScroll(getScrollX(), getScrollY(), dX, dY, withAnimation ? 600 : 0);
-    }
-
   }
 
   private class OnGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -927,18 +800,37 @@ public class EPG extends ViewGroup {
       int scrollY = getScrollY() + y;
 
       int channelPosition = getChannelPosition(scrollY);
-      if (channelPosition != -1 && mClickListener != null) {
-        if (calculateResetButtonHitArea().contains(scrollX, scrollY)) {
-          // Reset button clicked
-          mClickListener.onResetButtonClicked();
-        } else if (calculateChannelsHitArea().contains(x, y)) {
+
+      if (calculateResetButtonHitArea().contains(scrollX, scrollY)) {
+        // Reset button clicked
+        mClickListener.onResetButtonClicked();
+        return true;
+      }
+
+      if (channelPosition != -1 && mClickListener != null && channelPosition < epgData.getChannelCount()) {
+        if (calculateChannelsHitArea().contains(x, y)) {
           // Channel area is clicked
           mClickListener.onChannelClicked(channelPosition, epgData.getChannel(channelPosition));
         } else if (calculateProgramsHitArea().contains(x, y)) {
           // Event area is clicked
           int programPosition = getProgramPosition(channelPosition, getTimeFrom(getScrollX() + x - calculateProgramsHitArea().left));
+
           if (programPosition != -1) {
-            mClickListener.onEventClicked(epgData.getEvent(channelPosition, programPosition));
+
+            EPGEvent epgEvent = epgData.getEvent(channelPosition, programPosition);
+
+            if (epgEvent == null || epgEvent.isSelected()) {
+              return true;
+            }
+
+            if (lastSelectedEvent != null) {
+              lastSelectedEvent.setSelected(false);
+            }
+
+            lastSelectedEvent = epgEvent;
+            lastSelectedEvent.setSelected(true);
+            invalidate();
+            mClickListener.onEventClicked(channelPosition, programPosition, epgData.getEvent(channelPosition, programPosition));
           }
         }
       }
@@ -984,12 +876,38 @@ public class EPG extends ViewGroup {
       return true;
     }
 
+
     @Override
     public boolean onDown(MotionEvent e) {
       if (!mScroller.isFinished()) {
         mScroller.forceFinished(true);
         return true;
       }
+
+      // This is absolute coordinate on screen not taking scroll into account.
+      int x = (int) e.getX();
+      int y = (int) e.getY();
+
+      int scrollY = getScrollY() + y;
+
+      int channelPosition = getChannelPosition(scrollY);
+
+      if (calculateProgramsHitArea().contains(x, y)) {
+        // Event area is clicked
+        int programPosition = getProgramPosition(channelPosition, getTimeFrom(getScrollX() + x - calculateProgramsHitArea().left));
+
+        if (programPosition != -1) {
+
+          if (lastPressedEvent != null) {
+            lastPressedEvent.setPressed(false);
+          }
+
+          lastPressedEvent = epgData.getEvent(channelPosition, programPosition);
+          lastPressedEvent.setPressed(true);
+          invalidate();
+        }
+      }
+
       return true;
     }
   }

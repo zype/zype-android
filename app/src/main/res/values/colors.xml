@@ -63,5 +63,6 @@
     <color name="epg_event_layout_text">@color/colorPrimaryWhite</color>
     <color name="epg_time_bar">#ffffff</color>
     <color name="epg_event_layout_background_selected">@color/accent</color>
+    <color name="epg_event_layout_background_pressed">#5000adef</color>
     <color name="lb_tv_white">#FFCCCCCC</color>
 </resources>

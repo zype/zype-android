@@ -36,7 +36,7 @@
     <dimen name="epg_channel_layout_width">100dp</dimen>
     <dimen name="epg_event_layout_text">15sp</dimen>
     <dimen name="epg_time_bar_height">35dp</dimen>
-    <dimen name="epg_time_bar_text">14sp</dimen>
+    <dimen name="epg_time_bar_text">10sp</dimen>
     <dimen name="epg_time_bar_month_text">15sp</dimen>
     <dimen name="epg_time_bar_line_width">2dp</dimen>
     <dimen name="epg_reset_button_size">40dp</dimen>
