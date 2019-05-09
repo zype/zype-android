@@ -119,9 +119,7 @@ public class GalleryFragment extends Fragment {
         epgImg.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
-            if(ZypeSettings.EPG_ENABLED) {
               startActivity(new Intent(getActivity(), EpgActivity.class));
-            }
 
           }
        });
@@ -186,7 +184,9 @@ public class GalleryFragment extends Fragment {
                 if (allDataLoaded(galleryRows)) {
                     adapter.setData(galleryRows);
                     hideProgress();
-                    epgLay.setVisibility(View.VISIBLE);
+                    if(ZypeSettings.EPG_ENABLED) {
+                        epgLay.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });
