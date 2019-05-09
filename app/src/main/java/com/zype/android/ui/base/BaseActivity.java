@@ -22,7 +22,7 @@ import com.zype.android.webapi.WebApiManager;
 /**
  * @author vasya
  * @version 1
- *          date 6/26/15
+ * date 6/26/15
  */
 public abstract class BaseActivity extends AppCompatActivity {
     private final NetworkEventHandler mNetworkEventHandler = new NetworkEventHandler();
@@ -63,9 +63,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mApi.unsubscribe(this);
-        BusProvider.getBus().unregister(mNetworkEventHandler);
-        NetworkStateObserver.getInstance().unregister(this);
+        try {
+            mApi.unsubscribe(this);
+            BusProvider.getBus().unregister(mNetworkEventHandler);
+            NetworkStateObserver.getInstance().unregister(this);
+        } catch (Exception e) {
+
+        }
     }
 
     protected void handleAuthorizationError(AuthorizationErrorEvent event) {

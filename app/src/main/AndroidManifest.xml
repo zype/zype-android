@@ -196,7 +196,7 @@
             />
 
         <activity android:name=".ui.epg.EpgActivity"
-            android:screenOrientation="landscape" />
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|uiMode"/>
 
         <!--
          Optionally, register AnalyticsReceiver and AnalyticsService to support background
