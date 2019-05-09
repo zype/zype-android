@@ -14,10 +14,10 @@
 
         <ImageView
             android:id="@+id/main_logo"
-            android:layout_width="116dp"
-            android:layout_height="46dp"
-            android:layout_margin="24dp"
-            android:scaleType="centerInside"
+            android:layout_width="80dp"
+            android:layout_height="35dp"
+            android:layout_margin="12dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/splash_logo" />
 
         <TextClock
@@ -25,12 +25,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_margin="24dp"
             android:format12Hour="hh:mm a"
+            android:layout_margin="12dp"
             android:gravity="right"
             android:textColor="@color/epg_event_layout_text"
-            android:textSize="16sp" />
-
+            android:textSize="15sp" />
     </LinearLayout>
 
     <com.zype.android.ui.epg.EPG
@@ -42,13 +41,9 @@
 
     <ProgressBar
         android:id="@+id/progressView"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:indeterminate="true"
-        android:indeterminateBehavior="repeat"
-        android:indeterminateDrawable="@drawable/progress_drawable"
         android:visibility="gone" />
 
 </RelativeLayout>

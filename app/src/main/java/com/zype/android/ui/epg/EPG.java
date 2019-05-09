@@ -55,7 +55,7 @@ public class EPG extends ViewGroup {
   private final Paint mPaint, tPaint;
   private final Scroller mScroller;
   private final GestureDetector mGestureDetector;
-
+  private final Bitmap mResetButtonIcon;
   private final int mChannelLayoutMargin;
   private final int mChannelLayoutPadding;
   private final int mChannelLayoutHeight;
@@ -148,7 +148,7 @@ public class EPG extends ViewGroup {
     BitmapFactory.Options options = new BitmapFactory.Options();
     options.outWidth = mResetButtonSize;
     options.outHeight = mResetButtonSize;
-    //mResetButtonIcon = BitmapFactory.decodeResource(getResources(), R.drawable.reset, options);
+    mResetButtonIcon = BitmapFactory.decodeResource(getResources(), R.drawable.reset, options);
 
   }
 
@@ -199,7 +199,7 @@ public class EPG extends ViewGroup {
       drawEvents(canvas, drawingRect);
       drawTimebar(canvas, drawingRect);
       //drawTimeLine(canvas, drawingRect);
-      //drawResetButton(canvas, drawingRect);
+      drawResetButton(canvas, drawingRect);
 
       // If scroller is scrolling/animating do scroll. This applies when doing a fling.
       if (mScroller.computeScrollOffset()) {
@@ -249,6 +249,25 @@ public class EPG extends ViewGroup {
 
   @Override
   protected void onLayout(boolean changed, int l, int t, int r, int b) {
+  }
+
+  private void drawResetButton(Canvas canvas, Rect drawingRect) {
+    // Show button when scrolled 1/3 of screen width from current time
+    final long threshold = getWidth() / 3;
+    if (Math.abs(getXPositionStart() - getScrollX()) > threshold) {
+      drawingRect = calculateResetButtonHitArea();
+      mPaint.setColor(mTimeBarLineColor);
+      canvas.drawCircle(drawingRect.right - (mResetButtonSize / 2),
+          drawingRect.bottom - (mResetButtonSize / 2),
+          Math.min(drawingRect.width(), drawingRect.height()) / 2,
+          mPaint);
+
+      drawingRect.left += mResetButtonMargin;
+      drawingRect.right -= mResetButtonMargin;
+      drawingRect.top += mResetButtonMargin;
+      drawingRect.bottom -= mResetButtonMargin;
+      canvas.drawBitmap(mResetButtonIcon, null, drawingRect, mPaint);
+    }
   }
 
   private void drawTimebarBottomStroke(Canvas canvas, Rect drawingRect) {
