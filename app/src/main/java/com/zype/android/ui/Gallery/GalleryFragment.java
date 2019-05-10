@@ -111,11 +111,11 @@ public class GalleryFragment extends Fragment {
         listGallery.setAdapter(adapter);
 
         progressBar = rootView.findViewById(R.id.progress);
-        epgLay = rootView.findViewById(R.id.epgLay);
-        epgTitle = rootView.findViewById(R.id.epgLay).findViewById(R.id.epgTitle);
+        epgLay = rootView.findViewById(R.id.epg_layout);
+        epgTitle = rootView.findViewById(R.id.epg_layout).findViewById(R.id.epgTitle);
         epgTitle.setText(getString(R.string.guide));
         epgLay.setVisibility(View.GONE);
-        epgImg = rootView.findViewById(R.id.epgLay).findViewById(R.id.epgImg);
+        epgImg = rootView.findViewById(R.id.epg_layout).findViewById(R.id.epgImg);
         epgImg.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
