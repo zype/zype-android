@@ -52,9 +52,9 @@ public class GalleryFragment extends Fragment {
 
     CustomViewPager pagerHeroImages;
     ProgressBar progressBar;
-    View epgLay;
-    TextView epgTitle;
-    ImageView epgImg;
+    private View epgLay;
+    private TextView epgTitle;
+    private ImageView epgImg;
 
     public static GalleryFragment newInstance(String parentPlaylistId) {
         GalleryFragment fragment = new GalleryFragment();
@@ -113,14 +113,13 @@ public class GalleryFragment extends Fragment {
         progressBar = rootView.findViewById(R.id.progress);
         epgLay = rootView.findViewById(R.id.epgLay);
         epgTitle = rootView.findViewById(R.id.epgLay).findViewById(R.id.epgTitle);
-        epgTitle.setText("Guide");
+        epgTitle.setText(getString(R.string.guide));
         epgLay.setVisibility(View.GONE);
         epgImg = rootView.findViewById(R.id.epgLay).findViewById(R.id.epgImg);
         epgImg.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
               startActivity(new Intent(getActivity(), EpgActivity.class));
-
           }
        });
 

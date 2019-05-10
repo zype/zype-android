@@ -65,4 +65,6 @@
     <string name="ccl_failed_to_set_track_style">Failed to update the captions style.</string>
     <string name="ccl_mini_upnext">Up Next</string>
 
+    <string name="guide">Guide</string>
+
 </resources>

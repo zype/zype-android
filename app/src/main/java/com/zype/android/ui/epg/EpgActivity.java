@@ -95,16 +95,6 @@ public class EpgActivity extends BaseActivity {
     return TAG;
   }
 
- /* @Override
-  public boolean dispatchKeyEvent(KeyEvent event) {
-    switch (event.getKeyCode()) {
-      case KeyEvent.KEYCODE_BACK:
-        if (event.getAction() == KeyEvent.ACTION_UP) {
-          finish();
-        }
-    }
-    return super.dispatchKeyEvent(event);
-  }*/
 
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
