@@ -63,13 +63,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        try {
-            mApi.unsubscribe(this);
-            BusProvider.getBus().unregister(mNetworkEventHandler);
-            NetworkStateObserver.getInstance().unregister(this);
-        } catch (Exception e) {
-
-        }
+        mApi.unsubscribe(this);
+        BusProvider.getBus().unregister(mNetworkEventHandler);
+        NetworkStateObserver.getInstance().unregister(this);
     }
 
     protected void handleAuthorizationError(AuthorizationErrorEvent event) {
