@@ -20,22 +20,12 @@
             app:layout_constraintTop_toTopOf="parent"
             />
 
-        <include
-            android:id="@+id/epg_layout"
-            layout="@layout/gallery_epg_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
         <android.support.v7.widget.RecyclerView
             android:id="@+id/listGallery"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintTop_toBottomOf="@+id/pagerHeroImages"
-            app:layout_constraintBottom_toTopOf="@+id/epg_layout"
             tools:listitem="@layout/gallery_list_item"
             />
 

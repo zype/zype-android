@@ -2,11 +2,7 @@ package com.zype.android.ui.Gallery;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -14,26 +10,18 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
-import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Gallery.Model.GalleryRow;
 import com.zype.android.ui.Gallery.Model.HeroImage;
 import com.zype.android.ui.Widget.CustomViewPager;
-import com.zype.android.ui.epg.EpgActivity;
-import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.Logger;
 
 import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
 import static android.support.v4.view.ViewPager.SCROLL_STATE_IDLE;
-import static android.support.v4.view.ViewPager.SCROLL_STATE_SETTLING;
 
 /**
  * Created by Evgeny Cherkasov on 12.06.2018
@@ -52,9 +40,6 @@ public class GalleryFragment extends Fragment {
 
     CustomViewPager pagerHeroImages;
     ProgressBar progressBar;
-    private View epgLay;
-    private TextView epgTitle;
-    private ImageView epgImg;
 
     public static GalleryFragment newInstance(String parentPlaylistId) {
         GalleryFragment fragment = new GalleryFragment();
@@ -111,18 +96,6 @@ public class GalleryFragment extends Fragment {
         listGallery.setAdapter(adapter);
 
         progressBar = rootView.findViewById(R.id.progress);
-        epgLay = rootView.findViewById(R.id.epg_layout);
-        epgTitle = rootView.findViewById(R.id.epg_layout).findViewById(R.id.epgTitle);
-        epgTitle.setText(getString(R.string.guide));
-        epgLay.setVisibility(View.GONE);
-        epgImg = rootView.findViewById(R.id.epg_layout).findViewById(R.id.epgImg);
-        epgImg.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-              startActivity(new Intent(getActivity(), EpgActivity.class));
-          }
-       });
-
         return rootView;
     }
 
@@ -175,7 +148,6 @@ public class GalleryFragment extends Fragment {
 
     private void updateGalleryRows() {
         showProgress();
-        epgLay.setVisibility(View.GONE);
         model.getGalleryRows(parentPlaylistId).observe(this, new Observer<List<GalleryRow>>() {
             @Override
             public void onChanged(@Nullable List<GalleryRow> galleryRows) {
@@ -183,9 +155,6 @@ public class GalleryFragment extends Fragment {
                 if (allDataLoaded(galleryRows)) {
                     adapter.setData(galleryRows);
                     hideProgress();
-                    if(ZypeSettings.EPG_ENABLED) {
-                        epgLay.setVisibility(View.VISIBLE);
-                    }
                 }
             }
         });

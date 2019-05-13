@@ -44,7 +44,7 @@ public class EPG extends ViewGroup {
 
   public static final int DAYS_BACK_MILLIS = 3 * 24 * 60 * 60 * 1000;        // 3 days
   public static final int DAYS_FORWARD_MILLIS = 3 * 24 * 60 * 60 * 1000;     // 3 days
-  public static final int HOURS_IN_VIEWPORT_MILLIS = 2 * 60 * 60 * 1000;     // 2 hours
+  public static final int HOURS_IN_VIEWPORT_MILLIS = 1 * 60 * 60 * 1000;     // 2 hours
   public static final int TIME_LABEL_SPACING_MILLIS = 30 * 60 * 1000;        // 30 minutes
   public static int screenWidth;
   public static int screenHeight;

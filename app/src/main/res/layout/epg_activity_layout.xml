@@ -5,38 +5,10 @@
     android:background="@color/epg_background"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/logo_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/main_logo"
-            android:layout_width="80dp"
-            android:layout_height="35dp"
-            android:layout_margin="12dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/splash_logo" />
-
-        <TextClock
-            android:id="@+id/textClock"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:format12Hour="hh:mm a"
-            android:layout_margin="12dp"
-            android:gravity="right"
-            android:textColor="@color/epg_event_layout_text"
-            android:textSize="15sp" />
-    </LinearLayout>
-
     <com.zype.android.ui.epg.EPG
         android:id="@+id/epg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/logo_view"
         android:focusable="true" />
 
     <ProgressBar
