@@ -13,6 +13,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -265,8 +266,9 @@ public class EPG extends ViewGroup {
     }
   }
 
+
   private void drawTimebarBottomStroke(Canvas canvas, Rect drawingRect) {
-    drawingRect.left = getScrollX() + mChannelLayoutWidth + mChannelLayoutMargin;
+    drawingRect.left = getScrollX() + getChannelAreaWidth();
     drawingRect.top = getScrollY() + mTimeBarHeight;
     drawingRect.right = drawingRect.left + getWidth();
     drawingRect.bottom = drawingRect.top + mChannelLayoutMargin;
@@ -275,9 +277,9 @@ public class EPG extends ViewGroup {
     mPaint.setColor(mEPGBottomStrokeBackground);
     canvas.drawRect(drawingRect, mPaint);
 
-    if (shouldDrawTimeLine(DateTime.now().getMillis())) {
-      mPaint.setColor(mEventLayoutBackgroundSelected);
-      drawingRect.right = getXFrom(DateTime.now().getMillis());
+    mPaint.setColor(mEventLayoutBackgroundSelected);
+    drawingRect.right = getXFrom(DateTime.now().getMillis());
+    if (drawingRect.right > drawingRect.left) {
       canvas.drawRect(drawingRect, mPaint);
     }
   }
@@ -709,7 +711,7 @@ public class EPG extends ViewGroup {
       calculateMaxVerticalScroll();
       calculateMaxHorizontalScroll();
 
-      int scrollX = getXFrom(getMostRecentHourTimeWithOffset()) -(mChannelLayoutWidth + mChannelLayoutMargin);
+      int scrollX = getXFrom(getMostRecentHourTimeWithOffset()) - (mChannelLayoutWidth + mChannelLayoutMargin);
       new Handler().post(() -> {
         mScroller.startScroll(0, getScrollY(),
             scrollX,
@@ -736,7 +738,7 @@ public class EPG extends ViewGroup {
   }
 
   private long getMostRecentHourTimeWithOffset() {
-    return getMostRecentHourTime() ; //- 20 * 60 * 1000;
+    return getMostRecentHourTime(); //- 20 * 60 * 1000;
   }
 
 
