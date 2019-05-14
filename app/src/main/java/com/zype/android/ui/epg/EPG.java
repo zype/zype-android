@@ -268,7 +268,7 @@ public class EPG extends ViewGroup {
 
 
   private void drawTimebarBottomStroke(Canvas canvas, Rect drawingRect) {
-    drawingRect.left = getScrollX() + getChannelAreaWidth();
+    drawingRect.left = getScrollX() + mChannelLayoutWidth + mChannelLayoutMargin;
     drawingRect.top = getScrollY() + mTimeBarHeight;
     drawingRect.right = drawingRect.left + getWidth();
     drawingRect.bottom = drawingRect.top + mChannelLayoutMargin;
