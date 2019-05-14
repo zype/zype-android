@@ -64,8 +64,8 @@ public class LaunchActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        SettingsParamsBuilder settingsParamsBuilder = new SettingsParamsBuilder();
-        getApi().executeRequest(WebApiManager.Request.GET_SETTINGS, settingsParamsBuilder.build());
+//        SettingsParamsBuilder settingsParamsBuilder = new SettingsParamsBuilder();
+//        getApi().executeRequest(WebApiManager.Request.GET_SETTINGS, settingsParamsBuilder.build());
     }
 
     private void jump() {

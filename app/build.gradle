@@ -41,7 +41,7 @@ android {
     }
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
-    def zypeTemplateVersion = "2.2.10"
+    def zypeTemplateVersion = "2.3.0"
 
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
@@ -96,7 +96,6 @@ android {
         template {
             versionName '1.0.0'
             applicationId "<APPLICATION_ID>"
-
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      // TODO: Provide valid app_id for OneSignal
                                      onesignal_app_id: '',
@@ -137,6 +136,8 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     implementation 'com.android.support:multidex:1.0.3'
+
+    implementation project(':zypeapi')
 
     // Android Architecture Components
 

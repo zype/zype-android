@@ -158,7 +158,7 @@
     <string name="my_library_sign_in">Please sign in to see\nMy library videos</string>
     <string name="entitlement_dialog_error_title">Error</string>
 
-    <!--m Notifications -->
+    <!--Notifications -->
     <string name="notification_channel_name">Zype</string>
     <string name="notification_channel_description">Zype Notification Channel</string>
 
@@ -194,6 +194,7 @@
     <string name="video_options_play_as_audio">Play as Audio</string>
     <string name="video_options_play_as_video">Play as Video</string>
     <string name="videos_loading">Gathering videos for you…</string>
+    <string name="videos_error">We’re sorry, but there’s an issue loading videos.</string>
 
 
     <!--Other-->
