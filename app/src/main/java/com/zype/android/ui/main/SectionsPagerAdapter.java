@@ -13,6 +13,7 @@ import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ui.Gallery.GalleryFragment;
 import com.zype.android.ui.MyLibrary.MyLibraryFragment;
+import com.zype.android.ui.epg.EPGFragment;
 import com.zype.android.ui.main.Model.Section;
 import com.zype.android.ui.main.fragments.download.DownloadFragment;
 import com.zype.android.ui.main.fragments.favorite.FavoritesFragment;
@@ -26,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import static android.view.View.GONE;
+import static android.view.View.resolveSize;
 
 /**
  * @author vasya
@@ -95,6 +97,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 else {
                     return PlaylistFragment.newInstance();
                 }
+            case R.id.menuNavigationGuide:
+                return EPGFragment.newInstance();
             case R.id.menuNavigationFavorites:
                 return FavoritesFragment.newInstance();
             case R.id.menuNavigationDownloads:

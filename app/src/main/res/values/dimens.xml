@@ -28,4 +28,20 @@
     <dimen name="text_size_common">12sp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
+    <!-- EPG -->
+    <!-- EPG dimensions-->
+    <dimen name="epg_channel_layout_margin">2.5dp</dimen>
+    <dimen name="epg_channel_layout_padding">8dp</dimen>
+    <dimen name="epg_channel_layout_height">50dp</dimen>
+    <dimen name="epg_channel_layout_width">100dp</dimen>
+    <dimen name="epg_event_layout_text">15sp</dimen>
+    <dimen name="epg_time_bar_height">35dp</dimen>
+    <dimen name="epg_time_bar_text">10sp</dimen>
+    <dimen name="epg_time_bar_month_text">15sp</dimen>
+    <dimen name="epg_time_bar_line_width">2dp</dimen>
+    <dimen name="epg_reset_button_size">40dp</dimen>
+    <dimen name="epg_reset_button_margin">10dp</dimen>
+    <dimen name="textsize">16sp</dimen>
+    <dimen name="epg_channel_bar_text">11sp</dimen>
+
 </resources>

@@ -103,6 +103,10 @@ android {
             ]
         }
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 
     applicationVariants.all { variant ->
         def file = project.file("src/" + variant.getFlavorName() + "/res/raw/zype_app_configuration.json")
@@ -183,6 +187,11 @@ dependencies {
     implementation 'com.onesignal:OneSignal:3.8.4@aar'
 
     implementation 'com.github.bumptech.glide:glide:4.7.1'
+
+    implementation 'joda-time:joda-time:2.7'
+
+    implementation 'io.reactivex:rxjava:1.1.0'
+    implementation 'io.reactivex:rxandroid:1.1.0'
 
     implementation('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
         transitive = true;

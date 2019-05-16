@@ -22,7 +22,7 @@ import com.zype.android.webapi.WebApiManager;
 /**
  * @author vasya
  * @version 1
- *          date 6/26/15
+ * date 6/26/15
  */
 public abstract class BaseActivity extends AppCompatActivity {
     private final NetworkEventHandler mNetworkEventHandler = new NetworkEventHandler();

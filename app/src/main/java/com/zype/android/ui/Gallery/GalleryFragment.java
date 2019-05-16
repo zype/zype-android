@@ -2,11 +2,7 @@ package com.zype.android.ui.Gallery;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -18,18 +14,14 @@ import android.widget.ProgressBar;
 
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Gallery.Model.GalleryRow;
 import com.zype.android.ui.Gallery.Model.HeroImage;
 import com.zype.android.ui.Widget.CustomViewPager;
-import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.Logger;
 
 import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
 import static android.support.v4.view.ViewPager.SCROLL_STATE_IDLE;
-import static android.support.v4.view.ViewPager.SCROLL_STATE_SETTLING;
 
 /**
  * Created by Evgeny Cherkasov on 12.06.2018
@@ -104,7 +96,6 @@ public class GalleryFragment extends Fragment {
         listGallery.setAdapter(adapter);
 
         progressBar = rootView.findViewById(R.id.progress);
-
         return rootView;
     }
 

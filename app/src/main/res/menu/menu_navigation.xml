@@ -5,6 +5,13 @@
         android:title="@string/menu_navigation_home"
         android:icon="@drawable/baseline_home_black_24"
         />
+
+    <item
+        android:id="@+id/menuNavigationGuide"
+        android:title="@string/menu_navigation_guide"
+        android:icon="@drawable/baseline_guide_black"
+        />
+
     <item
         android:id="@+id/menuNavigationFavorites"
         android:title="@string/menu_navigation_favorites"

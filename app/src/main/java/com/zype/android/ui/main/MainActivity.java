@@ -18,6 +18,7 @@ import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
@@ -131,6 +132,14 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     private void setupNavigation() {
         sections = new LinkedHashMap<>();
         sections.put(R.id.menuNavigationHome, new Section(getString(R.string.menu_navigation_home)));
+
+        if(ZypeSettings.EPG_ENABLED) {
+            sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
+        }
+        else {
+            bottomNavigationView.getMenu().findItem(R.id.menuNavigationGuide).setVisible(false);
+        }
+
         sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
         if (ZypeConfiguration.isDownloadsEnabled(this)) {
             bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(true);
@@ -151,6 +160,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menuNavigationGuide:
             case R.id.menuNavigationHome:
             case R.id.menuNavigationFavorites:
             case R.id.menuNavigationDownloads:
