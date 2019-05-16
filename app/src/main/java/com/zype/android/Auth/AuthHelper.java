@@ -35,6 +35,10 @@ public class AuthHelper {
         return SettingsProvider.getInstance().isLoggedIn();
     }
 
+    public static String getAccessToken() {
+        return SettingsProvider.getInstance().getAccessToken();
+    }
+
     public static boolean isAccessTokenExpired() {
         long currentTimeInSeconds = new Date().getTime() / 1000L;
         long expirationDateInSeconds = SettingsProvider.getInstance().getAccessTokenExpirationDate();

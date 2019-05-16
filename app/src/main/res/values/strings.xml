@@ -160,7 +160,7 @@
     <string name="my_library_sign_in">Please sign in to see\nMy library videos</string>
     <string name="entitlement_dialog_error_title">Error</string>
 
-    <!--m Notifications -->
+    <!--Notifications -->
     <string name="notification_channel_name">Zype</string>
     <string name="notification_channel_description">Zype Notification Channel</string>
 
@@ -187,7 +187,7 @@
     <string name="subscribe_or_login_button_restore">Restore Purchases</string>
     <string name="subscribe_or_login_button_subscribe_now">Subscribe Now</string>
     <string name="subscribe_or_login_error_restore_purchase_zype">Not found Zype Plan for existing in-app subscription</string>
-    <string name="subscribe_or_login_error_validation">Error validation subscription via Zype service</string>
+    <string name="subscribe_or_login_error_validation">We\'re sorry, there was a problem validating your subscription. Please close the app and visit Subscribe or Login > Restore Purchase upon reload.</string>
     <string name="subscribe_or_login_title">Subscribe or Sign In</string>
 
     <!-- Videos -->
@@ -196,6 +196,7 @@
     <string name="video_options_play_as_audio">Play as Audio</string>
     <string name="video_options_play_as_video">Play as Video</string>
     <string name="videos_loading">Gathering videos for you…</string>
+    <string name="videos_error">We’re sorry, but there’s an issue loading videos.</string>
 
 
     <!--Other-->
