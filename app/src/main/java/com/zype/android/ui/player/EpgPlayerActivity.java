@@ -12,6 +12,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.R;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.utils.BundleConstants;
+import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.events.ErrorEvent;
@@ -71,7 +72,8 @@ public class EpgPlayerActivity extends BaseVideoActivity {
 
     @Override
     public void onError() {
-
+        hideProgress();
+        DialogHelper.showErrorAlert(this, getString(R.string.video_error_bad_request));
     }
 
     @Subscribe

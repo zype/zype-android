@@ -71,7 +71,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     public final static int TYPE_UNKNOWN = -101;
     private static final String FRAGMENT_TAG_PLAYER = "FRAGMENT_TAG_PLAYER";
     protected static String mVideoId;
-    protected static String epgAppendUrl;
+    protected String epgAppendUrl;
     protected int mType = TYPE_UNKNOWN;
     protected MediaControlInterface mInterface;
     protected ActionBar mActionBar;
@@ -171,9 +171,6 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
         progressBar = (ProgressBar) baseView.findViewById(R.id.progress);
-        if (progressBar == null) {
-            progressBar = (ProgressBar) findViewById(R.id.progress);
-        }
 
         initVideo();
         //Block ChromeCast
