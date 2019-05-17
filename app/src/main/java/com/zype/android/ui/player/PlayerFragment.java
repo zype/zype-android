@@ -121,6 +121,7 @@ public class PlayerFragment extends BaseFragment implements
     public static final int TYPE_VIDEO_WEB = 4;
     public static final int TYPE_AUDIO_LIVE = 5;
     public static final int TYPE_VIDEO_LIVE = 6;
+    public static final int TYPE_VIDEO_EPG = 7;
 
     public static final String CONTENT_TYPE_TYPE = "content_type";
     public static final String CONTENT_URL = "content_url";
@@ -682,6 +683,7 @@ public class PlayerFragment extends BaseFragment implements
     private CustomPlayer.RendererBuilder getRendererBuilder() {
         String userAgent = Util.getUserAgent(getContext(), WebApiManager.CUSTOM_HEADER_VALUE);
         switch (contentType) {
+            case TYPE_VIDEO_EPG:
             case TYPE_VIDEO_WEB:
             case TYPE_VIDEO_LIVE:
             case TYPE_AUDIO_WEB:
@@ -840,7 +842,7 @@ public class PlayerFragment extends BaseFragment implements
                 manager.trackStop();
 
                 showControls();
-                if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB) {
+                if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_EPG) {
                     if (playWhenReady) {
                         mListener.videoFinished();
                     }
@@ -859,7 +861,7 @@ public class PlayerFragment extends BaseFragment implements
             case ExoPlayer.STATE_READY:
                 mediaSession.setActive(true);
 
-                if (isNeedToSeekToLatestListenPosition) {
+                if (isNeedToSeekToLatestListenPosition && contentType != TYPE_VIDEO_EPG) {
                     long playerPosition = 0;
                     if (contentType != TYPE_AUDIO_LIVE && contentType != TYPE_VIDEO_LIVE) {
                         playerPosition = DataHelper.getPlayTime(getActivity().getContentResolver(), fileId);
@@ -871,7 +873,7 @@ public class PlayerFragment extends BaseFragment implements
 
                 updateClosedCaptionsTrack();
 
-                if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB) {
+                if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_EPG) {
                     Logger.d(String.format("onStateChanged(): ExoPlayer.STATE_READY: playWhenReady=%1$s", playWhenReady));
                     // Count play time of the live stream if user is not logged in and is not subscribed
                     if (onAir && (!SettingsProvider.getInstance().isLoggedIn() || SettingsProvider.getInstance().getSubscriptionCount() <= 0)) {
@@ -952,7 +954,7 @@ public class PlayerFragment extends BaseFragment implements
 
     private void hideControls() {
         if (mediaController != null) {
-            if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE) {
+            if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE || contentType == TYPE_VIDEO_EPG) {
                 mediaController.hide();
             }
             else {
@@ -971,7 +973,7 @@ public class PlayerFragment extends BaseFragment implements
     private void showControls() {
         if (mediaController != null) {
             updateClosedCaptionsVisibility();
-            if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE) {
+            if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_LIVE || contentType == TYPE_VIDEO_EPG) {
                 if (isControlsEnabled) {
                     mediaController.show(5000);
                 }

@@ -16,12 +16,18 @@ public class EPGChannel implements Serializable {
   private List<EPGEvent> events = new ArrayList();
   private EPGChannel previousChannel;
   private EPGChannel nextChannel;
+  private String videoId;
 
-  public EPGChannel(String imageURL, String name, int channelID, String id) {
+  public EPGChannel(String imageURL, String name, int channelID, String id, String videoId) {
     this.imageURL = imageURL;
     this.name = name;
     this.channelID = channelID;
     this.id = id;
+    this.videoId = videoId;
+  }
+
+  public String getVideoId() {
+    return videoId;
   }
 
   public String getId() {

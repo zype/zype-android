@@ -3,9 +3,12 @@ package com.zype.android.webapi.model.epg;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
+
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Program implements Serializable {
 
@@ -31,13 +34,17 @@ public class Program implements Serializable {
   @Expose
   public String endTime;
 
+  @SerializedName("end_time")
+  @Expose
+  public String endDateTime;
+
+  @SerializedName("start_time")
+  @Expose
+  public String startDateTime;
 
   public long getStartTime() {
     try {
-      SimpleDateFormat formatter = new
-          SimpleDateFormat(DATE_FORMAT);
-      Date date = formatter.parse(startTime);
-      return date.getTime();
+      return LocalDateTime.parse(startTime, DateTimeFormat.forPattern(DATE_FORMAT)).toDateTime().getMillis() + DateTimeZone.getDefault().getOffset(DateTime.now());
     } catch (Exception e) {
       return 0;
     }
@@ -45,13 +52,9 @@ public class Program implements Serializable {
 
   public long getEndTime() {
     try {
-      SimpleDateFormat formatter = new
-          SimpleDateFormat(DATE_FORMAT);
-      Date date = formatter.parse(endTime);
-      return date.getTime();
+      return LocalDateTime.parse(endTime, DateTimeFormat.forPattern(DATE_FORMAT)).toDateTime().getMillis() + DateTimeZone.getDefault().getOffset(DateTime.now());
     } catch (Exception e) {
       return 0;
     }
   }
-
 }

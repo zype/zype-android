@@ -53,7 +53,7 @@ public class EPGDataManager {
 
           compositeSubscription.add(Observable.just(channels).flatMapIterable(channelList -> channelList)
               .filter(epgChannel -> epgChannel.isActive()).flatMap(epgChannel -> {
-                String startDate = DateTimeFormat.forPattern("yyyy-MM-dd").print(DateTime.now().minusDays(1));
+                String startDate = DateTimeFormat.forPattern("yyyy-MM-dd").print(DateTime.now().minusDays(3));
                 String endDate = DateTimeFormat.forPattern("yyyy-MM-dd").print(DateTime.now().plusDays(1));
                 ProgramResponse programResponse = zypeApi.loadEpgEvents(epgChannel, startDate, endDate);
 
@@ -92,14 +92,14 @@ public class EPGDataManager {
     List<EPGChannel> epgChannels = new ArrayList<>();
 
     for (Channel channel : channels) {
-      EPGChannel epgChannel = new EPGChannel("", channel.name, pos++, channel.id);
+      EPGChannel epgChannel = new EPGChannel("", channel.name, pos++, channel.id, channel.getVideoId());
       epgChannel.setPreviousChannel(prevChannel);
 
       EPGEvent prevEpgEvent = null;
 
       for (Program program : channel.getPrograms()) {
         EPGEvent epgEvent = new EPGEvent(epgChannel, program.getStartTime(), program.getEndTime(), program.name,
-            "");
+                    "", program.startDateTime, program.endDateTime);
 
         epgEvent.setPreviousEvent(prevEpgEvent);
 
