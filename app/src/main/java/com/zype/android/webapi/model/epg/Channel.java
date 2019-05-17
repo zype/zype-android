@@ -27,11 +27,11 @@ public class Channel implements Serializable {
   private List<Program> programs = new ArrayList<>();
 
   public boolean isActive() {
-    if (!TextUtils.isEmpty(status)) {
+   /* if (!TextUtils.isEmpty(status)) {
       return status.equalsIgnoreCase("synced");
-    }
+    }*/
 
-    return false;
+    return true;
   }
 
   public List<Program> getPrograms() {

@@ -56,7 +56,7 @@ public class ZypeSettings {
 
     public static final String THEME = ZypeConfiguration.THEME_DARK;
 
-    public static final boolean EPG_ENABLED = false;
+    public static final boolean EPG_ENABLED = true;
 
 //    /**
 //     * Google client id and secret are required for native to universal subscription feature.

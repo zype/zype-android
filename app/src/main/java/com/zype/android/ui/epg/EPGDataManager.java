@@ -53,7 +53,7 @@ public class EPGDataManager {
 
           compositeSubscription.add(Observable.just(channels).flatMapIterable(channelList -> channelList)
               .filter(epgChannel -> epgChannel.isActive()).flatMap(epgChannel -> {
-                String startDate = DateTimeFormat.forPattern("yyyy-MM-dd").print(DateTime.now().minusDays(1));
+                String startDate = DateTimeFormat.forPattern("yyyy-MM-dd").print(DateTime.now().minusDays(3));
                 String endDate = DateTimeFormat.forPattern("yyyy-MM-dd").print(DateTime.now().plusDays(1));
                 ProgramResponse programResponse = zypeApi.loadEpgEvents(epgChannel, startDate, endDate);
 
