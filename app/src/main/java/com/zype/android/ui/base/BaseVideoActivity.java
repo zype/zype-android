@@ -71,6 +71,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     public final static int TYPE_UNKNOWN = -101;
     private static final String FRAGMENT_TAG_PLAYER = "FRAGMENT_TAG_PLAYER";
     protected static String mVideoId;
+    protected static String epgAppendUrl;
     protected int mType = TYPE_UNKNOWN;
     protected MediaControlInterface mInterface;
     protected ActionBar mActionBar;
@@ -86,7 +87,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
     // LIVE URLS
     protected String liveVideoUrlToPlay = "";
     protected String liveAudioUrlToPlay = "";
-
+    protected String epgVideoUrlToPlay = "";
 
     protected View getBaseView() {
         return (ViewGroup) ((ViewGroup) this
@@ -140,6 +141,9 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         return PlayerFragment.newInstance(PlayerFragment.TYPE_AUDIO_LOCAL, filePath, fileId);
     }
 
+    private static Fragment getEpgVideoFragment(String filePath, String fileId) {
+        return PlayerFragment.newInstance(PlayerFragment.TYPE_VIDEO_EPG, filePath, fileId);
+    }
 
     private static Fragment getYoutubeFragment(String videoId) {
         return YouTubeFragment.newInstance(videoId);
@@ -167,6 +171,9 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
         progressBar = (ProgressBar) baseView.findViewById(R.id.progress);
+        if (progressBar == null) {
+            progressBar = (ProgressBar) findViewById(R.id.progress);
+        }
 
         initVideo();
         //Block ChromeCast
@@ -279,6 +286,9 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
                     break;
                 case TYPE_YOUTUBE:
                     fragment = getYoutubeFragment(videoData.getId());
+                    break;
+                case PlayerFragment.TYPE_VIDEO_EPG:
+                    fragment = getEpgVideoFragment(epgVideoUrlToPlay, mVideoId);
                     break;
                 case TYPE_WEB:
                     fragment = null;
@@ -599,6 +609,9 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             case PlayerFragment.TYPE_AUDIO_LIVE:
                 url = liveAudioUrlToPlay;
                 break;
+            case PlayerFragment.TYPE_VIDEO_EPG:
+                url = epgVideoUrlToPlay;
+                break;
 //            case TYPE_YOUTUBE:
 //                url = null;
 //                break;
@@ -726,6 +739,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
                 && !TextUtils.isEmpty(getIntent().getStringExtra(BundleConstants.VIDEO_ID))) {
             playlistId = getIntent().getStringExtra(BundleConstants.PLAYLIST_ID);
             mVideoId = getIntent().getStringExtra(BundleConstants.VIDEO_ID);
+            epgAppendUrl = getIntent().getStringExtra(BundleConstants.EPG_APPEND);
             mType = getIntent().getIntExtra(BundleConstants.MEDIA_TYPE, TYPE_UNKNOWN);
             if (mType == PlayerFragment.TYPE_VIDEO_LIVE) {
                 requestLiveVideoUrl(mVideoId);

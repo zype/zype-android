@@ -200,6 +200,11 @@
         <activity android:name=".ui.epg.EpgActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|uiMode"/>
 
+        <activity
+            android:name="com.zype.android.ui.player.EpgPlayerActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|uiMode"
+            android:theme="@style/AppTheme" />
+
         <!--
          Optionally, register AnalyticsReceiver and AnalyticsService to support background
          dispatching on non-Google Play devices

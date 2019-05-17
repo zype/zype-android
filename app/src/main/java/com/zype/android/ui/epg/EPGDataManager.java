@@ -92,14 +92,14 @@ public class EPGDataManager {
     List<EPGChannel> epgChannels = new ArrayList<>();
 
     for (Channel channel : channels) {
-      EPGChannel epgChannel = new EPGChannel("", channel.name, pos++, channel.id);
+      EPGChannel epgChannel = new EPGChannel("", channel.name, pos++, channel.id, channel.getVideoId());
       epgChannel.setPreviousChannel(prevChannel);
 
       EPGEvent prevEpgEvent = null;
 
       for (Program program : channel.getPrograms()) {
         EPGEvent epgEvent = new EPGEvent(epgChannel, program.getStartTime(), program.getEndTime(), program.name,
-            "");
+                    "", program.startDateTime, program.endDateTime);
 
         epgEvent.setPreviousEvent(prevEpgEvent);
 

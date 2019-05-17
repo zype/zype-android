@@ -26,6 +26,9 @@ public class Channel implements Serializable {
   public int programGuideEntryCount;
   private List<Program> programs = new ArrayList<>();
 
+  @SerializedName("video_ids")
+  private List<String> videoIds = new ArrayList<>();
+
   public boolean isActive() {
    /* if (!TextUtils.isEmpty(status)) {
       return status.equalsIgnoreCase("synced");
@@ -47,5 +50,12 @@ public class Channel implements Serializable {
     for (Program program : programs) {
       this.programs.add(program);
     }
+  }
+
+  public String getVideoId() {
+    if (videoIds != null && videoIds.size() > 0) {
+      return videoIds.get(0);
+    }
+    return "";
   }
 }

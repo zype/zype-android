@@ -1,6 +1,8 @@
 package com.zype.android.ui.epg;
 
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,7 +10,11 @@ import android.widget.ProgressBar;
 
 import com.zype.android.R;
 import com.zype.android.ui.base.BaseFragment;
+import com.zype.android.ui.dialog.CustomAlertDialog;
+import com.zype.android.ui.player.EpgPlayerActivity;
 import com.zype.android.utils.Logger;
+
+import org.joda.time.DateTime;
 
 import java.util.concurrent.TimeUnit;
 
@@ -58,6 +64,20 @@ public class EPGFragment extends BaseFragment {
       @Override
       public void onEventClicked(int channelPosition, int programPosition, EPGEvent epgEvent) {
 
+        if (TextUtils.isEmpty(epgEvent.getChannel().getVideoId()) || epgEvent.getStart() > DateTime.now().getMillis()) {
+
+          DialogFragment newFragment = CustomAlertDialog.newInstance(
+                  R.string.alert, R.string.alert_msg);
+          newFragment.show(getActivity().getSupportFragmentManager(), "dialog_free_space");
+
+          return;
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        if (epgEvent.getEnd() < DateTime.now().getMillis()) {
+          stringBuilder.append("&start=" + epgEvent.getStartDateTime());
+          stringBuilder.append("&end=" + epgEvent.getEndDateTime());
+        }
+        EpgPlayerActivity.startActivity(getActivity(), epgEvent.getChannel().getVideoId(), stringBuilder.toString());
       }
 
       @Override

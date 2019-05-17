@@ -205,5 +205,6 @@
     <string name="unauthorised_title">Registration Required</string>
 
     <string name="login_signup_sign_msg">Please sign up or sign into an account in order to watch this video</string>
-
+    <string name="alert">Alert</string>
+    <string name="alert_msg">We\'re sorry, that program is not yet available.</string>
 </resources>

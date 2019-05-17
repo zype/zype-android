@@ -830,7 +830,7 @@ public class EPG extends ViewGroup {
             }
 
             lastSelectedEvent = epgEvent;
-            lastSelectedEvent.setSelected(true);
+           // lastSelectedEvent.setSelected(true);
             invalidate();
             mClickListener.onEventClicked(channelPosition, programPosition, epgData.getEvent(channelPosition, programPosition));
           }
