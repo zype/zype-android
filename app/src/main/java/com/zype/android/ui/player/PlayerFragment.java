@@ -987,7 +987,7 @@ public class PlayerFragment extends BaseFragment implements
         }
     }
 
-    SurfaceHolder.Callback surfaceCallback = new Callback() {
+    Callback surfaceCallback = new Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             if (player != null) {
@@ -1429,6 +1429,11 @@ public class PlayerFragment extends BaseFragment implements
     private void attachPlayerToAnalyticsManager(){
         if (player != null && analytics != null){
             VideoData video = VideoHelper.getVideo(getActivity().getContentResolver(), fileId);
+
+            if(video == null) {
+                return;
+            }
+
             AnalyticsDimensions dimensions = analytics.getDimensions();
 
             Context context = getActivity().getApplicationContext();
