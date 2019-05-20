@@ -301,7 +301,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
         Logger.d("changeFragment(): videoId=" + mVideoId);
         Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
         Fragment fragment;
-        if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
+        if (epgAppendUrl != null || video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
             fragment = getFragment(isChromeCastConnected, mVideoId);
         }
         else {
@@ -751,6 +751,10 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             Logger.e("VideoId is empty !!");// но тут должен быть путь
         }
         if (mType == TYPE_WEB) {
+            if(epgAppendUrl != null) {
+                requestVideoUrl(mVideoId);
+            }
+            else
             if (AuthHelper.isVideoAuthorized(this, mVideoId)) {
                 Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
                 if (video != null &&
