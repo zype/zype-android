@@ -51,7 +51,6 @@ import com.zype.android.webapi.events.download.DownloadAudioEvent;
 import com.zype.android.webapi.events.download.DownloadVideoEvent;
 import com.zype.android.webapi.events.favorite.FavoriteEvent;
 import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
-import com.zype.android.webapi.events.player.PlayerVideoEvent;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.File;

@@ -111,7 +111,7 @@ public interface IZypeApi {
 
     // Videos
     @GET("/videos")
-    Call<VideosResponse> getVideos(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
+    Call<VideosResponse> getVideos(@QueryMap HashMap<String, String> params);
 
     @GET("/videos/{video_id}")
     Call<VideoResponse> getVideo(@Path("video_id") String videoId, @QueryMap HashMap<String, String> params);

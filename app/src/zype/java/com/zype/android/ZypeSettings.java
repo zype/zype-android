@@ -5,14 +5,14 @@ package com.zype.android;
  */
 
 public class ZypeSettings {
-    // Zype app key
-    public static final String APP_KEY = "eIqvZ7K4fJLZgQvWGH8oolqKq5G-J1oUPtY07nTunWlZnuOeahcPhqATaXr3zmi_";
-    // OAuth credentials
-    public static final String CLIENT_ID = "57cc5ab74d238d644523311362c6ccdb4ab4b163c02d703d9d10df1753195912";
-
-//    public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
-    // Playlist
-    public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
+//    // Zype app key
+//    public static final String APP_KEY = "eIqvZ7K4fJLZgQvWGH8oolqKq5G-J1oUPtY07nTunWlZnuOeahcPhqATaXr3zmi_";
+//    // OAuth credentials
+//    public static final String CLIENT_ID = "57cc5ab74d238d644523311362c6ccdb4ab4b163c02d703d9d10df1753195912";
+//
+////    public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
+//    // Playlist
+//    public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
 
 //    // Zype app key
 //    public static final String APP_KEY = "DV8vhDumvxPh2ieCfjOzuQQdn0zSOZ-otnGALBnzFAqtIO-feZbsSwKXy3DA_JhK";
@@ -22,6 +22,13 @@ public class ZypeSettings {
 //    // Playlist
 //    public static final String ROOT_PLAYLIST_ID = "5807ccdc849e2d0d11000146";
 
+    // Shout Factory
+    // Zype app key
+    public static final String APP_KEY = "6KvlCCM-mkpMeEAIBgOP1GDOoMFxQPmlGFNhvR5na8GXKYe2--cH8aAUPRT2zS0F";
+    // OAuth credentials
+    public static final String CLIENT_ID = "0a9d31baeeb33eb21aa6335b5a2ae5cc1dedc3769ec0067c993aaa4682632f0e";
+    // Playlist
+    public static final String ROOT_PLAYLIST_ID = "593065d9345e3b150500090f";
 
     // Google Analytics Tracking Id
     public static final String GA_TRACKING_ID = "";
@@ -49,22 +56,13 @@ public class ZypeSettings {
     public static final String DEVICE_LINKING_URL = "https://www.zype.com";
     public static final boolean DOWNLOADS_ENABLED = true;
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
+    public static final boolean EPG_ENABLED = false;
     public static final boolean PLAYLIST_GALLERY_VIEW = true;
     public static final boolean PLAYLIST_GALLERY_HERO_IMAGES = true;
     public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = true;
     public static final boolean SHARE_VIDEO_ENABLED = false;
 
     public static final String THEME = ZypeConfiguration.THEME_DARK;
-
-    public static final boolean EPG_ENABLED = false;
-
-//    /**
-//     * Google client id and secret are required for native to universal subscription feature.
-//     * They are used in request to Zype Bifrost service for verifying subscription.
-//     */
-//    public static final String GOOGLE_CLIENT_ID = "818854525960-e4mm2df9tfaqtg2o0li62u0rd80tt5mj.apps.googleusercontent.com";
-//    public static final String GOOGLE_CLIENT_SECRET = "OfBs7XR_B_DYR1YRcO-ehVPU";
-//    public static final String GOOGLE_REDIRECT_URL = "urn:ietf:wg:oauth:2.0:oob";
 
 }
 
