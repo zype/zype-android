@@ -430,4 +430,28 @@ public class ZypeApi {
             }
         });
     }
+
+    public void searchVideos(@NonNull String query, String playlistId,
+                             int page, @NonNull final IZypeApiListener listener) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(ZypeApi.QUERY, query);
+        if (!TextUtils.isEmpty(playlistId)) {
+            params.put(PLAYLIST_ID_INCLUSIVE, playlistId);
+        }
+        params.put(ZypeApi.APP_KEY, appKey);
+        params.put(ZypeApi.PAGE, String.valueOf(page));
+        params.put(ZypeApi.PER_PAGE, String.valueOf(ZypeApi.PER_PAGE_DEFAULT));
+        getApi().getVideos(params).enqueue(new Callback<VideosResponse>() {
+            @Override
+            public void onResponse(Call<VideosResponse> call, Response<VideosResponse> response) {
+                listener.onCompleted(new ZypeApiResponse<VideosResponse>(response.body(), true));
+            }
+
+            @Override
+            public void onFailure(Call<VideosResponse> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse<VideosResponse>(null, false));
+            }
+        });
+    }
+
 }

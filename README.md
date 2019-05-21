@@ -122,9 +122,22 @@ An example of fully functional app that is using a Zype sandbox account.
  - Uncomment init of Google Analytics in [ZypeApp.java](https://github.com/zype/zype-android/blob/master/app/src/main/java/com/zype/android/ZypeApp.java)
 
 **7.** To use Fabric:
- - Update your Fabric API key in [AndroidManifest.xml](https://github.com/zype/zype-android/blob/master/app/src/main/AndroidManifest.xml)
- - Uncomment init of Fabric in [ZypeApp.java](https://github.com/zype/zype-android/blob/master/app/src/main/java/com/zype/android/ZypeApp.java)
-
+ - In [AndroidManifest.xml](https://github.com/zype/zype-android/blob/master/app/src/main/AndroidManifest.xml) uncomment Fabric section and put you Fabric API key:  
+ ```
+         <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="<YOUR KEY HERE>" />
+        -->
+```
+ - In [ZypeApp.java](https://github.com/zype/zype-android/blob/master/app/src/main/java/com/zype/android/ZypeApp.java) uncomment Fabric initialization:
+ ```
+ initFabric();
+ ``` 
+ - In [build.gradle](https://github.com/zype/zype-android/blob/master/app/build.gradle) uncomment following line: 
+ ```
+ apply plugin: 'io.fabric'
+ ``` 
+ 
 **8.** Integration of OneSignal push notification:
  - Set `OneSignal` attribute in [zype_app_configuration.json](https://github.com/zype/zype-android/blob/master/app/src/template/res/raw/zype_app_configuration.json) file to `true`
  - Set `onesignal_app_id` attribute in the following code in the [build.gradle](https://github.com/zype/zype-android/blob/master/app/build.gradle):

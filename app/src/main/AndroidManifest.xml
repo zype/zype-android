@@ -185,6 +185,15 @@
                 android:value="com.zype.android.ui.main.MainActivity" />
         </activity>
         <activity
+            android:name=".ui.v2.search.SearchActivity"
+            android:label="@string/title_activity_search"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zype.android.ui.main.MainActivity" />
+        </activity>
+        <activity
             android:name=".ui.Subscription.SubscribeOrLoginActivity"
             android:theme="@style/AppThemeWithActionBar"
             />
