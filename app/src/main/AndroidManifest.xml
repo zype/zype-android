@@ -94,6 +94,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.zype.android.ui.main.MainActivity" />
         </activity>
+        <activity
+            android:name=".ui.video_details.v2.VideoDetailActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
+            android:exported="true"
+            android:label="@string/title_activity_episode_detail"
+            android:launchMode="singleTask"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zype.android.ui.main.MainActivity" />
+        </activity>
         <!--
         <activity
             android:name="com.zype.android.ui.chromecast.LivePlayerActivity"

@@ -2,27 +2,47 @@ package com.zype.android.ui.player;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.android.exoplayer.TimeRange;
 import com.google.android.exoplayer.chunk.Format;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
+import com.zype.android.Db.DbHelper;
+import com.zype.android.Db.Entity.AdSchedule;
+import com.zype.android.Db.Entity.AnalyticBeacon;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.core.provider.helpers.PlaylistHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.ParamsBuilder;
 import com.zype.android.webapi.builder.PlayerParamsBuilder;
 import com.zype.android.webapi.events.player.PlayerAudioEvent;
 import com.zype.android.webapi.model.player.File;
+import com.zype.android.zypeapi.IZypeApiListener;
+import com.zype.android.zypeapi.ZypeApi;
+import com.zype.android.zypeapi.ZypeApiResponse;
+import com.zype.android.zypeapi.model.Advertising;
+import com.zype.android.zypeapi.model.Analytics;
+import com.zype.android.zypeapi.model.PlayerResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,11 +56,20 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private MutableLiveData<List<PlayerMode>> availablePlayerModes;
     private MutableLiveData<PlayerMode> playerMode;
     private MutableLiveData<String> playerUrl;
+    private MutableLiveData<Integer> playbackState = new MutableLiveData<>();
+    MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
     private String videoId;
+    private String playlistId;
+
+    private List<AdSchedule> adSchedule;
+    private AnalyticBeacon analyticBeacon;
+    private boolean onAir;
 
     private long playbackPosition = 0;
-    private boolean isPlaybackPositionRestored = false;
+    private boolean isPlaybackPositionRestored;
+    private boolean isUrlLoaded = false;
+    private boolean inBackground = false;
 
     public enum PlayerMode {
         AUDIO,
@@ -48,13 +77,15 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     DataRepository repo;
-    WebApiManager api;
+    ZypeApi api;
+    WebApiManager oldApi;
 
     public PlayerViewModel(Application application) {
         super(application);
         repo = DataRepository.getInstance(application);
-        api = WebApiManager.getInstance();
-        api.subscribe(this);
+        api = ZypeApi.getInstance();
+        oldApi = WebApiManager.getInstance();
+        oldApi.subscribe(this);
 
         availablePlayerModes = new MutableLiveData<>();
         availablePlayerModes.setValue(new ArrayList<PlayerMode>());
@@ -63,12 +94,16 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     @Override
     protected void onCleared() {
-        api.unsubscribe(this);
+        oldApi.unsubscribe(this);
         super.onCleared();
     }
 
     public void init(String videoId, PlayerMode mediaType) {
         this.videoId = videoId;
+
+        Video video = repo.getVideoSync(videoId);
+        playbackPosition = video.playTime;
+        isPlaybackPositionRestored = false;
 
         updateAvailablePlayerModes();
         if (mediaType != null || isMediaTypeAvailable(mediaType)) {
@@ -85,6 +120,26 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
     }
 
+    // Ad schedule
+
+    private void updateAdSchedule() {
+        adSchedule = repo.getAdScheduleSync(videoId);
+    }
+
+    public List<AdSchedule> getAdSchedule() {
+        return adSchedule;
+    }
+
+    // Analytics beacon
+
+    private void updateAnalyticsBeacon() {
+        analyticBeacon = repo.getAnalyticsBeaconSync(videoId);
+    }
+
+    public AnalyticBeacon getAnalyticBeacon() {
+        return analyticBeacon;
+    }
+
     // Playback position
 
     public long getPlaybackPosition() {
@@ -93,10 +148,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     public void savePlaybackPosition(long position) {
         this.playbackPosition = position;
-
-//        Video video = repo.getVideoSync(videoId);
-//        video.playTime = position;
-//        repo.updateVideo(video);
+        Video video = repo.getVideoSync(videoId);
+        video.playTime = position;
+        repo.updateVideo(video);
 
         isPlaybackPositionRestored = false;
     }
@@ -109,52 +163,113 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         isPlaybackPositionRestored = true;
     }
 
+    public void onPlaybackStarted() {
+        Video video = repo.getVideoSync(videoId);
+        video.isPlayStarted = 1;
+        repo.updateVideo(video);
+    }
+
+    public void onPlaybackFinished() {
+        Video video = repo.getVideoSync(videoId);
+        video.isPlayStarted = 1;
+        video.isPlayFinished = 1;
+        repo.updateVideo(video);
+    }
+
+    public boolean isThereNextVideo() {
+        return !(PlaylistHelper.getNextVideoId(videoId, repo.getPlaylistVideosSync(playlistId)) == null);
+    }
+
+    public boolean isTherePreviousVideo() {
+        return !(PlaylistHelper.getPreviousVideoId(videoId, repo.getPlaylistVideosSync(playlistId)) == null);
+    }
+
+    // Playback state
+
+    public MutableLiveData<Integer> getPlaybackState() {
+        return playbackState;
+    }
+
+    public void setPlaybackState(int state) {
+        playbackState.setValue(state);
+    }
+
+    // On air
+
+    public void setOnAir(boolean onAir) {
+        this.onAir = onAir;
+    }
+
+    public boolean isOnAir() {
+        return this.onAir;
+    }
+
+
 
     public MutableLiveData<String> getPlayerUrl() {
         if (playerUrl == null) {
             playerUrl = new MutableLiveData<>();
         }
         Video video = repo.getVideoSync(videoId);
-        if (ZypeApp.get(getApplication()).getAppConfiguration().audioOnlyPlaybackEnabled) {
-            if (TextUtils.isEmpty(video.playerAudioUrl)) {
-                loadAudioPlayerUrl(videoId);
-            }
-        }
-        if (TextUtils.isEmpty(video.playerVideoUrl)) {
-//                    loadVideoPlayerUrl(videoId);
-        }
+////        if (ZypeApp.get(getApplication()).getAppConfiguration().audioOnlyPlaybackEnabled) {
+////            if (TextUtils.isEmpty(video.playerAudioUrl)) {
+////                loadAudioPlayerUrl(videoId);
+////            }
+////        }
+//        if (TextUtils.isEmpty(video.playerVideoUrl)) {
+////                    loadVideoPlayerUrl(videoId);
+//        }
+        video.playerAudioUrl = null;
+        video.playerVideoUrl = null;
         updatePlayerUrl(video);
+        loadPlayer();
         return playerUrl;
     }
 
     private void updatePlayerUrl(Video video) {
+        String newPlayerUrl = null;
         if (playerMode.getValue() != null) {
             switch (playerMode.getValue()) {
                 case AUDIO:
                     if (video.isDownloadedAudio == 1) {
-                        playerUrl.setValue(video.downloadAudioPath);
+                        newPlayerUrl = video.downloadAudioPath;
                     }
                     else {
-                        playerUrl.setValue(video.playerAudioUrl);
+                        newPlayerUrl = video.playerAudioUrl;
                     }
                     break;
                 case VIDEO:
                     if (video.isDownloadedVideo == 1) {
-                        playerUrl.setValue(video.downloadVideoPath);
+                        newPlayerUrl = video.downloadVideoPath;
                     }
                     else {
-                        playerUrl.setValue(video.playerVideoUrl);
+                        newPlayerUrl = video.playerVideoUrl;
                     }
                     break;
             }
         }
+        updateAdSchedule();
+        updateAnalyticsBeacon();
+        if (playerUrl.getValue() == null) {
+            if (newPlayerUrl != null) {
+                playerUrl.setValue(newPlayerUrl);
+            }
+        }
+        else {
+            if (!playerUrl.getValue().equals(newPlayerUrl)) {
+                playerUrl.setValue(newPlayerUrl);
+            }
+        }
     }
+
+    // Player mode
 
     public MutableLiveData<PlayerMode> getPlayerMode() {
         return playerMode;
     }
 
     public void setPlayerMode(PlayerMode mode) {
+        Logger.d("setPlayerMode(): mode=" + mode.name());
         Video video = repo.getVideoSync(videoId);
         if (video != null) {
             playerMode.setValue(mode);
@@ -191,6 +306,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 && availablePlayerModes.getValue().contains(mediaType);
     }
 
+    // Downloads
+
     public boolean isAudioDownloaded() {
         Video video = repo.getVideoSync(videoId);
         if (video != null) {
@@ -225,83 +342,222 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
     }
 
-    /**
-     * Make API request for audio player
-     *
-     * @param videoId Video id
-     */
-    private void loadAudioPlayerUrl(final String videoId) {
-        Logger.d("loadAudioPlayerUrl(): videoId=" + videoId);
+    public void setToBackground(boolean value) {
+        inBackground = value;
+    }
 
+    public boolean isInBackground() {
+        return inBackground;
+    }
+
+    // Error
+
+    public LiveData<String> onPlayerError() {
+        if (errorMessage == null) {
+            errorMessage = new MutableLiveData<>();
+        }
+        return errorMessage;
+    }
+
+    public void loadPlayer() {
+        Logger.d("loadPlayer(): videoId=" + videoId);
+        String uuid = null;
         if (AuthHelper.isLoggedIn()) {
-            AuthHelper.onLoggedIn(new Observer<Boolean>() {
-                @Override
-                public void onChanged(@Nullable Boolean isLoggedIn) {
-                    PlayerParamsBuilder builder = new PlayerParamsBuilder();
-                    if (isLoggedIn) {
-                        builder.addAccessToken();
-                    } else {
-                        builder.addAppKey();
-                    }
-                    builder.addVideoId(videoId);
-                    builder.addAudio();
-                    api.executeRequest(WebApiManager.Request.PLAYER_AUDIO, builder.build());
-                }
-            });
+            AuthHelper.onLoggedIn(isLoggedIn ->
+                    loadVideoPlayer(AuthHelper.getAccessToken(), uuid));
         }
         else {
-            PlayerParamsBuilder builder = new PlayerParamsBuilder();
-            builder.addAppKey();
-            builder.addVideoId(videoId);
-            builder.addAudio();
-            api.executeRequest(WebApiManager.Request.PLAYER_AUDIO, builder.build());
+            loadVideoPlayer(null, uuid);
         }
     }
 
-    /**
-     * Handles API request for audio player
-     *
-     * @param event Response event
-     */
-    @Subscribe
-    public void handleAudioPlayerUrl(PlayerAudioEvent event) {
-        Logger.d("handleAudioPlayerUrl()");
+    IZypeApiListener createVideoPlayerListener(String accessToken, String uuid) {
+        return new IZypeApiListener() {
+            @Override
+            public void onCompleted(ZypeApiResponse response) {
+                PlayerResponse playerResponse = (PlayerResponse) response.data;
+                if (response.isSuccessful) {
+                    List<com.zype.android.zypeapi.model.File> files = playerResponse.playerData.body.files;
+                    if (files == null || files.isEmpty()) {
+                        Logger.w("loadVideoPlayer()::onCompleted(): Video source not found");
+                        return;
+                    }
+                    // Take first source in the list
+                    String url = files.get(0).url;
+                    Logger.d("loadVideoPlayer()::onCompleted(): url=" + url);
 
-        Bundle requestOptions = event.getOptions();
-        HashMap<String, String> pathParams = (HashMap<String, String>) requestOptions.getSerializable(ParamsBuilder.GET_PARAMS);
-        String videoId = pathParams.get(PlayerParamsBuilder.VIDEO_ID);
+                    // Ad tags
+                    repo.deleteAdSchedule(videoId);
+                    Advertising advertising = playerResponse.playerData.body.advertising;
+                    if (advertising != null) {
+                        List<AdSchedule> schedule = DbHelper.adScheduleApiToEntity(advertising.schedule, videoId);
+                        repo.insertAdSchedule(schedule);
+                    }
+                    updateAdSchedule();
 
-        List<File> files = event.getEventData().getModelData().getResponse().getBody().getFiles();
-        if (files == null || files.isEmpty()) {
-            Logger.w("handleAudioPlayerUrl(): Audio source not found");
-            return;
-        }
+                    // Analytics
+                    repo.deleteAnalyticsBeacon(videoId);
+                    Analytics analytics = playerResponse.playerData.body.analytics;
+                    if (analytics != null &&
+                            analytics.beacon != null && analytics.dimensions != null) {
+                        repo.insertAnalyticsBeacon(DbHelper.analyticsApiToEntity(analytics));
+                    }
+                    updateAnalyticsBeacon();
 
-        // Take first source in the list
-        String url = files.get(0).getUrl();
-        Logger.d("handleAudioPlayerUrl(): url=" + url);
+                    // Save video url in the local database if it was changed
+                    Video video = repo.getVideoSync(videoId);
+                    if (video.playerVideoUrl == null || !video.playerVideoUrl.equals(url)) {
+                        video.playerVideoUrl = url;
+                        repo.updateVideo(video);
 
-        // Save audio url in the local database if it was changed
-        Video video = repo.getVideoSync(videoId);
-        if (video.playerAudioUrl == null || !video.playerAudioUrl.equals(url)) {
-            video.playerAudioUrl = url;
-            repo.updateVideo(video);
+                        updateAvailablePlayerModes();
+                        if (playerMode.getValue() == null) {
+                            playerMode.setValue(PlayerMode.VIDEO);
+                        }
+                        updatePlayerUrl(video);
+                    }
 
-            if (playerMode.getValue() == PlayerMode.AUDIO) {
-                playerUrl.setValue(url);
+                    // Load audio
+                    if (ZypeApp.get(getApplication()).getAppConfiguration().audioOnlyPlaybackEnabled) {
+                        loadAudioPlayer(accessToken, uuid);
+                    }
+                }
+                else {
+                    if (playerResponse != null) {
+//                        errorMessage.setValue(playerResponse.message);
+                    }
+                    else {
+                        if (WebApiManager.isHaveActiveNetworkConnection(getApplication())) {
+                            errorMessage.setValue(getApplication().getString(R.string.video_error_bad_request));
+                        }
+                        else {
+                            errorMessage.setValue(getApplication().getString(R.string.error_internet_connection));
+                        }
+                    }
+                }
             }
-            updateAvailablePlayerModes();
-        }
+        };
     }
 
-    //
+    private void loadVideoPlayer(String accessToken, String uuid) {
+        api.getPlayer(videoId, false, accessToken, uuid,
+                createVideoPlayerListener(accessToken, uuid));
+    }
+
+    IZypeApiListener createAudioPlayerListener(String accessToken, String uuid) {
+        return new IZypeApiListener() {
+            @Override
+            public void onCompleted(ZypeApiResponse response) {
+                PlayerResponse playerResponse = (PlayerResponse) response.data;
+                if (response.isSuccessful) {
+                    List<com.zype.android.zypeapi.model.File> files = playerResponse.playerData.body.files;
+                    if (files == null || files.isEmpty()) {
+                        Logger.w("loadAudioPlayer()::onCompleted(): Audio source not found");
+                        return;
+                    }
+                    // Take first source in the list
+                    String url = files.get(0).url;
+                    Logger.d("loadAudioPlayer()::onCompleted(): url=" + url);
+
+                    // Save audio url in the local database if it was changed
+                    Video video = repo.getVideoSync(videoId);
+                    if (video.playerAudioUrl == null || !video.playerAudioUrl.equals(url)) {
+                        video.playerAudioUrl = url;
+                        repo.updateVideo(video);
+
+                        if (playerMode.getValue() == PlayerMode.AUDIO) {
+                            playerUrl.setValue(url);
+                        }
+                        updateAvailablePlayerModes();
+                    }
+                }
+                else {
+                }
+            }
+        };
+    }
+
+    private void loadAudioPlayer(String accessToken, String uuid) {
+        api.getPlayer(videoId, false, accessToken, uuid,
+                createAudioPlayerListener(accessToken, uuid));
+    }
+
+//    /**
+//     * Make API request for audio player
+//     *
+//     * @param videoId Video id
+//     */
+//    private void loadAudioPlayerUrl(final String videoId) {
+//        Logger.d("loadAudioPlayerUrl(): videoId=" + videoId);
+//
+//        if (AuthHelper.isLoggedIn()) {
+//            AuthHelper.onLoggedIn(new Observer<Boolean>() {
+//                @Override
+//                public void onChanged(@Nullable Boolean isLoggedIn) {
+//                    PlayerParamsBuilder builder = new PlayerParamsBuilder();
+//                    if (isLoggedIn) {
+//                        builder.addAccessToken();
+//                    } else {
+//                        builder.addAppKey();
+//                    }
+//                    builder.addVideoId(videoId);
+//                    builder.addAudio();
+//                    oldApi.executeRequest(WebApiManager.Request.PLAYER_AUDIO, builder.build());
+//                }
+//            });
+//        }
+//        else {
+//            PlayerParamsBuilder builder = new PlayerParamsBuilder();
+//            builder.addAppKey();
+//            builder.addVideoId(videoId);
+//            builder.addAudio();
+//            oldApi.executeRequest(WebApiManager.Request.PLAYER_AUDIO, builder.build());
+//        }
+//    }
+//
+//    /**
+//     * Handles API request for audio player
+//     *
+//     * @param event Response event
+//     */
+//    @Subscribe
+//    public void handleAudioPlayerUrl(PlayerAudioEvent event) {
+//        Logger.d("handleAudioPlayerUrl()");
+//
+//        Bundle requestOptions = event.getOptions();
+//        HashMap<String, String> pathParams = (HashMap<String, String>) requestOptions.getSerializable(ParamsBuilder.GET_PARAMS);
+//        String videoId = pathParams.get(PlayerParamsBuilder.VIDEO_ID);
+//
+//        List<File> files = event.getEventData().getModelData().getResponse().getBody().getFiles();
+//        if (files == null || files.isEmpty()) {
+//            Logger.w("handleAudioPlayerUrl(): Audio source not found");
+//            return;
+//        }
+//
+//        // Take first source in the list
+//        String url = files.get(0).getUrl();
+//        Logger.d("handleAudioPlayerUrl(): url=" + url);
+//
+//        // Save audio url in the local database if it was changed
+//        Video video = repo.getVideoSync(videoId);
+//        if (video.playerAudioUrl == null || !video.playerAudioUrl.equals(url)) {
+//            video.playerAudioUrl = url;
+//            repo.updateVideo(video);
+//
+//            if (playerMode.getValue() == PlayerMode.AUDIO) {
+//                playerUrl.setValue(url);
+//            }
+//            updateAvailablePlayerModes();
+//        }
+//    }
+
     // 'CustomPlayer.InfoListener' implementation
-    //
 
     @Override
     public void onVideoFormatEnabled(Format format, int trigger, long mediaTimeMs) {
         Logger.i("onVideoFormatEnabled()");
-        if (getPlayerMode().getValue() == PlayerMode.VIDEO && format.codecs != null && format.codecs.equals("mp4a.40.2")) {
+        if (getPlayerMode().getValue() == PlayerMode.VIDEO
+                && format.codecs != null && format.codecs.equals("mp4a.40.2")) {
             Video video = repo.getVideoSync(videoId);
             video.playerVideoUrl = null;
             repo.updateVideo(video);
@@ -339,4 +595,32 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     @Override
     public void onAvailableRangeChanged(TimeRange availableRange) {
     }
+
+    // ExoPlayer 2 related staff
+    // TODO: Move this to a helper class
+
+    public MediaSource getMediaSource(Context context, String contentUri) {
+        MediaSource result = null;
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
+                Util.getUserAgent(context, WebApiManager.CUSTOM_HEADER_VALUE));
+        if (contentUri.contains("http:") || contentUri.contains("https:")) {
+            if (contentUri.contains(".mp4")
+                    || contentUri.contains(".m4a")
+                    || contentUri.contains(".mp3")) {
+                result = new ExtractorMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(Uri.parse(contentUri));
+            }
+            else {
+                result = new HlsMediaSource.Factory(dataSourceFactory)
+                        .setAllowChunklessPreparation(true)
+                        .createMediaSource(Uri.parse(contentUri));
+            }
+        }
+        else {
+            result = new ExtractorMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(Uri.parse(contentUri));
+        }
+        return result;
+    }
+
 }
