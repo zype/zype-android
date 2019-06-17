@@ -33,6 +33,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.bumptech.glide.request.target.BaseTarget;
 import com.bumptech.glide.request.target.SizeReadyCallback;
@@ -56,12 +57,14 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.SinglePeriodTimeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.TrackSelectionView;
+import com.google.android.exoplayer2.util.Util;
 import com.zype.android.BuildConfig;
 import com.zype.android.Db.Entity.AdSchedule;
 import com.zype.android.Db.Entity.AnalyticBeacon;
@@ -87,10 +90,15 @@ import com.zype.android.webapi.model.video.Thumbnail;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Observable;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener,
         AdErrorEvent.AdErrorListener, AudioCapabilitiesReceiver.Listener, java.util.Observer {
@@ -115,6 +123,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private ImageButton buttonNext;
     private ImageButton buttonPrevious;
     private ImageButton buttonSubtitles;
+    private TextView textPosition;
+    private TextView textPositionLive;
+    private TextView textDuration;
+    private TextView textDurationLive;
 
     private Handler handlerTimer;
 
@@ -218,6 +230,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             onSubtitles();
         });
 
+        textPosition = playerView.findViewById(R.id.exo_position);
+        textPositionLive = playerView.findViewById(R.id.textPositionLive);
+        textDuration = playerView.findViewById(R.id.exo_duration);
+        textDurationLive = playerView.findViewById(R.id.textDurationLive);
+
         return rootView;
     }
 
@@ -237,6 +254,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         videoViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
         videoViewModel.getVideo().observe(this, video -> {
             thumbnail = VideoHelper.getThumbnailByHeight(video, 480);
+            initProgress(video);
         });
         videoViewModel.isFullscreen().observe(this, fullscreen -> {
             updateFullscreenButton(fullscreen);
@@ -350,8 +368,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
                 MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), contentUri);
                 if (mediaSource != null) {
-                    player.seekTo(playerViewModel.getPlaybackPosition());
-                    playerViewModel.onPlaybackPositionRestored();
+                    if (videoViewModel.getVideoSync().onAir != 1) {
+                        player.seekTo(playerViewModel.getPlaybackPosition());
+                        playerViewModel.onPlaybackPositionRestored();
+                    }
                     player.prepare(mediaSource, false, false);
 
                 //    startAds();
@@ -378,14 +398,14 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private void updateNextPreviousButtons() {
         if (ZypeConfiguration.autoplayEnabled(getActivity())
                 && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
-            buttonNext.setVisibility(View.VISIBLE);
-            buttonPrevious.setVisibility(View.VISIBLE);
+            buttonNext.setVisibility(VISIBLE);
+            buttonPrevious.setVisibility(VISIBLE);
             buttonNext.setEnabled(playerViewModel.isThereNextVideo());
             buttonPrevious.setEnabled(playerViewModel.isTherePreviousVideo());
         }
         else {
-            buttonNext.setVisibility(View.GONE);
-            buttonPrevious.setVisibility(View.GONE);
+            buttonNext.setVisibility(GONE);
+            buttonPrevious.setVisibility(GONE);
         }
     }
 
@@ -400,13 +420,34 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
     private void updateSubtitlesButton(int subtitlesTrackIndex) {
         if (subtitlesTrackIndex != -1) {
-            buttonSubtitles.setVisibility(View.VISIBLE);
+            buttonSubtitles.setVisibility(VISIBLE);
             buttonSubtitles.setTag(subtitlesTrackIndex);
         }
         else {
-            buttonSubtitles.setVisibility(View.GONE);
+            buttonSubtitles.setVisibility(GONE);
             buttonSubtitles.setTag(null);
         }
+    }
+
+    private void initProgress(Video video) {
+        if (video.onAir == 1) {
+            textPosition.setVisibility(GONE);
+            textPositionLive.setVisibility(VISIBLE);
+            textDuration.setVisibility(GONE);
+            textDurationLive.setVisibility(VISIBLE);
+        }
+        else {
+            textPosition.setVisibility(VISIBLE);
+            textPositionLive.setVisibility(GONE);
+            textDuration.setVisibility(VISIBLE);
+            textDurationLive.setVisibility(GONE);
+        }
+    }
+
+    private void updatePositionLive(long position) {
+        StringBuilder builder = new StringBuilder();
+        Formatter formatter = new Formatter(builder, Locale.getDefault());
+        textPositionLive.setText("-" + Util.getStringForTime(builder, formatter, position));
     }
 
     private void showThumbnail() {
@@ -543,6 +584,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         @Override
         public void onPositionDiscontinuity(@Player.DiscontinuityReason int reason) {
+            Logger.d("PlayerEventListener::onPositionDiscontinuity():");
         }
 
         @Override
@@ -557,6 +599,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         @Override
         public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
             Logger.d("PlayerEventListener::onTimelineChanged():");
+            if (videoViewModel.getVideoSync().onAir == 1) {
+                Timeline.Window window = new Timeline.Window();
+                timeline.getWindow(0, window);
+                updatePositionLive(C.usToMs(window.durationUs));
+            }
         }
     }
 
