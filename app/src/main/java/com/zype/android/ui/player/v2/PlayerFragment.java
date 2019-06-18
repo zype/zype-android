@@ -62,7 +62,9 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.ui.DefaultTimeBar;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.TimeBar;
 import com.google.android.exoplayer2.ui.TrackSelectionView;
 import com.google.android.exoplayer2.util.Util;
 import com.zype.android.BuildConfig;
@@ -127,6 +129,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private TextView textPositionLive;
     private TextView textDuration;
     private TextView textDurationLive;
+    private DefaultTimeBar viewTimeBar;
 
     private Handler handlerTimer;
 
@@ -234,6 +237,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         textPositionLive = playerView.findViewById(R.id.textPositionLive);
         textDuration = playerView.findViewById(R.id.exo_duration);
         textDurationLive = playerView.findViewById(R.id.textDurationLive);
+        viewTimeBar = playerView.findViewById(R.id.exo_progress);
 
         return rootView;
     }
@@ -435,6 +439,20 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             textPositionLive.setVisibility(VISIBLE);
             textDuration.setVisibility(GONE);
             textDurationLive.setVisibility(VISIBLE);
+            viewTimeBar.addListener(new TimeBar.OnScrubListener() {
+                @Override
+                public void onScrubStart(TimeBar timeBar, long position) {
+                }
+
+                @Override
+                public void onScrubMove(TimeBar timeBar, long position) {
+                    updatePositionLive(player.getCurrentTimeline(), position);
+                }
+
+                @Override
+                public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
+                }
+            });
         }
         else {
             textPosition.setVisibility(VISIBLE);
@@ -444,10 +462,13 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         }
     }
 
-    private void updatePositionLive(long position) {
+    private void updatePositionLive(Timeline timeline, long position) {
+        Timeline.Window window = new Timeline.Window();
+        timeline.getWindow(0, window);
+        long duration = C.usToMs(window.durationUs);
         StringBuilder builder = new StringBuilder();
         Formatter formatter = new Formatter(builder, Locale.getDefault());
-        textPositionLive.setText("-" + Util.getStringForTime(builder, formatter, position));
+        textPositionLive.setText("-" + Util.getStringForTime(builder, formatter, duration - position));
     }
 
     private void showThumbnail() {
@@ -600,9 +621,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
             Logger.d("PlayerEventListener::onTimelineChanged():");
             if (videoViewModel.getVideoSync().onAir == 1) {
-                Timeline.Window window = new Timeline.Window();
-                timeline.getWindow(0, window);
-                updatePositionLive(C.usToMs(window.durationUs));
+                updatePositionLive(timeline, player.getCurrentPosition());
             }
         }
     }
