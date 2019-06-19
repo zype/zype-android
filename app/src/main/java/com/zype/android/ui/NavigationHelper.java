@@ -143,6 +143,14 @@ public class NavigationHelper {
         activity.startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
     }
 
+    public void switchToUnauthorizedUserScreen(Activity activity, Bundle extras) {
+        Intent intent = new Intent(activity, UnAuthorizedUserActivity.class);
+        if (extras != null) {
+            intent.putExtras(extras);
+        }
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_USER);
+    }
+
     public void switchToIntroScreen(Activity activity) {
         Intent intent = new Intent(activity, IntroActivity.class);
         activity.startActivity(intent);
@@ -216,7 +224,12 @@ public class NavigationHelper {
         extras.putString(BundleConstants.VIDEO_ID, video.id);
         extras.putString(BundleConstants.PLAYLIST_ID, playlistId);
 
-        if (Integer.valueOf(video.subscriptionRequired) == 1) {
+        if (video.registrationRequired == 1) {
+            if (!AuthHelper.isLoggedIn()) {
+                switchToUnauthorizedUserScreen(activity, extras);
+            }
+        }
+        else if (Integer.valueOf(video.subscriptionRequired) == 1) {
             if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
                 switchToSubscriptionScreen(activity, extras);
             }
