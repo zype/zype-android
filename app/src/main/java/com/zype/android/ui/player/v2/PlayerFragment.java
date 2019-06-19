@@ -257,7 +257,6 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         if (playerUrlObserver == null)
             playerUrlObserver = createPlayerUrlObserver();
 
-        initPlayer();
         playerViewModel.getPlayerMode().observe(this, playerModeObserver);
         playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
 
@@ -277,6 +276,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public void onStart() {
         super.onStart();
         Logger.d("onStart()");
+
+        initPlayer();
     }
 
     @Override
@@ -401,7 +402,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     }
                     player.prepare(mediaSource, false, false);
 
-                //    startAds();
+                    startAds();
                 }
                 updateNextPreviousButtons();
             }
@@ -612,9 +613,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             switch (playbackState) {
                 case Player.STATE_READY: {
                     mediaSession.setActive(true);
-                    if (player.getPlayWhenReady()) {
-                        playerViewModel.onPlaybackStarted();
-                        updateSubtitlesButton(getSubtitlesTrack());
+                    if (player != null) {
+                        if (player.getPlayWhenReady()) {
+                            playerViewModel.onPlaybackStarted();
+                        }
                     }
                     break;
                 }
@@ -647,6 +649,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         @SuppressWarnings("ReferenceEquality")
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
             Logger.d("onTracksChanged():");
+
+            // Update subtitles
+            updateSubtitlesButton(getSubtitlesTrack());
+
             // When we are in VIDEO player mode, check if the player actually has video track to play.
             // If it has no video tracks available, switch to AUDIO mode
             if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.VIDEO) {
@@ -777,7 +783,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         }
         for (int i = 0; i < info.getRendererCount(); i++) {
             if (player.getRendererType(i) == C.TRACK_TYPE_TEXT) {
-                return i;
+                if (info.getTrackGroups(i).length > 0)
+                    return i;
+                else
+                    return -1;
             }
         }
         return -1;
