@@ -35,9 +35,10 @@
         <ImageButton android:id="@id/exo_prev"
             style="@style/ExoMediaButton.Previous"/>
 -->
-
-        <ImageButton android:id="@+id/buttonPrevious"
-            style="@style/ExoMediaButton.Previous"/>
+        <ImageButton
+            android:id="@+id/buttonPrevious"
+            style="@style/ExoMediaButton.Previous"
+            />
 
         <ImageButton android:id="@id/exo_rew"
             style="@style/ExoMediaButton.Rewind"/>

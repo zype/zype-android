@@ -53,11 +53,12 @@ import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.SinglePeriodTimeline;
+import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
@@ -66,6 +67,7 @@ import com.google.android.exoplayer2.ui.DefaultTimeBar;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.TimeBar;
 import com.google.android.exoplayer2.ui.TrackSelectionView;
+import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 import com.zype.android.BuildConfig;
 import com.zype.android.Db.Entity.AdSchedule;
@@ -78,7 +80,6 @@ import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.receiver.PhoneCallReceiver;
 import com.zype.android.receiver.RemoteControlReceiver;
-import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.dialog.ErrorDialogFragment;
 import com.zype.android.ui.player.PlayerViewModel;
 import com.zype.android.ui.player.SensorViewModel;
@@ -119,6 +120,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private Thumbnail thumbnail;
 
     private Observer<String> playerUrlObserver;
+    private Observer<PlayerViewModel.PlayerMode> playerModeObserver;
 
     private PlayerView playerView;
     private ImageButton buttonFullscreen;
@@ -216,13 +218,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             }
         });
 
-//        buttonNext = playerView.findViewById(R.id.exo_next);
         buttonNext = playerView.findViewById(R.id.buttonNext);
         buttonNext.setOnClickListener(v -> {
             onNext();
         });
 
-//        buttonPrevious = playerView.findViewById(R.id.exo_prev);
         buttonPrevious = playerView.findViewById(R.id.buttonPrevious);
         buttonPrevious.setOnClickListener(v -> {
             onPrevious();
@@ -252,8 +252,14 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         initMediaSession();
 
         playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
+        if (playerModeObserver == null)
+            playerModeObserver = createPlayerModeObserver();
         if (playerUrlObserver == null)
             playerUrlObserver = createPlayerUrlObserver();
+
+        initPlayer();
+        playerViewModel.getPlayerMode().observe(this, playerModeObserver);
+        playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
 
         videoViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
         videoViewModel.getVideo().observe(this, video -> {
@@ -265,8 +271,6 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         });
 
         sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
-
-        updateNextPreviousButtons();
     }
 
     @Override
@@ -292,7 +296,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         registerReceivers();
 
-        start();
+//        start();
 
         // IMA SDK
 
@@ -363,14 +367,33 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
     // View model observers
 
-    private Observer<String> createPlayerUrlObserver() {
-        return contentUri -> {
-            Logger.d("getContentUri(): contentUri=" + contentUri);
-//                contentUri = "http://sample.vodobox.com/planete_interdite/planete_interdite_alternate.m3u8";
-            if (!TextUtils.isEmpty(contentUri)) {
-                attachPlayerToAnalyticsManager(contentUri);
+    private Observer<PlayerViewModel.PlayerMode> createPlayerModeObserver() {
+        return playerMode -> {
+            Logger.d("getPlayerMode(): playerMode=" + playerMode);
+            if (playerMode != null) {
+                if (playerViewModel.playbackPositionRestored()) {
+                    playerViewModel.savePlaybackPosition(player.getCurrentPosition());
+                }
+                if (playerMode == PlayerViewModel.PlayerMode.VIDEO) {
+                    playerView.setUseArtwork(false);
+                }
+                else if (playerMode == PlayerViewModel.PlayerMode.AUDIO) {
+                    playerView.setUseArtwork(true);
+                    showThumbnail();
+                }
+//                initPlayer();
+            }
+        };
 
-                MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), contentUri);
+    }
+
+    private Observer<String> createPlayerUrlObserver() {
+        return playerUrl -> {
+            Logger.d("getPlayerUrl(): playerUrl=" + playerUrl);
+            if (!TextUtils.isEmpty(playerUrl)) {
+                attachPlayerToAnalyticsManager(playerUrl);
+
+                MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playerUrl);
                 if (mediaSource != null) {
                     if (videoViewModel.getVideoSync().onAir != 1) {
                         player.seekTo(playerViewModel.getPlaybackPosition());
@@ -380,8 +403,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
                 //    startAds();
                 }
+                updateNextPreviousButtons();
             }
-//                playerViewModel.getPlayerUrl().removeObserver(this);
         };
     }
 
@@ -399,13 +422,22 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         return playerView.getUseController();
     }
 
+    private void setButtonEnabled(boolean enabled, View view) {
+        if (view == null) {
+            return;
+        }
+        view.setEnabled(enabled);
+        view.setAlpha(enabled ? 1f : 0.3f);
+        view.setVisibility(VISIBLE);
+    }
+
     private void updateNextPreviousButtons() {
         if (ZypeConfiguration.autoplayEnabled(getActivity())
                 && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
             buttonNext.setVisibility(VISIBLE);
             buttonPrevious.setVisibility(VISIBLE);
-            buttonNext.setEnabled(playerViewModel.isThereNextVideo());
-            buttonPrevious.setEnabled(playerViewModel.isTherePreviousVideo());
+            setButtonEnabled(playerViewModel.isThereNextVideo(), buttonNext);
+            setButtonEnabled(playerViewModel.isTherePreviousVideo(), buttonPrevious);
         }
         else {
             buttonNext.setVisibility(GONE);
@@ -543,8 +575,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
     // Player
 
-    private void preparePlayer() {
-        Logger.d("preparePlayer()");
+    private void initPlayer() {
+        Logger.d("initPlayer()");
 
         if (player == null) {
             trackSelector = new DefaultTrackSelector();
@@ -561,8 +593,6 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         else {
             pause();
         }
-
-        playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
     }
 
     private void releasePlayer() {
@@ -578,6 +608,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private class PlayerEventListener implements Player.EventListener {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            Logger.d("onPlayerStateChanged(): playWhenReady=" + playWhenReady + ", playbackState=" + playbackState);
             switch (playbackState) {
                 case Player.STATE_READY: {
                     mediaSession.setActive(true);
@@ -615,6 +646,15 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         @Override
         @SuppressWarnings("ReferenceEquality")
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+            Logger.d("onTracksChanged():");
+            // When we are in VIDEO player mode, check if the player actually has video track to play.
+            // If it has no video tracks available, switch to AUDIO mode
+            if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.VIDEO) {
+                if (!hasVideoTrack(trackGroups)) {
+                    playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.AUDIO);
+                    playerViewModel.setMediaTypeAvailable(PlayerViewModel.PlayerMode.VIDEO, false);
+                }
+            }
         }
 
         @Override
@@ -641,19 +681,6 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     private void start() {
-        playerViewModel.getPlayerMode().observe(this, playerMode -> {
-            Logger.d("getPlayerMode(): playerMode=" + playerMode);
-            if (playerMode != null) {
-                if (playerViewModel.playbackPositionRestored()) {
-                    playerViewModel.savePlaybackPosition(player.getCurrentPosition());
-                }
-                if (playerMode == PlayerViewModel.PlayerMode.AUDIO) {
-                    playerView.setUseArtwork(true);
-                    showThumbnail();
-                }
-                preparePlayer();
-            }
-        });
     }
 
     private void stop() {
@@ -664,6 +691,20 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         releasePlayer();
         mediaSession.setActive(false);
     }
+
+    private boolean hasVideoTrack(TrackGroupArray trackGroups) {
+        boolean result = false;
+        for (int i = 0; i < trackGroups.length; i++) {
+            if (trackGroups.get(i).length > 0
+                    && MimeTypes.isVideo(trackGroups.get(0).getFormat(0).sampleMimeType)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    // Media session
 
     private void initMediaSession() {
         ComponentName mediaButtonReceiver = new ComponentName(getContext().getApplicationContext(),
@@ -711,14 +752,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
     private void onNext() {
         videoViewModel.nextVideo();
-//        AutoplayHelper.playNextVideo(getActivity(),
-//                playerViewModel.getVideoId(), playerViewModel.getPlaylistId());
     }
 
     private void onPrevious() {
         videoViewModel.previousVideo();
-//        AutoplayHelper.playPreviousVideo(getActivity(),
-//                playerViewModel.getVideoId(), playerViewModel.getPlaylistId());
     }
 
     private void onSubtitles() {
@@ -1122,7 +1159,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 //        boolean backgrounded = player.getBackgrounded();
 //        boolean playWhenReady = player.getPlayWhenReady();
 //        releasePlayer();
-//        preparePlayer(playWhenReady);
+//        initPlayer(playWhenReady);
 //        player.setBackgrounded(backgrounded);
     }
 

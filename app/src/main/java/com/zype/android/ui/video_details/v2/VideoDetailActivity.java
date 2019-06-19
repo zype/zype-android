@@ -131,7 +131,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
             public void onChanged(@Nullable Video video) {
                 if (video != null) {
                     getSupportActionBar().setTitle(video.title);
-                    playerViewModel.init(video.id, PlayerViewModel.PlayerMode.VIDEO);
+                    playerViewModel.init(video.id, playlistId, PlayerViewModel.PlayerMode.VIDEO);
                     showPlayerFragment();
                 }
             }
