@@ -342,9 +342,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 showNotification();
             }
             else {
-                stop();
-                Logger.d("onStop(): Player released");
-                player = null;
+                pause();
             }
         }
 
@@ -358,8 +356,6 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         if (player != null) {
             stop();
-            Logger.d("onStop(): Player released");
-            player = null;
         }
         unregisterReceivers();
 
@@ -597,6 +593,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     private void releasePlayer() {
+        Logger.d("releasePlayer()");
         AnalyticsManager.getInstance().trackStop();
 
         if (player != null) {

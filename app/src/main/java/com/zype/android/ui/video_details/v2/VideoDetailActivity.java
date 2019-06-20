@@ -91,9 +91,10 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        Logger.d("onNewIntent()");
 
         if (!playerViewModel.isInBackground()) {
-            initialize(intent);
+//            initialize(intent);
         }
     }
 
