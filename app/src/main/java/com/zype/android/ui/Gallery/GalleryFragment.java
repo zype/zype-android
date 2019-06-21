@@ -35,6 +35,8 @@ public class GalleryFragment extends Fragment {
     private GalleryViewModel model;
     private String parentPlaylistId;
 
+    private Observer<List<GalleryRow>> galleryRowsObserver;
+
     private HeroImagesPagerAdapter adapterHeroImages;
     private GalleryRowsAdapter adapter;
 
@@ -131,14 +133,22 @@ public class GalleryFragment extends Fragment {
             });
         }
 
+        if (galleryRowsObserver == null) {
+            galleryRowsObserver = createGalleryRowObserver();
+        }
         model = ViewModelProviders.of(getActivity()).get(GalleryViewModel.class);
+        model.setPlaylistId(parentPlaylistId);
+        showProgress();
+        updateGalleryRows();
+//        adapter.notifyDataSetChanged();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updateGalleryRows();
-        adapter.notifyDataSetChanged();
+//        showProgress();
+//        updateGalleryRows();
+//        adapter.notifyDataSetChanged();
     }
 
     private boolean heroImagesEnabled() {
@@ -148,30 +158,44 @@ public class GalleryFragment extends Fragment {
 
     private void updateGalleryRows() {
         showProgress();
-        model.getGalleryRows(parentPlaylistId).observe(this, new Observer<List<GalleryRow>>() {
-            @Override
-            public void onChanged(@Nullable List<GalleryRow> galleryRows) {
-                Logger.d("onChanged(): Gallery rows changed, size=" + galleryRows.size());
-                if (allDataLoaded(galleryRows)) {
-                    adapter.setData(galleryRows);
-                    hideProgress();
-                }
-            }
-        });
+//        model.getGalleryRows(parentPlaylistId).observe(this, new Observer<List<GalleryRow>>() {
+//            @Override
+//            public void onChanged(@Nullable List<GalleryRow> galleryRows) {
+//                Logger.d("onChanged(): Gallery rows changed, size=" + galleryRows.size());
+////                if (allDataLoaded(galleryRows)) {
+//                    adapter.setData(galleryRows);
+//                    hideProgress();
+////                }
+//            }
+//        });
+        model.getGalleryRows().observe(this, galleryRowsObserver);
     }
 
-    private boolean allDataLoaded(List<GalleryRow> galleryRows) {
-        boolean result = true;
-        for (GalleryRow item : galleryRows) {
-            if ((item.videos == null || item.videos.isEmpty())
-                    && (item.nestedPlaylists == null || item.nestedPlaylists.isEmpty())) {
-                result = false;
-                break;
+    private Observer<List<GalleryRow>> createGalleryRowObserver() {
+        return galleryRows -> {
+            Logger.d("getGalleryRows()::onChanged(): size=" + galleryRows.size() + ", state=" + model.getGalleryRowsState());
+            if (model.getGalleryRowsState() == GalleryRow.State.LOADING) {
+                showProgress();
             }
-        }
-        Logger.d("allDataLoaded(): " + result);
-        return result;
+            else {
+                adapter.setData(galleryRows);
+                hideProgress();
+            }
+        };
     }
+
+//    private boolean allDataLoaded(List<GalleryRow> galleryRows) {
+//        boolean result = true;
+//        for (GalleryRow item : galleryRows) {
+//            if ((item.videos == null || item.videos.isEmpty())
+//                    && (item.nestedPlaylists == null || item.nestedPlaylists.isEmpty())) {
+//                result = false;
+//                break;
+//            }
+//        }
+//        Logger.d("allDataLoaded(): " + result);
+//        return result;
+//    }
 
     private void showProgress() {
         progressBar.setVisibility(View.VISIBLE);

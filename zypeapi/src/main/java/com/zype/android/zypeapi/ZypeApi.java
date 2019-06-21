@@ -1,12 +1,17 @@
 package com.zype.android.zypeapi;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.zype.android.zypeapi.model.PlayerResponse;
+import com.zype.android.zypeapi.model.PlaylistsResponse;
 import com.zype.android.zypeapi.model.VideoFavoriteResponse;
+import com.zype.android.zypeapi.model.VideoResponse;
 import com.zype.android.zypeapi.model.VideosResponse;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -26,6 +31,7 @@ public class ZypeApi {
     // Parameters
     public static final String ACCESS_TOKEN = "access_token";
     public static final String APP_KEY = "app_key";
+    private static final String AUDIO = "audio";
     private static final String CLIENT_GRANT_TYPE = "grant_type";
     private static final String CLIENT_ID = "client_id";
     public static final String CONSUMER_EMAIL = "consumer[email]";
@@ -33,6 +39,7 @@ public class ZypeApi {
     public static final String CONSUMER_PASSWORD = "consumer[password]";
     private static final String LINKED_DEVICE_ID = "linked_device_id";
     private static final String PAGE = "page";
+    private static final String PARENT_ID = "parent_id";
     private static final String PASSWORD = "password";
     public static final String PER_PAGE = "per_page";
     private static final String PIN = "pin";
@@ -414,19 +421,102 @@ public class ZypeApi {
     }
 
 
-    public void getPlaylistVideos(@NonNull String playlistId, int page, @NonNull final IZypeApiListener listener) {
+    // Player
+
+    public void getPlayer(@NonNull String videoId, boolean isAudio, String accessToken, String uuid,
+                          @NonNull final IZypeApiListener listener) {
+        HashMap<String, String> params = new HashMap<>();
+        if (TextUtils.isEmpty(accessToken)) {
+            params.put(ZypeApi.APP_KEY, appKey);
+        }
+        else {
+            params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+        }
+        if (!TextUtils.isEmpty(uuid)) {
+            params.put(ZypeApi.UUID, uuid);
+        }
+        if (isAudio) {
+            params.put(ZypeApi.AUDIO, String.valueOf(isAudio));
+        }
+        getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, videoId, params).enqueue(new Callback<PlayerResponse>() {
+            @Override
+            public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
+                if (response.isSuccessful()) {
+                    listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                }
+            }
+
+            @Override
+            public void onFailure (Call <PlayerResponse> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse<PlayerResponse>(null, false));
+            }
+        });
+    }
+
+    // Playlist
+
+    public void getPlaylists(@Nullable String parentId, int page, Map<String, String> parameters,
+                             @NonNull final IZypeApiListener listener) {
         HashMap<String, String> params = new HashMap<>();
         params.put(ZypeApi.APP_KEY, appKey);
         params.put(ZypeApi.PER_PAGE, String.valueOf(ZypeApi.PER_PAGE_DEFAULT));
+        params.putAll(parameters);
+        if (!TextUtils.isEmpty(parentId)) {
+            params.put(ZypeApi.PARENT_ID, parentId);
+        }
+        getApi().getPlaylists(page, params).enqueue(new Callback<PlaylistsResponse>() {
+            @Override
+            public void onResponse(Call<PlaylistsResponse> call, Response<PlaylistsResponse> response) {
+                listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+            }
+
+            @Override
+            public void onFailure(Call<PlaylistsResponse> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse<PlaylistsResponse>(null, false));
+            }
+        });
+    }
+
+    // Videos
+
+    public void getPlaylistVideos(@NonNull String playlistId, int page,
+                                  @NonNull final IZypeApiListener listener) {
+        getPlaylistVideos(playlistId, page, null, listener);
+    }
+
+    public void getPlaylistVideos(@NonNull String playlistId, int page, Map<String, String> parameters,
+                                  @NonNull final IZypeApiListener listener) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(ZypeApi.APP_KEY, appKey);
+        params.put(ZypeApi.PER_PAGE, String.valueOf(ZypeApi.PER_PAGE_DEFAULT));
+        if (parameters != null) {
+            params.putAll(parameters);
+        }
         getApi().getPlaylistVideos(playlistId, page, params).enqueue(new Callback<VideosResponse>() {
             @Override
             public void onResponse(Call<VideosResponse> call, Response<VideosResponse> response) {
-                listener.onCompleted(new ZypeApiResponse<VideosResponse>(response.body(), true));
+                listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
             }
 
             @Override
             public void onFailure(Call<VideosResponse> call, Throwable t) {
                 listener.onCompleted(new ZypeApiResponse<VideosResponse>(null, false));
+            }
+        });
+    }
+
+    public void getVideo(@NonNull String videoId, @NonNull final IZypeApiListener listener) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(ZypeApi.APP_KEY, appKey);
+        getApi().getVideo(videoId, params).enqueue(new Callback<VideoResponse>() {
+            @Override
+            public void onResponse(Call<VideoResponse> call, Response<VideoResponse> response) {
+                listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+            }
+
+            @Override
+            public void onFailure(Call<VideoResponse> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse<VideoResponse>(null, false));
             }
         });
     }

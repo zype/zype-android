@@ -15,9 +15,8 @@ public class PlaylistData {
     @Expose
     public String id;
 
-    @SerializedName("_keywords")
     @Expose
-    public List<String> keywords = new ArrayList<>();
+    public boolean active;
 
     @SerializedName("created_at")
     @Expose
@@ -32,6 +31,10 @@ public class PlaylistData {
 
     @Expose
     public List<Image> images = new ArrayList<>();
+
+    @SerializedName("_keywords")
+    @Expose
+    public List<String> keywords = new ArrayList<>();
 
     @SerializedName("site_id")
     @Expose
@@ -48,10 +51,6 @@ public class PlaylistData {
     @Expose
     public String title;
 
-    @SerializedName("updated_at")
-    @Expose
-    public String updatedAt;
-
     @SerializedName("parent_id")
     @Expose
     public String parentId;
@@ -63,6 +62,10 @@ public class PlaylistData {
     @SerializedName("playlist_item_count")
     @Expose
     public int playlistItemCount;
+
+    @SerializedName("updated_at")
+    @Expose
+    public String updatedAt;
 
     @Expose
     public List<String> values = new ArrayList<>();
