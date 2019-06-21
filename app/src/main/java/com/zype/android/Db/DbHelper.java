@@ -199,6 +199,7 @@ public class DbHelper {
         entity.publishedAt = videoData.publishedAt;
         entity.purchaseRequired = String.valueOf(videoData.purchaseRequired ? 1 : 0);
         entity.rating = String.valueOf(videoData.rating);
+        entity.registrationRequired = videoData.registrationRequired ? 1 : 0;
         entity.relatedPlaylistIds = new Gson().toJson(videoData.relatedPlaylistIds);
         entity.requestCount = String.valueOf(videoData.requestCount);
         entity.season = videoData.season;

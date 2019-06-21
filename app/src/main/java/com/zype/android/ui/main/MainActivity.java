@@ -153,6 +153,28 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         adapterSections.setData(sections);
     }
 
+    // Actions
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case REQUEST_USER:
+                if (resultCode == RESULT_OK) {
+                    if (data != null) {
+                        Bundle extras = data.getExtras();
+                        if (extras != null) {
+                            String videoId = extras.getString(BundleConstants.VIDEO_ID);
+                            String playlistId = extras.getString(BundleConstants.PLAYLIST_ID);
+                            NavigationHelper.getInstance(this)
+                                    .switchToVideoDetailsScreen(this, videoId, playlistId, false);
+                        }
+                    }
+                }
+                return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     //
     // 'BottomNavigationView.OnNavigationItemSelectedListener' implementation
     //

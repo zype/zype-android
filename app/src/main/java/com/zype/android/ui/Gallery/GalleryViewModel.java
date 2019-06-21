@@ -125,35 +125,36 @@ public class GalleryViewModel extends AndroidViewModel {
         else {
             newRows = galleryRows.getValue();
         }
-        if (galleryRowsState == CREATED) {
-            galleryRowsState = LOADING;
-            Logger.d("updateGalleryRows(): state=LOADING");
-            galleryRows.setValue(newRows);
-            return;
-        }
-        if (allRowsUpdated(newRows)) {
-            if (galleryRowsState != UPDATED) {
-                galleryRowsState = UPDATED;
-                Logger.d("updateGalleryRows(): state=UPDATED");
+        switch (galleryRowsState) {
+            case CREATED:
+                galleryRowsState = LOADING;
+                Logger.d("updateGalleryRows(): state=LOADING");
                 galleryRows.setValue(newRows);
                 return;
-            }
-        }
-        if (allRowsReady(newRows)) {
-            if (galleryRowsState != READY) {
-                galleryRowsState = READY;
-                Logger.d("updateGalleryRows(): state=READY");
-                galleryRows.setValue(newRows);
+            case LOADING:
+                if (allRowsReady(newRows)) {
+                    galleryRowsState = READY;
+                    Logger.d("updateGalleryRows(): state=READY");
+                    galleryRows.setValue(newRows);
+                    return;
+                }
+            case READY:
+                if (allRowsUpdated(newRows)) {
+                    galleryRowsState = UPDATED;
+                    Logger.d("updateGalleryRows(): state=UPDATED");
+                    galleryRows.setValue(newRows);
+                    return;
+                }
+            case UPDATED:
                 return;
-            }
         }
     }
 
     private void loadRootPlaylists() {
-        Logger.d("loadRootPlaylists()");
+        Logger.d("loadRootPlaylists(): parentPlaylistId=" + parentPlaylistId);
         final List<Playlist> result = new ArrayList<>();
         Map<String, String> parameters = new HashMap<>();
-        parameters.put(ZypeApi.PER_PAGE, String.valueOf(10));
+        parameters.put(ZypeApi.PER_PAGE, String.valueOf(100));
         final IZypeApiListener listener = new IZypeApiListener() {
             @Override
             public void onCompleted(ZypeApiResponse response) {
