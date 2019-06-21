@@ -63,10 +63,10 @@ public class SearchViewModel  extends BaseViewModel {
                     for (com.zype.android.zypeapi.model.VideoData item : videosResponse.videoData) {
                         Video video = repo.getVideoSync(item.id);
                         if (video != null) {
-                            result.add(DbHelper.updateVideoEntityByApiVideo(video, item));
+                            result.add(DbHelper.videoUpdateEntityByApi(video, item));
                         }
                         else {
-                            result.add(DbHelper.apiVideoToVideoEntity(item));
+                            result.add(DbHelper.videoApiToEntity(item));
                         }
                     }
                     if (videosResponse.pagination.current == videosResponse.pagination.pages
