@@ -75,7 +75,7 @@ public class DataRepository {
 
     public void insertPlaylistVideos(List<Video> videos, Playlist playlist) {
         List<PlaylistVideo> playlistVideos = new ArrayList<>();
-        int number = 1;
+        int number = db.zypeDao().getPlaylistVideosSync(playlist.id).size() + 1;
         for (Video video : videos) {
             PlaylistVideo playlistVideo = new PlaylistVideo();
             playlistVideo.number = number;

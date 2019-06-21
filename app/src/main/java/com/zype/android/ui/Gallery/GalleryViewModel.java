@@ -261,7 +261,9 @@ public class GalleryViewModel extends AndroidViewModel {
                         }
                     }
                     repo.insertVideos(result);
-                    repo.deletePlaylistVideos(row.playlist, result);
+                    if (videosResponse.pagination.current == 1) {
+                        repo.deletePlaylistVideos(row.playlist.id);
+                    }
                     repo.insertPlaylistVideos(result, row.playlist);
                     row.videos = repo.getPlaylistVideosSync(row.playlist.id);
                     if (videosResponse.pagination.current == videosResponse.pagination.pages) {

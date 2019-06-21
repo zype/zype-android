@@ -41,10 +41,14 @@ public interface ZypeDao {
     /*
      * Retrieve playlist videos
      */
-    @Query("SELECT * FROM video INNER JOIN playlist_video ON video._id = playlist_video.video_id WHERE playlist_video.playlist_id = :playlistId")
+    @Query("SELECT * FROM video INNER JOIN playlist_video ON video._id = playlist_video.video_id " +
+            "WHERE playlist_video.playlist_id = :playlistId " +
+            "ORDER BY playlist_video.number")
     public LiveData<List<Video>> getPlaylistVideos(String playlistId);
 
-    @Query("SELECT * FROM video INNER JOIN playlist_video ON video._id = playlist_video.video_id WHERE playlist_video.playlist_id = :playlistId")
+    @Query("SELECT * FROM video INNER JOIN playlist_video ON video._id = playlist_video.video_id " +
+            "WHERE playlist_video.playlist_id = :playlistId " +
+            "ORDER BY playlist_video.number")
     public List<Video> getPlaylistVideosSync(String playlistId);
 
     /*
