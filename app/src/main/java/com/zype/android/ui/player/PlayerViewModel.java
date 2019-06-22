@@ -149,9 +149,15 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     public void savePlaybackPosition(long position) {
         this.playbackPosition = position;
-        Video video = repo.getVideoSync(videoId);
-        video.playTime = position;
-        repo.updateVideo(video);
+
+        if(!TextUtils.isEmpty(videoId)) {
+            Video video = repo.getVideoSync(videoId);
+
+            if(video != null) {
+                video.playTime = position;
+                repo.updateVideo(video);
+            }
+        }
 
         isPlaybackPositionRestored = false;
     }
@@ -165,16 +171,26 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public void onPlaybackStarted() {
-        Video video = repo.getVideoSync(videoId);
-        video.isPlayStarted = 1;
-        repo.updateVideo(video);
+        if(!TextUtils.isEmpty(videoId)) {
+            Video video = repo.getVideoSync(videoId);
+
+            if (video != null) {
+                video.isPlayStarted = 1;
+                repo.updateVideo(video);
+            }
+        }
     }
 
     public void onPlaybackFinished() {
-        Video video = repo.getVideoSync(videoId);
-        video.isPlayStarted = 1;
-        video.isPlayFinished = 1;
-        repo.updateVideo(video);
+        if(!TextUtils.isEmpty(videoId)) {
+            Video video = repo.getVideoSync(videoId);
+
+            if (video != null) {
+                video.isPlayStarted = 1;
+                video.isPlayFinished = 1;
+                repo.updateVideo(video);
+            }
+        }
     }
 
     public boolean isThereNextVideo() {
@@ -302,6 +318,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public void setMediaTypeAvailable(PlayerMode mediaType, boolean available) {
+        Logger.d("setMediaTypeAvailable(): mediaType=" + mediaType + ", available=" + available);
         if (isMediaTypeAvailable(mediaType)) {
             if (!available) {
                 availablePlayerModes.getValue().remove(mediaType);
