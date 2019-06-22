@@ -953,6 +953,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 }
                 adsLoader.contentComplete();
                 break;
+            case AD_PROGRESS:
+                if (player.getPlayWhenReady()) {
+                    pause();
+                }
+                break;
             default:
                 break;
         }
@@ -964,7 +969,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public void onAdError(AdErrorEvent adErrorEvent) {
         Logger.e("Ad error: " + adErrorEvent.getError().getMessage());
         updateNextAd();
-//        isControlsEnabled = true;
+        enablePlayerControls();
         play();
     }
 
