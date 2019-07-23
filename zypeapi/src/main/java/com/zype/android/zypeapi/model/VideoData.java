@@ -76,6 +76,10 @@ public class VideoData {
     @Expose
     public int rating;
 
+    @SerializedName("registration_required")
+    @Expose
+    public boolean registrationRequired;
+
     @SerializedName("related_playlist_ids")
     @Expose
     public List<String> relatedPlaylistIds = new ArrayList<>();

@@ -5,30 +5,14 @@ package com.zype.android;
  */
 
 public class ZypeSettings {
-//    // Zype app key
-//    public static final String APP_KEY = "eIqvZ7K4fJLZgQvWGH8oolqKq5G-J1oUPtY07nTunWlZnuOeahcPhqATaXr3zmi_";
-//    // OAuth credentials
-//    public static final String CLIENT_ID = "57cc5ab74d238d644523311362c6ccdb4ab4b163c02d703d9d10df1753195912";
-//
-////    public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
-//    // Playlist
-//    public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
-
-//    // Zype app key
-//    public static final String APP_KEY = "DV8vhDumvxPh2ieCfjOzuQQdn0zSOZ-otnGALBnzFAqtIO-feZbsSwKXy3DA_JhK";
-//    // OAuth credentials
-//    public static final String CLIENT_ID = "fb40dd8a2bc4ae7c7d66054936f185b04d21b8165990ed27c3d64eaaa9146bb6";
-////    public static final String CLIENT_SECRET = "068b42f2487e00dde76707668a9edd9dd2fe16e3b5c34ac450419bf43c61034e";
-//    // Playlist
-//    public static final String ROOT_PLAYLIST_ID = "5807ccdc849e2d0d11000146";
-
-    // Shout Factory
     // Zype app key
-    public static final String APP_KEY = "6KvlCCM-mkpMeEAIBgOP1GDOoMFxQPmlGFNhvR5na8GXKYe2--cH8aAUPRT2zS0F";
+    public static final String APP_KEY = "eIqvZ7K4fJLZgQvWGH8oolqKq5G-J1oUPtY07nTunWlZnuOeahcPhqATaXr3zmi_";
     // OAuth credentials
-    public static final String CLIENT_ID = "0a9d31baeeb33eb21aa6335b5a2ae5cc1dedc3769ec0067c993aaa4682632f0e";
+    public static final String CLIENT_ID = "57cc5ab74d238d644523311362c6ccdb4ab4b163c02d703d9d10df1753195912";
+
+//    public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "593065d9345e3b150500090f";
+    public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
 
     // Google Analytics Tracking Id
     public static final String GA_TRACKING_ID = "";

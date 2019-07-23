@@ -73,6 +73,26 @@ public class DataRepository {
         db.zypeDao().deletePlaylistVideos(playlistId);
     }
 
+    public void insertPlaylistVideos(List<Video> videos, Playlist playlist) {
+        List<PlaylistVideo> playlistVideos = new ArrayList<>();
+        int number = db.zypeDao().getPlaylistVideosSync(playlist.id).size() + 1;
+        for (Video video : videos) {
+            PlaylistVideo playlistVideo = new PlaylistVideo();
+            playlistVideo.number = number;
+            playlistVideo.playlistId = playlist.id;
+            playlistVideo.videoId = video.id;
+            playlistVideos.add(playlistVideo);
+            number++;
+        }
+        db.zypeDao().insertPlaylistVideos(playlistVideos);
+    }
+
+    public void deletePlaylistVideos(Playlist playlist, List<Video> videos) {
+        for (Video video : videos) {
+            db.zypeDao().deletePlaylistVideo(playlist.id, video.id);
+        }
+    }
+
     public Video getVideoSync(String videoId) {
         Video video = db.zypeDao().getVideoSync(videoId);
         if (video != null) {

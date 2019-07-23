@@ -1,11 +1,17 @@
 package com.zype.android.Db;
 
 import com.google.gson.Gson;
+import com.zype.android.Db.Entity.AdSchedule;
+import com.zype.android.Db.Entity.AnalyticBeacon;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.webapi.model.playlist.PlaylistData;
+import com.zype.android.webapi.model.video.Image;
 import com.zype.android.webapi.model.video.VideoData;
+import com.zype.android.zypeapi.model.AdvertisingSchedule;
+import com.zype.android.zypeapi.model.Analytics;
+import com.zype.android.zypeapi.model.AnalyticsDimensions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +20,51 @@ import java.util.List;
  * Created by Evgeny Cherkasov on 07.07.2018
  */
 public class DbHelper {
+
+    public static List<AdSchedule> adScheduleApiToEntity(List<AdvertisingSchedule> schedule, String videoId) {
+        List<AdSchedule> result = new ArrayList<>();
+        for (AdvertisingSchedule item : schedule) {
+            AdSchedule entity = new AdSchedule();
+            entity.videoId = videoId;
+            entity.offset = item.offset;
+            entity.tag = item.tag;
+            result.add(entity);
+        }
+        return result;
+    }
+
+    public static AnalyticBeacon analyticsApiToEntity(Analytics analytics) {
+        AnalyticBeacon result = new AnalyticBeacon();
+        result.beacon = analytics.beacon;
+        AnalyticsDimensions dimensions = analytics.dimensions;
+        result.device = dimensions.device;
+        result.playerId = dimensions.playerId;
+        result.siteId = dimensions.siteId;
+        result.videoId = dimensions.videoId;
+        return result;
+    }
+
+    // Playlist
+
+    public static Playlist playlistApiToEntity(com.zype.android.zypeapi.model.PlaylistData playlist) {
+        return playlistUpdateEntityByApi(new Playlist(), playlist);
+    }
+
+    public static Playlist playlistUpdateEntityByApi(Playlist entity, com.zype.android.zypeapi.model.PlaylistData data) {
+        entity.id = data.id;
+        entity.active = data.active ? 1 : 0;
+        entity.createdAt = data.createdAt;
+        entity.deletedAt = data.deletedAt;
+        entity.images = new Gson().toJson(data.images);
+        entity.parentId = data.parentId;
+        entity.playlistItemCount = data.playlistItemCount;
+        entity.priority = data.priority;
+        entity.thumbnails = new Gson().toJson(data.thumbnails);
+        entity.thumbnailLayout = data.thumbnailLayout;
+        entity.title = data.title;
+        entity.updatedAt = data.updatedAt;
+        return entity;
+    }
 
     public static List<Playlist> playlistDataToEntity(List<PlaylistData> playlists) {
         List<Playlist> result = new ArrayList<>(playlists.size());
@@ -120,11 +171,13 @@ public class DbHelper {
         return result;
     }
 
-    public static Video apiVideoToVideoEntity(com.zype.android.zypeapi.model.VideoData videoData) {
-        return updateVideoEntityByApiVideo(new Video(), videoData);
+    // Video
+
+    public static Video videoApiToEntity(com.zype.android.zypeapi.model.VideoData videoData) {
+        return videoUpdateEntityByApi(new Video(), videoData);
     }
 
-    public static Video updateVideoEntityByApiVideo(Video entity, com.zype.android.zypeapi.model.VideoData videoData) {
+    public static Video videoUpdateEntityByApi(Video entity, com.zype.android.zypeapi.model.VideoData videoData) {
         entity.id = videoData.id;
         entity.active = videoData.active ? 1 : 0;
         entity.category = new Gson().toJson(videoData.categories);
@@ -146,6 +199,7 @@ public class DbHelper {
         entity.publishedAt = videoData.publishedAt;
         entity.purchaseRequired = String.valueOf(videoData.purchaseRequired ? 1 : 0);
         entity.rating = String.valueOf(videoData.rating);
+        entity.registrationRequired = videoData.registrationRequired ? 1 : 0;
         entity.relatedPlaylistIds = new Gson().toJson(videoData.relatedPlaylistIds);
         entity.requestCount = String.valueOf(videoData.requestCount);
         entity.season = videoData.season;
@@ -169,7 +223,7 @@ public class DbHelper {
     public static List<Video> apiVideosToVideoEntities(List<com.zype.android.zypeapi.model.VideoData> videoData) {
         List<Video> result = new ArrayList<>(videoData.size());
         for (com.zype.android.zypeapi.model.VideoData item : videoData) {
-            Video entity = apiVideoToVideoEntity(item);
+            Video entity = videoApiToEntity(item);
             result.add(entity);
         }
         return result;

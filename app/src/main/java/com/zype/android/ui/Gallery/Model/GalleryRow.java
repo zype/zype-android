@@ -12,8 +12,18 @@ public class GalleryRow {
     public Playlist playlist;
     public List<Video> videos;
     public List<Playlist> nestedPlaylists;
+    public State state;
+    public int pageToLoad;
 
     public GalleryRow(Playlist playlist) {
         this.playlist = playlist;
+        this.state = State.LOADING;
+    }
+
+    public enum State {
+        CREATED,
+        LOADING,
+        READY,
+        UPDATED
     }
 }
