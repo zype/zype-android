@@ -47,7 +47,9 @@ public class UnAuthorizedUserActivity extends BaseActivity {
       case REQUEST_CONSUMER:
       case REQUEST_LOGIN:
         if (resultCode == RESULT_OK) {
-          setResult(RESULT_OK);
+          Intent resultData = new Intent();
+          resultData.putExtras(getIntent().getExtras());
+          setResult(RESULT_OK, resultData);
 
         } else {
           setResult(RESULT_CANCELED);

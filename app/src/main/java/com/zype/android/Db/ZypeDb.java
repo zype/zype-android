@@ -20,7 +20,7 @@ import com.zype.android.Db.Entity.Video;
  */
 
 @Database(entities = {AdSchedule.class, AnalyticBeacon.class, FavoriteVideo.class, Playlist.class, PlaylistVideo.class, Video.class},
-            version = 8)
+            version = 9)
 public abstract class ZypeDb extends RoomDatabase {
     public abstract ZypeDao zypeDao();
 

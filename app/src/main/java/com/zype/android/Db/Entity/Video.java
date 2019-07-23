@@ -124,7 +124,7 @@ public class Video implements PlaylistItem {
     public Integer onAir;
 
     @ColumnInfo(name = "play_time")
-    public Integer playTime;
+    public Long playTime;
 
     @ColumnInfo(name = "player_audio_url")
     public String playerAudioUrl;

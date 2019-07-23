@@ -67,7 +67,6 @@ public class AuthHelper {
         }
 
         return result;
-
     }
 
     public static boolean isRegistrationRequired(Context context, String videoId) {
@@ -91,6 +90,11 @@ public class AuthHelper {
         Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
         if (video == null) {
             return false;
+        }
+        if (video.registrationRequired == 1) {
+            if (!isLoggedIn()) {
+                return false;
+            }
         }
         if (Integer.valueOf(video.purchaseRequired) == 1) {
             if (ZypeConfiguration.isUniversalTVODEnabled(context)) {

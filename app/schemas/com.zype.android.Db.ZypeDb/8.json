@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 8,
-    "identityHash": "b9511afa4586a7ca42fd945177793509",
+    "identityHash": "728420f8a56aa49aa20caaae28eb93ef",
     "entities": [
       {
         "tableName": "ad_schedule",
@@ -44,7 +44,7 @@
       },
       {
         "tableName": "analytic_beacon",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`beacon_id` INTEGER NOT NULL, `beacon` TEXT NOT NULL, `device` TEXT NOT NULL, `player_id` TEXT NOT NULL, `site_id` TEXT NOT NULL, `video_id` TEXT NOT NULL, PRIMARY KEY(`beacon_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`beacon_id` INTEGER NOT NULL, `beacon` TEXT NOT NULL, `device` TEXT, `player_id` TEXT, `site_id` TEXT, `video_id` TEXT NOT NULL, PRIMARY KEY(`beacon_id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -62,19 +62,19 @@
             "fieldPath": "device",
             "columnName": "device",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "playerId",
             "columnName": "player_id",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "siteId",
             "columnName": "site_id",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "videoId",
@@ -649,7 +649,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"b9511afa4586a7ca42fd945177793509\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"728420f8a56aa49aa20caaae28eb93ef\")"
     ]
   }
 }

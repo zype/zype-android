@@ -203,6 +203,7 @@
     <string name="instagram_title">Instagram</string>
     <string name="web_title">Web</string>
     <string name="unauthorised_title">Registration Required</string>
+    <string name="error_internet_connection">Your device\'s internet connection isn\'t working. Please check your connection and try again.</string>
 
     <string name="login_signup_sign_msg">Please sign up or sign into an account in order to watch this video</string>
     <string name="alert">Alert</string>

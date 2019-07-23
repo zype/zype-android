@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "818854525960",
+    "firebase_url": "https://zype-android.firebaseio.com",
+    "project_id": "zype-android",
+    "storage_bucket": "zype-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:818854525960:android:53d474417028725b",
+        "android_client_info": {
+          "package_name": "com.zype.android.template"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "818854525960-5l95e4t9clkj2420ep7d1voj970scr8d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHVDhqrJnRMclAnvg70naj1NafKi_tFlg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

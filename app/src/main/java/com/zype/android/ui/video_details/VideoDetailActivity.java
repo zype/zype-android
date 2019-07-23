@@ -77,6 +77,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     VideoDetailViewModel videoDetailViewModel;
     PlayerViewModel playerViewModel;
 
+    Observer<String> playerErrorObserver = null;
     Observer<String> playerUrlObserver = null;
 
     public static void startActivity(Activity activity, String videoId, String playlistId) {
@@ -109,6 +110,9 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     private void initialize() {
         initUI();
 
+        if (playerErrorObserver == null) {
+            playerErrorObserver = createPlayerErrorObserver();
+        }
         if (playerUrlObserver == null) {
             playerUrlObserver = createPlayerUrlObserver();
         }
@@ -250,7 +254,8 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                     if (video != null) {
                         if (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video)) {
                             if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.VIDEO) {
-                                requestVideoUrl(mVideoId);
+                                playerViewModel.loadPlayer();
+//                                requestVideoUrl(mVideoId);
                             }
                         }
                     }
@@ -337,7 +342,12 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     public void onError() {
         hideProgress();
         showVideoThumbnail();
-        DialogHelper.showErrorAlert(this, getString(R.string.video_error_bad_request));
+        if (WebApiManager.isHaveActiveNetworkConnection(this)) {
+            DialogHelper.showErrorAlert(this, getString(R.string.video_error_bad_request));
+        }
+        else {
+            DialogHelper.showErrorAlert(this, getString(R.string.error_internet_connection));
+        }
     }
 
     // //////////
@@ -360,7 +370,8 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                     mediaType = PlayerViewModel.PlayerMode.VIDEO;
                     break;
             }
-            playerViewModel.init(video.id, mediaType);
+            playerViewModel.init(video.id, playlistId, mediaType);
+            playerViewModel.onPlayerError().observe(this, playerErrorObserver);
             playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
 
             if (video.isZypeLive == 0) {
@@ -413,11 +424,20 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         }
     }
 
+    private Observer<String> createPlayerErrorObserver() {
+        return errorMessage -> {
+            Logger.e("onPlayerError()::onChanged(): message=" + errorMessage);
+            hideProgress();
+            showVideoThumbnail();
+            DialogHelper.showErrorAlert(this, errorMessage, () -> finish());
+        };
+    }
+
     private Observer<String> createPlayerUrlObserver() {
         return new Observer<String>() {
             @Override
             public void onChanged(@Nullable String url) {
-                Logger.d("getPlayerUrl(): onChanged(): url=" + url);
+                Logger.d("getPlayerUrl()::onChanged(): url=" + url);
                 if (!TextUtils.isEmpty(url)) {
                     switch (playerViewModel.getPlayerMode().getValue()) {
                         case AUDIO:
@@ -442,7 +462,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                     hideProgress();
                 }
                 else {
-                    requestVideoUrl(mVideoId);
+//                    requestVideoUrl(mVideoId);
                 }
             }
         };

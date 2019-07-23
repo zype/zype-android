@@ -22,15 +22,12 @@ public class AnalyticBeacon {
     public String beacon;
 
     @ColumnInfo(name = "device")
-    @NonNull
     public String device;
 
     @ColumnInfo(name = "player_id")
-    @NonNull
     public String playerId;
 
     @ColumnInfo(name = "site_id")
-    @NonNull
     public String siteId;
 
     @ColumnInfo(name = "video_id")

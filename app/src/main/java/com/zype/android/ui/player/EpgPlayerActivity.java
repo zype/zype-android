@@ -52,10 +52,10 @@ public class EpgPlayerActivity extends BaseVideoActivity {
         return EpgPlayerActivity.class.getName();
     }
 
-    @Override
-    public void onShowAudio() {
-        //IGNORE
-    }
+//    @Override
+//    public void onShowAudio() {
+//        //IGNORE
+//    }
 
     @Override
     public void onFullscreenChanged(boolean isFullscreen) {

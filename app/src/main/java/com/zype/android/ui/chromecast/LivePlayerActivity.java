@@ -43,10 +43,10 @@ public class LivePlayerActivity extends BaseVideoActivity {
         return getString(R.string.activity_name_live);
     }
 
-    @Override
-    public void onShowAudio() {
-        //IGNORE
-    }
+//    @Override
+//    public void onShowAudio() {
+//        //IGNORE
+//    }
 
     @Override
     public void onFullscreenChanged(boolean isFullscreen) {

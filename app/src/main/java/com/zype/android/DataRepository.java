@@ -4,6 +4,8 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 
 import com.google.gson.Gson;
+import com.zype.android.Db.Entity.AdSchedule;
+import com.zype.android.Db.Entity.AnalyticBeacon;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
@@ -35,6 +37,34 @@ public class DataRepository {
             }
         }
         return INSTANCE;
+    }
+
+    // Ad schedule
+
+    public List<AdSchedule> getAdScheduleSync(String videoId) {
+        return db.zypeDao().getAdScheduleSync(videoId);
+    }
+
+    public void deleteAdSchedule(String videoId) {
+        db.zypeDao().deleteAdSchedule(videoId);
+    }
+
+    public void insertAdSchedule(List<AdSchedule> schedule) {
+        db.zypeDao().insertAdSchedule(schedule);
+    }
+
+    // Analytics beacon
+
+    public AnalyticBeacon getAnalyticsBeaconSync(String videoId) {
+        return db.zypeDao().getAnalyticsBeaconSync(videoId);
+    }
+
+    public void deleteAnalyticsBeacon(String videoId) {
+        db.zypeDao().deleteAnalyticsBeacon(videoId);
+    }
+
+    public void insertAnalyticsBeacon(AnalyticBeacon beacon) {
+        db.zypeDao().insertAnalyticsBeacon(beacon);
     }
 
     // Playlist
@@ -100,6 +130,7 @@ public class DataRepository {
             if (video.isDownloadedVideo == null) video.isDownloadedVideo = 0;
             if (video.isZypeLive == null) video.isZypeLive = 0;
             if (video.onAir == null) video.onAir = 0;
+            if (video.playTime == null) video.playTime = 0L;
         }
         return video;
     }
