@@ -216,10 +216,10 @@ public class VideoDetailViewModel extends AndroidViewModel {
                 if (response.isSuccessful) {
                     Video video = repo.getVideoSync(videoId);
                     if (video != null) {
-                        video = DbHelper.updateVideoEntityByApiVideo(video, videoResponse.videoData);
+                        video = DbHelper.videoUpdateEntityByApi(video, videoResponse.videoData);
                     }
                     else {
-                        video = DbHelper.apiVideoToVideoEntity(videoResponse.videoData);
+                        video = DbHelper.videoApiToEntity(videoResponse.videoData);
                     }
                     repo.updateVideo(video);
                 }

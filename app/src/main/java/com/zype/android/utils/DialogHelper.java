@@ -14,6 +14,10 @@ import android.text.TextUtils;
 
 public class DialogHelper {
 
+    public interface IDialogListener {
+        void onNegativeButtonClick();
+    }
+
     public static void showAlert(final Context context, String title, String message) {
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
         alertDialog.setTitle(title);
@@ -96,6 +100,27 @@ public class DialogHelper {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
+            }
+        });
+        AlertDialog alert = alertDialog.create();
+        if (!activity.isFinishing()) {
+            alert.show();
+        }
+    }
+
+    public static void showErrorAlert(final Activity activity, String message, IDialogListener listener) {
+        if (activity == null || activity.isFinishing()) {
+            return;
+        }
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+        alertDialog.setMessage(message);
+        alertDialog.setNegativeButton(activity.getString(R.string.dialog_button_close), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.onNegativeButtonClick();
+                }
             }
         });
         AlertDialog alert = alertDialog.create();
