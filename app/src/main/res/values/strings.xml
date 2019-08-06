@@ -17,7 +17,7 @@
     <string name="download_empty_list">Not downloads yet… save some shows now!</string>
     <string name="favorite_empty_list">You currently have no favorites.</string>
     <string name="highlight_empty_list">TODO add text</string>
-    <string name="search_empty_list">Sorry, we can`t find what are you looking for</string>
+    <string name="search_empty_list">No results. Try another search.</string>
     <string name="error_player">There was an error initializing the YouTubePlayer (%1$s)</string>
     <string name="title_tab_settings">Settings</string>
     <string name="title_activity_web">WebActivity</string>
