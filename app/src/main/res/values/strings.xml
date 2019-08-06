@@ -105,8 +105,8 @@
     <string name="dialog_update_app_message">You\'ve selected premium content. Please download the latest version of this app in order to purchase access to this content.</string>
 
     <!-- Downloads -->
-    <string name="downloads_empty_title">It looks like you haven’t downloaded any videos yet</string>
-    <string name="downloads_empty_message">You can download videos in order to watch them offline by clicking on the Download icon for any individual video.</string>
+    <string name="downloads_empty_title">It looks like you haven’t downloaded any videos yet.</string>
+    <string name="downloads_empty_message">You can download videos in order to watch them offline by signing in to your account and clicking on the Download icon for any individual video.</string>
 
     <!-- Favorites -->
     <string name="favorites_empty_title">It looks like you haven’t added any videos to Favorites yet</string>
