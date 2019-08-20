@@ -150,6 +150,7 @@
     <string name="menu_navigation_downloads">Downloads</string>
     <string name="menu_navigation_favorites">Favorites</string>
     <string name="menu_navigation_home">Home</string>
+    <string name="menu_navigation_join">Join</string>
     <string name="menu_navigation_guide">Guide</string>
 
     <string name="menu_navigation_settings">Settings</string>

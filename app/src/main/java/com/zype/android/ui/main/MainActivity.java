@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Auth.AuthLiveData;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
@@ -61,6 +63,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zype.android.utils.BundleConstants.REQUEST_LOGIN;
 import static com.zype.android.utils.BundleConstants.REQUEST_USER;
 
 public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
@@ -68,6 +71,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         BillingManager.BillingUpdatesListener {
 
     BottomNavigationView bottomNavigationView;
+    MenuItem lastSelectedItem = null;
 
     CustomViewPager pagerSections;
     Map<Integer, Section> sections;
@@ -86,6 +90,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         bottomNavigationView = findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         setupNavigation();
+
+        AuthLiveData.getInstance().observe(this, isLoggedIn -> setupNavigation());
 
         pagerSections = findViewById(R.id.pagerSections);
         pagerSections.setAdapter(adapterSections);
@@ -132,28 +138,63 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     }
 
     private void setupNavigation() {
+        bottomNavigationView.getMenu().clear();
+
         sections = new LinkedHashMap<>();
+
+        // Home
+        bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationHome,
+                Menu.NONE, R.string.menu_navigation_home)
+                .setIcon(R.drawable.baseline_home_black_24);
         sections.put(R.id.menuNavigationHome, new Section(getString(R.string.menu_navigation_home)));
 
+        // EPG
         if(ZypeSettings.EPG_ENABLED) {
+            bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationGuide,
+                    Menu.NONE, R.string.menu_navigation_guide)
+                    .setIcon(R.drawable.baseline_guide_black);
             sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
         }
-        else {
-            bottomNavigationView.getMenu().findItem(R.id.menuNavigationGuide).setVisible(false);
+//        else {
+//            bottomNavigationView.getMenu().findItem(R.id.menuNavigationGuide).setVisible(false);
+//        }
+
+        // Join
+        if (!AuthHelper.isLoggedIn()) {
+            bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationJoin,
+                    Menu.NONE, R.string.menu_navigation_join)
+                    .setIcon(R.drawable.baseline_account_circle_black_24);
         }
 
+        // Favorites
+        bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationFavorites,
+                Menu.NONE, R.string.menu_navigation_favorites)
+                .setIcon(R.drawable.baseline_star_rate_black_24);
         sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
+
         if (ZypeConfiguration.isDownloadsEnabled(this)) {
-            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(true);
+//            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(true);
+            bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationDownloads,
+                    Menu.NONE, R.string.menu_navigation_downloads)
+                    .setIcon(R.drawable.baseline_cloud_download_black_24);
             sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
         }
-        else {
-            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(false);
-        }
+//        else {
+//            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(false);
+//        }
+
+        // Settings
+        bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationSettings,
+                Menu.NONE, R.string.menu_navigation_settings)
+                .setIcon(R.drawable.baseline_settings_black_24);
         sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings)));
 
         adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
         adapterSections.setData(sections);
+
+        if (lastSelectedItem != null) {
+            bottomNavigationView.setSelectedItemId(lastSelectedItem.getItemId());
+        }
     }
 
     // Actions
@@ -163,17 +204,23 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         switch (requestCode) {
             case REQUEST_USER:
                 if (resultCode == RESULT_OK) {
-                    if (data != null) {
+                    setupNavigation();
+                    if (data != null && data.getExtras() != null) {
                         Bundle extras = data.getExtras();
-                        if (extras != null) {
-                            String videoId = extras.getString(BundleConstants.VIDEO_ID);
-                            String playlistId = extras.getString(BundleConstants.PLAYLIST_ID);
-                            NavigationHelper.getInstance(this)
-                                    .switchToVideoDetailsScreen(this, videoId, playlistId, false);
+                        String videoId = extras.getString(BundleConstants.VIDEO_ID);
+                        String playlistId = extras.getString(BundleConstants.PLAYLIST_ID);
+                        NavigationHelper.getInstance(this)
+                                .switchToVideoDetailsScreen(this, videoId, playlistId, false);
                         }
+                    else {
+                        DialogHelper.showAlert(this,
+                                "Thank you for creating an account!",
+                                "You can now enjoy watching video content.");
                     }
                 }
                 return;
+            case REQUEST_LOGIN:
+                setupNavigation();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -184,6 +231,9 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menuNavigationJoin:
+                NavigationHelper.getInstance(this).switchToUnauthorizedUserScreen(this, null);
+                return false;
             case R.id.menuNavigationGuide:
             case R.id.menuNavigationHome:
             case R.id.menuNavigationFavorites:
@@ -192,6 +242,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 Section section = sections.get(item.getItemId());
                 pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()));
                 setTitle(section.title);
+                lastSelectedItem = item;
                 return true;
         }
         return false;
@@ -325,6 +376,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         SettingsProvider.getInstance().logout();
 //        DataHelper.clearAllVideos(getContentResolver());
         DownloaderService.cancelAllDownloads();
+        setupNavigation();
     }
 
     @Override
