@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -35,6 +36,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 public class SearchActivity extends AppCompatActivity {
+    private static final String TAG = SearchActivity.class.getSimpleName();
 
     private SearchViewModel model;
 
@@ -81,6 +83,7 @@ public class SearchActivity extends AppCompatActivity {
             public boolean onClose() {
                 hideProgress();
                 model.clearSearchResults();
+                showEmptyQuery(true);
                 return false;
             }
         });
@@ -101,19 +104,24 @@ public class SearchActivity extends AppCompatActivity {
         return new Observer<StatefulData<List<Video>>>() {
             @Override
             public void onChanged(@Nullable StatefulData<List<Video>> videos) {
+                Log.d(TAG, "getVideos()::onChanged()");
                 if (videos.state == DataState.READY) {
                     hideKeyboard();
                     hideProgress();
                     adapter.setData(videos.data);
                     if (videos.data == null || videos.data.isEmpty()) {
-                        listVideos.setVisibility(GONE);
-                        textEmptyResult.setVisibility(VISIBLE);
-                        textErrorEmptyQuery.setVisibility(GONE);
+                        if (TextUtils.isEmpty(viewSearch.getQuery())) {
+                            showEmptyQuery(true);
+                            showEmptyResult(false);
+                        }
+                        else {
+                            showEmptyQuery(false);
+                            showEmptyResult(true);
+                        }
                     }
                     else {
-                        listVideos.setVisibility(VISIBLE);
-                        textEmptyResult.setVisibility(GONE);
-                        textErrorEmptyQuery.setVisibility(GONE);
+                        showEmptyQuery(false);
+                        showEmptyResult(false);
                     }
                 }
                 else if (videos.state == DataState.LOADING) {
@@ -126,9 +134,8 @@ public class SearchActivity extends AppCompatActivity {
                 else if (videos.state == DataState.ERROR) {
                     hideProgress();
                     adapter.setData(null);
-                    listVideos.setVisibility(GONE);
-                    textEmptyResult.setVisibility(VISIBLE);
-                    textErrorEmptyQuery.setVisibility(GONE);
+                    showEmptyQuery(false);
+                    showEmptyResult(true);
                 }
                 else {
                     Logger.e("getVideos()::onChanged(): Unknown state");
@@ -164,4 +171,14 @@ public class SearchActivity extends AppCompatActivity {
     private void hideProgress() {
         progressBar.setVisibility(View.GONE);
     }
+
+    private void showEmptyQuery(boolean value) {
+        textErrorEmptyQuery.setVisibility(value ? VISIBLE : GONE);
+    }
+
+    private void showEmptyResult(boolean value) {
+        textEmptyResult.setVisibility(value ? VISIBLE : GONE);
+        listVideos.setVisibility(value ? GONE : VISIBLE);
+    }
+
 }

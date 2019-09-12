@@ -102,10 +102,12 @@ public class VideoDetailViewModel extends AndroidViewModel {
             if (ZypeConfiguration.isDownloadsEnabled(getApplication())
                     && (ZypeConfiguration.isDownloadsForGuestsEnabled(getApplication())
                     || SettingsProvider.getInstance().isLoggedIn())) {
-                if (TextUtils.isEmpty(video.downloadVideoUrl)) {
+                if (TextUtils.isEmpty(video.downloadVideoUrl)
+                    || video.isDownloadedVideo == 0) {
                     loadVideoDownloadUrl(videoId);
                 }
-                if (TextUtils.isEmpty(video.downloadAudioUrl)) {
+                if (TextUtils.isEmpty(video.downloadAudioUrl)
+                    || video.isDownloadedAudio == 0) {
                     loadAudioDownloadUrl(videoId);
                 }
             }
@@ -278,7 +280,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
      * @param videoId Video id
      */
     private void loadAudioDownloadUrl(final String videoId) {
-        Logger.d("loadVideoDownloadUrl(): videoId=" + videoId);
+        Logger.d("loadAudioDownloadUrl(): videoId=" + videoId);
 
         if (AuthHelper.isLoggedIn()) {
             AuthHelper.onLoggedIn(new Observer<Boolean>() {
