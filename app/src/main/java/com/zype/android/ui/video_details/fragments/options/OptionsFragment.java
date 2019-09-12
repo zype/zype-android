@@ -430,10 +430,10 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                     downloadUrlExist = false;
                 }
             }
-            // Get audio and video download urls if not exist
-            if (!downloadUrlExist) {
-                ((BaseVideoActivity) getActivity()).getDownloadUrls(videoId);
-            }
+//            // Get audio and video download urls if not exist
+//            if (!downloadUrlExist) {
+//                ((BaseVideoActivity) getActivity()).getDownloadUrls(videoId);
+//            }
         }
         final VideoMenuDialogFragment fragment = VideoMenuDialogFragment.newInstance(downloadItems);
         fragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {

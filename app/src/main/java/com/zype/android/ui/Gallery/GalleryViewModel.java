@@ -6,6 +6,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import com.squareup.otto.Subscribe;
@@ -31,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zype.android.core.settings.SettingsProvider.CONSUMER_SUBSCRIPTION_COUNT;
 import static com.zype.android.ui.Gallery.Model.GalleryRow.State.CREATED;
 import static com.zype.android.ui.Gallery.Model.GalleryRow.State.LOADING;
 import static com.zype.android.ui.Gallery.Model.GalleryRow.State.READY;
@@ -55,6 +58,7 @@ public class GalleryViewModel extends AndroidViewModel {
     DataRepository repo;
     ZypeApi api;
     WebApiManager oldApi;
+    SharedPreferences.OnSharedPreferenceChangeListener listenerPreferences;
 
     public GalleryViewModel(Application application) {
         super(application);
@@ -62,11 +66,23 @@ public class GalleryViewModel extends AndroidViewModel {
         api = ZypeApi.getInstance();
         oldApi = WebApiManager.getInstance();
         oldApi.subscribe(this);
+        listenerPreferences = (sharedPreferences, key) -> {
+            // Update gallery rows when subscription count is changed
+            if (key.equals(CONSUMER_SUBSCRIPTION_COUNT)) {
+                if (galleryRows != null) {
+                    galleryRows.setValue(galleryRows.getValue());
+                }
+            }
+        };
+        PreferenceManager.getDefaultSharedPreferences(application)
+                .registerOnSharedPreferenceChangeListener(listenerPreferences);
     }
 
     @Override
     protected void onCleared() {
         oldApi.unsubscribe(this);
+        PreferenceManager.getDefaultSharedPreferences(getApplication())
+                .unregisterOnSharedPreferenceChangeListener(listenerPreferences);
         super.onCleared();
     }
 

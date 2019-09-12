@@ -458,11 +458,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 //                        errorMessage.setValue(playerResponse.message);
                 }
                 else {
-                    if (WebApiManager.isHaveActiveNetworkConnection(getApplication())) {
-                        errorMessage.setValue(getApplication().getString(R.string.video_error_bad_request));
-                    }
-                    else {
-                        errorMessage.setValue(getApplication().getString(R.string.error_internet_connection));
+                    if (!isVideoDownloaded()) {
+                        if (WebApiManager.isHaveActiveNetworkConnection(getApplication())) {
+                            errorMessage.setValue(getApplication().getString(R.string.video_error_bad_request));
+                        } else {
+                            errorMessage.setValue(getApplication().getString(R.string.error_internet_connection));
+                        }
                     }
                 }
             }

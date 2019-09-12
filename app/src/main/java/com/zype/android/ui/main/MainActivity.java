@@ -1,5 +1,6 @@
 package com.zype.android.ui.main;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -17,6 +18,8 @@ import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
+import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
@@ -248,8 +251,13 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 //        if (SettingsProvider.getInstance().getSubscriptionCount() == 0) {
 //            onRequestSubscription();
 //        } else {
-            VideoDetailActivity.startActivity(this, videoId, null, mediaType);
+//            VideoDetailActivity.startActivity(this, videoId, null, mediaType);
 //        }
+        NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
+        Video video = DataRepository.getInstance(this.getApplication()).getVideoSync(videoId);
+        if (video != null) {
+            navigationHelper.handleVideoClick(this, video, null, false);
+        }
     }
 
     @Override
