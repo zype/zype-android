@@ -438,14 +438,13 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 if (video.playerVideoUrl == null || !video.playerVideoUrl.equals(url)) {
                     video.playerVideoUrl = url;
                     repo.updateVideo(video);
-
-                    updateAvailablePlayerModes();
-                    if (playerMode.getValue() == null) {
-                        setPlayerMode(PlayerMode.VIDEO);
-                    }
-                    else if (playerMode.getValue() == PlayerMode.VIDEO) {
-                        updatePlayerUrl(video);
-                    }
+                }
+                updateAvailablePlayerModes();
+                if (playerMode.getValue() == null) {
+                    setPlayerMode(PlayerMode.VIDEO);
+                }
+                else if (playerMode.getValue() == PlayerMode.VIDEO) {
+                    updatePlayerUrl(video);
                 }
 
                 // Load audio
@@ -492,14 +491,13 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 if (video.playerAudioUrl == null || !video.playerAudioUrl.equals(url)) {
                     video.playerAudioUrl = url;
                     repo.updateVideo(video);
-
-                    updateAvailablePlayerModes();
-                    if (playerMode.getValue() == null) {
-                        setPlayerMode(PlayerMode.AUDIO);
-                    }
-                    else if (playerMode.getValue() == PlayerMode.AUDIO) {
-                        updatePlayerUrl(video);
-                    }
+                }
+                updateAvailablePlayerModes();
+                if (playerMode.getValue() == null) {
+                    setPlayerMode(PlayerMode.AUDIO);
+                }
+                else if (playerMode.getValue() == PlayerMode.AUDIO) {
+                    updatePlayerUrl(video);
                 }
             }
             else {

@@ -203,18 +203,15 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         playerView = rootView.findViewById(R.id.player_view);
 
         buttonFullscreen = playerView.findViewById(R.id.exo_fullscreen);
-        buttonFullscreen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean fullscreen = UiUtils.isLandscapeOrientation(getActivity());
-                if (fullscreen) {
-                    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-                    listenForDeviceRotation(Configuration.ORIENTATION_PORTRAIT);
-                }
-                else {
-                    getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-                    listenForDeviceRotation(Configuration.ORIENTATION_LANDSCAPE);
-                }
+        buttonFullscreen.setOnClickListener(view -> {
+            boolean fullscreen = UiUtils.isLandscapeOrientation(getActivity());
+            if (fullscreen) {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                listenForDeviceRotation(Configuration.ORIENTATION_PORTRAIT);
+            }
+            else {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+                listenForDeviceRotation(Configuration.ORIENTATION_LANDSCAPE);
             }
         });
 

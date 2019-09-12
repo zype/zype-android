@@ -30,6 +30,13 @@ public class SensorViewModel extends AndroidViewModel implements SensorEventList
         sensorManager = (SensorManager) getApplication().getSystemService(Context.SENSOR_SERVICE);
     }
 
+    @Override
+    protected void onCleared() {
+        Logger.d("onCleared()");
+        stopListeningOrientation();
+        super.onCleared();
+    }
+
     public MutableLiveData<Integer> getOrientation() {
         if (orientationLiveData == null) {
             orientationLiveData = new MutableLiveData<>();
@@ -50,7 +57,7 @@ public class SensorViewModel extends AndroidViewModel implements SensorEventList
     private void updateOrientation() {
         SensorManager.getRotationMatrix(mRotationMatrix, null, mAccelerometerReading, mMagnetometerReading);
         SensorManager.getOrientation(mRotationMatrix, mOrientationAngles);
-        Logger.d("updateOrientationAngles(): x=" + mOrientationAngles[0] + ", y=" + mOrientationAngles[1] + ", z=" + mOrientationAngles[2]);
+        Logger.d("updateOrientation(): x=" + mOrientationAngles[0] + ", y=" + mOrientationAngles[1] + ", z=" + mOrientationAngles[2]);
 
         float y = mOrientationAngles[1];
         if (y > 0 && y < 0.78f) {
