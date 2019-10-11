@@ -9,6 +9,12 @@
     android:layout_margin="16dp"
     tools:context="com.zype.android.ui.Consumer.ConsumerActivity"
     >
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="32dp"
+        >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -16,10 +22,18 @@
         android:orientation="vertical"
         android:id="@+id/layoutForm"
         >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/splash_logo"
+            />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:id="@+id/textTitle"
             android:text="@string/consumer_create_form_subtitle"
             android:gravity="center_horizontal"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
@@ -28,12 +42,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:id="@+id/textDescription"
             android:text="@string/consumer_create_form_description"
             android:gravity="center_horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             />
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:id="@+id/layoutEmail"
             android:hint="@string/consumer_email"
             >
@@ -46,6 +65,9 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:layout_marginBottom="16dp"
             android:id="@+id/layoutPassword"
             android:hint="@string/consumer_password"
@@ -57,8 +79,9 @@
                 />
         </android.support.design.widget.TextInputLayout>
         <Button
-            android:layout_width="match_parent"
+            android:layout_width="240dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="20dp"
             android:id="@+id/buttonUpdate"
@@ -73,6 +96,7 @@
             android:gravity="center_horizontal"
             />
     </LinearLayout>
+</android.support.v4.widget.NestedScrollView>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
