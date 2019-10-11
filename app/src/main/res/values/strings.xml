@@ -188,7 +188,8 @@
     <string name="subscribe_or_login_button_subscribe_now">Subscribe Now</string>
     <string name="subscribe_or_login_error_restore_purchase_zype">Not found Zype Plan for existing in-app subscription</string>
     <string name="subscribe_or_login_error_validation">We\'re sorry, there was a problem validating your subscription. Please close the app and visit Subscribe or Login > Restore Purchase upon reload.</string>
-    <string name="subscribe_or_login_title">Subscribe or Sign In</string>
+    <string name="subscribe_or_login_title">Enjoy %1$s</string>
+    <string name="subscribe_or_login_subtitle">Get access to Premium Content across all devices</string>
 
     <!-- Videos -->
     <string name="video_error_bad_request">We’re sorry, but there’s an issue playing this video.

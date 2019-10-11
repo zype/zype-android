@@ -7,24 +7,16 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.android.billingclient.api.Purchase;
-import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.Subscription;
-import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
-import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
-import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.events.ErrorEvent;
-import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 
 import java.util.List;
-
-import retrofit.RetrofitError;
 
 import static com.zype.android.utils.BundleConstants.REQUEST_CONSUMER;
 import static com.zype.android.utils.BundleConstants.REQUEST_LOGIN;
@@ -41,7 +33,7 @@ public class SubscribeOrLoginActivity extends BaseActivity {
         setContentView(R.layout.activity_subscribe_or_login);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        setTitle(getString(R.string.subscribe_or_login_title));
+        setTitle(String.format(getString(R.string.subscribe_or_login_title), getString(R.string.app_name)));
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
@@ -54,6 +55,9 @@ public class SubscribeOrLoginFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_subscribe_or_login, container, false);
 
         final NavigationHelper navigationHelper = NavigationHelper.getInstance(getActivity());
+
+        TextView textTitle = rootView.findViewById(R.id.textTitle);
+        textTitle.setText(String.format(getString(R.string.subscribe_or_login_title), getString(R.string.app_name)));
         Button buttonSubscribe = rootView.findViewById(R.id.buttonSubscribe);
         buttonSubscribe.setOnClickListener(new View.OnClickListener() {
             @Override
