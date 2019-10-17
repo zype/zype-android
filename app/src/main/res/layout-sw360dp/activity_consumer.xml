@@ -7,15 +7,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_margin="16dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
     tools:context="com.zype.android.ui.Consumer.ConsumerActivity"
     >
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginBottom="0dp"
+        android:layout_marginBottom="32dp"
         >
         <LinearLayout
             android:layout_width="match_parent"
@@ -26,7 +24,7 @@
             >
             <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="72dp"
+                android:layout_height="120dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/splash_logo"
@@ -34,7 +32,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="16dp"
                 android:id="@+id/textTitle"
                 android:text="@string/consumer_create_form_subtitle"
                 android:gravity="center_horizontal"
@@ -43,12 +41,11 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="16dp"
                 android:id="@+id/textDescription"
                 android:text="@string/consumer_create_form_description"
                 android:gravity="center_horizontal"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textSize="10sp"
                 />
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -63,7 +60,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
-                    android:textSize="12sp"
                     />
             </android.support.design.widget.TextInputLayout>
             <android.support.design.widget.TextInputLayout
@@ -72,7 +68,7 @@
                 android:layout_gravity="center_horizontal"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="16dp"
                 android:id="@+id/layoutPassword"
                 android:hint="@string/consumer_password"
                 >
@@ -80,7 +76,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:textSize="12sp"
                     />
             </android.support.design.widget.TextInputLayout>
             <Button
@@ -88,7 +83,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="20dp"
                 android:id="@+id/buttonUpdate"
                 android:text="@string/consumer_button_update"
                 style="@style/Widget.AppCompat.Button.Colored"
