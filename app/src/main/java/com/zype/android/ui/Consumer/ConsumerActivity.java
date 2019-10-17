@@ -60,6 +60,13 @@ public class ConsumerActivity extends BaseActivity {
 
         initParameters(savedInstanceState);
 
+        TextView textTitle = findViewById(R.id.textTitle);
+        textTitle.setText(String.format(getString(R.string.consumer_create_form_subtitle),
+                getString(R.string.app_name)));
+        TextView textDescription = findViewById(R.id.textDescription);
+        textDescription.setText(String.format(getString(R.string.consumer_create_form_description),
+                getString(R.string.app_name)));
+
         layoutEmail = findViewById(R.id.layoutEmail);
         layoutPassword = findViewById(R.id.layoutPassword);
         buttonUpdate = findViewById(R.id.buttonUpdate);

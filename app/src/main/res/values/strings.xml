@@ -78,12 +78,14 @@
     <string name="subtitles_off">Turn off</string>
 
     <!-- Consumer -->
-    <string name="consumer_button_update">Create Account</string>
-    <string name="consumer_create_form_description">Enter a valid email and password. Account credentials will allow access on all devices.</string>
-    <string name="consumer_create_form_subtitle">Create your account</string>
+    <string name="consumer_button_update">Continue</string>
+    <string name="consumer_create_form_description">Enter your email and password to create an account
+        and get access to %1$s on any device. With your account, you can access Premium Content,
+        Favorites and Recommendations across all devices, and download  content to watch offline.</string>
+    <string name="consumer_create_form_subtitle">Get all of %1$s!</string>
     <string name="consumer_create_sign_in">Already have an account? Sign in</string>
     <string name="consumer_create_sign_in_link">Sign in</string>
-    <string name="consumer_create_terms">By clicking Create Account, you agree to our Terms of Service and Privacy</string>
+    <string name="consumer_create_terms">By clicking Continue, you agree to our Terms of Service and Privacy</string>
     <string name="consumer_create_terms_link">Terms of Service and Privacy</string>
     <string name="consumer_email">Email</string>
     <string name="consumer_email_error_empty">Email is required</string>
@@ -188,7 +190,8 @@
     <string name="subscribe_or_login_button_subscribe_now">Subscribe Now</string>
     <string name="subscribe_or_login_error_restore_purchase_zype">Not found Zype Plan for existing in-app subscription</string>
     <string name="subscribe_or_login_error_validation">We\'re sorry, there was a problem validating your subscription. Please close the app and visit Subscribe or Login > Restore Purchase upon reload.</string>
-    <string name="subscribe_or_login_title">Subscribe or Sign In</string>
+    <string name="subscribe_or_login_title">Enjoy %1$s</string>
+    <string name="subscribe_or_login_subtitle">Get access to Premium Content across all devices</string>
 
     <!-- Videos -->
     <string name="video_error_bad_request">We’re sorry, but there’s an issue playing this video.
