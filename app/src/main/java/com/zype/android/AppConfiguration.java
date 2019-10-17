@@ -10,6 +10,8 @@ public class AppConfiguration {
     @SerializedName("audioOnlyPlayback")
     public Boolean audioOnlyPlaybackEnabled;
 
+    public Boolean hideFavoritesActionWhenSignedOut;
+
     public String marketplace;
 
 }

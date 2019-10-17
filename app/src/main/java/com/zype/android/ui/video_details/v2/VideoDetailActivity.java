@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -21,9 +22,12 @@ import android.widget.ProgressBar;
 
 import com.google.android.exoplayer2.Player;
 import com.squareup.otto.Subscribe;
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.provider.DataHelper;
@@ -40,6 +44,8 @@ import com.zype.android.ui.video_details.VideoDetailPager;
 import com.zype.android.ui.video_details.VideoDetailPagerAdapter;
 import com.zype.android.ui.video_details.VideoDetailViewModel;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
+import com.zype.android.ui.video_details.fragments.options.Options;
+import com.zype.android.ui.video_details.fragments.summary.SummaryFragment;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
@@ -58,6 +64,7 @@ import com.zype.android.webapi.model.player.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.View.GONE;
 import static com.zype.android.webapi.WebApiManager.WorkerHandler.BAD_REQUEST;
 
 public class VideoDetailActivity extends BaseActivity implements OnDetailActivityFragmentListener,
@@ -75,6 +82,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
     private ProgressBar progressPlayer;
     private TabLayout tabs;
     private VideoDetailPager pagerSections;
+    private FrameLayout layoutSummary;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -119,12 +127,6 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
 
         layoutPlayer = findViewById(R.id.layoutPlayer);
 
-        pagerSections = findViewById(R.id.pagerSections);
-        pagerSections.setAdapter(new VideoDetailPagerAdapter(this, getSupportFragmentManager(),
-                videoId));
-        tabs = findViewById(R.id.tabs);
-        tabs.setupWithViewPager(pagerSections);
-
         progressPlayer = findViewById(R.id.progressPlayer);
 
         model = ViewModelProviders.of(this).get(VideoDetailViewModel.class)
@@ -162,6 +164,50 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
                 }
             }
         });
+
+        showSections(videoId);
+    }
+
+    private boolean hasOptions(String videoId) {
+        List<PlayerViewModel.PlayerMode> playerModes = playerViewModel.getAvailablePlayerModes().getValue();
+        if (playerModes != null && playerModes.size() > 1) {
+            return true;
+        }
+        if (AuthHelper.isLoggedIn()
+                || !ZypeApp.get(this).getAppConfiguration().hideFavoritesActionWhenSignedOut) {
+            return true;
+        }
+        if (ZypeSettings.SHARE_VIDEO_ENABLED) {
+            return true;
+        }
+        if (ZypeConfiguration.isDownloadsEnabled(this) &&
+                (isAudioDownloadUrlExists(videoId) || isVideoDownloadUrlExists(videoId))) {
+            return true;
+        }
+        return false;
+    }
+
+    private void showSections(String videoId) {
+        pagerSections = findViewById(R.id.pagerSections);
+        tabs = findViewById(R.id.tabs);
+        layoutSummary = findViewById(R.id.layoutSummary);
+        if (hasOptions(videoId)) {
+            pagerSections.setAdapter(new VideoDetailPagerAdapter(this,
+                    getSupportFragmentManager(),
+                    videoId));
+            tabs.setupWithViewPager(pagerSections);
+            pagerSections.setVisibility(View.VISIBLE);
+            tabs.setVisibility(View.VISIBLE);
+            layoutSummary.setVisibility(GONE);
+        }
+        else {
+            FragmentManager fm = getSupportFragmentManager();
+            Fragment fragment = SummaryFragment.newInstance(videoId);
+            fm.beginTransaction().replace(R.id.layoutSummary, fragment, "SummaryFragment").commit();
+            pagerSections.setVisibility(GONE);
+            tabs.setVisibility(GONE);
+            layoutSummary.setVisibility(View.VISIBLE);
+        }
     }
 
     // View model observers
@@ -391,6 +437,16 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
                 }
             }
         }
+    }
+
+    //
+
+    private boolean isAudioDownloadUrlExists(String videoId) {
+        return !TextUtils.isEmpty(DataHelper.getAudioUrl(getContentResolver(), videoId));
+    }
+
+    private boolean isVideoDownloadUrlExists(String videoId) {
+        return !TextUtils.isEmpty(DataHelper.getVideoUrl(getContentResolver(), videoId));
     }
 
 }

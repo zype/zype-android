@@ -1,6 +1,8 @@
 {
   "audioOnlyPlayback": false,
 
+  "hideFavoritesActionWhenSignedOut": false,
+
   "OneSignal": "false",
   "AWSPinpoint": "false"
 }
