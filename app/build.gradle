@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.25.4'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 import java.text.SimpleDateFormat
@@ -41,7 +41,7 @@ android {
     }
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
-    def zypeTemplateVersion = "2.4.1"
+    def zypeTemplateVersion = "2.4.2"
 
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
@@ -161,7 +161,7 @@ dependencies {
     testImplementation "android.arch.persistence.room:testing:$room_version"
 
 
-    implementation('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
+    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true;
     }
     androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.4.1'
