@@ -45,6 +45,10 @@ Update values of following color resources to change lock icon colors:
 
 `icon_unlocked` - Color of the unlocked icon. If set to transparent color, the unlocked icon will not display.
 
+## Inline title
+
+To display video and playlist titles underneath each thumbnail image set `PLAYLIST_GALLERY_ITEM_INLINE_TITLES` flag to `true` in the **[ZypeSettings.java](https://github.com/zype/zype-android/blob/master/app/src/template/java/com/zype/android/ZypeSettings.java)** file.  
+
 ## Social links
 
 To remove web site and/or social media links (Facebook, Twitter, Instagram) from the Settings page you can comment out corresponding lines in the `onCreate()` method in  [SettingsFragment.java](https://github.com/zype/zype-android/tree/master/app/src/main/java/com/zype/android/ui/main/fragments/settings/SettingsFragment.java):

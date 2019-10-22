@@ -43,7 +43,8 @@ public class ZypeSettings {
     public static final boolean EPG_ENABLED = false;
     public static final boolean PLAYLIST_GALLERY_VIEW = true;
     public static final boolean PLAYLIST_GALLERY_HERO_IMAGES = true;
-    public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = true;
+    public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = false;
+    public static final boolean PLAYLIST_GALLERY_ITEM_INLINE_TITLES = true;
     public static final boolean SHARE_VIDEO_ENABLED = false;
 
     public static final String THEME = ZypeConfiguration.THEME_DARK;
