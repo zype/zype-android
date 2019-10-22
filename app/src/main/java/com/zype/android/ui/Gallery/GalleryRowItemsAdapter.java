@@ -22,6 +22,7 @@ import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistItem;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
@@ -76,6 +77,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
         holder.item = items.get(position);
 
         updateTitle(holder);
+        updateInlineTitle(holder);
         loadThumbnail(holder);
         updateLockIcon(holder);
 
@@ -110,6 +112,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
         public PlaylistItem item;
         public FrameLayout layoutTitle;
         public TextView textTitle;
+        public TextView textInlineTitle;
         public ImageView imageThumbnail;
         public ImageView imageLocked;
 
@@ -118,6 +121,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
             this.view = view;
             layoutTitle = view.findViewById(R.id.layoutTitle);
             textTitle = view.findViewById(R.id.textTitle);
+            textInlineTitle = view.findViewById(R.id.textInlineTitle);
             imageThumbnail = view.findViewById(R.id.imageThumbnail);
             imageLocked = view.findViewById(R.id.imageLocked);
         }
@@ -181,6 +185,16 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
         }
         else {
             holder.layoutTitle.setVisibility(GONE);
+        }
+    }
+
+    private void updateInlineTitle(ViewHolder holder) {
+        if (ZypeConfiguration.playlistGalleryItemInlineTitles()) {
+            holder.textInlineTitle.setVisibility(View.VISIBLE);
+            holder.textInlineTitle.setText(holder.item.getTitle());
+        }
+        else {
+            holder.textInlineTitle.setVisibility(GONE);
         }
     }
 

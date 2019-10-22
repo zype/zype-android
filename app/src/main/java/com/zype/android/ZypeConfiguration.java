@@ -205,4 +205,7 @@ public class ZypeConfiguration {
         return getBooleanPreference(PREFERENCE_PLAYLIST_GALLERY_ITEM_TITLES, ZypeSettings.PLAYLIST_GALLERY_ITEM_TITLES, context);
     }
 
+    public static boolean playlistGalleryItemInlineTitles() {
+        return ZypeSettings.PLAYLIST_GALLERY_ITEM_INLINE_TITLES;
+    }
 }
