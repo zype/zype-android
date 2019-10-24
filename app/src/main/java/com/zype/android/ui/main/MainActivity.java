@@ -159,10 +159,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             bottomNavigationView.getMenu().findItem(R.id.menuNavigationLive).setVisible(false);
         }
 
-
-
-        sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_live)));
-
         sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
         if (ZypeConfiguration.isDownloadsEnabled(this)) {
             bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(true);
