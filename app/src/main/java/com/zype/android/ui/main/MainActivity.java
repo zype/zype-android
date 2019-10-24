@@ -1,6 +1,5 @@
 package com.zype.android.ui.main;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,16 +28,16 @@ import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
 import com.zype.android.ui.Auth.LoginActivity;
 import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
+import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.Widget.CustomViewPager;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.main.Model.Section;
-import com.zype.android.ui.video_details.VideoDetailActivity;
-import com.zype.android.ui.main.fragments.videos.VideosActivity;
 import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
+import com.zype.android.ui.main.fragments.videos.VideosActivity;
 import com.zype.android.ui.search.SearchActivity;
+import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
@@ -76,6 +75,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     Map<Integer, Section> sections;
 
     SectionsPagerAdapter adapterSections;
+    private int lastSelectedTabId = R.id.menuNavigationHome;
+    private boolean refreshTab = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +126,14 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (refreshTab) {
+            bottomNavigationView.setSelectedItemId(lastSelectedTabId);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menuMainSearch:
@@ -138,12 +147,21 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         sections = new LinkedHashMap<>();
         sections.put(R.id.menuNavigationHome, new Section(getString(R.string.menu_navigation_home)));
 
-        if(ZypeSettings.EPG_ENABLED) {
-            sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
+//        if (ZypeSettings.EPG_ENABLED) {
+//            sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
+//        } else {
+//            bottomNavigationView.getMenu().findItem(R.id.menuNavigationGuide).setVisible(false);
+//        }
+
+        if (ZypeSettings.SHOW_LIVE) {
+            sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_guide)));
+        } else {
+            bottomNavigationView.getMenu().findItem(R.id.menuNavigationLive).setVisible(false);
         }
-        else {
-            bottomNavigationView.getMenu().findItem(R.id.menuNavigationGuide).setVisible(false);
-        }
+
+
+
+        sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_live)));
 
         sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
         if (ZypeConfiguration.isDownloadsEnabled(this)) {
@@ -186,17 +204,25 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     //
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        refreshTab = true;
         switch (item.getItemId()) {
-            case R.id.menuNavigationGuide:
+            case R.id.menuNavigationDownloads:
             case R.id.menuNavigationHome:
             case R.id.menuNavigationFavorites:
-            case R.id.menuNavigationDownloads:
-            case R.id.menuNavigationSettings:
+            case R.id.menuNavigationSettings: {
+                lastSelectedTabId = item.getItemId();
                 Section section = sections.get(item.getItemId());
                 pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()));
                 setTitle(section.title);
                 return true;
+            }
+            case R.id.menuNavigationLive: {
+                NavigationHelper.getInstance(this)
+                        .switchToVideoDetailsScreen(this, "5c8faa013bbf420fc200bc40", "5c8fa8b33bbf420fce00bc14", false);
+                return true;
+            }
         }
+
         return false;
     }
 
@@ -236,12 +262,10 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         if (ZypeConfiguration.isUniversalSubscriptionEnabled(this)) {
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
                 onRequestSubscription(videoId);
-            }
-            else {
+            } else {
                 VideoDetailActivity.startActivity(this, videoId, null);
             }
-        }
-        else {
+        } else {
             VideoDetailActivity.startActivity(this, videoId, null);
         }
     }
@@ -271,8 +295,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             } else {
                 onRequestLogin();
             }
-        }
-        else {
+        } else {
             DataHelper.setFavoriteVideo(getContentResolver(), videoId, true);
         }
     }
@@ -286,12 +309,10 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                         .addPathVideoId(videoId)
                         .addAccessToken();
                 getApi().executeRequest(WebApiManager.Request.UN_FAVORITE, builder.build());
-            }
-            else {
+            } else {
                 onRequestLogin();
             }
-        }
-        else {
+        } else {
             DataHelper.setFavoriteVideo(getContentResolver(), videoId, false);
         }
     }
@@ -348,8 +369,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             extras.putString(BundleConstants.VIDEO_ID, videoId);
             extras.putString(BundleConstants.PLAYLIST_ID, null);
             NavigationHelper.getInstance(this).switchToSubscriptionScreen(this, extras);
-        }
-        else {
+        } else {
             DialogHelper.showSubscriptionAlertIssue(this);
         }
     }

@@ -97,10 +97,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 else {
                     return PlaylistFragment.newInstance();
                 }
-            case R.id.menuNavigationGuide:
-                return EPGFragment.newInstance();
+//            case R.id.menuNavigationGuide:
+//                return EPGFragment.newInstance();
             case R.id.menuNavigationFavorites:
                 return FavoritesFragment.newInstance();
+            case R.id.menuNavigationLive:
             case R.id.menuNavigationDownloads:
                 return DownloadFragment.newInstance();
 //            case TAB_ID_MY_LIBRARY:
