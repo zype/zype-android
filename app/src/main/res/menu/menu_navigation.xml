@@ -11,11 +11,11 @@
 <!--        android:title="@string/menu_navigation_guide"-->
 <!--        android:icon="@drawable/baseline_guide_black"-->
 <!--        />-->
-    <item
-        android:id="@+id/menuNavigationLive"
-        android:title="@string/menu_navigation_live"
-        android:icon="@drawable/androidhome_white"
-        />
+<!--    <item-->
+<!--        android:id="@+id/menuNavigationLive"-->
+<!--        android:title="@string/menu_navigation_live"-->
+<!--        android:icon="@drawable/icon_live"-->
+<!--        />-->
 
     <item
         android:id="@+id/menuNavigationFavorites"

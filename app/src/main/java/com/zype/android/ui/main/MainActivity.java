@@ -87,6 +87,9 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         setSupportActionBar(toolbar);
         setTitle(R.string.menu_navigation_home);
 
+        adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        setupSections();
+
         bottomNavigationView = findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         setupNavigation();
@@ -143,31 +146,54 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupNavigation() {
+    private void setupSections() {
         sections = new LinkedHashMap<>();
         sections.put(R.id.menuNavigationHome, new Section(getString(R.string.menu_navigation_home)));
+        sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
+        sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_live)));
+        sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
+        sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
+        sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings)));
+        adapterSections.setData(sections);
+    }
 
-//        if (ZypeSettings.EPG_ENABLED) {
-//            sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
-//        } else {
-//            bottomNavigationView.getMenu().findItem(R.id.menuNavigationGuide).setVisible(false);
-//        }
+    private void setupNavigation() {
+        bottomNavigationView.getMenu().clear();
+
+        // Home
+        bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationHome,
+                Menu.NONE, R.string.menu_navigation_home)
+                .setIcon(R.drawable.androidhome_white);
+
+        if (ZypeSettings.EPG_ENABLED) {
+            bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationGuide,
+                    Menu.NONE, R.string.menu_navigation_guide)
+                    .setIcon(R.drawable.baseline_guide_black);
+        }
 
         if (ZypeSettings.SHOW_LIVE) {
-            sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_guide)));
-        } else {
-            bottomNavigationView.getMenu().findItem(R.id.menuNavigationLive).setVisible(false);
+            bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationLive,
+                    Menu.NONE, R.string.menu_navigation_live)
+                    .setIcon(R.drawable.icon_live);
         }
 
-        sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
+        // Favorites
+        bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationFavorites,
+                Menu.NONE, R.string.menu_navigation_favorites)
+                .setIcon(R.drawable.baseline_star_rate_black_24);
+
         if (ZypeConfiguration.isDownloadsEnabled(this)) {
-            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(true);
-            sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
+            bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationDownloads,
+                    Menu.NONE, R.string.menu_navigation_downloads)
+                    .setIcon(R.drawable.baseline_cloud_download_black_24);
         }
-        else {
-            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(false);
-        }
-        sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings)));
+
+
+        // Settings
+        bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationSettings,
+                Menu.NONE, R.string.menu_navigation_settings)
+                .setIcon(R.drawable.baseline_settings_black_24);
+
 
         adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
         adapterSections.setData(sections);
@@ -205,6 +231,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             case R.id.menuNavigationDownloads:
             case R.id.menuNavigationHome:
             case R.id.menuNavigationFavorites:
+            case R.id.menuNavigationGuide:
             case R.id.menuNavigationSettings: {
                 lastSelectedTabId = item.getItemId();
                 Section section = sections.get(item.getItemId());
