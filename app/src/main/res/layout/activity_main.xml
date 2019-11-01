@@ -32,19 +32,25 @@
             />
 -->
     </android.support.design.widget.AppBarLayout>
-    <FrameLayout
+    <RelativeLayout
+        android:id="@+id/root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="56dp"
-        android:id="@+id/root_view"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        >
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
         <com.zype.android.ui.Widget.CustomViewPager
             android:id="@+id/pagerSections"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-    </FrameLayout>
+            android:layout_height="match_parent" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
+    </RelativeLayout>
     <android.support.design.widget.BottomNavigationView
         android:layout_width="match_parent"
         android:layout_height="56dp"

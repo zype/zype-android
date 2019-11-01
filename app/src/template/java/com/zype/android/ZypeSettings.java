@@ -47,6 +47,7 @@ public class ZypeSettings {
     public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = false;
     public static final boolean PLAYLIST_GALLERY_ITEM_INLINE_TITLES = false;
     public static final boolean SHARE_VIDEO_ENABLED = false;
+    public static final boolean SHOW_LIVE = false;
 
     /**
      * Theme of the app.

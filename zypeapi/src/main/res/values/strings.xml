@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ZypeAPI</string>
+    <string name="live_video_load_error_message">Problem occurred, please try again later</string>
+
 </resources>

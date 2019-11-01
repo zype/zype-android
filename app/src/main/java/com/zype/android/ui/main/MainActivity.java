@@ -1,6 +1,5 @@
 package com.zype.android.ui.main;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
@@ -19,6 +19,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.DataRepository;
+import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
@@ -29,16 +30,16 @@ import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
 import com.zype.android.ui.Auth.LoginActivity;
 import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
+import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.Widget.CustomViewPager;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.main.Model.Section;
-import com.zype.android.ui.video_details.VideoDetailActivity;
-import com.zype.android.ui.main.fragments.videos.VideosActivity;
 import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
+import com.zype.android.ui.main.fragments.videos.VideosActivity;
 import com.zype.android.ui.search.SearchActivity;
+import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
@@ -58,6 +59,8 @@ import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.File;
+import com.zype.android.zypeapi.ZypeApi;
+import com.zype.android.zypeapi.model.VideoResponse;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -76,6 +79,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     Map<Integer, Section> sections;
 
     SectionsPagerAdapter adapterSections;
+    private int lastSelectedTabId = R.id.menuNavigationHome;
+    private boolean refreshTab = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +90,9 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle(R.string.menu_navigation_home);
+
+        adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        setupSections();
 
         bottomNavigationView = findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
@@ -125,6 +133,14 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (refreshTab) {
+            bottomNavigationView.setSelectedItemId(lastSelectedTabId);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menuMainSearch:
@@ -134,26 +150,54 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupNavigation() {
+    private void setupSections() {
         sections = new LinkedHashMap<>();
         sections.put(R.id.menuNavigationHome, new Section(getString(R.string.menu_navigation_home)));
-
-        if(ZypeSettings.EPG_ENABLED) {
-            sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
-        }
-        else {
-            bottomNavigationView.getMenu().findItem(R.id.menuNavigationGuide).setVisible(false);
-        }
-
+        sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
+        sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_live)));
         sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
-        if (ZypeConfiguration.isDownloadsEnabled(this)) {
-            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(true);
-            sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
-        }
-        else {
-            bottomNavigationView.getMenu().findItem(R.id.menuNavigationDownloads).setVisible(false);
-        }
+        sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
         sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings)));
+        adapterSections.setData(sections);
+    }
+
+    private void setupNavigation() {
+        bottomNavigationView.getMenu().clear();
+
+        // Home
+        bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationHome,
+                Menu.NONE, R.string.menu_navigation_home)
+                .setIcon(R.drawable.baseline_home_black_24);
+
+        if (ZypeSettings.EPG_ENABLED) {
+            bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationGuide,
+                    Menu.NONE, R.string.menu_navigation_guide)
+                    .setIcon(R.drawable.baseline_guide_black);
+        }
+
+        if (ZypeSettings.SHOW_LIVE) {
+            bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationLive,
+                    Menu.NONE, R.string.menu_navigation_live)
+                    .setIcon(R.drawable.icon_live);
+        }
+
+        // Favorites
+        bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationFavorites,
+                Menu.NONE, R.string.menu_navigation_favorites)
+                .setIcon(R.drawable.baseline_star_rate_black_24);
+
+        if (ZypeConfiguration.isDownloadsEnabled(this)) {
+            bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationDownloads,
+                    Menu.NONE, R.string.menu_navigation_downloads)
+                    .setIcon(R.drawable.baseline_cloud_download_black_24);
+        }
+
+
+        // Settings
+        bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationSettings,
+                Menu.NONE, R.string.menu_navigation_settings)
+                .setIcon(R.drawable.baseline_settings_black_24);
+
 
         adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
         adapterSections.setData(sections);
@@ -186,18 +230,58 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     //
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        refreshTab = true;
         switch (item.getItemId()) {
-            case R.id.menuNavigationGuide:
+            case R.id.menuNavigationDownloads:
             case R.id.menuNavigationHome:
             case R.id.menuNavigationFavorites:
-            case R.id.menuNavigationDownloads:
-            case R.id.menuNavigationSettings:
+            case R.id.menuNavigationGuide:
+            case R.id.menuNavigationSettings: {
+                lastSelectedTabId = item.getItemId();
                 Section section = sections.get(item.getItemId());
                 pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()));
                 setTitle(section.title);
                 return true;
+            }
+            case R.id.menuNavigationLive: {
+                switchToLiveVideo();
+                return true;
+            }
         }
+
         return false;
+    }
+
+    private void switchToLiveVideo() {
+        //show loader
+        ProgressBar progressBar=(ProgressBar) findViewById(R.id.progress);
+        progressBar.setVisibility(View.VISIBLE);
+
+        ZypeApi zypeApi = ZypeApi.getInstance();
+
+        zypeApi.getVideo(ZypeSettings.LIVE_VIDEO_ID, response -> {
+            progressBar.setVisibility(View.GONE);
+            if(response.isSuccessful) {
+                VideoResponse videoResponse = (VideoResponse) response.data;
+                DataRepository repo = DataRepository.getInstance(getApplication());
+                Video video = repo.getVideoSync(ZypeSettings.LIVE_VIDEO_ID);
+                if (video != null) {
+                    video = DbHelper.videoUpdateEntityByApi(video, videoResponse.videoData);
+                }
+                else {
+                    video = DbHelper.videoApiToEntity(videoResponse.videoData);
+                }
+                repo.updateVideo(video);
+
+                NavigationHelper.getInstance(this)
+                        .switchToVideoDetailsScreen(this, video.id, null, false);
+            }else{
+                UiUtils.showErrorSnackbar(findViewById(R.id.root_view), getString(R.string.live_video_load_error_message));
+                if (refreshTab) {
+                    bottomNavigationView.setSelectedItemId(lastSelectedTabId);
+                }
+            }
+        });
     }
 
     @Override
@@ -236,12 +320,10 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         if (ZypeConfiguration.isUniversalSubscriptionEnabled(this)) {
             if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
                 onRequestSubscription(videoId);
-            }
-            else {
+            } else {
                 VideoDetailActivity.startActivity(this, videoId, null);
             }
-        }
-        else {
+        } else {
             VideoDetailActivity.startActivity(this, videoId, null);
         }
     }
@@ -271,8 +353,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             } else {
                 onRequestLogin();
             }
-        }
-        else {
+        } else {
             DataHelper.setFavoriteVideo(getContentResolver(), videoId, true);
         }
     }
@@ -286,12 +367,10 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                         .addPathVideoId(videoId)
                         .addAccessToken();
                 getApi().executeRequest(WebApiManager.Request.UN_FAVORITE, builder.build());
-            }
-            else {
+            } else {
                 onRequestLogin();
             }
-        }
-        else {
+        } else {
             DataHelper.setFavoriteVideo(getContentResolver(), videoId, false);
         }
     }
@@ -348,8 +427,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             extras.putString(BundleConstants.VIDEO_ID, videoId);
             extras.putString(BundleConstants.PLAYLIST_ID, null);
             NavigationHelper.getInstance(this).switchToSubscriptionScreen(this, extras);
-        }
-        else {
+        } else {
             DialogHelper.showSubscriptionAlertIssue(this);
         }
     }

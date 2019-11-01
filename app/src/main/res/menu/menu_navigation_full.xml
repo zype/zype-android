@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menuNavigationHome"
+        android:icon="@drawable/baseline_home_black_24"
+        android:title="@string/menu_navigation_home" />
+
+    <item
+        android:id="@+id/menuNavigationGuide"
+        android:icon="@drawable/baseline_guide_black"
+        android:title="@string/menu_navigation_guide" />
+    <item
+        android:id="@+id/menuNavigationLive"
+        android:icon="@drawable/icon_live"
+        android:title="@string/menu_navigation_live" />
+
+    <item
+        android:id="@+id/menuNavigationFavorites"
+        android:icon="@drawable/baseline_star_rate_black_24"
+        android:title="@string/menu_navigation_favorites" />
+    <item
+        android:id="@+id/menuNavigationDownloads"
+        android:icon="@drawable/baseline_cloud_download_black_24"
+        android:title="@string/menu_navigation_downloads" />
+    <item
+        android:id="@+id/menuNavigationSettings"
+        android:icon="@drawable/baseline_settings_black_24"
+        android:title="@string/menu_navigation_settings" />
+</menu>

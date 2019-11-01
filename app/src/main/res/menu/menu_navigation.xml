@@ -6,11 +6,16 @@
         android:icon="@drawable/baseline_home_black_24"
         />
 
-    <item
-        android:id="@+id/menuNavigationGuide"
-        android:title="@string/menu_navigation_guide"
-        android:icon="@drawable/baseline_guide_black"
-        />
+<!--    <item-->
+<!--        android:id="@+id/menuNavigationGuide"-->
+<!--        android:title="@string/menu_navigation_guide"-->
+<!--        android:icon="@drawable/baseline_guide_black"-->
+<!--        />-->
+<!--    <item-->
+<!--        android:id="@+id/menuNavigationLive"-->
+<!--        android:title="@string/menu_navigation_live"-->
+<!--        android:icon="@drawable/icon_live"-->
+<!--        />-->
 
     <item
         android:id="@+id/menuNavigationFavorites"
