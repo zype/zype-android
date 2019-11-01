@@ -163,7 +163,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         // Home
         bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationHome,
                 Menu.NONE, R.string.menu_navigation_home)
-                .setIcon(R.drawable.androidhome_white);
+                .setIcon(R.drawable.baseline_home_black_24);
 
         if (ZypeSettings.EPG_ENABLED) {
             bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationGuide,
@@ -241,7 +241,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             }
             case R.id.menuNavigationLive: {
                 NavigationHelper.getInstance(this)
-                        .switchToVideoDetailsScreen(this, "5c8faa013bbf420fc200bc40", "5c8fa8b33bbf420fce00bc14", false);
+                        .switchToVideoDetailsScreen(this, ZypeSettings.LIVE_VIDEO_ID, ZypeSettings.LIVE_PLAYLIST_ID, false);
                 return true;
             }
         }
