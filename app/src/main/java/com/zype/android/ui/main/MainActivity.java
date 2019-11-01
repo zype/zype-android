@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
@@ -18,6 +19,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.DataRepository;
+import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
@@ -57,6 +59,8 @@ import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.File;
+import com.zype.android.zypeapi.ZypeApi;
+import com.zype.android.zypeapi.model.VideoResponse;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -240,13 +244,44 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 return true;
             }
             case R.id.menuNavigationLive: {
-                NavigationHelper.getInstance(this)
-                        .switchToVideoDetailsScreen(this, ZypeSettings.LIVE_VIDEO_ID, ZypeSettings.LIVE_PLAYLIST_ID, false);
+                switchToLiveVideo();
                 return true;
             }
         }
 
         return false;
+    }
+
+    private void switchToLiveVideo() {
+        //show loader
+        ProgressBar progressBar=(ProgressBar) findViewById(R.id.progress);
+        progressBar.setVisibility(View.VISIBLE);
+
+        ZypeApi zypeApi = ZypeApi.getInstance();
+
+        zypeApi.getVideo(ZypeSettings.LIVE_VIDEO_ID, response -> {
+            progressBar.setVisibility(View.GONE);
+            if(response.isSuccessful) {
+                VideoResponse videoResponse = (VideoResponse) response.data;
+                DataRepository repo = DataRepository.getInstance(getApplication());
+                Video video = repo.getVideoSync(ZypeSettings.LIVE_VIDEO_ID);
+                if (video != null) {
+                    video = DbHelper.videoUpdateEntityByApi(video, videoResponse.videoData);
+                }
+                else {
+                    video = DbHelper.videoApiToEntity(videoResponse.videoData);
+                }
+                repo.updateVideo(video);
+
+                NavigationHelper.getInstance(this)
+                        .switchToVideoDetailsScreen(this, video.id, null, false);
+            }else{
+                UiUtils.showErrorSnackbar(findViewById(R.id.root_view), getString(R.string.live_video_load_error_message));
+                if (refreshTab) {
+                    bottomNavigationView.setSelectedItemId(lastSelectedTabId);
+                }
+            }
+        });
     }
 
     @Override

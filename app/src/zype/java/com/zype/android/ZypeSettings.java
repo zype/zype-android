@@ -50,8 +50,6 @@ public class ZypeSettings {
     //Live
     public static final boolean SHOW_LIVE = true;
     public static final String LIVE_VIDEO_ID = "5c8faa013bbf420fc200bc40";
-    public static final String LIVE_PLAYLIST_ID = "5c8fa8b33bbf420fce00bc14";
-
 
     public static final String THEME = ZypeConfiguration.THEME_DARK;
 
