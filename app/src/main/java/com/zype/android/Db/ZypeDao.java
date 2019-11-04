@@ -2,12 +2,14 @@ package com.zype.android.Db;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.zype.android.Db.Entity.AdSchedule;
 import com.zype.android.Db.Entity.AnalyticBeacon;
+import com.zype.android.Db.Entity.FavoriteVideo;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
@@ -112,4 +114,20 @@ public interface ZypeDao {
     @Insert(onConflict = REPLACE)
     public void insertVideos(List<Video> videos);
 
+    // Video favorites
+
+    @Query("SELECT * FROM favorite")
+    public List<FavoriteVideo> getVideoFavorites();
+
+    @Query("SELECT * FROM favorite WHERE favorite.video_id = :videoId LIMIT 1")
+    public FavoriteVideo getVideoFavoriteByVideoId(String videoId);
+
+    @Insert(onConflict = REPLACE)
+    public void addVideoFavorite(FavoriteVideo favoriteVideo);
+
+    @Query("DELETE FROM favorite WHERE favorite.video_id = :videoId")
+    public void deleteVideoFavoriteByVideoId(String videoId);
+
+    @Query("DELETE FROM favorite")
+    public void deleteVideoFavorites();
 }
