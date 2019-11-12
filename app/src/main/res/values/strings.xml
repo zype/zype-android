@@ -200,6 +200,7 @@
     <string name="video_options_play_as_audio">Play as Audio</string>
     <string name="video_options_play_as_video">Play as Video</string>
     <string name="videos_loading">Gathering videos for you…</string>
+    <string name="videos_episode">Episode %1$s</string>
     <string name="videos_error">We’re sorry, but there’s an issue loading videos.</string>
 
 

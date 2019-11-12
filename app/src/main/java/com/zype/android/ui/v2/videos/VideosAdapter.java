@@ -3,6 +3,7 @@ package com.zype.android.ui.v2.videos;
 import android.app.Activity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,17 +76,15 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
     public void onBindViewHolder(final VideosAdapter.ViewHolder holder, int position) {
         holder.item = items.get(position);
         holder.textTitle.setText(holder.item.title);
+        updateInfo(holder);
         loadThumbnail(holder);
         updateLockIcon(holder);
         updateDownloadProgress(holder);
         updatePopupMenu(holder);
-        holder.view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NavigationHelper navigationHelper = NavigationHelper.getInstance(holder.view.getContext());
-                Video video = (Video) holder.item;
-                navigationHelper.handleVideoClick((Activity) holder.view.getContext(), video, playlistId, false);
-            }
+        holder.view.setOnClickListener(v -> {
+            NavigationHelper navigationHelper = NavigationHelper.getInstance(holder.view.getContext());
+            Video video = holder.item;
+            navigationHelper.handleVideoClick((Activity) holder.view.getContext(), video, playlistId, false);
         });
     }
 
@@ -103,6 +102,7 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
         public final View view;
         public Video item;
         public TextView textTitle;
+        public TextView textInfo;
         public ImageView imageLocked;
         public ImageView imagePopup;
         public ImageView imageThumbnail;
@@ -112,11 +112,24 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
             super(view);
             this.view = view;
             textTitle = view.findViewById(R.id.textTitle);
+            textInfo = view.findViewById(R.id.textInfo);
             imageLocked = view.findViewById(R.id.imageLocked);
             imagePopup = view.findViewById(R.id.imagePopup);
             imageThumbnail = view.findViewById(R.id.imageThumbnail);
             progressDownload = view.findViewById(R.id.progressDownload);
         }
+    }
+
+    private void updateInfo(ViewHolder holder) {
+        String info = "";
+        String episode = "";
+        if (!TextUtils.isEmpty(holder.item.episode)) {
+            episode = String.format(holder.view.getContext().getString(R.string.videos_episode), holder.item.episode);
+        }
+        if (!TextUtils.isEmpty(episode)) {
+            info += episode;
+        }
+        holder.textInfo.setText(info);
     }
 
     private void loadThumbnail(ViewHolder holder) {

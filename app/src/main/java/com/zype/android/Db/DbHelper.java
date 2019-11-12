@@ -115,7 +115,7 @@ public class DbHelper {
         entity.description = (videoData.getDescription() == null) ? "" : videoData.getDescription();
         entity.discoveryUrl = videoData.getDiscoveryUrl();
         entity.duration = videoData.getDuration();
-        entity.episode = String.valueOf(videoData.getEpisode());
+        entity.episode = (videoData.getEpisode() == null) ? "" : String.valueOf(videoData.getEpisode());
         entity.expireAt = videoData.getExpireAt();
         entity.featured = String.valueOf(videoData.isFeatured() ? 1 : 0);
         entity.foreignId = videoData.getForeignId();
@@ -187,7 +187,7 @@ public class DbHelper {
         entity.description = (videoData.description == null) ? "" : videoData.description;
         entity.discoveryUrl = videoData.discoveryUrl;
         entity.duration = videoData.duration;
-        entity.episode = String.valueOf(videoData.episode);
+        entity.episode = (videoData.episode == null) ? "" : String.valueOf(videoData.episode);
         entity.expireAt = videoData.expireAt;
         entity.featured = String.valueOf(videoData.featured ? 1 : 0);
         entity.foreignId = videoData.foreignId;
