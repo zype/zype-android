@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.utils.Logger;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class VideosFragment extends Fragment {
 
     private static final String ARG_PLAYLIST_ID = "PlaylistId";
 
-    private VideosViewModel model;
+    private PlaylistVideosViewModel model;
     private String playlistId;
 
     private VideosAdapter adapter;
@@ -66,7 +67,7 @@ public class VideosFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        model = ViewModelProviders.of(this).get(VideosViewModel.class);
+        model = ViewModelProviders.of(this).get(PlaylistVideosViewModel.class);
 
         showProgress();
         model.getVideos(playlistId).observe(this, new Observer<List<Video>>() {
@@ -87,6 +88,19 @@ public class VideosFragment extends Fragment {
                 }
             }
         });
+
+        adapter.setPopupMenuListener((action, video) -> {
+            model.handleVideoAction(action, video, success -> {
+                if (success) {
+//                    model.retrieveVideos(false);
+                }
+                else {
+                    NavigationHelper.getInstance(getActivity()).switchToLoginScreen(getActivity());
+                }
+            });
+        });
+
+
     }
 
     private void showProgress() {

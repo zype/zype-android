@@ -3,14 +3,21 @@ package com.zype.android;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 
-import com.google.gson.Gson;
+import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.AdSchedule;
 import com.zype.android.Db.Entity.AnalyticBeacon;
+import com.zype.android.Db.Entity.FavoriteVideo;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.Db.ZypeDb;
-import com.zype.android.webapi.model.video.VideoData;
+import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.zypeapi.IZypeApiListener;
+import com.zype.android.zypeapi.ZypeApi;
+import com.zype.android.zypeapi.model.VideoFavoriteData;
+import com.zype.android.zypeapi.model.VideoFavoritesResponse;
+import com.zype.android.zypeapi.model.VideoResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +30,10 @@ public class DataRepository {
     private static DataRepository INSTANCE;
 
     private ZypeDb db;
+
+    public interface IDataLoading {
+        void onLoadingCompleted(boolean success);
+    }
 
     private DataRepository(Application application) {
         db = ZypeDb.getDatabase(application);
@@ -95,6 +106,10 @@ public class DataRepository {
         return db.zypeDao().getPlaylistVideosSync(playlistId);
     }
 
+    public List<Video> getFavoriteVideosSync() {
+        return db.zypeDao().getFavoriteVideosSync();
+    }
+
     public void insertPlaylistVideos(List<PlaylistVideo> playlistVideos) {
         db.zypeDao().insertPlaylistVideos(playlistVideos);
     }
@@ -143,5 +158,98 @@ public class DataRepository {
         db.zypeDao().insertVideos(videos);
     }
 
+    public void loadVideo(String videoId, IZypeApiListener listener) {
+        ZypeApi.getInstance().getVideo(videoId,
+                (IZypeApiListener<VideoResponse>) response -> {
+                    if (response.isSuccessful) {
+                        if (response.data != null) {
+                            Video video = getVideoSync(response.data.videoData.id);
+                            List<Video> videoList = new ArrayList<>();
+                            if (video != null) {
+                                videoList.add(DbHelper.videoUpdateEntityByApi(video, response.data.videoData));
+                            } else {
+                                videoList.add(DbHelper.videoApiToEntity(response.data.videoData));
+                            }
+                            insertVideos(videoList);
 
+                            if (listener != null) {
+                                listener.onCompleted(response);
+                            }
+                        }
+                    }
+                });
+    }
+
+    // Video favorites
+
+    public void loadVideoFavorites(IDataLoading listener) {
+        deleteVideoFavorites();
+        String accessToken = AuthHelper.getAccessToken();
+        String consumerId = SettingsProvider.getInstance().getConsumerId();
+        ZypeApi.getInstance().getVideoFavorites(accessToken, consumerId,
+                (IZypeApiListener<VideoFavoritesResponse>) response -> {
+                    if (response.isSuccessful) {
+                        for (VideoFavoriteData item : response.data.videoFavorites) {
+                            Video video = getVideoSync(item.videoId);
+                            if (video == null) {
+                                loadVideo(item.videoId, response1 -> {
+                                    if (response.isSuccessful) {
+                                        Video dbVideo = getVideoSync(item.videoId);
+                                        if (dbVideo != null) {
+                                            dbVideo.isFavorite = 1;
+                                            updateVideo(dbVideo);
+
+                                            FavoriteVideo favoriteVideo = new FavoriteVideo();
+                                            favoriteVideo.id = item.id;
+                                            favoriteVideo.videoId = item.videoId;
+                                            addVideoFavorite(favoriteVideo);
+                                        }
+                                    }
+                                });
+                            }
+                            else {
+                                video.isFavorite = 1;
+                                updateVideo(video);
+
+                                FavoriteVideo favoriteVideo = new FavoriteVideo();
+                                favoriteVideo.id = item.id;
+                                favoriteVideo.videoId = item.videoId;
+                                addVideoFavorite(favoriteVideo);
+                            }
+                        }
+                        if (listener != null) {
+                            listener.onLoadingCompleted(true);
+                        }
+                    }
+                    else {
+                        if (listener != null) {
+                            listener.onLoadingCompleted(false);
+                        }
+                    }
+                });
+    }
+
+    public void addVideoFavorite(FavoriteVideo favoriteVideo) {
+        db.zypeDao().addVideoFavorite(favoriteVideo);
+    }
+
+    public FavoriteVideo getVideoFavoriteByVideoId(String videoId) {
+        return db.zypeDao().getVideoFavoriteByVideoId(videoId);
+    }
+
+    public void deleteVideoFavoriteByVideoId(String videoId) {
+        db.zypeDao().deleteVideoFavoriteByVideoId(videoId);
+    }
+
+    public void deleteVideoFavorites() {
+        List<FavoriteVideo> favoriteVideos = db.zypeDao().getVideoFavorites();
+        for (FavoriteVideo item : favoriteVideos) {
+            Video video = getVideoSync(item.videoId);
+            if (video != null) {
+                video.isFavorite = 0;
+                updateVideo(video);
+            }
+        }
+        db.zypeDao().deleteVideoFavorites();
+    }
 }

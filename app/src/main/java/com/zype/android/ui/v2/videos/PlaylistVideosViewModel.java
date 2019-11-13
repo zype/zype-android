@@ -1,4 +1,4 @@
-package com.zype.android.ui.v2.search;
+package com.zype.android.ui.v2.videos;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -9,10 +9,6 @@ import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
-import com.zype.android.ui.v2.base.BaseViewModel;
-import com.zype.android.ui.v2.base.DataState;
-import com.zype.android.ui.v2.base.StatefulData;
-import com.zype.android.ui.v2.videos.VideoActionsHelper;
 import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
 import com.zype.android.zypeapi.ZypeApiResponse;
@@ -25,45 +21,49 @@ import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_FAVORITE;
 import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_UNFAVORITE;
 
 /**
- * Created by Evgeny Cherkasov on 21.05.2019.
+ * Created by Evgeny Cherkasov on 11.02.2019.
  */
-public class SearchViewModel  extends BaseViewModel {
-    private MutableLiveData<StatefulData<List<Video>>> videos;
+public class PlaylistVideosViewModel extends AndroidViewModel {
+    DataRepository repo;
+    ZypeApi api;
 
-    public SearchViewModel(Application application) {
+    LiveData<List<Video>> videos;
+    MutableLiveData<String> errorMessage;
+
+    public PlaylistVideosViewModel(Application application) {
         super(application);
+        repo = DataRepository.getInstance(application);
+        api = ZypeApi.getInstance();
     }
 
-    public LiveData<StatefulData<List<Video>>> getVideos() {
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+    }
+
+    public LiveData<List<Video>> getVideos(String playlistId) {
         if (videos == null) {
-            videos = new MutableLiveData<>();
-            videos.setValue(new StatefulData<>(null, null, DataState.READY));
+            videos = repo.getPlaylistVideos(playlistId);
         }
+        loadVideos(playlistId);
         return videos;
     }
 
-    public void search(String query, String playlistId) {
-        if (videos == null) {
-            videos = new MutableLiveData<>();
+    public LiveData<String> getErrorMessage() {
+        if (errorMessage == null) {
+            errorMessage = new MutableLiveData<>();
         }
-        videos.setValue(new StatefulData<>(null, null, DataState.LOADING));
-        loadSearchResult(query, playlistId);
+        return errorMessage;
     }
 
-    public void clearSearchResults() {
-        if (videos == null) {
-            videos = new MutableLiveData<>();
+    public LiveData<String> onError() {
+        if (errorMessage == null) {
+            errorMessage = new MutableLiveData<>();
         }
-        videos.setValue(new StatefulData<>(null, null, DataState.READY));
+        return errorMessage;
     }
 
-    public void refresh() {
-        if (videos != null) {
-            videos.setValue(videos.getValue());
-        }
-    }
-
-    private void loadSearchResult(String query, String playlistId) {
+    private void loadVideos(final String playlistId) {
         final List<Video> result = new ArrayList<>();
         final IZypeApiListener listener = new IZypeApiListener() {
             @Override
@@ -79,26 +79,26 @@ public class SearchViewModel  extends BaseViewModel {
                             result.add(DbHelper.videoApiToEntity(item));
                         }
                     }
-                    if (videosResponse.pagination.current == videosResponse.pagination.pages
-                        || videosResponse.pagination.pages == 0) {
+                    if (videosResponse.pagination.current == videosResponse.pagination.pages) {
                         repo.insertVideos(result);
-                        videos.setValue(new StatefulData<>(result, null, DataState.READY));
+                        repo.deletePlaylistVideos(playlistId);
+                        repo.insertPlaylistVideos(DbHelper.videosToPlaylistVideos(result, playlistId));
                     }
                     else {
-                        api.searchVideos(query, playlistId, videosResponse.pagination.next, this);
+                        api.getPlaylistVideos(playlistId, videosResponse.pagination.next, this);
                     }
                 }
                 else {
                     if (videosResponse != null) {
-                        videos.setValue(new StatefulData<>(null, videosResponse.message, DataState.ERROR));
+                        errorMessage.setValue(videosResponse.message);
                     }
                     else {
-                        videos.setValue(new StatefulData<>(null, getApplication().getString(R.string.videos_error), DataState.ERROR));
+                        errorMessage.setValue(getApplication().getString(R.string.videos_error));
                     }
                 }
             }
         };
-        api.searchVideos(query, playlistId, 1, listener);
+        api.getPlaylistVideos(playlistId, 1, listener);
     }
 
     public void handleVideoAction(int action, Video video, VideoActionsHelper.IVideoActionCallback listener) {
