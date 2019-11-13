@@ -280,9 +280,9 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
                             tracker.send(event);
                         }
                     }
-                });
-                fragment.show(((Activity) holder.view.getContext()).getFragmentManager(), "menu");
-            }
+            });
+            fragment.show(((Activity) holder.view.getContext()).getFragmentManager(), "menu");
+//            }
         };
         if (items.isEmpty()) {
             holder.imagePopup.setVisibility(GONE);

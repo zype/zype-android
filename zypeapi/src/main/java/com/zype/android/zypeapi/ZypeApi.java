@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.zype.android.zypeapi.model.PlayerResponse;
 import com.zype.android.zypeapi.model.PlaylistsResponse;
 import com.zype.android.zypeapi.model.VideoFavoriteResponse;
+import com.zype.android.zypeapi.model.VideoFavoritesResponse;
 import com.zype.android.zypeapi.model.VideoResponse;
 import com.zype.android.zypeapi.model.VideosResponse;
 
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -395,32 +397,6 @@ public class ZypeApi {
 //        }
 //    }
 
-    public void addVideoFavorite(@NonNull String accessToken, String consumerId, @NonNull String videoId,
-                                 @NonNull final IZypeApiListener listener) {
-        HashMap<String, String> queryParams = new HashMap<>();
-        queryParams.put(ZypeApi.ACCESS_TOKEN, accessToken);
-        HashMap<String, String> fieldParams = new HashMap<>();
-        fieldParams.put("video_id", videoId);
-        ZypeApi.getInstance().getApi().addVideoFavorite(consumerId, queryParams, fieldParams)
-                .enqueue(new Callback<VideoFavoriteResponse>() {
-                    @Override
-                    public void onResponse(Call<VideoFavoriteResponse> call, Response<VideoFavoriteResponse> response) {
-                        if (response.isSuccessful()) {
-                            listener.onCompleted(new ZypeApiResponse<VideoFavoriteResponse>(response.body(), true));
-                        }
-                        else {
-                            listener.onCompleted(new ZypeApiResponse<VideoFavoriteResponse>(response.body(), false));
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<VideoFavoriteResponse> call, Throwable t) {
-                        listener.onCompleted(new ZypeApiResponse<VideoFavoriteResponse>(null, false));
-                    }
-                });
-    }
-
-
     // Player
 
     public void getPlayer(@NonNull String videoId, boolean isAudio, String accessToken, String uuid,
@@ -542,6 +518,82 @@ public class ZypeApi {
                 listener.onCompleted(new ZypeApiResponse<VideosResponse>(null, false));
             }
         });
+    }
+
+    // Video favorites
+
+    public void getVideoFavorites(@NonNull String accessToken, @NonNull String consumerId,
+                                  @NonNull final IZypeApiListener listener) {
+        HashMap<String, String> queryParams = new HashMap<>();
+        queryParams.put(ZypeApi.ACCESS_TOKEN, accessToken);
+        queryParams.put(PER_PAGE, "100");
+        ZypeApi.getInstance().getApi().getVideoFavorites(consumerId, queryParams)
+                .enqueue(new Callback<VideoFavoritesResponse>() {
+                    @Override
+                    public void onResponse(Call<VideoFavoritesResponse> call, Response<VideoFavoritesResponse> response) {
+                        if (response.isSuccessful()) {
+                            listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                        }
+                        else {
+                            listener.onCompleted(new ZypeApiResponse<>(response.body(), false));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<VideoFavoritesResponse> call, Throwable t) {
+                        listener.onCompleted(new ZypeApiResponse<VideoFavoriteResponse>(null, false));
+                    }
+                });
+    }
+
+    public void addVideoFavorite(@NonNull String accessToken, String consumerId, @NonNull String videoId,
+                                 @NonNull final IZypeApiListener listener) {
+        HashMap<String, String> queryParams = new HashMap<>();
+        queryParams.put(ZypeApi.ACCESS_TOKEN, accessToken);
+        HashMap<String, String> fieldParams = new HashMap<>();
+        fieldParams.put("video_id", videoId);
+        ZypeApi.getInstance().getApi().addVideoFavorite(consumerId, queryParams, fieldParams)
+                .enqueue(new Callback<VideoFavoriteResponse>() {
+                    @Override
+                    public void onResponse(Call<VideoFavoriteResponse> call, Response<VideoFavoriteResponse> response) {
+                        if (response.isSuccessful()) {
+                            listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                        }
+                        else {
+                            listener.onCompleted(new ZypeApiResponse<>(response.body(), false));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<VideoFavoriteResponse> call, Throwable t) {
+                        listener.onCompleted(new ZypeApiResponse<VideoFavoriteResponse>(null, false));
+                    }
+                });
+    }
+
+    public void removeVideoFavorite(@NonNull String accessToken,
+                                    @NonNull String consumerId,
+                                    @NonNull String videoFavoriteId,
+                                    @NonNull final IZypeApiListener listener) {
+        HashMap<String, String> queryParams = new HashMap<>();
+        queryParams.put(ZypeApi.ACCESS_TOKEN, accessToken);
+        ZypeApi.getInstance().getApi().removeVideoFavorite(consumerId, videoFavoriteId, queryParams)
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            listener.onCompleted(new ZypeApiResponse<>(null, true));
+                        }
+                        else {
+                            listener.onCompleted(new ZypeApiResponse<>(null, false));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        listener.onCompleted(new ZypeApiResponse<>(null, false));
+                    }
+                });
     }
 
 }
