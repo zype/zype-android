@@ -1,6 +1,8 @@
 package com.zype.android.ui.video_details.fragments.options;
 
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
@@ -14,6 +16,7 @@ import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.ui.dialog.VideoMenuDialogFragment;
 import com.zype.android.ui.player.PlayerViewModel;
+import com.zype.android.ui.v2.videos.VideoActionsHelper;
 import com.zype.android.ui.video_details.VideoDetailViewModel;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
 import com.zype.android.ui.main.fragments.videos.VideosMenuItem;
@@ -368,7 +371,10 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         if (playerModes != null && playerModes.size() > 1) {
             list.add(new Options(OPTION_PLAY_AS, getString(R.string.video_options_play_as_audio), -1));
         }
-        list.add(new Options(OPTION_FAVORITES, getFavoriteTitle(isFavorite), getFavoriteIcon(isFavorite)));
+        if (AuthHelper.isLoggedIn()
+                || !ZypeApp.get(getContext()).getAppConfiguration().hideFavoritesActionWhenSignedOut) {
+            list.add(new Options(OPTION_FAVORITES, getFavoriteTitle(isFavorite), getFavoriteIcon(isFavorite)));
+        }
         if (ZypeSettings.SHARE_VIDEO_ENABLED) {
             list.add(new Options(OPTION_SHARE, getString(R.string.option_share), R.drawable.icn_share));
         }
@@ -430,10 +436,10 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
                     downloadUrlExist = false;
                 }
             }
-//            // Get audio and video download urls if not exist
-//            if (!downloadUrlExist) {
-//                ((BaseVideoActivity) getActivity()).getDownloadUrls(videoId);
-//            }
+            // Get audio and video download urls if not exist
+            if (!downloadUrlExist) {
+                ((BaseVideoActivity) getActivity()).getDownloadUrls(videoId);
+            }
         }
         final VideoMenuDialogFragment fragment = VideoMenuDialogFragment.newInstance(downloadItems);
         fragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -482,10 +488,14 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
             case OPTION_FAVORITES:
                 isFavorite = !isFavorite;
                 if (isFavorite) {
-                    mListener.onFavorite(videoId);
+                    VideoActionsHelper.onFavorite(videoDetailViewModel.getVideo().getValue(),
+                            getActivity().getApplication(), null);
+//                    mListener.onFavorite(videoId);
                 }
                 else {
-                    mListener.onUnFavorite(videoId);
+                    VideoActionsHelper.onUnfavorite(videoDetailViewModel.getVideo().getValue(),
+                            getActivity().getApplication(), null);
+//                    mListener.onUnFavorite(videoId);
                 }
                 mAdapter.changeList(getOptionsList(playerViewModel.getAvailablePlayerModes().getValue()));
                 break;

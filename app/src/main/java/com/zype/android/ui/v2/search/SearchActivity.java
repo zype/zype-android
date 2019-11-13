@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.v2.base.DataState;
 import com.zype.android.ui.v2.base.StatefulData;
 import com.zype.android.ui.v2.videos.VideosAdapter;
@@ -98,6 +99,18 @@ public class SearchActivity extends AppCompatActivity {
 
         model = ViewModelProviders.of(this).get(SearchViewModel.class);
         model.getVideos().observe(this, createVideosObserver());
+
+        adapter.setPopupMenuListener((action, video) -> {
+            model.handleVideoAction(action, video, success -> {
+                if (success) {
+                    model.refresh();
+                }
+                else {
+                    NavigationHelper.getInstance(SearchActivity.this).switchToLoginScreen(SearchActivity.this);
+                }
+            });
+        });
+
     }
 
     private Observer<StatefulData<List<Video>>> createVideosObserver() {

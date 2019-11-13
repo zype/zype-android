@@ -16,9 +16,9 @@ import com.zype.android.ui.MyLibrary.MyLibraryFragment;
 import com.zype.android.ui.epg.EPGFragment;
 import com.zype.android.ui.main.Model.Section;
 import com.zype.android.ui.main.fragments.download.DownloadFragment;
-import com.zype.android.ui.main.fragments.favorite.FavoritesFragment;
 import com.zype.android.ui.main.fragments.playlist.PlaylistFragment;
 import com.zype.android.ui.main.fragments.settings.SettingsFragment;
+import com.zype.android.ui.v2.favorites.FavoritesFragment;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -100,6 +100,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case R.id.menuNavigationGuide:
                 return EPGFragment.newInstance();
             case R.id.menuNavigationFavorites:
+//                return FavoritesFragment.newInstance();
                 return FavoritesFragment.newInstance();
             case R.id.menuNavigationLive:
             case R.id.menuNavigationDownloads:

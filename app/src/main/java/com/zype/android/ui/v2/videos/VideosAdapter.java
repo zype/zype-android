@@ -45,6 +45,7 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
     private String playlistId;
     boolean usePoster = false;
     private boolean showDownloadOptions = false;
+    private IPopupMenu menuListener;
 
     private static final int ITEM_UNFAVORITE = 0;
     private static final int ITEM_FAVORITE = 1;
@@ -55,9 +56,17 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
     private static final int ITEM_DOWNLOAD_AUDIO = 6;
     private static final int ITEM_SHARE = 10;
 
+    public interface IPopupMenu {
+        void onMenuItemSelected(int action, Video video);
+    }
+
     public VideosAdapter(String playlistId) {
         items = new ArrayList<>();
         this.playlistId = playlistId;
+    }
+
+    public void setPopupMenuListener(IPopupMenu listener) {
+        this.menuListener = listener;
     }
 
     public void setData(List<Video> items) {
@@ -189,32 +198,36 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
 
     private void updatePopupMenu(final ViewHolder holder) {
         final ArrayList<VideosMenuItem> items = new ArrayList<>(getPopupMenuItems(holder));
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.view.showContextMenu();
+        View.OnClickListener listener = view -> {
+            holder.view.showContextMenu();
 
-                final VideoMenuDialogFragment fragment = VideoMenuDialogFragment.newInstance(items);
-                fragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Map<String, String> event;
-                        Tracker tracker = ZypeApp.getTracker();
-                        switch (fragment.getList().get(position).getId()) {
-                            case ITEM_UNFAVORITE:
-                                VideoActionsHelper.onUnfavorite(holder.item, (Activity) holder.view.getContext());
-                                event = new HitBuilders.EventBuilder()
-                                        .setAction("Unfavorite")
-                                        .setLabel("id=" + holder.item.id)
-                                        .build();
-                                break;
-                            case ITEM_FAVORITE:
-                                VideoActionsHelper.onFavorite(holder.item, (Activity) holder.view.getContext());
-                                event = new HitBuilders.EventBuilder()
-                                        .setAction("Favorite")
-                                        .setLabel("id=" + holder.item.id)
-                                        .build();
-                                break;
+            final VideoMenuDialogFragment fragment = VideoMenuDialogFragment.newInstance(items);
+            fragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Map<String, String> event;
+                    Tracker tracker = ZypeApp.getTracker();
+                    switch (fragment.getList().get(position).getId()) {
+                        case ITEM_UNFAVORITE:
+                            if (menuListener != null) {
+                                menuListener.onMenuItemSelected(VideoActionsHelper.ACTION_UNFAVORITE, holder.item);
+                            }
+//                            VideoActionsHelper.onUnfavorite(holder.item, (Activity) holder.view.getContext(), null);
+                            event = new HitBuilders.EventBuilder()
+                                    .setAction("Unfavorite")
+                                    .setLabel("id=" + holder.item.id)
+                                    .build();
+                            break;
+                        case ITEM_FAVORITE:
+                            if (menuListener != null) {
+                                menuListener.onMenuItemSelected(VideoActionsHelper.ACTION_FAVORITE, holder.item);
+                            }
+//                            VideoActionsHelper.onFavorite(holder.item, (Activity) holder.view.getContext(), null);
+                            event = new HitBuilders.EventBuilder()
+                                    .setAction("Favorite")
+                                    .setLabel("id=" + holder.item.id)
+                                    .build();
+                            break;
 //                            case ITEM_SHARE:
 //                                videoActionListener.onShareVideo(holder.item.id);
 //                                event = new HitBuilders.EventBuilder()
@@ -285,8 +298,8 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
         List<VideosMenuItem> list = new ArrayList<>();
 
         int currentProgress = DownloaderService.currentProgress(holder.item.id);
-        if (SettingsProvider.getInstance().isLoggedIn()
-                || !ZypeConfiguration.isUniversalSubscriptionEnabled(holder.view.getContext())) {
+        if (AuthHelper.isLoggedIn()
+                || !ZypeApp.get(holder.view.getContext()).getAppConfiguration().hideFavoritesActionWhenSignedOut) {
             if (holder.item.isFavorite != null && holder.item.isFavorite == 1) {
                 list.add(new VideosMenuItem(ITEM_UNFAVORITE, R.string.menu_unfavorite));
             }

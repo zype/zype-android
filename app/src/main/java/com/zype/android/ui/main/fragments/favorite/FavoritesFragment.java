@@ -1,5 +1,6 @@
 package com.zype.android.ui.main.fragments.favorite;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -19,16 +20,21 @@ import android.widget.ListView;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.main.fragments.videos.VideosCursorAdapter;
+import com.zype.android.ui.v2.videos.VideoActionsHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.ConsumerParamsBuilder;
@@ -75,6 +81,34 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
 
         layoutEmpty = rootView.findViewById(R.id.layoutEmpty);
 
+        onVideoItemActionListener = new OnVideoItemAction() {
+            @Override
+            public void onFavoriteVideo(String videoId) {
+                Video video = DataRepository.getInstance(getActivity().getApplication()).getVideoSync(videoId);
+                VideoActionsHelper.onFavorite(video, getActivity().getApplication(), (success) -> startLoadCursors());
+            }
+
+            @Override
+            public void onUnFavoriteVideo(String videoId) {
+                Video video = DataRepository.getInstance(getActivity().getApplication()).getVideoSync(videoId);
+                VideoActionsHelper.onUnfavorite(video, getActivity().getApplication(), (success) -> startLoadCursors());
+            }
+
+            @Override
+            public void onShareVideo(String videoId) {
+
+            }
+
+            @Override
+            public void onDownloadVideo(String videoId) {
+
+            }
+
+            @Override
+            public void onDownloadAudio(String videoId) {
+
+            }
+        };
         adapter = new VideosCursorAdapter(getActivity(), CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER, onVideoItemActionListener, onLoginListener);
         listFavorites = rootView.findViewById(R.id.listFavorites);
 //        textEmpty = (TextView) view.findViewById(R.id.empty);
@@ -109,7 +143,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
                     + " must implement OnFragmentInteractionListener");
         }
         try {
-            onVideoItemActionListener = (OnVideoItemAction) context;
+//            onVideoItemActionListener = (OnVideoItemAction) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement OnEpisodeItemAction");
@@ -127,7 +161,7 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     public void onDetach() {
         super.onDetach();
         listener = null;
-        onVideoItemActionListener = null;
+//        onVideoItemActionListener = null;
         onLoginListener = null;
     }
 
@@ -144,11 +178,11 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     public void onResume() {
         super.onResume();
 //        updateTextEmpty();
-        if (ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())) {
+//        if (ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())) {
            if (SettingsProvider.getInstance().isLoggedIn()) {
                 requestConsumerFavoriteVideo(1);
             }
-        }
+//        }
     }
 
     @Override
@@ -171,7 +205,10 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
-        listener.onFavoriteVideoClick(holder.videoId, holder.isFavorite);
+//        listener.onFavoriteVideoClick(holder.videoId, holder.isFavorite);
+        NavigationHelper navigationHelper = NavigationHelper.getInstance(getActivity());
+        Video video = DataRepository.getInstance(getActivity().getApplication()).getVideoSync(holder.videoId);
+        navigationHelper.handleVideoClick(getActivity(), video, null, false);
     }
 
     // //////////
@@ -211,13 +248,20 @@ public class FavoritesFragment extends BaseFragment implements ListView.OnItemCl
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        adapter.changeCursor(cursor);
-        if (cursor != null && cursor.getCount() > 0) {
-            layoutEmpty.setVisibility(View.GONE);
+        boolean isFavoritesAvailable = AuthHelper.isLoggedIn()
+                || !ZypeApp.get(getContext()).getAppConfiguration().hideFavoritesActionWhenSignedOut;
+        if (isFavoritesAvailable) {
+            adapter.changeCursor(cursor);
+            if (cursor != null && cursor.getCount() > 0) {
+                layoutEmpty.setVisibility(View.GONE);
+            } else {
+                layoutEmpty.setVisibility(View.VISIBLE);
+            }
         }
         else {
             layoutEmpty.setVisibility(View.VISIBLE);
         }
+
     }
 
     @Override

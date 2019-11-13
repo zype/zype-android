@@ -31,6 +31,10 @@ public class DataRepository {
 
     private ZypeDb db;
 
+    public interface IDataLoading {
+        void onLoadingCompleted(boolean success);
+    }
+
     private DataRepository(Application application) {
         db = ZypeDb.getDatabase(application);
     }
@@ -100,6 +104,10 @@ public class DataRepository {
 
     public List<Video> getPlaylistVideosSync(String playlistId) {
         return db.zypeDao().getPlaylistVideosSync(playlistId);
+    }
+
+    public List<Video> getFavoriteVideosSync() {
+        return db.zypeDao().getFavoriteVideosSync();
     }
 
     public void insertPlaylistVideos(List<PlaylistVideo> playlistVideos) {
@@ -174,7 +182,7 @@ public class DataRepository {
 
     // Video favorites
 
-    public void loadVideoFavorites() {
+    public void loadVideoFavorites(IDataLoading listener) {
         deleteVideoFavorites();
         String accessToken = AuthHelper.getAccessToken();
         String consumerId = SettingsProvider.getInstance().getConsumerId();
@@ -208,6 +216,14 @@ public class DataRepository {
                                 favoriteVideo.videoId = item.videoId;
                                 addVideoFavorite(favoriteVideo);
                             }
+                        }
+                        if (listener != null) {
+                            listener.onLoadingCompleted(true);
+                        }
+                    }
+                    else {
+                        if (listener != null) {
+                            listener.onLoadingCompleted(false);
                         }
                     }
                 });

@@ -77,6 +77,11 @@ public interface ZypeDao {
             "ORDER BY playlist_video.number")
     public List<Video> getPlaylistVideosSync(String playlistId);
 
+    @Query("SELECT * FROM video " +
+            "WHERE video.is_favorite = 1 " +
+            "ORDER BY video.updated_at DESC")
+    public List<Video> getFavoriteVideosSync();
+
     /*
      * Insert (or update) a list of videos into the playlist
      */

@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Auth.AuthLiveData;
+import com.zype.android.DataRepository;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;
@@ -496,6 +497,8 @@ public class LoginActivity extends BaseActivity {
         SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, data.getConsumerData().getEmail());
 
         AuthHelper.onLoginStateChanged();
+
+        DataRepository.getInstance(this.getApplication()).loadVideoFavorites(null);
 
         setResult(RESULT_OK);
         finish();

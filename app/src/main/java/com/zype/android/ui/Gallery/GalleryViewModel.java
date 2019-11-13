@@ -99,7 +99,12 @@ public class GalleryViewModel extends AndroidViewModel {
         if (galleryRows == null) {
             galleryRows = new MutableLiveData<>();
         }
-        loadRootPlaylists();
+        if (galleryRowsState != UPDATED) {
+            loadRootPlaylists();
+        }
+        else {
+            galleryRows.setValue(galleryRows.getValue());
+        }
         return galleryRows;
     }
 
@@ -185,7 +190,7 @@ public class GalleryViewModel extends AndroidViewModel {
                             result.add(DbHelper.playlistApiToEntity(item));
                         }
                     }
-                    if (playlistsResponse.pagination.current == playlistsResponse.pagination.pages) {
+                    if (playlistsResponse.pagination.current >= playlistsResponse.pagination.pages) {
                         repo.insertPlaylists(result);
                         createGalleryRows();
                         Logger.d("loadRootPlaylists(): size=" + result.size());
@@ -231,7 +236,7 @@ public class GalleryViewModel extends AndroidViewModel {
                     }
                     repo.insertPlaylists(result);
                     row.nestedPlaylists = repo.getPlaylistsSync(row.playlist.id);
-                    if (playlistsResponse.pagination.current == playlistsResponse.pagination.pages) {
+                    if (playlistsResponse.pagination.current >= playlistsResponse.pagination.pages) {
                         row.pageToLoad = -1;
                         row.state = UPDATED;
                     }
@@ -283,7 +288,7 @@ public class GalleryViewModel extends AndroidViewModel {
                     }
                     repo.insertPlaylistVideos(result, row.playlist);
                     row.videos = repo.getPlaylistVideosSync(row.playlist.id);
-                    if (videosResponse.pagination.current == videosResponse.pagination.pages) {
+                    if (videosResponse.pagination.current >= videosResponse.pagination.pages) {
                         row.pageToLoad = -1;
                         row.state = UPDATED;
                     }
