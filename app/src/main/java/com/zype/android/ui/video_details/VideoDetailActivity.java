@@ -77,7 +77,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     VideoDetailViewModel videoDetailViewModel;
     PlayerViewModel playerViewModel;
 
-    Observer<String> playerErrorObserver = null;
+    Observer<PlayerViewModel.Error> playerErrorObserver = null;
     Observer<String> playerUrlObserver = null;
 
     public static void startActivity(Activity activity, String videoId, String playlistId) {
@@ -424,12 +424,12 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         }
     }
 
-    private Observer<String> createPlayerErrorObserver() {
-        return errorMessage -> {
-            Logger.e("onPlayerError()::onChanged(): message=" + errorMessage);
+    private Observer<PlayerViewModel.Error> createPlayerErrorObserver() {
+        return error -> {
+            Logger.e("onPlayerError()::onChanged(): message=" + error);
             hideProgress();
             showVideoThumbnail();
-            DialogHelper.showErrorAlert(this, errorMessage, () -> finish());
+            DialogHelper.showErrorAlert(this, error.message, () -> finish());
         };
     }
 

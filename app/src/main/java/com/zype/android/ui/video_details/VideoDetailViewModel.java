@@ -87,9 +87,17 @@ public class VideoDetailViewModel extends AndroidViewModel {
         return this;
     }
 
+    public String getVideoId() {
+        return videoId;
+    }
+
     public VideoDetailViewModel setPlaylistId(String playlistId) {
         this.playlistId = playlistId;
         return this;
+    }
+
+    public String getPlaylistId() {
+        return playlistId;
     }
 
     private void initVideo() {
