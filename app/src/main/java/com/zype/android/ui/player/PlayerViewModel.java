@@ -4,23 +4,18 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.net.Uri;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.android.exoplayer.TimeRange;
 import com.google.android.exoplayer.chunk.Format;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
@@ -33,19 +28,13 @@ import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.PlaylistHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.builder.ParamsBuilder;
-import com.zype.android.webapi.builder.PlayerParamsBuilder;
-import com.zype.android.webapi.events.player.PlayerAudioEvent;
-import com.zype.android.webapi.model.player.File;
 import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
-import com.zype.android.zypeapi.ZypeApiResponse;
 import com.zype.android.zypeapi.model.Advertising;
 import com.zype.android.zypeapi.model.Analytics;
 import com.zype.android.zypeapi.model.PlayerResponse;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -57,7 +46,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private MutableLiveData<PlayerMode> playerMode;
     private MutableLiveData<String> playerUrl;
     private MutableLiveData<Integer> playbackState = new MutableLiveData<>();
-    private MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private MutableLiveData<Error> error = new MutableLiveData<>();
 
     private String videoId;
     private String playlistId;
@@ -74,6 +63,21 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     public enum PlayerMode {
         AUDIO,
         VIDEO
+    }
+
+    public enum ErrorType {
+        LOCKED,
+        UNKNOWN
+    }
+
+    public static class Error {
+        public ErrorType type;
+        public String message;
+
+        public Error(ErrorType type, String message) {
+            this.type = type;
+            this.message = message;
+        }
     }
 
     DataRepository repo;
@@ -381,11 +385,11 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     // Error
 
-    public LiveData<String> onPlayerError() {
-        if (errorMessage == null) {
-            errorMessage = new MutableLiveData<>();
+    public LiveData<Error> onPlayerError() {
+        if (error == null) {
+            error = new MutableLiveData<>();
         }
-        return errorMessage;
+        return error;
     }
 
     //
@@ -453,15 +457,17 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 }
             }
             else {
-                if (playerResponse != null) {
-//                        errorMessage.setValue(playerResponse.message);
+                if (response.errorBody != null && response.errorBody.status == 403) {
+                    error.setValue(new Error(ErrorType.LOCKED, ""));
                 }
                 else {
                     if (!isVideoDownloaded()) {
                         if (WebApiManager.isHaveActiveNetworkConnection(getApplication())) {
-                            errorMessage.setValue(getApplication().getString(R.string.video_error_bad_request));
+                            error.setValue(new Error(ErrorType.UNKNOWN,
+                                    getApplication().getString(R.string.video_error_bad_request)));
                         } else {
-                            errorMessage.setValue(getApplication().getString(R.string.error_internet_connection));
+                            error.setValue(new Error(ErrorType.UNKNOWN,
+                                    getApplication().getString(R.string.error_internet_connection)));
                         }
                     }
                 }

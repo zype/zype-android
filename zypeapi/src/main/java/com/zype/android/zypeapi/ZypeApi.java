@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.zype.android.zypeapi.model.ErrorBody;
 import com.zype.android.zypeapi.model.PlayerResponse;
 import com.zype.android.zypeapi.model.PlaylistsResponse;
 import com.zype.android.zypeapi.model.VideoFavoriteResponse;
@@ -419,6 +421,20 @@ public class ZypeApi {
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
                 if (response.isSuccessful()) {
                     listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                }
+                else {
+                    try {
+                        String error = response.errorBody().string();
+                        Gson gson = new Gson();
+                        ErrorBody errorBody = gson.fromJson(error, ErrorBody.class);
+                        errorBody.status = response.code();
+                        listener.onCompleted(new ZypeApiResponse<PlayerResponse>(errorBody));
+                    }
+                    catch (Exception e) {
+                        ErrorBody errorBody = new ErrorBody();
+                        errorBody.status = response.code();
+                        listener.onCompleted(new ZypeApiResponse<PlayerResponse>(errorBody));
+                    }
                 }
             }
 

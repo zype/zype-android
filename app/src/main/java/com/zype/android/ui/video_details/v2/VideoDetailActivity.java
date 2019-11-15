@@ -36,6 +36,7 @@ import com.zype.android.service.DownloadHelper;
 import com.zype.android.ui.Auth.LoginActivity;
 import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.Helpers.IPlaylistVideos;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerViewModel;
@@ -76,7 +77,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
     private VideoDetailViewModel model;
     private PlayerViewModel playerViewModel;
 
-    Observer<String> playerErrorObserver = null;
+    Observer<PlayerViewModel.Error> playerErrorObserver = null;
 
     private FrameLayout layoutPlayer;
     private ProgressBar progressPlayer;
@@ -105,7 +106,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         Logger.d("onNewIntent()");
 
         if (!playerViewModel.isInBackground()) {
-//            initialize(intent);
+            initialize(intent);
         }
     }
 
@@ -132,14 +133,11 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         model = ViewModelProviders.of(this).get(VideoDetailViewModel.class)
                 .setVideoId(videoId)
                 .setPlaylistId(playlistId);
-        model.getVideo().observe(this, new Observer<Video>() {
-            @Override
-            public void onChanged(@Nullable Video video) {
-                if (video != null) {
-                    getSupportActionBar().setTitle(video.title);
-                    playerViewModel.init(video.id, playlistId, PlayerViewModel.PlayerMode.VIDEO);
-                    showPlayerFragment();
-                }
+        model.getVideo().observe(this, video -> {
+            if (video != null) {
+                getSupportActionBar().setTitle(video.title);
+                playerViewModel.init(video.id, playlistId, PlayerViewModel.PlayerMode.VIDEO);
+                showPlayerFragment();
             }
         });
 
@@ -201,23 +199,49 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
             layoutSummary.setVisibility(GONE);
         }
         else {
-            FragmentManager fm = getSupportFragmentManager();
-            Fragment fragment = SummaryFragment.newInstance(videoId);
-            fm.beginTransaction().replace(R.id.layoutSummary, fragment, "SummaryFragment").commit();
             pagerSections.setVisibility(GONE);
             tabs.setVisibility(GONE);
             layoutSummary.setVisibility(View.VISIBLE);
+            FragmentManager fm = getSupportFragmentManager();
+            Fragment fragment = SummaryFragment.newInstance();
+            fm.beginTransaction().replace(R.id.layoutSummary, fragment, SummaryFragment.TAG).commit();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case BundleConstants.REQUEST_SUBSCRIBE_OR_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    model.setVideoId(model.getVideoId());
+                }
+                else {
+
+                }
+                return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     // View model observers
 
-    private Observer<String> createPlayerErrorObserver() {
-        return errorMessage -> {
-            Logger.e("onPlayerError()::onChanged(): message=" + errorMessage);
+    private Observer<PlayerViewModel.Error> createPlayerErrorObserver() {
+        return error -> {
+            if (error == null) {
+                return;
+            }
+            Logger.e("onPlayerError()::onChanged(): type=" + error.type + ", message=" + error.message);
             hideProgress();
+            switch (error.type) {
+                case LOCKED:
+                    NavigationHelper.getInstance(VideoDetailActivity.this)
+                            .handleUnauthorizedVideo(VideoDetailActivity.this, model.getVideoSync(), model.getPlaylistId());
+                    break;
+                case UNKNOWN:
+                    DialogHelper.showErrorAlert(this, error.message, () -> finish());
+                    break;
+            }
 //            showVideoThumbnail();
-            DialogHelper.showErrorAlert(this, errorMessage, () -> finish());
         };
     }
 
@@ -228,8 +252,8 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         if (fullscreen) {
             hideSystemUI();
             findViewById(R.id.layoutRoot).setFitsSystemWindows(false);
-            tabs.setVisibility(View.GONE);
-            pagerSections.setVisibility(View.GONE);
+            tabs.setVisibility(GONE);
+            pagerSections.setVisibility(GONE);
             getSupportActionBar().hide();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             layoutPlayer.setLayoutParams(params);
@@ -238,8 +262,10 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         else {
             showSystemUI();
             findViewById(R.id.layoutRoot).setFitsSystemWindows(true);
-            tabs.setVisibility(View.VISIBLE);
-            pagerSections.setVisibility(View.VISIBLE);
+            if (hasOptions(model.getVideo().getValue().id)) {
+                tabs.setVisibility(View.VISIBLE);
+                pagerSections.setVisibility(View.VISIBLE);
+            }
             getSupportActionBar().show();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             params.height = (int) getResources().getDimension(R.dimen.episode_video_height);
