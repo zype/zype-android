@@ -27,12 +27,14 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.request.target.BaseTarget;
@@ -51,6 +53,7 @@ import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Format;
@@ -80,6 +83,7 @@ import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.receiver.PhoneCallReceiver;
 import com.zype.android.receiver.RemoteControlReceiver;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.dialog.ErrorDialogFragment;
 import com.zype.android.ui.player.PlayerViewModel;
 import com.zype.android.ui.player.SensorViewModel;
@@ -121,8 +125,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
     private Observer<String> playerUrlObserver;
     private Observer<PlayerViewModel.PlayerMode> playerModeObserver;
+    private Observer<PlayerViewModel.Error> playerErrorObserver;
 
     private PlayerView playerView;
+    private ImageView imageThumbnail;
     private ImageButton buttonFullscreen;
     private ImageButton buttonNext;
     private ImageButton buttonPrevious;
@@ -201,6 +207,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
 
         playerView = rootView.findViewById(R.id.player_view);
+        imageThumbnail = rootView.findViewById(R.id.imageThumbnail);
 
         buttonFullscreen = playerView.findViewById(R.id.exo_fullscreen);
         buttonFullscreen.setOnClickListener(view -> {
@@ -253,13 +260,19 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             playerModeObserver = createPlayerModeObserver();
         if (playerUrlObserver == null)
             playerUrlObserver = createPlayerUrlObserver();
+        if (playerErrorObserver == null)
+            playerErrorObserver = createPlayerErrorObserver();
 
         playerViewModel.getPlayerMode().observe(this, playerModeObserver);
         playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
+        playerViewModel.onPlayerError().observe(this, playerErrorObserver);
 
         videoViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
         videoViewModel.getVideo().observe(this, video -> {
             thumbnail = VideoHelper.getThumbnailByHeight(video, 480);
+            if (thumbnail != null) {
+                UiUtils.loadImage(thumbnail.getUrl(), R.drawable.placeholder_video, imageThumbnail);
+            }
             initProgress(video);
         });
         videoViewModel.isFullscreen().observe(this, fullscreen -> {
@@ -403,6 +416,20 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     startAds();
                 }
                 updateNextPreviousButtons();
+            }
+        };
+    }
+
+    private Observer<PlayerViewModel.Error> createPlayerErrorObserver() {
+        return error -> {
+            if (error == null) {
+                return;
+            }
+            switch (error.type) {
+                case LOCKED:
+//                    playerView.setUseArtwork(true);
+//                    showThumbnail();
+                    break;
             }
         };
     }
@@ -584,6 +611,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             player.addListener(new PlayerEventListener());
 
             playerView.setPlayer(player);
+            playerView.setControlDispatcher(new PlayerControlDispatcher());
         }
 
         if (isPlayerControlsEnabled()) {
@@ -605,11 +633,28 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         }
     }
 
+    private class PlayerControlDispatcher extends DefaultControlDispatcher {
+        @Override
+        public boolean dispatchSetPlayWhenReady(Player player, boolean playWhenReady) {
+            if (playerViewModel.getPlaybackState() != null) {
+                if (playerViewModel.getPlaybackState().getValue() == Player.STATE_IDLE) {
+                    NavigationHelper.getInstance(getActivity())
+                            .handleUnauthorizedVideo(getActivity(), videoViewModel.getVideoSync(), videoViewModel.getPlaylistId());
+                }
+            }
+            return super.dispatchSetPlayWhenReady(player, playWhenReady);
+        }
+    }
+
     private class PlayerEventListener implements Player.EventListener {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             Logger.d("onPlayerStateChanged(): playWhenReady=" + playWhenReady + ", playbackState=" + playbackState);
+            imageThumbnail.setVisibility(GONE);
             switch (playbackState) {
+                case Player.STATE_IDLE:
+                    imageThumbnail.setVisibility(VISIBLE);
+                    break;
                 case Player.STATE_READY: {
                     mediaSession.setActive(true);
                     if (player != null) {
@@ -644,6 +689,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         @Override
         public void onPlayerError(ExoPlaybackException e) {
+            Log.e(TAG, "onPlayerError(): " + e.getMessage());
         }
 
         @Override
