@@ -199,12 +199,12 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
             layoutSummary.setVisibility(GONE);
         }
         else {
-            FragmentManager fm = getSupportFragmentManager();
-            Fragment fragment = SummaryFragment.newInstance(videoId);
-            fm.beginTransaction().replace(R.id.layoutSummary, fragment, "SummaryFragment").commit();
             pagerSections.setVisibility(GONE);
             tabs.setVisibility(GONE);
             layoutSummary.setVisibility(View.VISIBLE);
+            FragmentManager fm = getSupportFragmentManager();
+            Fragment fragment = SummaryFragment.newInstance();
+            fm.beginTransaction().replace(R.id.layoutSummary, fragment, SummaryFragment.TAG).commit();
         }
     }
 
@@ -252,8 +252,8 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         if (fullscreen) {
             hideSystemUI();
             findViewById(R.id.layoutRoot).setFitsSystemWindows(false);
-            tabs.setVisibility(View.GONE);
-            pagerSections.setVisibility(View.GONE);
+            tabs.setVisibility(GONE);
+            pagerSections.setVisibility(GONE);
             getSupportActionBar().hide();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             layoutPlayer.setLayoutParams(params);
@@ -262,8 +262,10 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         else {
             showSystemUI();
             findViewById(R.id.layoutRoot).setFitsSystemWindows(true);
-            tabs.setVisibility(View.VISIBLE);
-            pagerSections.setVisibility(View.VISIBLE);
+            if (hasOptions(model.getVideo().getValue().id)) {
+                tabs.setVisibility(View.VISIBLE);
+                pagerSections.setVisibility(View.VISIBLE);
+            }
             getSupportActionBar().show();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             params.height = (int) getResources().getDimension(R.dimen.episode_video_height);

@@ -1,6 +1,7 @@
 package com.zype.android.ui.video_details;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -31,10 +32,10 @@ public class VideoDetailPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
-    public BaseFragment getItem(int position) {
+    public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return SummaryFragment.newInstance(videoId);
+                return SummaryFragment.newInstance();
             case 1:
                 return OptionsFragment.newInstance(videoId);
             default:
