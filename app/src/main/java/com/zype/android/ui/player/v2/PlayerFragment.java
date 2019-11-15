@@ -620,14 +620,16 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     break;
                 }
                 case Player.STATE_ENDED: {
-                    AnalyticsManager.getInstance().trackStop();
+                    if (playerViewModel.getPlaybackState().getValue() != playbackState) {
+                        AnalyticsManager.getInstance().trackStop();
 
-                    playerViewModel.savePlaybackPosition(0);
-                    playerViewModel.onPlaybackFinished();
+                        playerViewModel.savePlaybackPosition(0);
+                        playerViewModel.onPlaybackFinished();
 
-                    if (ZypeConfiguration.autoplayEnabled(getActivity())
-                            && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
-                        onNext();
+                        if (ZypeConfiguration.autoplayEnabled(getActivity())
+                                && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
+                            onNext();
+                        }
                     }
                     break;
                 }
