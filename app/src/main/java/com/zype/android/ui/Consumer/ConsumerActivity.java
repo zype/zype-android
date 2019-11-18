@@ -172,6 +172,7 @@ public class ConsumerActivity extends BaseActivity {
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     setResult(RESULT_OK);
+                    NavigationHelper.getInstance(this).switchToSubscriptionScreen(this, null);
                     finish();
                 }
                 break;

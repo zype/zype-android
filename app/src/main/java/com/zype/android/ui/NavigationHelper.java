@@ -163,7 +163,9 @@ public class NavigationHelper {
 
     public void switchToSubscriptionScreen(Activity activity, Bundle extras) {
         Intent intent = new Intent(activity, SubscriptionActivity.class);
-        intent.putExtras(extras);
+        if (extras !=null){
+            intent.putExtras(extras);
+        }
         activity.startActivityForResult(intent, BundleConstants.REQUEST_SUBSCRIPTION);
     }
 
