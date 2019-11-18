@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.zype.android.zypeapi.model.MarketplaceIds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,10 @@ public class PlaylistData {
     @Expose
     private String updatedAt;
 
+    @SerializedName("marketplace_ids")
+    @Expose
+    public MarketplaceIds marketplaceIds;
+
     @SerializedName("parent_id")
     @Expose
     private String parentId;
@@ -57,6 +62,14 @@ public class PlaylistData {
     @SerializedName("playlist_item_count")
     @Expose
     private int playlistItemCount;
+
+    @SerializedName("purchase_price")
+    @Expose
+    public String purchasePrice;
+
+    @SerializedName("purchase_required")
+    @Expose
+    public boolean purchaseRequired;
 
     @SerializedName("thumbnail_layout")
     @Expose

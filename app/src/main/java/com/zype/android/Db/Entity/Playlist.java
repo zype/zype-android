@@ -32,6 +32,9 @@ public class Playlist implements PlaylistItem {
     @ColumnInfo(name = "images")
     public String images;
 
+    @ColumnInfo(name = "marketplace_ids")
+    public String marketplaceIds;
+
     @ColumnInfo(name = "thumbnail_layout")
     public String thumbnailLayout;
 
@@ -43,6 +46,13 @@ public class Playlist implements PlaylistItem {
 
     @ColumnInfo(name = "priority")
     public Integer priority;
+
+    @ColumnInfo(name = "purchase_price")
+    public String purchasePrice;
+
+    @ColumnInfo(name = "purchase_required")
+    @NonNull
+    public Integer purchaseRequired;
 
     @ColumnInfo(name = "thumbnails")
     public String thumbnails;

@@ -56,9 +56,12 @@ public class DbHelper {
         entity.createdAt = data.createdAt;
         entity.deletedAt = data.deletedAt;
         entity.images = new Gson().toJson(data.images);
+        entity.marketplaceIds = new Gson().toJson(data.marketplaceIds);
         entity.parentId = data.parentId;
         entity.playlistItemCount = data.playlistItemCount;
         entity.priority = data.priority;
+        entity.purchasePrice = data.purchasePrice;
+        entity.purchaseRequired = data.purchaseRequired ? 1 : 0;
         entity.thumbnails = new Gson().toJson(data.thumbnails);
         entity.thumbnailLayout = data.thumbnailLayout;
         entity.title = data.title;
@@ -75,6 +78,9 @@ public class DbHelper {
             playlistEntity.createdAt = item.getCreatedAt();
             playlistEntity.deletedAt = item.getDeletedAt();
             playlistEntity.images = new Gson().toJson(item.getImages());
+            playlistEntity.marketplaceIds = new Gson().toJson(item.marketplaceIds);
+            playlistEntity.purchasePrice = item.purchasePrice;
+            playlistEntity.purchaseRequired = item.purchaseRequired ? 1 : 0;
             playlistEntity.parentId = item.getParentId();
             playlistEntity.playlistItemCount = item.getPlaylistItemCount();
             playlistEntity.priority = item.getPriority();
