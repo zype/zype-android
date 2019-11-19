@@ -1,6 +1,8 @@
 package com.zype.android.ui.monetization;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,8 @@ import com.zype.android.ui.NavigationHelper;
 
 public class PaywallPlaylistTvodFragment extends Fragment {
     public static final String TAG = PaywallPlaylistTvodFragment.class.getSimpleName();
+
+    private PaywallViewModel model;
 
     public PaywallPlaylistTvodFragment() {}
 
@@ -36,7 +40,7 @@ public class PaywallPlaylistTvodFragment extends Fragment {
         Button buttonBuyPlaylist = rootView.findViewById(R.id.buttonBuyPlaylist);
         buttonBuyPlaylist.setOnClickListener(v -> {
             if (AuthHelper.isLoggedIn()) {
-                navigationHelper.switchToPurchaseScreen(getActivity(), getActivity().getIntent().getExtras());
+                model.makePurchase(getActivity());
             }
             else {
                 navigationHelper.switchToConsumerScreen(getActivity());
@@ -50,4 +54,10 @@ public class PaywallPlaylistTvodFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        model = ViewModelProviders.of(getActivity()).get(PaywallViewModel.class);
+    }
 }

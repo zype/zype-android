@@ -26,6 +26,7 @@ import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
 import com.zype.android.ui.monetization.PaywallActivity;
+import com.zype.android.ui.monetization.PaywallType;
 import com.zype.android.ui.v2.search.SearchActivity;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.utils.BundleConstants;
@@ -35,8 +36,7 @@ import com.zype.android.utils.Logger;
 import java.util.List;
 
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
-import static com.zype.android.ui.monetization.PaywallActivity.EXTRA_PAYWALL;
-import static com.zype.android.ui.monetization.PaywallActivity.VALUE_PAYWALL_PLAYLIST_TVOD;
+import static com.zype.android.ui.monetization.PaywallActivity.EXTRA_PAYWALL_TYPE;
 
 /**
  * Created by Evgeny Cherkasov on 11.07.2017.
@@ -251,7 +251,7 @@ public class NavigationHelper {
 
             if (playlist.purchaseRequired == 1) {
                 if (ZypeConfiguration.isNativeTvodEnabled(activity)) {
-                    extras.putString(EXTRA_PAYWALL, VALUE_PAYWALL_PLAYLIST_TVOD);
+                    extras.putSerializable(EXTRA_PAYWALL_TYPE, PaywallType.PLAYLIST_TVOD);
                     switchToPaywallScreen(activity, extras);
                 }
             }
