@@ -46,6 +46,10 @@ public class PaywallViewModel extends BaseViewModel {
         this.playlistId = playlistId;
     }
 
+    public Playlist getPlaylist() {
+        return repo.getPlaylistSync(playlistId);
+    }
+
     public LiveData<Boolean> isPurchased() {
         return isPurchased;
     }

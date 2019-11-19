@@ -1,15 +1,20 @@
 package com.zype.android.ui.monetization;
 
+import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.zype.android.R;
+import com.zype.android.ZypeApp;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.Subscription.SubscriptionHelper;
 import com.zype.android.utils.BundleConstants;
+import com.zype.android.utils.DialogHelper;
 
 import static com.zype.android.utils.BundleConstants.REQUEST_CONSUMER;
 import static com.zype.android.utils.BundleConstants.REQUEST_LOGIN;
@@ -21,6 +26,8 @@ public class PaywallActivity extends AppCompatActivity {
     public static final String EXTRA_PAYWALL_TYPE = "PaywallType";
 
     private PaywallViewModel model;
+
+    private ProgressDialog dialogProgress;
 
     private final NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
 
@@ -37,8 +44,21 @@ public class PaywallActivity extends AppCompatActivity {
         model.setPlaylistId(getIntent().getStringExtra(BundleConstants.PLAYLIST_ID));
 
         model.isPurchased().observe(this, isPurchased -> {
-            if (isPurchased)
-                openVideo();
+            if (isPurchased) {
+                showProgress(getString(R.string.paywall_verifying_purchase));
+                ZypeApp.marketplaceGateway
+                        .verifyPlaylistPurchase(model.getPlaylist()).observe(this, result -> {
+                            hideProgress();
+                            if (result) {
+                                setResult(RESULT_OK);
+                                openVideo();
+                            }
+                            else {
+                                DialogHelper.showErrorAlert(PaywallActivity.this,
+                                        getString(R.string.paywall_error_validation));
+                            }
+                        });
+            }
         });
 
         showFragment(model.getPaywallType());
@@ -53,6 +73,23 @@ public class PaywallActivity extends AppCompatActivity {
                         .replace(R.id.content, fragment, PaywallPlaylistTvodFragment.TAG)
                         .commit();
                 break;
+        }
+    }
+
+    private void showProgress(String message) {
+        if (!isFinishing()) {
+            dialogProgress = new ProgressDialog(this);
+            dialogProgress.setMessage(message);
+            dialogProgress.setCancelable(false);
+            dialogProgress.show();
+        }
+    }
+
+    private void hideProgress() {
+        if (!isFinishing()) {
+            if (dialogProgress != null) {
+                dialogProgress.dismiss();
+            }
         }
     }
 
