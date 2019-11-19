@@ -639,7 +639,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             if (playerViewModel.getPlaybackState() != null) {
                 if (playerViewModel.getPlaybackState().getValue() == Player.STATE_IDLE) {
                     NavigationHelper.getInstance(getActivity())
-                            .handleUnauthorizedVideo(getActivity(), videoViewModel.getVideoSync(), videoViewModel.getPlaylistId());
+                            .handleUnauthorizedVideo(getActivity(),
+                                    videoViewModel.getVideoSync(), videoViewModel.getPlaylistSync());
                 }
             }
             return super.dispatchSetPlayWhenReady(player, playWhenReady);

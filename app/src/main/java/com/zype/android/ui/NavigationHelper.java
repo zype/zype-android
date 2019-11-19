@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.android.billingclient.api.Purchase;
 import com.zype.android.Auth.AuthHelper;
@@ -24,6 +25,7 @@ import com.zype.android.ui.Gallery.GalleryActivity;
 import com.zype.android.ui.Intro.IntroActivity;
 import com.zype.android.ui.Subscription.SubscriptionActivity;
 import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
+import com.zype.android.ui.monetization.PaywallActivity;
 import com.zype.android.ui.v2.search.SearchActivity;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.utils.BundleConstants;
@@ -33,6 +35,8 @@ import com.zype.android.utils.Logger;
 import java.util.List;
 
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
+import static com.zype.android.ui.monetization.PaywallActivity.EXTRA_PAYWALL;
+import static com.zype.android.ui.monetization.PaywallActivity.VALUE_PAYWALL_PLAYLIST_TVOD;
 
 /**
  * Created by Evgeny Cherkasov on 11.07.2017.
@@ -59,47 +63,47 @@ public class NavigationHelper {
         return instance;
     }
 
-    public void checkSubscription(Activity activity, String videoId, String playlistId, boolean onAir) {
-        Bundle extras = new Bundle();
-        extras.putString(BundleConstants.VIDEO_ID, videoId);
-        extras.putString(BundleConstants.PLAYLIST_ID, playlistId);
-        if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
-            if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                switchToSubscriptionScreen(activity, extras);
-            }
-            else {
-                switchToVideoDetailsScreen(activity, videoId, playlistId, false);
-            }
-        }
-        else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
-            if (SettingsProvider.getInstance().isLoggedIn()) {
-                if (SettingsProvider.getInstance().getSubscriptionCount() > 0
-                        || !isLiveStreamLimitExceeded(onAir)) {
-                    switchToVideoDetailsScreen(activity, videoId, playlistId, false);
-                }
-                else {
-                    switchToSubscriptionScreen(activity, extras);
-                }
-            }
-            else {
-                switchToSubscriptionScreen(activity, extras);
-            }
-        }
-        else {
-            if (SettingsProvider.getInstance().isLoggedIn()) {
-                if (SettingsProvider.getInstance().getSubscriptionCount() > 0
-                        || !isLiveStreamLimitExceeded(onAir)) {
-                    switchToVideoDetailsScreen(activity, videoId, playlistId, false);
-                }
-                else {
-                    DialogHelper.showSubscriptionAlertIssue(context);
-                }
-            }
-            else {
-                switchToLoginScreen(activity);
-            }
-        }
-    }
+//    public void checkSubscription(Activity activity, String videoId, String playlistId, boolean onAir) {
+//        Bundle extras = new Bundle();
+//        extras.putString(BundleConstants.VIDEO_ID, videoId);
+//        extras.putString(BundleConstants.PLAYLIST_ID, playlistId);
+//        if (ZypeConfiguration.isNativeSubscriptionEnabled(activity)) {
+//            if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+//                switchToSubscriptionScreen(activity, extras);
+//            }
+//            else {
+//                switchToVideoDetailsScreen(activity, videoId, playlistId, false);
+//            }
+//        }
+//        else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
+//            if (SettingsProvider.getInstance().isLoggedIn()) {
+//                if (SettingsProvider.getInstance().getSubscriptionCount() > 0
+//                        || !isLiveStreamLimitExceeded(onAir)) {
+//                    switchToVideoDetailsScreen(activity, videoId, playlistId, false);
+//                }
+//                else {
+//                    switchToSubscriptionScreen(activity, extras);
+//                }
+//            }
+//            else {
+//                switchToSubscriptionScreen(activity, extras);
+//            }
+//        }
+//        else {
+//            if (SettingsProvider.getInstance().isLoggedIn()) {
+//                if (SettingsProvider.getInstance().getSubscriptionCount() > 0
+//                        || !isLiveStreamLimitExceeded(onAir)) {
+//                    switchToVideoDetailsScreen(activity, videoId, playlistId, false);
+//                }
+//                else {
+//                    DialogHelper.showSubscriptionAlertIssue(context);
+//                }
+//            }
+//            else {
+//                switchToLoginScreen(activity);
+//            }
+//        }
+//    }
 
     private boolean isLiveStreamLimitExceeded(boolean onAir) {
         boolean result = false;
@@ -169,8 +173,8 @@ public class NavigationHelper {
         activity.startActivityForResult(intent, BundleConstants.REQUEST_SUBSCRIPTION);
     }
 
-    public void switchToVideoDetailsScreen(Activity activity, String videoId, String playlistId, boolean autoplay) {
-//        Intent intent = new Intent(activity, VideoDetailActivity.class);
+    public void switchToVideoDetailsScreen(Activity activity,
+                                           String videoId, String playlistId, boolean autoplay) {
         Intent intent = new Intent(activity, com.zype.android.ui.video_details.v2.VideoDetailActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(BundleConstants.VIDEO_ID, videoId);
@@ -210,21 +214,48 @@ public class NavigationHelper {
         activity.startActivityForResult(intent, BundleConstants.REQUEST_SUBSCRIBE_OR_LOGIN);
     }
 
+    public void switchToPaywallScreen(Activity activity, Bundle extras) {
+        Intent intent = new Intent(activity, PaywallActivity.class);
+        intent.putExtras(extras);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_PAYWALL);
+    }
+
+    public void switchToPurchaseScreen(Activity activity, Bundle extras) {
+        Intent intent = new Intent(activity, SubscriptionActivity.class);
+        intent.putExtras(extras);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_PURCHASE);
+    }
+
     // Video
 
     public void handleVideoClick(Activity activity, @NonNull Video video, String playlistId, boolean autoplay) {
+        Playlist playlist = null;
+        if (!TextUtils.isEmpty(playlistId)) {
+            playlist = DataRepository.getInstance(activity.getApplication())
+                    .getPlaylistSync(playlistId);
+        }
+
         if (AuthHelper.isVideoUnlocked(activity, video.id, playlistId)) {
             switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
         }
         else {
-            handleUnauthorizedVideo(activity, video, null);
+            handleUnauthorizedVideo(activity, video, playlist);
         }
     }
 
-    public void handleUnauthorizedVideo(Activity activity, Video video, String playlistId) {
+    public void handleUnauthorizedVideo(Activity activity, Video video, Playlist playlist) {
         Bundle extras = new Bundle();
         extras.putString(BundleConstants.VIDEO_ID, video.id);
-        extras.putString(BundleConstants.PLAYLIST_ID, playlistId);
+        if (playlist != null) {
+            extras.putString(BundleConstants.PLAYLIST_ID, playlist.id);
+
+            if (playlist.purchaseRequired == 1) {
+                if (ZypeConfiguration.isNativeTvodEnabled(activity)) {
+                    extras.putString(EXTRA_PAYWALL, VALUE_PAYWALL_PLAYLIST_TVOD);
+                    switchToPaywallScreen(activity, extras);
+                }
+            }
+        }
 
         if (video.registrationRequired == 1) {
             if (!AuthHelper.isLoggedIn()) {

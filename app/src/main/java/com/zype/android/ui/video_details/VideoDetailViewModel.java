@@ -11,6 +11,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
+import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;
@@ -98,6 +99,15 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
     public String getPlaylistId() {
         return playlistId;
+    }
+
+    public Playlist getPlaylistSync() {
+        if (!TextUtils.isEmpty(playlistId)) {
+            return repo.getPlaylistSync(playlistId);
+        }
+        else {
+            return null;
+        }
     }
 
     private void initVideo() {

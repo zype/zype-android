@@ -235,7 +235,8 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
             switch (error.type) {
                 case LOCKED:
                     NavigationHelper.getInstance(VideoDetailActivity.this)
-                            .handleUnauthorizedVideo(VideoDetailActivity.this, model.getVideoSync(), model.getPlaylistId());
+                            .handleUnauthorizedVideo(VideoDetailActivity.this,
+                                    model.getVideoSync(), model.getPlaylistSync());
                     break;
                 case UNKNOWN:
                     DialogHelper.showErrorAlert(this, error.message, () -> finish());
