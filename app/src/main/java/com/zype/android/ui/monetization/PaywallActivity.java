@@ -43,6 +43,7 @@ public class PaywallActivity extends AppCompatActivity {
         model = ViewModelProviders.of(this).get(PaywallViewModel.class);
         model.setPaywallType((PaywallType) getIntent().getSerializableExtra(EXTRA_PAYWALL_TYPE));
         model.setPlaylistId(getIntent().getStringExtra(BundleConstants.PLAYLIST_ID));
+        model.setVideoId(getIntent().getStringExtra(BundleConstants.VIDEO_ID));
 
         model.isPurchased().observe(this, isPurchased -> {
             if (isPurchased) {
@@ -114,7 +115,7 @@ public class PaywallActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CONSUMER:
                 if (resultCode == RESULT_OK) {
-                    showPurchaseFragment();
+                    model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
                 }
                 else {
                     close();
@@ -122,11 +123,12 @@ public class PaywallActivity extends AppCompatActivity {
                 break;
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
-                    if (SubscriptionHelper.hasSubscription()) {
+                    if (AuthHelper.isVideoUnlocked(PaywallActivity.this,
+                            model.getVideoId(), model.getPlaylistId())) {
                         openVideo();
                     }
                     else {
-                        showPurchaseFragment();
+                        model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
                     }
                 }
                 else {
@@ -147,9 +149,7 @@ public class PaywallActivity extends AppCompatActivity {
 
     private void openVideo() {
         navigationHelper.switchToVideoDetailsScreen(this,
-                getIntent().getExtras().getString(BundleConstants.VIDEO_ID),
-                getIntent().getExtras().getString(BundleConstants.PLAYLIST_ID),
-                false);
+                model.getVideoId(), model.getPlaylistId(), false);
         finish();
     }
 

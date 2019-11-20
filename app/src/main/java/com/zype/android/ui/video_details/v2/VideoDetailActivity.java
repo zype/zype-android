@@ -11,7 +11,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
@@ -23,7 +22,6 @@ import android.widget.ProgressBar;
 import com.google.android.exoplayer2.Player;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
-import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
@@ -34,7 +32,6 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.ui.Auth.LoginActivity;
-import com.zype.android.ui.Helpers.AutoplayHelper;
 import com.zype.android.ui.Helpers.IPlaylistVideos;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseActivity;
@@ -45,22 +42,17 @@ import com.zype.android.ui.video_details.VideoDetailPager;
 import com.zype.android.ui.video_details.VideoDetailPagerAdapter;
 import com.zype.android.ui.video_details.VideoDetailViewModel;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
-import com.zype.android.ui.video_details.fragments.options.Options;
 import com.zype.android.ui.video_details.fragments.summary.SummaryFragment;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
-import com.zype.android.utils.ListUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.FavoriteParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
-import com.zype.android.webapi.events.download.DownloadAudioEvent;
-import com.zype.android.webapi.events.download.DownloadVideoEvent;
 import com.zype.android.webapi.events.favorite.FavoriteEvent;
 import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
-import com.zype.android.webapi.model.player.File;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -235,7 +227,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
             switch (error.type) {
                 case LOCKED:
                     NavigationHelper.getInstance(VideoDetailActivity.this)
-                            .handleUnauthorizedVideo(VideoDetailActivity.this,
+                            .handleLockedVideo(VideoDetailActivity.this,
                                     model.getVideoSync(), model.getPlaylistSync());
                     break;
                 case UNKNOWN:

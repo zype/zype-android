@@ -16,6 +16,7 @@ import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.PurchaseItem;
 import com.zype.android.Db.Entity.Playlist;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.ui.v2.base.BaseViewModel;
 import com.zype.android.zypeapi.model.MarketplaceIds;
 
@@ -33,6 +34,7 @@ public class PaywallViewModel extends BaseViewModel {
 
     private String playlistId;
     private PaywallType paywallType;
+    private String videoId;
 
     private BillingManager billingManager;
 
@@ -67,9 +69,27 @@ public class PaywallViewModel extends BaseViewModel {
         this.playlistId = playlistId;
     }
 
+    public String getPlaylistId() {
+        return playlistId;
+    }
+
     public Playlist getPlaylist() {
         return repo.getPlaylistSync(playlistId);
     }
+
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
+    }
+
+    public String getVideoId() {
+        return videoId;
+    }
+
+    public Video getVideo() {
+        return repo.getVideoSync(videoId);
+    }
+
+    //
 
     public LiveData<Boolean> isPurchased() {
         return isPurchased;

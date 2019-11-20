@@ -239,11 +239,11 @@ public class NavigationHelper {
             switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
         }
         else {
-            handleUnauthorizedVideo(activity, video, playlist);
+            handleLockedVideo(activity, video, playlist);
         }
     }
 
-    public void handleUnauthorizedVideo(Activity activity, Video video, Playlist playlist) {
+    public void handleLockedVideo(Activity activity, Video video, Playlist playlist) {
         Bundle extras = new Bundle();
         extras.putString(BundleConstants.VIDEO_ID, video.id);
         if (playlist != null) {
