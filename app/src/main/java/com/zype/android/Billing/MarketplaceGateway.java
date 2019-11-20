@@ -134,10 +134,10 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
         if (playlistPurchaseVerified == null) {
             playlistPurchaseVerified = new MutableLiveData<>();
         }
-        else {
-            Logger.w("validateSubscription(): Can't verify subscription now.");
-            return null;
-        }
+//        else {
+//            Logger.w("validateSubscription(): Can't verify subscription now.");
+//            return null;
+//        }
 
         MarketplaceIds marketplaceIds = new Gson().fromJson(playlist.marketplaceIds, MarketplaceIds.class);
         final String sku = marketplaceIds.googleplay;
@@ -181,6 +181,9 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
         if (subscriptionVerified != null) {
             subscriptionVerified.setValue(true);
         }
+        if (playlistPurchaseVerified != null) {
+            playlistPurchaseVerified.setValue(true);
+        }
     }
 
     @Subscribe
@@ -191,6 +194,9 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
             if (error != null) {
                 if (subscriptionVerified != null) {
                     subscriptionVerified.setValue(false);
+                }
+                if (playlistPurchaseVerified != null) {
+                    playlistPurchaseVerified.setValue(false);
                 }
             }
         }

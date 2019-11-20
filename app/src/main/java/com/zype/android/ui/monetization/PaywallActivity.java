@@ -65,6 +65,8 @@ public class PaywallActivity extends AppCompatActivity {
 
         model.getState().observe(this, state -> {
             if (state == PaywallViewModel.State.READY_FOR_PURCHASE) {
+                // TODO: REMOVE clearing purchases in the release
+                ZypeApp.marketplaceGateway.getBillingManager().clearPurchases();
                 showPurchaseFragment();
             }
             else if (state == PaywallViewModel.State.SIGN_IN_REQUIRED) {
