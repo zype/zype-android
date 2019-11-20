@@ -67,7 +67,10 @@ public class SummaryFragment extends Fragment {
         return video -> {
             textTitle.setText(video.title);
             if (!TextUtils.isEmpty(video.episode)) {
+                textVideoEpisode.setVisibility(View.VISIBLE);
                 textVideoEpisode.setText(String.format(getActivity().getString(R.string.videos_episode), video.episode));
+            }else{
+                textVideoEpisode.setVisibility(View.GONE);
             }
             textDescription.setText(video.description);
         };
