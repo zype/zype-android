@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ui.NavigationHelper;
@@ -61,10 +62,17 @@ public class PaywallActivity extends AppCompatActivity {
             }
         });
 
-        showFragment(model.getPaywallType());
+        model.getState().observe(this, state -> {
+            if (state == PaywallViewModel.State.READY_FOR_PURCHASE) {
+                showPurchaseFragment();
+            }
+            else if (state == PaywallViewModel.State.SIGN_IN_REQUIRED) {
+                showPaywallFragment(model.getPaywallType());
+            }
+        });
     }
 
-    private void showFragment(PaywallType paywallType) {
+    private void showPaywallFragment(PaywallType paywallType) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         switch (paywallType) {
             case PLAYLIST_TVOD:
@@ -74,6 +82,14 @@ public class PaywallActivity extends AppCompatActivity {
                         .commit();
                 break;
         }
+    }
+
+    private void showPurchaseFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        PurchaseFragment fragment = PurchaseFragment.getInstance();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content, fragment, PurchaseFragment.TAG)
+                .commit();
     }
 
     private void showProgress(String message) {
@@ -98,7 +114,7 @@ public class PaywallActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CONSUMER:
                 if (resultCode == RESULT_OK) {
-                    model.makePurchase(this);
+                    showPurchaseFragment();
                 }
                 else {
                     close();
@@ -110,7 +126,7 @@ public class PaywallActivity extends AppCompatActivity {
                         openVideo();
                     }
                     else {
-                        model.makePurchase(this);
+                        showPurchaseFragment();
                     }
                 }
                 else {

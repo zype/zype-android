@@ -176,7 +176,8 @@ public class BillingManager implements PurchasesUpdatedListener {
     /**
      * Query SKUs available for purchase
      */
-    public void querySkuDetailsAsync(@SkuType final String itemType, final List<String> skuList, final SkuDetailsResponseListener listener) {
+    public void querySkuDetailsAsync(@SkuType final String itemType, final List<String> skuList,
+                                     final SkuDetailsResponseListener listener) {
         // Creating a runnable from the request to use it inside our connection retry policy below
         Runnable queryRequest = new Runnable() {
             @Override

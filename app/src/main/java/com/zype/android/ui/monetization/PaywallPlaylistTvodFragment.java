@@ -40,7 +40,7 @@ public class PaywallPlaylistTvodFragment extends Fragment {
         Button buttonBuyPlaylist = rootView.findViewById(R.id.buttonBuyPlaylist);
         buttonBuyPlaylist.setOnClickListener(v -> {
             if (AuthHelper.isLoggedIn()) {
-                model.makePurchase(getActivity());
+                model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
             }
             else {
                 navigationHelper.switchToConsumerScreen(getActivity());
