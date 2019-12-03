@@ -291,12 +291,17 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             if (holder.item.getMarketplace() != null) {
                 holder.textTitle.setText(holder.item.getMarketplace().getTitle());
                 String periodText = getPeriodText(holder.item.getMarketplace().getSubscriptionPeriod());
+                String price;
                 if (TextUtils.isEmpty(periodText)) {
-                    holder.textPrice.setText(String.valueOf(holder.item.getMarketplace().getPrice()));
+                    price = String.valueOf(holder.item.getMarketplace().getPrice());
                 }
                 else {
-                    holder.textPrice.setText(String.format("%1$s/%2$s", holder.item.getMarketplace().getPrice(), periodText));
+                    price = String.format("%1$s/%2$s", holder.item.getMarketplace().getPrice(), periodText);
                 }
+                if (!TextUtils.isEmpty(holder.item.getMarketplace().getFreeTrialPeriod())) {
+                    price += " (After Free Trial)";
+                }
+                holder.textPrice.setText(price);
                 holder.textDescription.setText(holder.item.getMarketplace().getDescription());
                 holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.getMarketplace().getTitle()));
                 holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
