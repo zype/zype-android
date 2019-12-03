@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -289,7 +290,13 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             holder.item = items.get(position);
             if (holder.item.getMarketplace() != null) {
                 holder.textTitle.setText(holder.item.getMarketplace().getTitle());
-                holder.textPrice.setText(String.valueOf(holder.item.getMarketplace().getPrice()));
+                String periodText = getPeriodText(holder.item.getMarketplace().getSubscriptionPeriod());
+                if (TextUtils.isEmpty(periodText)) {
+                    holder.textPrice.setText(String.valueOf(holder.item.getMarketplace().getPrice()));
+                }
+                else {
+                    holder.textPrice.setText(String.format("%1$s/%2$s", holder.item.getMarketplace().getPrice(), periodText));
+                }
                 holder.textDescription.setText(holder.item.getMarketplace().getDescription());
                 holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.getMarketplace().getTitle()));
                 holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
@@ -322,6 +329,17 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
                 textPrice = view.findViewById(R.id.textPrice);
                 textDescription = view.findViewById(R.id.textDescription);
                 buttonContinue = view.findViewById(R.id.buttonContinue);
+            }
+        }
+
+        private String getPeriodText(String subscriptionPeriod) {
+            switch (subscriptionPeriod) {
+                case "P1M":
+                    return "month";
+                case "P1Y":
+                    return "year";
+                default:
+                    return "";
             }
         }
     }
