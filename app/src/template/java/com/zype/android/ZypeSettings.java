@@ -49,6 +49,8 @@ public class ZypeSettings {
     public static final boolean SHARE_VIDEO_ENABLED = false;
     public static final boolean SHOW_LIVE = false;
 
+    public static final String LIVE_VIDEO_ID = "";
+
     /**
      * Theme of the app.
      * Use following constants for the theme:
