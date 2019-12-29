@@ -12,6 +12,7 @@ import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.gson.Gson;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Db.Entity.Playlist;
+import com.zype.android.ZypeApp;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
@@ -21,6 +22,9 @@ import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 import com.zype.android.webapi.events.plan.PlanEvent;
 import com.zype.android.webapi.model.plan.PlanData;
+import com.zype.android.zypeapi.IZypeApiListener;
+import com.zype.android.zypeapi.ZypeApi;
+import com.zype.android.zypeapi.ZypeApiResponse;
 import com.zype.android.zypeapi.model.MarketplaceIds;
 
 import java.util.ArrayList;
@@ -145,13 +149,33 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
             if (item.getSku().equals(sku)) {
                 Logger.d("purchase originalJson=" + item.getOriginalJson());
                 Logger.d("purchase signature=" + item.getSignature());
-                MarketplaceConnectParamsBuilder builder = new MarketplaceConnectParamsBuilder()
-                        .addConsumerId(SettingsProvider.getInstance().getConsumerId())
-                        .addPlaylistId(playlist.id)
-                        .addPurchaseToken(item.getPurchaseToken())
-                        .addReceipt(item.getOriginalJson())
-                        .addSignature(item.getSignature());
-                api.executeRequest(WebApiManager.Request.MARKETPLACE_CONNECT, builder.build());
+                ZypeApi.getInstance().verifyTvodPurchaseGoogle(
+                        ZypeApp.appData.id,
+                        ZypeApp.appData.siteId,
+                        SettingsProvider.getInstance().getConsumerId(),
+                        playlist.id,
+                        item.getPurchaseToken(),
+                        item.getOriginalJson(),
+                        item.getSignature(),
+                        response -> {
+                            if (response.isSuccessful) {
+                                if (playlistPurchaseVerified != null) {
+                                    playlistPurchaseVerified.setValue(true);
+                                }
+                            }
+                            else {
+                                if (playlistPurchaseVerified != null) {
+                                    playlistPurchaseVerified.setValue(false);
+                                }
+                            }
+                        });
+//                MarketplaceConnectParamsBuilder builder = new MarketplaceConnectParamsBuilder()
+//                        .addConsumerId(SettingsProvider.getInstance().getConsumerId())
+//                        .addPlaylistId(playlist.id)
+//                        .addPurchaseToken(item.getPurchaseToken())
+//                        .addReceipt(item.getOriginalJson())
+//                        .addSignature(item.getSignature());
+//                api.executeRequest(WebApiManager.Request.MARKETPLACE_CONNECT, builder.build());
             }
         }
         return playlistPurchaseVerified;

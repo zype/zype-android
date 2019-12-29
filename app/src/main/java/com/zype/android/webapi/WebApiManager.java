@@ -266,6 +266,7 @@ public class WebApiManager {
                 body.appId = ZypeApp.appData.id;
                 body.consumerId = postParams.get(MarketplaceConnectParamsBuilder.CONSUMER_ID);
                 body.planId = postParams.get(MarketplaceConnectParamsBuilder.PLAN_ID);
+                body.playlistId = postParams.get(MarketplaceConnectParamsBuilder.PLAYLIST_ID);
                 body.purchaseToken = postParams.get(MarketplaceConnectParamsBuilder.PURCHASE_TOKEN);
                 body.siteId = ZypeApp.appData.siteId;
                 MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();

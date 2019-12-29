@@ -6,6 +6,9 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.zype.android.zypeapi.model.ErrorBody;
+import com.zype.android.zypeapi.model.MarketplaceConnectBody;
+import com.zype.android.zypeapi.model.MarketplaceConnectBodyData;
+import com.zype.android.zypeapi.model.MarketplaceConnectResponse;
 import com.zype.android.zypeapi.model.PlayerResponse;
 import com.zype.android.zypeapi.model.PlaylistsResponse;
 import com.zype.android.zypeapi.model.VideoEntitlementsResponse;
@@ -399,6 +402,35 @@ public class ZypeApi {
 //            return null;
 //        }
 //    }
+
+    // Marketplace connect
+
+    public void verifyTvodPurchaseGoogle(String appId, String siteId, String consumerId,
+                                         String playlistId, String purchaseToken,
+                                         String receipt, String signature,
+                                         @NonNull final IZypeApiListener listener) {
+        MarketplaceConnectBody body = new MarketplaceConnectBody();
+        body.appId = appId;
+        body.consumerId = consumerId;
+        body.playlistId = playlistId;
+        body.purchaseToken = purchaseToken;
+        body.siteId = siteId;
+        MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
+        bodyData.receipt = receipt;
+        bodyData.signature = signature;
+        body.data = bodyData;
+        getApi().verifyTvodPurchaseGoogle(body).enqueue(new Callback<MarketplaceConnectResponse>() {
+            @Override
+            public void onResponse(Call<MarketplaceConnectResponse> call, Response<MarketplaceConnectResponse> response) {
+                listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+            }
+
+            @Override
+            public void onFailure(Call<MarketplaceConnectResponse> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse<PlaylistsResponse>(null, false));
+            }
+        });
+    }
 
     // Player
 
