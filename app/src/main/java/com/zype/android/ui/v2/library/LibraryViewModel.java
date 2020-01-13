@@ -3,8 +3,11 @@ package com.zype.android.ui.v2.library;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
+import android.util.Log;
 
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Auth.AuthLiveData;
 import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
@@ -27,8 +30,23 @@ import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_UNFAVORITE
  * Created by Evgeny Cherkasov on 11.01.2020.
  */
 public class LibraryViewModel extends VideosViewModel {
+    private static final String TAG = LibraryViewModel.class.getSimpleName();
+
+    Observer<Boolean> observerLoggedIn;
+
     public LibraryViewModel(Application application) {
         super(application);
+        observerLoggedIn = isLoggedIn -> {
+            Log.d(TAG, "observerLoggedIn: " + isLoggedIn);
+            retrieveVideos(isLoggedIn);
+        };
+        AuthHelper.onLoggedIn(observerLoggedIn);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        AuthLiveData.getInstance().removeObserver(observerLoggedIn);
     }
 
     protected void retrieveVideos(boolean forceLoad) {

@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
@@ -83,6 +84,7 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
                 @Override
                 public void onClick(View v) {
                     mOnLoginListener.onLogout();
+                    AuthHelper.onLoginStateChanged();
                     initSignInButton();
                 }
             });

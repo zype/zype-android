@@ -28,6 +28,7 @@ public abstract class VideosViewModel extends BaseViewModel {
     }
 
     public LiveData<StatefulData<List<Video>>> getVideos() {
+        videos.setValue(new StatefulData<>(null, null, DataState.LOADING));
         retrieveVideos(true);
         return videos;
     }

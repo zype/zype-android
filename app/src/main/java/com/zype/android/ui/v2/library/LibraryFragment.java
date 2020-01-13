@@ -1,5 +1,6 @@
 package com.zype.android.ui.v2.library;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,10 +13,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ui.NavigationHelper;
+import com.zype.android.ui.v2.base.StatefulData;
 import com.zype.android.ui.v2.videos.VideosAdapter;
 import com.zype.android.utils.Logger;
+
+import java.util.List;
 
 /**
  * Created by Evgeny Cherkasov on 12.03.2018.
@@ -25,6 +30,7 @@ public class LibraryFragment extends Fragment {
     private static final String TAG = LibraryFragment.class.getSimpleName();
 
     private LibraryViewModel model;
+    private Observer<StatefulData<List<Video>>> observerVideos;
 
     private VideosAdapter adapter;
 
@@ -44,6 +50,7 @@ public class LibraryFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        observerVideos = createVideosObserver();
     }
 
     @Override
@@ -58,6 +65,7 @@ public class LibraryFragment extends Fragment {
         layoutSignedOut = rootView.findViewById(R.id.layoutSignedOut);
 
         progressBar = rootView.findViewById(R.id.progress);
+        showProgress();
 
         return rootView;
     }
@@ -73,33 +81,8 @@ public class LibraryFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        model = ViewModelProviders.of(getActivity()).get(LibraryViewModel.class);
-
-        showProgress();
-        model.getVideos().observe(this, videos -> {
-            if (videos == null) {
-                return;
-            }
-            hideProgress();
-            if (!AuthHelper.isLoggedIn()) {
-                showSignedOout();
-                return;
-            }
-            if (videos.data == null) {
-                Logger.e("getVideos(): videos list is mull");
-                showEmpty(true);
-            }
-            else {
-                Logger.d("getVideos(): size=" + videos.data.size());
-                adapter.setData(videos.data);
-                if (videos.data.size() > 0) {
-                    showEmpty(false);
-                }
-                else {
-                    showEmpty(true);
-                }
-            }
-        });
+        model = ViewModelProviders.of(this).get(LibraryViewModel.class);
+        model.getVideos().observe(this, observerVideos);
 
         adapter.setPopupMenuListener((action, video) -> {
             model.handleVideoAction(action, video, success -> {
@@ -131,6 +114,33 @@ public class LibraryFragment extends Fragment {
             layoutEmpty.setVisibility(View.GONE);
         }
         hideProgress();
+    }
+
+    private Observer<StatefulData<List<Video>>> createVideosObserver() {
+        return videos -> {
+            if (videos == null) {
+                return;
+            }
+            hideProgress();
+            if (!AuthHelper.isLoggedIn()) {
+                showSignedOout();
+                return;
+            }
+            if (videos.data == null) {
+                Logger.e("getVideos(): videos list is mull");
+                showEmpty(true);
+            }
+            else {
+                Logger.d("getVideos(): size=" + videos.data.size());
+                adapter.setData(videos.data);
+                if (videos.data.size() > 0) {
+                    showEmpty(false);
+                }
+                else {
+                    showEmpty(true);
+                }
+            }
+        };
     }
 
     private void showProgress() {

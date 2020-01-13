@@ -190,9 +190,7 @@ public class DataRepository {
     }
 
     public void loadVideoEntitlements(IDataLoading listener) {
-        clearVideoEntitlements();
         String accessToken = AuthHelper.getAccessToken();
-        String consumerId = SettingsProvider.getInstance().getConsumerId();
         final List<VideoEntitlementData> entitlements = new ArrayList<>();
         final IZypeApiListener<VideoEntitlementsResponse> apiListener = new IZypeApiListener<VideoEntitlementsResponse>() {
             @Override
@@ -237,7 +235,7 @@ public class DataRepository {
                 });
             }
             else {
-                video.isFavorite = 1;
+                video.isEntitled = 1;
                 updateVideo(video);
             }
         }

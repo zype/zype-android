@@ -10,7 +10,6 @@ public class ZypeSettings {
     // OAuth credentials
     public static final String CLIENT_ID = "57cc5ab74d238d644523311362c6ccdb4ab4b163c02d703d9d10df1753195912";
 
-//    public static final String CLIENT_SECRET = "06f45687da00bbe3cf51dddc7dbd7a288d1c852cf0b9a6e76e25bb115dcf872c";
     // Playlist
     public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
 
