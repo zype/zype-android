@@ -157,6 +157,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_live)));
         sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
         sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
+        sections.put(R.id.menuNavigationLibrary, new Section(getString(R.string.menu_navigation_library)));
         sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings)));
         adapterSections.setData(sections);
     }
@@ -186,12 +187,19 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 Menu.NONE, R.string.menu_navigation_favorites)
                 .setIcon(R.drawable.baseline_star_rate_black_24);
 
+        // Downloads
         if (ZypeConfiguration.isDownloadsEnabled(this)) {
             bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationDownloads,
                     Menu.NONE, R.string.menu_navigation_downloads)
                     .setIcon(R.drawable.baseline_cloud_download_black_24);
         }
 
+        // Library
+        if (ZypeSettings.LIBRARY_ENABLED) {
+            bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationLibrary,
+                    Menu.NONE, R.string.menu_navigation_library)
+                    .setIcon(R.drawable.baseline_video_library_black_24);
+        }
 
         // Settings
         bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationSettings,
@@ -236,6 +244,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             case R.id.menuNavigationHome:
             case R.id.menuNavigationFavorites:
             case R.id.menuNavigationGuide:
+            case R.id.menuNavigationLibrary:
             case R.id.menuNavigationSettings: {
                 lastSelectedTabId = item.getItemId();
                 Section section = sections.get(item.getItemId());
@@ -248,7 +257,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 return true;
             }
         }
-
         return false;
     }
 

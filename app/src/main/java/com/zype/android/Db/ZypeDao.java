@@ -23,6 +23,7 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
  * Created by Evgeny Cherkasov on 13.06.2018
  */
 
+// TODO: Remove 'public' in method declarations
 @Dao
 public interface ZypeDao {
 
@@ -118,6 +119,16 @@ public interface ZypeDao {
      */
     @Insert(onConflict = REPLACE)
     public void insertVideos(List<Video> videos);
+
+    // Video entitlements
+
+    @Query("SELECT * FROM video " +
+            "WHERE video.IsEntitled = 1 " +
+            "ORDER BY video.updated_at DESC")
+    List<Video> getEntitledVideosSync();
+
+    @Query("UPDATE video SET IsEntitled = 0 WHERE video.IsEntitled = 1")
+    void clearVideoEntitlements();
 
     // Video favorites
 

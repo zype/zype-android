@@ -41,6 +41,7 @@ public class ZypeSettings {
     public static final boolean DOWNLOADS_ENABLED = true;
     public static final boolean DOWNLOADS_ENABLED_FOR_GUESTS = true;
     public static final boolean EPG_ENABLED = false;
+    public static final boolean LIBRARY_ENABLED = true;
     public static final boolean PLAYLIST_GALLERY_VIEW = true;
     public static final boolean PLAYLIST_GALLERY_HERO_IMAGES = true;
     public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = false;
@@ -48,7 +49,7 @@ public class ZypeSettings {
     public static final boolean SHARE_VIDEO_ENABLED = false;
 
     //Live
-    public static final boolean SHOW_LIVE = true;
+    public static final boolean SHOW_LIVE = false;
     public static final String LIVE_VIDEO_ID = "5c8faa013bbf420fc200bc40";
 
     public static final String THEME = ZypeConfiguration.THEME_DARK;

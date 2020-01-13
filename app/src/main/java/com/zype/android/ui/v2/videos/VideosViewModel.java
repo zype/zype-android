@@ -14,6 +14,9 @@ import java.util.List;
 import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_FAVORITE;
 import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_UNFAVORITE;
 
+/**
+ * Created by Evgeny Cherkasov
+ */
 public abstract class VideosViewModel extends BaseViewModel {
 
     private MutableLiveData<StatefulData<List<Video>>> videos;
