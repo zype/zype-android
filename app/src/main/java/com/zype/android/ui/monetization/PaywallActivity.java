@@ -8,12 +8,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.MenuItem;
 
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.Subscription.SubscriptionHelper;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 
@@ -27,6 +28,7 @@ public class PaywallActivity extends AppCompatActivity {
     public static final String EXTRA_PAYWALL_TYPE = "PaywallType";
 
     private PaywallViewModel model;
+    private Observer<Boolean> purchasePlaylistVerificationListener;
 
     private ProgressDialog dialogProgress;
 
@@ -40,39 +42,58 @@ public class PaywallActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setTitle(String.format(getString(R.string.subscribe_or_login_title), getString(R.string.app_name)));
 
+        // TODO: REMOVE clearing purchases in the release
+        ZypeApp.marketplaceGateway.getBillingManager().clearPurchases();
+
         model = ViewModelProviders.of(this).get(PaywallViewModel.class);
         model.setPaywallType((PaywallType) getIntent().getSerializableExtra(EXTRA_PAYWALL_TYPE));
         model.setPlaylistId(getIntent().getStringExtra(BundleConstants.PLAYLIST_ID));
         model.setVideoId(getIntent().getStringExtra(BundleConstants.VIDEO_ID));
 
+        purchasePlaylistVerificationListener = createPurchasePlaylistVerificationListener();
+
         model.isPurchased().observe(this, isPurchased -> {
+            Log.d(TAG, "isPurchased(): " + isPurchased);
             if (isPurchased) {
                 showProgress(getString(R.string.paywall_verifying_purchase));
-                ZypeApp.marketplaceGateway
-                        .verifyPlaylistPurchase(model.getPlaylist()).observe(this, result -> {
-                            hideProgress();
-                            if (result) {
-                                setResult(RESULT_OK);
-                                openVideo();
-                            }
-                            else {
-                                DialogHelper.showErrorAlert(PaywallActivity.this,
-                                        getString(R.string.paywall_error_validation));
-                            }
-                        });
+                ZypeApp.marketplaceGateway.verifyPlaylistPurchase(model.getPlaylist(), model.getSelectedItem())
+                        .observe(this, purchasePlaylistVerificationListener);
             }
         });
 
         model.getState().observe(this, state -> {
+            Log.d(TAG, "getState(): " + state.name());
             if (state == PaywallViewModel.State.READY_FOR_PURCHASE) {
-                // TODO: REMOVE clearing purchases in the release
-                ZypeApp.marketplaceGateway.getBillingManager().clearPurchases();
                 showPurchaseFragment();
             }
             else if (state == PaywallViewModel.State.SIGN_IN_REQUIRED) {
                 showPaywallFragment(model.getPaywallType());
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private Observer<Boolean> createPurchasePlaylistVerificationListener() {
+        return result -> {
+            PaywallActivity.this.hideProgress();
+            if (result) {
+                PaywallActivity.this.setResult(RESULT_OK);
+                PaywallActivity.this.openVideo();
+            } else {
+                DialogHelper.showErrorAlert(PaywallActivity.this,
+                        PaywallActivity.this.getString(R.string.paywall_error_validation));
+            }
+        };
     }
 
     private void showPaywallFragment(PaywallType paywallType) {

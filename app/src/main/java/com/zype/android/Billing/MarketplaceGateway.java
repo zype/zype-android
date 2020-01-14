@@ -134,7 +134,7 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
         return subscriptionVerified;
     }
 
-    public LiveData<Boolean> verifyPlaylistPurchase(@NonNull Playlist playlist) {
+    public LiveData<Boolean> verifyPlaylistPurchase(@NonNull Playlist playlist, PurchaseItem purchaseItem) {
         if (playlistPurchaseVerified == null) {
             playlistPurchaseVerified = new MutableLiveData<>();
         }
@@ -155,6 +155,7 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
                         SettingsProvider.getInstance().getConsumerId(),
                         playlist.id,
                         item.getPurchaseToken(),
+                        String.valueOf(purchaseItem.product.getPriceAmountMicros() / 1000000),
                         item.getOriginalJson(),
                         item.getSignature(),
                         response -> {

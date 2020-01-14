@@ -102,7 +102,7 @@ public interface IZypeApi {
     Call<MarketplaceConnectResponse> verifyPurchaseAmazon(@Body MarketplaceConnectBody body);
 
     @POST("https://mkt.zype.com/v1/googleplay/transactions")
-    Call<MarketplaceConnectResponse> verifyTvodPurchaseGoogle(@Body MarketplaceConnectBody body);
+    Call<ResponseBody> verifyTvodPurchaseGoogle(@Body MarketplaceConnectBody body);
 
     // Playlist
     @GET("/playlists")

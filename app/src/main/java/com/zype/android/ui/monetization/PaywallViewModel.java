@@ -31,6 +31,7 @@ public class PaywallViewModel extends BaseViewModel {
     private MutableLiveData<Boolean> isPurchased = new MutableLiveData<>();
     private MutableLiveData<List<PurchaseItem>> purchaseItems = new MutableLiveData<>();
     private MutableLiveData<State> state = new MutableLiveData<>();
+    private PurchaseItem selectedItem;
 
     private String playlistId;
     private PaywallType paywallType;
@@ -47,13 +48,6 @@ public class PaywallViewModel extends BaseViewModel {
         super(application);
 
         isPurchased.setValue(false);
-        if (AuthHelper.isLoggedIn()) {
-            state.setValue(State.READY_FOR_PURCHASE);
-        }
-        else {
-            state.setValue(State.SIGN_IN_REQUIRED);
-        }
-
         billingManager = new BillingManager(getApplication(), createBillingUpdatesListener());
     }
 
@@ -108,6 +102,10 @@ public class PaywallViewModel extends BaseViewModel {
         this.state.setValue(state);
     }
 
+    public PurchaseItem getSelectedItem() {
+        return selectedItem;
+    }
+
     private void queryPurchaseItems() {
         switch (paywallType) {
             case PLAYLIST_TVOD:
@@ -154,16 +152,22 @@ public class PaywallViewModel extends BaseViewModel {
         return new BillingManager.BillingUpdatesListener() {
             @Override
             public void onBillingClientSetupFinished() {
-
+                Log.d(TAG, "BillingManager::onBillingClientSetupFinished()");
+                if (AuthHelper.isLoggedIn()) {
+                    state.setValue(State.READY_FOR_PURCHASE);
+                }
+                else {
+                    state.setValue(State.SIGN_IN_REQUIRED);
+                }
             }
 
             @Override
             public void onConsumeFinished(String token, int result) {
-
             }
 
             @Override
             public void onPurchasesUpdated(List<Purchase> purchases) {
+                Log.d(TAG, "BillingManager::onPurchasesUpdated(): count=" + purchases.size());
                 if (isItemPurchased(purchases)) {
                     isPurchased.setValue(true);
                 }
@@ -192,6 +196,12 @@ public class PaywallViewModel extends BaseViewModel {
     // Actions
 
     public void makePurchase(Activity activity, PurchaseItem item) {
+        selectedItem = item;
+        if (isPurchased.getValue()) {
+            // Force receipt validation
+            isPurchased.setValue(true);
+            return;
+        }
         if (item.playlist != null) {
             Log.d(TAG, "makePurchase(): playlist, sku=" + item.product.getSku());
             billingManager.initiatePurchaseFlow(activity,

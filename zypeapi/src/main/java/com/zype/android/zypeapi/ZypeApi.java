@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.zype.android.zypeapi.model.ErrorBody;
 import com.zype.android.zypeapi.model.MarketplaceConnectBody;
 import com.zype.android.zypeapi.model.MarketplaceConnectBodyData;
@@ -84,10 +85,13 @@ public class ZypeApi {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(client)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
             apiImpl = retrofit.create(IZypeApi.class);
         }
@@ -406,7 +410,7 @@ public class ZypeApi {
     // Marketplace connect
 
     public void verifyTvodPurchaseGoogle(String appId, String siteId, String consumerId,
-                                         String playlistId, String purchaseToken,
+                                         String playlistId, String purchaseToken, String amount,
                                          String receipt, String signature,
                                          @NonNull final IZypeApiListener listener) {
         MarketplaceConnectBody body = new MarketplaceConnectBody();
@@ -415,18 +419,25 @@ public class ZypeApi {
         body.playlistId = playlistId;
         body.purchaseToken = purchaseToken;
         body.siteId = siteId;
+        body.amount = amount;
+        body.transactionType = "purchase";
         MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
         bodyData.receipt = receipt;
         bodyData.signature = signature;
         body.data = bodyData;
-        getApi().verifyTvodPurchaseGoogle(body).enqueue(new Callback<MarketplaceConnectResponse>() {
+        getApi().verifyTvodPurchaseGoogle(body).enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<MarketplaceConnectResponse> call, Response<MarketplaceConnectResponse> response) {
-                listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                }
+                else {
+                    listener.onCompleted(new ZypeApiResponse<>(response.body(), false));
+                }
             }
 
             @Override
-            public void onFailure(Call<MarketplaceConnectResponse> call, Throwable t) {
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
                 listener.onCompleted(new ZypeApiResponse<PlaylistsResponse>(null, false));
             }
         });
