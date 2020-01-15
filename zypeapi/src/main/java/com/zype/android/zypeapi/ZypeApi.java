@@ -9,7 +9,6 @@ import com.google.gson.GsonBuilder;
 import com.zype.android.zypeapi.model.ErrorBody;
 import com.zype.android.zypeapi.model.MarketplaceConnectBody;
 import com.zype.android.zypeapi.model.MarketplaceConnectBodyData;
-import com.zype.android.zypeapi.model.MarketplaceConnectResponse;
 import com.zype.android.zypeapi.model.PlayerResponse;
 import com.zype.android.zypeapi.model.PlaylistsResponse;
 import com.zype.android.zypeapi.model.VideoEntitlementsResponse;

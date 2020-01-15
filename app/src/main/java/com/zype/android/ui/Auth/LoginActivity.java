@@ -499,6 +499,7 @@ public class LoginActivity extends BaseActivity {
         AuthHelper.onLoginStateChanged();
 
         DataRepository.getInstance(this.getApplication()).loadVideoFavorites(null);
+        DataRepository.getInstance(this.getApplication()).loadVideoEntitlements(null);
 
         setResult(RESULT_OK);
         finish();
