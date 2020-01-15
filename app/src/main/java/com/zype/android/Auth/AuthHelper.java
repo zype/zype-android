@@ -3,8 +3,11 @@ package com.zype.android.Auth;
 import android.app.Application;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
@@ -21,6 +24,7 @@ import java.util.Date;
  */
 
 public class AuthHelper {
+    private static final String TAG = AuthHelper.class.getSimpleName();
 
     public static void onLoggedIn(Observer<Boolean> observer) {
         AuthLiveData.getInstance().observeForever(observer);
@@ -52,13 +56,25 @@ public class AuthHelper {
         return false;
     }
 
-    public static boolean isVideoRequiredAuthorization(Context context, String videoId) {
-        boolean result = false;
-
+    public static boolean isPaywalledVideo(Context context, String videoId, String playlistId) {
         Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
         if (video == null) {
+            Log.e(TAG, "isPaywalledVideo(): Video not found " + videoId);
             return false;
         }
+
+        Playlist playlist = null;
+        if (!TextUtils.isEmpty(playlistId)) {
+            playlist = DataRepository.getInstance((Application) context.getApplicationContext())
+                    .getPlaylistSync(playlistId);
+        }
+
+        if (playlist != null) {
+            if (playlist.purchaseRequired == 1) {
+                return true;
+            }
+        }
+
         if (Integer.valueOf(video.purchaseRequired) == 1) {
             return true;
         }
@@ -66,7 +82,7 @@ public class AuthHelper {
             return true;
         }
 
-        return result;
+        return false;
     }
 
     public static boolean isRegistrationRequired(Context context, String videoId) {
@@ -84,13 +100,40 @@ public class AuthHelper {
 
     }
 
-    public static boolean isVideoAuthorized(Context context, String videoId) {
+    public static boolean isVideoUnlocked(Context context,
+                                          String videoId, String playlistId) {
         boolean result = true;
 
-        Video video = DataRepository.getInstance((Application) context.getApplicationContext()).getVideoSync(videoId);
+        Video video = DataRepository.getInstance((Application) context.getApplicationContext())
+                .getVideoSync(videoId);
         if (video == null) {
             return false;
         }
+
+        Playlist playlist = null;
+        if (!TextUtils.isEmpty(playlistId)) {
+            playlist = DataRepository.getInstance((Application) context.getApplicationContext())
+                    .getPlaylistSync(playlistId);
+        }
+        if (playlist != null) {
+            if (playlist.purchaseRequired == 1) {
+                if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
+                    if (video.isEntitled != null && video.isEntitled == 1) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else {
+                    // Playlist requires purchase, but UTVOD options is turned off in the app configuration
+                    Logger.w("Playlist " + playlist.id + " requires purchase, but universal TVOD feature " +
+                            "is turned off in the app configuration.");
+                    result = false;
+                }
+            }
+        }
+
         if (video.registrationRequired == 1) {
             if (!isLoggedIn()) {
                 return false;

@@ -167,7 +167,7 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
 
     private void updateLockIcon(ViewHolder holder) {
         Video video = holder.item;
-        if (AuthHelper.isVideoRequiredAuthorization(holder.view.getContext(), video.id)) {
+        if (AuthHelper.isPaywalledVideo(holder.view.getContext(), video.id, playlistId)) {
             holder.imageLocked.setVisibility(View.VISIBLE);
             if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
                 holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
