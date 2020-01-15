@@ -36,9 +36,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:id="@+id/textTitle"
-                android:text="@string/consumer_create_form_subtitle"
+                android:text="@string/consumer_create_form_title"
                 android:gravity="center_horizontal"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 />
             <TextView
                 android:layout_width="match_parent"
