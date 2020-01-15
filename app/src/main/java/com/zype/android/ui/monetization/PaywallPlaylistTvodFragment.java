@@ -11,13 +11,17 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.R;
+import com.zype.android.databinding.FragmentPaywallPlaylistTvodBinding;
 import com.zype.android.ui.NavigationHelper;
 
 public class PaywallPlaylistTvodFragment extends Fragment {
     public static final String TAG = PaywallPlaylistTvodFragment.class.getSimpleName();
 
     private PaywallViewModel model;
+
+    private FragmentPaywallPlaylistTvodBinding binding;
 
     public PaywallPlaylistTvodFragment() {}
 
@@ -30,15 +34,10 @@ public class PaywallPlaylistTvodFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_paywall_playlist_tvod, container, false);
+        binding = FragmentPaywallPlaylistTvodBinding.inflate(inflater, container, false);
 
         final NavigationHelper navigationHelper = NavigationHelper.getInstance(getActivity());
-
-        TextView textTitle = rootView.findViewById(R.id.textTitle);
-        textTitle.setText(String.format(getString(R.string.paywall_title), getString(R.string.app_name)));
-
-        Button buttonBuyPlaylist = rootView.findViewById(R.id.buttonBuyPlaylist);
-        buttonBuyPlaylist.setOnClickListener(v -> {
+        binding.buttonBuyPlaylist.setOnClickListener(v -> {
             if (AuthHelper.isLoggedIn()) {
                 model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
             }
@@ -46,12 +45,10 @@ public class PaywallPlaylistTvodFragment extends Fragment {
                 navigationHelper.switchToConsumerScreen(getActivity());
             }
         });
-
-        Button buttonSignIn = rootView.findViewById(R.id.buttonSignIn);
-        buttonSignIn.setOnClickListener(v ->
+        binding.buttonSignIn.setOnClickListener(v ->
                 navigationHelper.switchToLoginScreen(getActivity(), null));
 
-        return rootView;
+        return binding.getRoot();
     }
 
     @Override
@@ -59,5 +56,11 @@ public class PaywallPlaylistTvodFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         model = ViewModelProviders.of(getActivity()).get(PaywallViewModel.class);
+
+        Playlist playlist = model.getPlaylist();
+        if (playlist != null) {
+            binding.setNumberOfVideos(playlist.playlistItemCount);
+            binding.setPlaylistPrice(playlist.purchasePrice);
+        }
     }
 }
