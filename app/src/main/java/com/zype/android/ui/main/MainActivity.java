@@ -420,6 +420,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         SettingsProvider.getInstance().logout();
 //        DataHelper.clearAllVideos(getContentResolver());
         DownloaderService.cancelAllDownloads();
+        DataRepository.getInstance(getApplication()).deleteVideoFavorites();
+        DataRepository.getInstance(getApplication()).clearVideoEntitlements();
     }
 
     @Override
