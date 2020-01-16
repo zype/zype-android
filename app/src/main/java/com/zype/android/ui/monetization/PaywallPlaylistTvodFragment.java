@@ -7,8 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Db.Entity.Playlist;
@@ -62,5 +60,7 @@ public class PaywallPlaylistTvodFragment extends Fragment {
             binding.setNumberOfVideos(playlist.playlistItemCount);
             binding.setPlaylistPrice(playlist.purchasePrice);
         }
+
+        binding.setIsSignedIn(model.getState().getValue() == PaywallViewModel.State.SIGNED_IN);
     }
 }

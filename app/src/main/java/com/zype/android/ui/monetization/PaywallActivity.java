@@ -63,11 +63,14 @@ public class PaywallActivity extends AppCompatActivity {
 
         model.getState().observe(this, state -> {
             Log.d(TAG, "getState(): " + state.name());
-            if (state == PaywallViewModel.State.READY_FOR_PURCHASE) {
-                showPurchaseFragment();
-            }
-            else if (state == PaywallViewModel.State.SIGN_IN_REQUIRED) {
-                showPaywallFragment(model.getPaywallType());
+            switch(state) {
+                case READY_FOR_PURCHASE:
+                    showPurchaseFragment();
+                    break;
+                case SIGN_IN_REQUIRED:
+                case SIGNED_IN:
+                    showPaywallFragment(model.getPaywallType());
+                    break;
             }
         });
     }
@@ -151,7 +154,7 @@ public class PaywallActivity extends AppCompatActivity {
                         openVideo();
                     }
                     else {
-                        model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
+                        model.setState(PaywallViewModel.State.SIGNED_IN);
                     }
                 }
                 else {

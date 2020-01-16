@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
     <data>
+        <import type="android.view.View" />
         <variable name="numberOfVideos" type="Integer" />
         <variable name="playlistPrice" type="String" />
+        <variable name="isSignedIn" type="Boolean" />
     </data>
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -63,6 +65,7 @@
             android:layout_marginTop="16dp"
             android:text="@string/button_sign_in"
             android:theme="@style/ButtonBorder"
+            android:visibility="@{isSignedIn ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/guidelineBottom"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

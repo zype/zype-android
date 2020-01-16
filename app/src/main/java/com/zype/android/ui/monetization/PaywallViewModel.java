@@ -41,7 +41,8 @@ public class PaywallViewModel extends BaseViewModel {
 
     public enum State {
         READY_FOR_PURCHASE,
-        SIGN_IN_REQUIRED
+        SIGN_IN_REQUIRED,
+        SIGNED_IN
     }
 
     public PaywallViewModel(Application application) {
@@ -154,7 +155,7 @@ public class PaywallViewModel extends BaseViewModel {
             public void onBillingClientSetupFinished() {
                 Log.d(TAG, "BillingManager::onBillingClientSetupFinished()");
                 if (AuthHelper.isLoggedIn()) {
-                    state.setValue(State.READY_FOR_PURCHASE);
+                    state.setValue(State.SIGNED_IN);
                 }
                 else {
                     state.setValue(State.SIGN_IN_REQUIRED);
