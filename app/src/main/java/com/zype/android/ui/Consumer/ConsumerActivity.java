@@ -221,13 +221,24 @@ public class ConsumerActivity extends BaseActivity {
             layoutPassword.setErrorEnabled(true);
         }
         else {
-            layoutPassword.setErrorEnabled(false);
+            if (!isPasswordValid(consumer.password)) {
+                result = false;
+                layoutPassword.setError(getString(R.string.error_invalid_password));
+                layoutPassword.setErrorEnabled(true);
+            }
+            else {
+                layoutPassword.setErrorEnabled(false);
+            }
         }
         return result;
     }
 
     private boolean isEmailValid(String value) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches();
+    }
+
+    private boolean isPasswordValid(String password) {
+        return password.length() > 4;
     }
 
     private void updateConsumer() {
