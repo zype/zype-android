@@ -90,8 +90,10 @@ public class PaywallActivity extends AppCompatActivity {
         return result -> {
             PaywallActivity.this.hideProgress();
             if (result) {
-                PaywallActivity.this.setResult(RESULT_OK);
-                PaywallActivity.this.openVideo();
+                model.updateEntitlements(success -> {
+                    PaywallActivity.this.setResult(RESULT_OK);
+                    PaywallActivity.this.openVideo();
+                });
             } else {
                 DialogHelper.showErrorAlert(PaywallActivity.this,
                         PaywallActivity.this.getString(R.string.paywall_error_validation));

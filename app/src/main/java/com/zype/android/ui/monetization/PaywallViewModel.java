@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.PurchaseItem;
+import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ui.v2.base.BaseViewModel;
@@ -208,6 +209,10 @@ public class PaywallViewModel extends BaseViewModel {
             billingManager.initiatePurchaseFlow(activity,
                     item.product.getSku(), BillingClient.SkuType.INAPP);
         }
+    }
+
+    public void updateEntitlements(DataRepository.IDataLoading listener) {
+        repo.loadVideoEntitlements(listener);
     }
 
     // Util
