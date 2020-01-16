@@ -498,11 +498,12 @@ public class LoginActivity extends BaseActivity {
 
         AuthHelper.onLoginStateChanged();
 
-        DataRepository.getInstance(this.getApplication()).loadVideoFavorites(null);
-        DataRepository.getInstance(this.getApplication()).loadVideoEntitlements(null);
-
-        setResult(RESULT_OK);
-        finish();
+        DataRepository.getInstance(this.getApplication()).loadVideoFavorites(success -> {
+            DataRepository.getInstance(this.getApplication()).loadVideoEntitlements(success1 -> {
+                setResult(RESULT_OK);
+                finish();
+            });
+        });
     }
 
     @Override
