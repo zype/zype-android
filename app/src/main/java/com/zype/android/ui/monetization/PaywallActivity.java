@@ -143,7 +143,13 @@ public class PaywallActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CONSUMER:
                 if (resultCode == RESULT_OK) {
-                    model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
+                    if (AuthHelper.isVideoUnlocked(PaywallActivity.this,
+                            model.getVideoId(), model.getPlaylistId())) {
+                        openVideo();
+                    }
+                    else {
+                        model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
+                    }
                 }
                 else {
                     close();
