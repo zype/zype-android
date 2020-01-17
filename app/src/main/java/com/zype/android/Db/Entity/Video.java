@@ -67,7 +67,7 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "guest")
     public String guest;
 
-    @ColumnInfo(name = "EntitlementUpdatedAt")
+    @ColumnInfo(name = "entitlement_updated_at")
     public String entitlementUpdatedAt;
 
     @ColumnInfo(name = "episode")
@@ -97,7 +97,7 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "is_downloaded_audio_should_be")
     public Integer isDownloadedAudioShouldBe;
 
-    @ColumnInfo(name = "IsEntitled")
+    @ColumnInfo(name = "is_entitled")
     public Integer isEntitled;
 
     @ColumnInfo(name = "is_favorite")

@@ -123,11 +123,11 @@ public interface ZypeDao {
     // Video entitlements
 
     @Query("SELECT * FROM video " +
-            "WHERE video.IsEntitled = 1 " +
-            "ORDER BY video.updated_at DESC")
+            "WHERE video.is_entitled = 1 " +
+            "ORDER BY video.entitlement_updated_at DESC")
     List<Video> getEntitledVideosSync();
 
-    @Query("UPDATE video SET IsEntitled = 0 WHERE video.IsEntitled = 1")
+    @Query("UPDATE video SET is_entitled = 0 WHERE video.is_entitled = 1")
     void clearVideoEntitlements();
 
     // Video favorites

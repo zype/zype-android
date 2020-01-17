@@ -229,6 +229,7 @@ public class DataRepository {
                         Video dbVideo = getVideoSync(item.videoId);
                         if (dbVideo != null) {
                             dbVideo.isEntitled = 1;
+                            dbVideo.entitlementUpdatedAt = item.createdAt;
                             updateVideo(dbVideo);
                         }
                     }
@@ -236,6 +237,7 @@ public class DataRepository {
             }
             else {
                 video.isEntitled = 1;
+                video.entitlementUpdatedAt = item.createdAt;
                 updateVideo(video);
             }
         }
