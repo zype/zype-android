@@ -402,7 +402,8 @@ public class ZypeApi {
 
     // Player
 
-    public void getPlayer(@NonNull String videoId, boolean isAudio, String accessToken, String uuid,
+    public void getPlayer(@NonNull String videoId, boolean isAudio, String accessToken,
+                          String uuid, String appName,
                           @NonNull final IZypeApiListener listener,HashMap<String, String> params) {
         if (TextUtils.isEmpty(accessToken)) {
             params.put(ZypeApi.APP_KEY, appKey);
@@ -416,7 +417,8 @@ public class ZypeApi {
         if (isAudio) {
             params.put(ZypeApi.AUDIO, String.valueOf(isAudio));
         }
-        getApi().getPlayer(IZypeApi.HEADER_USER_AGENT, videoId, params).enqueue(new Callback<PlayerResponse>() {
+        getApi().getPlayer(IZypeApi.HEADER_USER_AGENT + " " + appName, videoId, params)
+                .enqueue(new Callback<PlayerResponse>() {
             @Override
             public void onResponse(Call<PlayerResponse> call, Response<PlayerResponse> response) {
                 if (response.isSuccessful()) {

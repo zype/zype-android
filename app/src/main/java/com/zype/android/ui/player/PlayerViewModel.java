@@ -21,6 +21,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.BuildConfig;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.AdSchedule;
@@ -495,7 +496,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
         ApplicationInfo appInfo = getApplication().getApplicationInfo();
         // App data
-        params.put(APP_BUNDLE, appInfo.packageName);
+//        params.put(APP_BUNDLE, appInfo.packageName);
+        params.put(APP_BUNDLE, "com.zype.thisoldhouse");
         params.put(APP_DOMAIN, appInfo.packageName);
         params.put(APP_ID, appInfo.packageName);
         params.put(APP_NAME, (appInfo.labelRes == 0) ? appInfo.nonLocalizedLabel.toString() : getApplication().getString(appInfo.labelRes));
@@ -516,6 +518,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     private void loadVideoPlayer(String accessToken, String uuid) {
         api.getPlayer(videoId, false, accessToken, uuid,
+                getApplication().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME,
                 createVideoPlayerListener(accessToken, uuid),getValues());
     }
 
@@ -553,6 +556,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     private void loadAudioPlayer(String accessToken, String uuid) {
         api.getPlayer(videoId, true, accessToken, uuid,
+                getApplication().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME,
                 createAudioPlayerListener(accessToken, uuid),getValues());
     }
 
