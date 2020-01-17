@@ -203,7 +203,7 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
             Video video = (Video) holder.item;
             if (AuthHelper.isPaywalledVideo(holder.view.getContext(), video.id, playlistId)) {
                 holder.imageLocked.setVisibility(View.VISIBLE);
-                if (AuthHelper.isVideoAuthorized(holder.view.getContext(), video.id)) {
+                if (AuthHelper.isVideoUnlocked(holder.view.getContext(), video.id, playlistId)) {
                     holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
                     UiUtils.setImageColor(holder.imageLocked,
                             ContextCompat.getColor(holder.view.getContext(), R.color.icon_unlocked));
