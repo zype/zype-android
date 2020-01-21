@@ -78,11 +78,10 @@
     <string name="subtitles_off">Turn off</string>
 
     <!-- Consumer -->
-    <string name="consumer_button_update">Continue</string>
-    <string name="consumer_create_form_description">Enter your email and password to create an account
-        and get access to %1$s on any device. With your account, you can access Premium Content,
-        Favorites and Recommendations across all devices, and download  content to watch offline.</string>
+    <string name="consumer_button_update">Create account</string>
+    <string name="consumer_create_form_description">Enter a valid email and password to create your account. Account credential will allow access on all devices.</string>
     <string name="consumer_create_form_subtitle">Get all of %1$s!</string>
+    <string name="consumer_create_form_title">Create your account</string>
     <string name="consumer_create_sign_in">Already have an account? Sign in</string>
     <string name="consumer_create_sign_in_link">Sign in</string>
     <string name="consumer_create_terms">By clicking Continue, you agree to our Terms of Service and Privacy</string>
@@ -171,6 +170,13 @@
     <!--Notifications -->
     <string name="notification_channel_name">Zype</string>
     <string name="notification_channel_description">Zype Notification Channel</string>
+
+    <!-- Paywall -->
+    <string name="paywall_button_buy_playlist">Buy all %1$d videos - $%2$s</string>
+    <string name="paywall_error_validation">We\'re sorry, there was a problem validating your purchase.</string>
+    <string name="paywall_subtitle">Get access to Premium Content across all devices</string>
+    <string name="paywall_title">Enjoy %1$s</string>
+    <string name="paywall_verifying_purchase">Verifying purchase</string>
 
     <!-- Player -->
     <string name="menu_player_closed_captions">Closed captions</string>
