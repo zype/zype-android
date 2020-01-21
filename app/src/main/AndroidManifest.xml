@@ -180,6 +180,7 @@
         <activity
             android:name=".ui.monetization.PaywallActivity"
             android:theme="@style/AppThemeWithActionBar"
+            android:screenOrientation="portrait"
             />
         <activity
             android:name=".ui.v2.videos.PlaylistActivity"
