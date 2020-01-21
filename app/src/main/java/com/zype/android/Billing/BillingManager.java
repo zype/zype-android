@@ -251,17 +251,19 @@ public class BillingManager implements PurchasesUpdatedListener {
      * Used only for testing one-time purchases
      */
     public void clearPurchases() {
-        for (Purchase purchase : purchases) {
-            ConsumeResponseListener listener = new ConsumeResponseListener() {
-                @Override
-                public void onConsumeResponse(int result, String outToken) {
-                    if (result == BillingResponse.OK) {
-                        // Handle the success of the consume operation.
-                        // For example, increase the number of coins inside the user's basket.
+        if (purchases != null) {
+            for (Purchase purchase : purchases) {
+                ConsumeResponseListener listener = new ConsumeResponseListener() {
+                    @Override
+                    public void onConsumeResponse(int result, String outToken) {
+                        if (result == BillingResponse.OK) {
+                            // Handle the success of the consume operation.
+                            // For example, increase the number of coins inside the user's basket.
+                        }
                     }
-                }
-            };
-            mBillingClient.consumeAsync(purchase.getPurchaseToken(), listener);
+                };
+                mBillingClient.consumeAsync(purchase.getPurchaseToken(), listener);
+            }
         }
     }
 }
