@@ -79,7 +79,7 @@
 
     <!-- Consumer -->
     <string name="consumer_button_update">Create account</string>
-    <string name="consumer_create_form_description">Enter a valid email and password to create your account. Account credential will allow access on all devices.</string>
+    <string name="consumer_create_form_description">Enter a valid email and password to create your account. Account credentials will allow access on all devices.</string>
     <string name="consumer_create_form_subtitle">Get all of %1$s!</string>
     <string name="consumer_create_form_title">Create your account</string>
     <string name="consumer_create_sign_in">Already have an account? Sign in</string>
