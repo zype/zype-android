@@ -4,7 +4,6 @@
         android:id="@+id/menuNavigationHome"
         android:icon="@drawable/baseline_home_black_24"
         android:title="@string/menu_navigation_home" />
-
     <item
         android:id="@+id/menuNavigationGuide"
         android:icon="@drawable/baseline_guide_black"
@@ -13,7 +12,6 @@
         android:id="@+id/menuNavigationLive"
         android:icon="@drawable/icon_live"
         android:title="@string/menu_navigation_live" />
-
     <item
         android:id="@+id/menuNavigationFavorites"
         android:icon="@drawable/baseline_star_rate_black_24"
@@ -22,6 +20,10 @@
         android:id="@+id/menuNavigationDownloads"
         android:icon="@drawable/baseline_cloud_download_black_24"
         android:title="@string/menu_navigation_downloads" />
+    <item
+        android:id="@+id/menuNavigationLibrary"
+        android:icon="@drawable/baseline_video_library_black_24"
+        android:title="@string/menu_navigation_library" />
     <item
         android:id="@+id/menuNavigationSettings"
         android:icon="@drawable/baseline_settings_black_24"

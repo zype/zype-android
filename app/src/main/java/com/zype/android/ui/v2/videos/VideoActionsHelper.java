@@ -97,10 +97,12 @@ public class VideoActionsHelper {
         repo.updateVideo(video);
 
         if (isFavorite) {
-            FavoriteVideo favoriteVideo = new FavoriteVideo();
-            favoriteVideo.id = videoFavoriteId;
-            favoriteVideo.videoId = video.id;
-            repo.addVideoFavorite(favoriteVideo);
+            if (videoFavoriteId != null) {
+                FavoriteVideo favoriteVideo = new FavoriteVideo();
+                favoriteVideo.id = videoFavoriteId;
+                favoriteVideo.videoId = video.id;
+                repo.addVideoFavorite(favoriteVideo);
+            }
         }
         else {
             repo.deleteVideoFavoriteByVideoId(video.id);

@@ -213,7 +213,7 @@ public class NavigationHelper {
     // Video
 
     public void handleVideoClick(Activity activity, @NonNull Video video, String playlistId, boolean autoplay) {
-        if (AuthHelper.isVideoAuthorized(activity, video.id)) {
+        if (AuthHelper.isVideoUnlocked(activity, video.id, playlistId)) {
             switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
         }
         else {

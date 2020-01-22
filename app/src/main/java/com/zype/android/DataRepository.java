@@ -15,6 +15,9 @@ import com.zype.android.Db.ZypeDb;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
+import com.zype.android.zypeapi.ZypeApiResponse;
+import com.zype.android.zypeapi.model.VideoEntitlementData;
+import com.zype.android.zypeapi.model.VideoEntitlementsResponse;
 import com.zype.android.zypeapi.model.VideoFavoriteData;
 import com.zype.android.zypeapi.model.VideoFavoritesResponse;
 import com.zype.android.zypeapi.model.VideoResponse;
@@ -178,6 +181,70 @@ public class DataRepository {
                         }
                     }
                 });
+    }
+
+    // Video entitlements
+
+    public List<Video> getEntitledVideosSync() {
+        return db.zypeDao().getEntitledVideosSync();
+    }
+
+    public void loadVideoEntitlements(IDataLoading listener) {
+        String accessToken = AuthHelper.getAccessToken();
+        final List<VideoEntitlementData> entitlements = new ArrayList<>();
+        final IZypeApiListener<VideoEntitlementsResponse> apiListener = new IZypeApiListener<VideoEntitlementsResponse>() {
+            @Override
+            public void onCompleted(ZypeApiResponse<VideoEntitlementsResponse> response) {
+                if (response.isSuccessful) {
+                    entitlements.addAll(response.data.videoEntitlements);
+                    if (response.data.pagination.current == response.data.pagination.pages
+                            || response.data.pagination.pages == 0) {
+                        clearVideoEntitlements();
+                        updateVideoEntitlements(entitlements);
+                        if (listener != null) {
+                            listener.onLoadingCompleted(true);
+                        }
+                    }
+                    else {
+                        ZypeApi.getInstance().getVideoEntitlements(accessToken,
+                                response.data.pagination.next, this);
+                    }
+                }
+                else {
+                    if (listener != null) {
+                        listener.onLoadingCompleted(false);
+                    }
+                }
+            }
+        };
+        ZypeApi.getInstance().getVideoEntitlements(accessToken, 1, apiListener);
+    }
+
+    private void updateVideoEntitlements(List<VideoEntitlementData> entitlements) {
+        for (VideoEntitlementData item : entitlements) {
+            Video video = getVideoSync(item.videoId);
+            if (video == null) {
+                loadVideo(item.videoId, response -> {
+                    if (response.isSuccessful) {
+                        Video dbVideo = getVideoSync(item.videoId);
+                        if (dbVideo != null) {
+                            dbVideo.isEntitled = 1;
+                            dbVideo.entitlementUpdatedAt = item.createdAt;
+                            updateVideo(dbVideo);
+                        }
+                    }
+                });
+            }
+            else {
+                video.isEntitled = 1;
+                video.entitlementUpdatedAt = item.createdAt;
+                updateVideo(video);
+            }
+        }
+    }
+
+    public void clearVideoEntitlements() {
+        db.zypeDao().clearVideoEntitlements();
     }
 
     // Video favorites

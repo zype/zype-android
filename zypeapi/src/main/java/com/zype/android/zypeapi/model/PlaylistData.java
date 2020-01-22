@@ -36,6 +36,18 @@ public class PlaylistData {
     @Expose
     public List<String> keywords = new ArrayList<>();
 
+    @SerializedName("marketplace_ids")
+    @Expose
+    public MarketplaceIds marketplaceIds;
+
+    @SerializedName("purchase_price")
+    @Expose
+    public String purchasePrice;
+
+    @SerializedName("purchase_required")
+    @Expose
+    public boolean purchaseRequired;
+
     @SerializedName("site_id")
     @Expose
     public String siteId;

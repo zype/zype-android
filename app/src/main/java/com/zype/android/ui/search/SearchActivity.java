@@ -487,7 +487,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         Logger.d("onItemClick()");
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
         NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
-        if (AuthHelper.isVideoAuthorized(this, holder.videoId)) {
+        if (AuthHelper.isVideoUnlocked(this, holder.videoId, null)) {
             navigationHelper.switchToVideoDetailsScreen(this, holder.videoId, null, false);
         }
         else {

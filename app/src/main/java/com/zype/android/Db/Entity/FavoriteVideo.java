@@ -18,19 +18,15 @@ public class FavoriteVideo {
     public String id;
 
     @ColumnInfo(name = "consumer_id")
-    @NonNull
     public String consumerId;
 
     @ColumnInfo(name = "created_at")
-    @NonNull
     public String createdAt;
 
     @ColumnInfo(name = "deleted_at")
-    @NonNull
     public String deletedAt;
 
     @ColumnInfo(name = "updated_at")
-    @NonNull
     public String updatedAt;
 
     @ColumnInfo(name = "video_id")

@@ -342,7 +342,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
 
         selectedVideoId = holder.videoId;
         NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
-        if (AuthHelper.isVideoAuthorized(this, holder.videoId)) {
+        if (AuthHelper.isVideoUnlocked(this, holder.videoId, playlistId)) {
             navigationHelper.switchToVideoDetailsScreen(this, holder.videoId, playlistId, false);
         }
         else {

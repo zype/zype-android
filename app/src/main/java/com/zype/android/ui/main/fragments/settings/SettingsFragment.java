@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.zype.android.Auth.AuthHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ZypeSettings;
@@ -83,6 +84,7 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
                 @Override
                 public void onClick(View v) {
                     mOnLoginListener.onLogout();
+                    AuthHelper.onLoginStateChanged();
                     initSignInButton();
                 }
             });
@@ -90,7 +92,8 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
         else {
             mSigninButton.setText(R.string.action_sign_in);
             if (ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())
-                    || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(getActivity())) {
+                    || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(getActivity())
+                    || ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
                 mSigninButton.setVisibility(View.VISIBLE);
                 mSigninButton.setOnClickListener(new View.OnClickListener() {
                     @Override

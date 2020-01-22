@@ -12,8 +12,8 @@ import android.widget.TextView;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.ui.Gallery.GalleryFragment;
-import com.zype.android.ui.MyLibrary.MyLibraryFragment;
 import com.zype.android.ui.epg.EPGFragment;
+import com.zype.android.ui.v2.library.LibraryFragment;
 import com.zype.android.ui.main.Model.Section;
 import com.zype.android.ui.main.fragments.download.DownloadFragment;
 import com.zype.android.ui.main.fragments.playlist.PlaylistFragment;
@@ -21,13 +21,11 @@ import com.zype.android.ui.main.fragments.settings.SettingsFragment;
 import com.zype.android.ui.v2.favorites.FavoritesFragment;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import static android.view.View.GONE;
-import static android.view.View.resolveSize;
 
 /**
  * @author vasya
@@ -39,7 +37,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     private static final int TAB_ID_HOME = 1;
     private static final int TAB_ID_DOWNLOADS = 2;
     private static final int TAB_ID_FAVORITES = 3;
-    private static final int TAB_ID_MY_LIBRARY = 4;
+    private static final int TAB_ID_LIBRARY = 4;
     private static final int TAB_ID_SETTINGS = 5;
 
     private Context context;
@@ -78,7 +76,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         tabs.add(tabData);
 
         if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
-            tabData = new TabData(TAB_ID_MY_LIBRARY, R.drawable.icn_downloads, R.string.main_tab_my_library);
+            tabData = new TabData(TAB_ID_LIBRARY, R.drawable.icn_downloads, R.string.main_tab_my_library);
             tabs.add(tabData);
         }
 
@@ -105,8 +103,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case R.id.menuNavigationLive:
             case R.id.menuNavigationDownloads:
                 return DownloadFragment.newInstance();
-//            case TAB_ID_MY_LIBRARY:
-//                return MyLibraryFragment.newInstance();
+            case R.id.menuNavigationLibrary:
+                return LibraryFragment.newInstance();
             case R.id.menuNavigationSettings:
                 return SettingsFragment.newInstance();
         }
@@ -122,7 +120,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 //                return DownloadFragment.newInstance();
 //            case TAB_ID_FAVORITES:
 //                return FavoritesFragment.newInstance();
-//            case TAB_ID_MY_LIBRARY:
+//            case TAB_ID_LIBRARY:
 //                return MyLibraryFragment.newInstance();
 //            case TAB_ID_SETTINGS:
 //                return SettingsFragment.newInstance();

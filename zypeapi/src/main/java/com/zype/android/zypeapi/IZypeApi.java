@@ -79,8 +79,7 @@ public interface IZypeApi {
                                              @QueryMap HashMap<String, String> params);
 
     @GET("/consumer/videos")
-    Call<VideoEntitlementsResponse> getVideoEntitlements(@Query(PARAM_PAGE) int page,
-                                                         @QueryMap HashMap<String, String> params);
+    Call<VideoEntitlementsResponse> getVideoEntitlements(@QueryMap HashMap<String, String> params);
 
     // Video Favorites
     @GET("/consumers/{consumer_id}/video_favorites")

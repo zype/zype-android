@@ -755,7 +755,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
                 requestVideoUrl(mVideoId);
             }
             else
-            if (AuthHelper.isVideoAuthorized(this, mVideoId)) {
+            if (AuthHelper.isVideoUnlocked(this, mVideoId, null)) {
                 Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
                 if (video != null &&
                         (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video))) {

@@ -245,7 +245,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         imageVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!AuthHelper.isVideoAuthorized(VideoDetailActivity.this, mVideoId)) {
+                if (!AuthHelper.isVideoUnlocked(VideoDetailActivity.this, mVideoId, null)) {
                     NavigationHelper.getInstance(VideoDetailActivity.this)
                             .handleNotAuthorizedVideo(VideoDetailActivity.this, mVideoId, playlistId);
                 }
@@ -418,7 +418,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     }
 
     private void checkVideoAuthorization() {
-        if (!AuthHelper.isVideoAuthorized(this, mVideoId)) {
+        if (!AuthHelper.isVideoUnlocked(this, mVideoId, null)) {
             showVideoThumbnail();
             NavigationHelper.getInstance(this).handleNotAuthorizedVideo(this, mVideoId, playlistId);
         }

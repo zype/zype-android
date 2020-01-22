@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.zype.android.zypeapi.model.ErrorBody;
 import com.zype.android.zypeapi.model.PlayerResponse;
 import com.zype.android.zypeapi.model.PlaylistsResponse;
+import com.zype.android.zypeapi.model.VideoEntitlementsResponse;
 import com.zype.android.zypeapi.model.VideoFavoriteResponse;
 import com.zype.android.zypeapi.model.VideoFavoritesResponse;
 import com.zype.android.zypeapi.model.VideoResponse;
@@ -534,6 +535,33 @@ public class ZypeApi {
                 listener.onCompleted(new ZypeApiResponse<VideosResponse>(null, false));
             }
         });
+    }
+
+    // Video entitlements
+
+    public void getVideoEntitlements(@NonNull String accessToken, int page,
+                                     @NonNull final IZypeApiListener listener) {
+        HashMap<String, String> queryParams = new HashMap<>();
+        queryParams.put(ZypeApi.ACCESS_TOKEN, accessToken);
+        queryParams.put(PAGE, String.valueOf(page));
+        queryParams.put(PER_PAGE, String.valueOf(PER_PAGE_DEFAULT));
+        ZypeApi.getInstance().getApi().getVideoEntitlements(queryParams)
+                .enqueue(new Callback<VideoEntitlementsResponse>() {
+                    @Override
+                    public void onResponse(Call<VideoEntitlementsResponse> call, Response<VideoEntitlementsResponse> response) {
+                        if (response.isSuccessful()) {
+                            listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                        }
+                        else {
+                            listener.onCompleted(new ZypeApiResponse<>(response.body(), false));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<VideoEntitlementsResponse> call, Throwable t) {
+                        listener.onCompleted(new ZypeApiResponse<VideoEntitlementsResponse>(null, false));
+                    }
+                });
     }
 
     // Video favorites

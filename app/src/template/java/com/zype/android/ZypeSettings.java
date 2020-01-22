@@ -42,6 +42,7 @@ public class ZypeSettings {
 
     // Following options are not supported by platform app builder.
     public static final boolean EPG_ENABLED = false;
+    public static final boolean LIBRARY_ENABLED = false;
     public static final boolean PLAYLIST_GALLERY_VIEW = false;
     public static final boolean PLAYLIST_GALLERY_HERO_IMAGES = false;
     public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = false;
