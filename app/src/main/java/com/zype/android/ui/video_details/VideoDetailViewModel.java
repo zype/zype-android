@@ -248,7 +248,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
                 }
             }
         };
-        api.getVideo(videoId, listener);
+        api.getVideo(videoId, false, listener);
 
 //        VideoParamsBuilder builder = new VideoParamsBuilder()
 //                .addVideoId(videoId);

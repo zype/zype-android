@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.android.billingclient.api.Purchase;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Playlist;
@@ -33,6 +35,7 @@ import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
@@ -46,12 +49,14 @@ public class NavigationHelper {
     private static volatile NavigationHelper instance;
 
     private Context context;
+    private DataRepository repo;
 
     private NavigationHelper(Context context) {
         if (instance != null){
             throw new RuntimeException("Use getInstance() method to get the single instance of this class.");
         }
         this.context = context.getApplicationContext();
+        this.repo = DataRepository.getInstance(ZypeApp.get(this.context));
     }
 
     public static NavigationHelper getInstance(Context context) {
@@ -246,6 +251,9 @@ public class NavigationHelper {
     public void handleLockedVideo(Activity activity, Video video, Playlist playlist) {
         Bundle extras = new Bundle();
         extras.putString(BundleConstants.VIDEO_ID, video.id);
+        if (playlist == null) {
+            playlist = findPurchaseRequiredPlaylist(video);
+        }
         if (playlist != null) {
             extras.putString(BundleConstants.PLAYLIST_ID, playlist.id);
 
@@ -295,6 +303,20 @@ public class NavigationHelper {
                         context.getString(R.string.dialog_update_app_message));
             }
         }
+    }
+
+    private Playlist findPurchaseRequiredPlaylist(Video video) {
+        Type type = new TypeToken<List<String>>(){}.getType();
+        List<String> playlistIds = new Gson().fromJson(video.serializedPlaylistIds, type);
+        if (playlistIds != null) {
+            for (String id : playlistIds) {
+                Playlist playlist = repo.getPlaylistSync(id);
+                if (playlist != null && playlist.purchaseRequired == 1) {
+                    return playlist;
+                }
+            }
+        }
+        return null;
     }
 
     public void handleNotAuthorizedVideo(Activity activity, String videoId, String playlistId) {

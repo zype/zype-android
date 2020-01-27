@@ -45,6 +45,7 @@ public class ZypeApi {
     public static final String CONSUMER_EMAIL = "consumer[email]";
     public static final String CONSUMER_ID = "consumer_id";
     public static final String CONSUMER_PASSWORD = "consumer[password]";
+    private static final String INCLUDE_PLAYLIST_IDS = "include_playlist_ids";
     private static final String LINKED_DEVICE_ID = "linked_device_id";
     private static final String PAGE = "page";
     private static final String PARENT_ID = "parent_id";
@@ -540,8 +541,12 @@ public class ZypeApi {
         });
     }
 
-    public void getVideo(@NonNull String videoId, @NonNull final IZypeApiListener listener) {
+    public void getVideo(@NonNull String videoId, boolean includePlaylistIds,
+                         @NonNull final IZypeApiListener listener) {
         HashMap<String, String> params = new HashMap<>();
+        if (includePlaylistIds) {
+            params.put(INCLUDE_PLAYLIST_IDS, "true");
+        }
         params.put(ZypeApi.APP_KEY, appKey);
         getApi().getVideo(videoId, params).enqueue(new Callback<VideoResponse>() {
             @Override

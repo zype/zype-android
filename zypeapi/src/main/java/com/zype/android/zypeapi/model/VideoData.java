@@ -94,6 +94,10 @@ public class VideoData {
     @Expose
     public List<Segment> segments = new ArrayList<>();
 
+    @SerializedName("serializable_playlist_ids")
+    @Expose
+    public List<String> serializablePlaylistIds = new ArrayList<>();
+
     @SerializedName("short_description")
     @Expose
     public String shortDescription;

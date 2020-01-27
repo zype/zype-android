@@ -267,7 +267,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
         ZypeApi zypeApi = ZypeApi.getInstance();
 
-        zypeApi.getVideo(ZypeSettings.LIVE_VIDEO_ID, response -> {
+        zypeApi.getVideo(ZypeSettings.LIVE_VIDEO_ID, false, response -> {
             progressBar.setVisibility(View.GONE);
             if(response.isSuccessful) {
                 VideoResponse videoResponse = (VideoResponse) response.data;

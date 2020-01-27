@@ -160,6 +160,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "segments")
     public String segments;
 
+    @ColumnInfo(name = "serialized_playlist_ids")
+    public String serializedPlaylistIds;
+
     @ColumnInfo(name = "short_description")
     public String shortDescription;
 

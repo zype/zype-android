@@ -101,7 +101,16 @@ public class FavoritesFragment extends Fragment {
             }
             hideProgress();
         });
-
+        model.getSelectedVideo().observe(this, video -> {
+            if (video != null) {
+                NavigationHelper navigationHelper = NavigationHelper.getInstance(getActivity());
+                navigationHelper.handleVideoClick(getActivity(), video, null, false);
+                model.onSelectedVideoProcessed();
+            }
+        });
+        adapter.setVideoListener((video) -> {
+            model.onVideoClicked(video);
+        });
         adapter.setPopupMenuListener((action, video) -> {
             model.handleVideoAction(action, video, success -> {
                 if (success) {
