@@ -42,6 +42,7 @@ import com.zype.android.zypeapi.model.Analytics;
 import com.zype.android.zypeapi.model.PlayerResponse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -491,7 +492,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         };
     }
 
-    private HashMap<String, String>  getValues(){
+    private HashMap<String, String> getValues(){
         HashMap<String, String> params = new HashMap<>();
 
         ApplicationInfo appInfo = getApplication().getApplicationInfo();
