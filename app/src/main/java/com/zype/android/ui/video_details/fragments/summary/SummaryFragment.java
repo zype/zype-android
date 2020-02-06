@@ -25,6 +25,8 @@ import com.zype.android.ui.video_details.VideoDetailViewModel;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.model.video.VideoData;
 
+import java.util.List;
+
 public class SummaryFragment extends Fragment {
     public static final String TAG = SummaryFragment.class.getSimpleName();
 

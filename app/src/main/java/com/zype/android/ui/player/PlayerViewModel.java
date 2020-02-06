@@ -50,6 +50,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     private String videoId;
     private String playlistId;
+    private String trailerVideoId;
 
     private List<AdSchedule> adSchedule;
     private AnalyticBeacon analyticBeacon;
@@ -112,6 +113,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         isPlaybackPositionRestored = false;
 
         playTrailer = false;
+        trailerVideoId = null;
 
         updateAvailablePlayerModes();
         if (mediaType != null || isMediaTypeAvailable(mediaType)) {
@@ -402,13 +404,14 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public void setTrailerVideoId(String trailerVideoId) {
+        this.trailerVideoId = trailerVideoId;
         if (TextUtils.isEmpty(trailerVideoId)) {
             playTrailer = false;
-            updateContentUri(repo.getVideoSync(videoId));
+            updatePlayerUrl(repo.getVideoSync(videoId));
         }
         else {
             playTrailer = true;
-            loadVideoPlayerUrl(trailerVideoId);
+            loadVideoPlayer(null, null);
         }
     }
 
@@ -439,9 +442,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 String url = files.get(0).url;
                 Logger.d("loadVideoPlayer()::onCompleted(): url=" + url);
 
-                // In play trailer mode just update content uri
+                // In play trailer mode just update player url
                 if (playTrailer) {
-                    contentUri.setValue(url);
+                    playerUrl.setValue(url);
                     return;
                 }
 
@@ -502,8 +505,14 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     private void loadVideoPlayer(String accessToken, String uuid) {
-        api.getPlayer(videoId, false, accessToken, uuid,
-                createVideoPlayerListener(accessToken, uuid));
+        if (playTrailer) {
+            api.getPlayer(trailerVideoId, false, accessToken, uuid,
+                    createVideoPlayerListener(accessToken, uuid));
+        }
+        else {
+            api.getPlayer(videoId, false, accessToken, uuid,
+                    createVideoPlayerListener(accessToken, uuid));
+        }
     }
 
     IZypeApiListener createAudioPlayerListener(String accessToken, String uuid) {

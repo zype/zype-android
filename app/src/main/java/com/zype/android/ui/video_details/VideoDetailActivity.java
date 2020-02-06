@@ -144,11 +144,11 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         videoDetailViewModel = ViewModelProviders.of(this).get(VideoDetailViewModel.class);
         videoDetailViewModel.getVideo(mVideoId).observe(this, videoDetailObserver);
 
-        playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class)
-            .setVideoId(mVideoId)
-            .setPlaylistId(playlistId);
-        playerViewModel.initialize();
-        playerViewModel.getContentUri().observe(this, contentUriObserver);
+//        playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class)
+//            .setVideoId(mVideoId)
+//            .setPlaylistId(playlistId);
+//        playerViewModel.initialize();
+//        playerViewModel.getContentUri().observe(this, contentUriObserver);
     }
 
     private void checkForRegistration() {
@@ -476,7 +476,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                         Logger.d("getContentUri(): onChanged(): playing trailer");
                         mType = PlayerFragment.TYPE_VIDEO_TRAILER;
                         Fragment fragment = PlayerFragment.newInstance(mType, url, null);
-                        showFragment(fragment);
+//                        showFragment(fragment);
                     }
                     else {
                         switch (playerViewModel.getPlayerMode().getValue()) {
@@ -522,7 +522,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                     // Update video details
                     updateTabs();
                     // Check video authorization
-                    if (AuthHelper.isVideoAuthorized(VideoDetailActivity.this, video)) {
+                    if (AuthHelper.isVideoUnlocked(VideoDetailActivity.this, video.id, playlistId)) {
                         // Show player view and request player data
                         showPlayerView(video);
                     }
@@ -571,15 +571,15 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     }
 
     private void showPlayerView(Video video) {
-        playerViewModel.setVideoId(video.id);
-        playerViewModel.setPlaylistId(playlistId);
-        playerViewModel.initialize();
+//        playerViewModel.setVideoId(video.id);
+//        playerViewModel.setPlaylistId(playlistId);
+//        playerViewModel.initialize();
     }
 
     private void showThumbnailView(Video video) {
         Logger.d("showThumbnailView()");
         Fragment fragment = ThumbnailFragment.newInstance(video.id);
-        showFragment(fragment);
+//        showFragment(fragment);
     }
 
     // //////////

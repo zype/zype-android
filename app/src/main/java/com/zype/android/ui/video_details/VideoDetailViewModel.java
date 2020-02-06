@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
+import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;

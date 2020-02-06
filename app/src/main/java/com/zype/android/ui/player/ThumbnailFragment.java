@@ -98,31 +98,31 @@ public class ThumbnailFragment extends Fragment {
     }
 
     private Observer<Video> createVideoDetailObserver() {
-        return new Observer<Video>() {
-            @Override
-            public void onChanged(final Video video) {
-                Logger.d("getVideo(): onChanged()");
+        return video -> {
+            Logger.d("getVideo(): onChanged()");
 
-                ImageView imageView = getView().findViewById(R.id.image);
-                if (video == null) {
-                    imageView.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.placeholder_video));
-                }
-                else {
-                    if (video.thumbnails != null) {
-                        Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 480);
-                        if (thumbnail != null) {
-                            UiUtils.loadImage(thumbnail.getUrl(), R.drawable.placeholder_video, imageView);
-                        }
-                        else {
-                            imageView.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.placeholder_video));
-                        }
+            ImageView imageView = getView().findViewById(R.id.image);
+            Button buttonWatchNow = getView().findViewById(R.id.buttonWatchNow);
+
+            if (video == null) {
+                imageView.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.placeholder_video));
+                buttonWatchNow.setVisibility(View.GONE);
+            }
+            else {
+                if (video.thumbnails != null) {
+                    Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 480);
+                    if (thumbnail != null) {
+                        UiUtils.loadImage(thumbnail.getUrl(), R.drawable.placeholder_video, imageView);
                     }
                     else {
                         imageView.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.placeholder_video));
                     }
                 }
-                Button buttonWatchNow = getView().findViewById(R.id.buttonWatchNow);
-                if (AuthHelper.isVideoAuthorized(getActivity(), video)) {
+                else {
+                    imageView.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.placeholder_video));
+                }
+
+                if (AuthHelper.isVideoUnlocked(getActivity(), video.id, model.getPlaylistId())) {
                     buttonWatchNow.setVisibility(View.GONE);
                 }
                 else {
