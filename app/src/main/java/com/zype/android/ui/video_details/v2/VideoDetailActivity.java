@@ -25,7 +25,6 @@ import com.zype.android.Auth.AuthHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.provider.DataHelper;
@@ -37,6 +36,7 @@ import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerViewModel;
+import com.zype.android.ui.player.ThumbnailFragment;
 import com.zype.android.ui.player.v2.PlayerFragment;
 import com.zype.android.ui.video_details.VideoDetailPager;
 import com.zype.android.ui.video_details.VideoDetailPagerAdapter;
@@ -69,6 +69,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
     private VideoDetailViewModel model;
     private PlayerViewModel playerViewModel;
 
+    Observer<Video> videoObserver = null;
     Observer<PlayerViewModel.Error> playerErrorObserver = null;
 
     private FrameLayout layoutPlayer;
@@ -125,13 +126,10 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         model = ViewModelProviders.of(this).get(VideoDetailViewModel.class)
                 .setVideoId(videoId)
                 .setPlaylistId(playlistId);
-        model.getVideo().observe(this, video -> {
-            if (video != null) {
-                getSupportActionBar().setTitle(video.title);
-                playerViewModel.init(video.id, playlistId, PlayerViewModel.PlayerMode.VIDEO);
-                showPlayerFragment();
-            }
-        });
+        if (videoObserver == null) {
+            videoObserver = createVideoObserver();
+        }
+        model.getVideo().observe(this, videoObserver);
 
         playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class);
         if (playerErrorObserver == null) {
@@ -167,9 +165,9 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
                 || !ZypeApp.get(this).getAppConfiguration().hideFavoritesActionWhenSignedOut) {
             return true;
         }
-        if (ZypeSettings.SHARE_VIDEO_ENABLED) {
-            return true;
-        }
+//        if (ZypeSettings.SHARE_VIDEO_ENABLED) {
+//            return true;
+//        }
         if (ZypeConfiguration.isDownloadsEnabled(this) &&
                 (isAudioDownloadUrlExists(videoId) || isVideoDownloadUrlExists(videoId))) {
             return true;
@@ -216,6 +214,30 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
     }
 
     // View model observers
+
+    private Observer<Video> createVideoObserver() {
+        return video -> {
+            Logger.d("getVideo(): onChanged()");
+            if (video == null) {
+                // Show no video view
+            }
+            else {
+                // Update title
+                getSupportActionBar().setTitle(video.title);
+                // Check video authorization
+                if (AuthHelper.isVideoUnlocked(VideoDetailActivity.this,
+                        video.id, model.getPlaylistId())) {
+                    // Show player view
+                    playerViewModel.init(video.id, model.getPlaylistId(), PlayerViewModel.PlayerMode.VIDEO);
+                    showPlayerFragment();
+                }
+                else {
+                    // Show paywall view
+                    showThumbnailFragment(video);
+                }
+            }
+        };
+    }
 
     private Observer<PlayerViewModel.Error> createPlayerErrorObserver() {
         return error -> {
@@ -273,6 +295,15 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         showProgress();
 
         PlayerFragment fragment = PlayerFragment.newInstance(getIntent().getStringExtra(EXTRA_VIDEO_ID));
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.player_container, fragment, PlayerFragment.TAG);
+        fragmentTransaction.commit();
+    }
+
+    private void showThumbnailFragment(Video video) {
+        Logger.d("showThumbnailView()");
+        Fragment fragment = ThumbnailFragment.newInstance(video.id);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.player_container, fragment, PlayerFragment.TAG);
