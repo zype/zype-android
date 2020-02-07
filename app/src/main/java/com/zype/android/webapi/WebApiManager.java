@@ -129,7 +129,8 @@ public class WebApiManager {
     private static final String ENDPOINT_API = "https://api.zype.com";
     private static final String ENDPOINT_PLAYER = "https://player.zype.com";
     private static final String ENDPOINT_LOGIN = "https://login.zype.com";
-    public static String CUSTOM_HEADER_VALUE = "Dalvik/2.1.0 (Zype Android; Linux; U; Android 5.0.2; One X Build/LRX22G)";
+//    public static String CUSTOM_HEADER_VALUE = "Dalvik/2.1.0 (Zype Android; Linux; U; Android 5.0.2; One X Build/LRX22G)";
+    public static String CUSTOM_HEADER_VALUE = System.getProperty("http.agent") + " Zype Android";
     private static WebApiManager sInstance;
     private final ZypeApiEndpointInterface mApi;
     private final ZypeApiEndpointInterface mLoginApi;
