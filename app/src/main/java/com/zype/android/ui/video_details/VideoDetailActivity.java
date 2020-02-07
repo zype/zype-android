@@ -471,7 +471,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
             public void onChanged(@Nullable String url) {
                 Logger.d("getContentUri(): onChanged(): url=" + url);
                 if (!TextUtils.isEmpty(url)) {
-                    if (playerViewModel.isPlayTrailer()) {
+                    if (playerViewModel.isTrailer().getValue()) {
                         Logger.d("getContentUri(): onChanged(): playing trailer");
                         mType = PlayerFragment.TYPE_VIDEO_TRAILER;
                         Fragment fragment = PlayerFragment.newInstance(mType, url, null);
@@ -577,7 +577,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
 
     private void showThumbnailView(Video video) {
         Logger.d("showThumbnailView()");
-        Fragment fragment = ThumbnailFragment.newInstance(video.id);
+//        Fragment fragment = ThumbnailFragment.newInstance(video.id);
 //        showFragment(fragment);
     }
 

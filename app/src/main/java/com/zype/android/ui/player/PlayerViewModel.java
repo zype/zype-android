@@ -52,7 +52,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     private MutableLiveData<List<PlayerMode>> availablePlayerModes;
     private MutableLiveData<PlayerMode> playerMode;
-    private MutableLiveData<String> playerUrl;
+    private MutableLiveData<String> playerUrl = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isTrailer = new MutableLiveData<>();
     private MutableLiveData<Integer> playbackState = new MutableLiveData<>();
     private MutableLiveData<Error> error = new MutableLiveData<>();
 
@@ -66,9 +67,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     private long playbackPosition = 0;
     private boolean isPlaybackPositionRestored;
-    private boolean isUrlLoaded = false;
     private boolean inBackground = false;
-    private boolean playTrailer = false;
 
     private static final String APP_BUNDLE = "app_bundle";
     private static final String APP_DOMAIN = "app_domain";
@@ -113,7 +112,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         oldApi.subscribe(this);
 
         availablePlayerModes = new MutableLiveData<>();
-        availablePlayerModes.setValue(new ArrayList<PlayerMode>());
+        availablePlayerModes.setValue(new ArrayList<>());
         playerMode = new MutableLiveData<>();
     }
 
@@ -131,7 +130,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         playbackPosition = video.playTime;
         isPlaybackPositionRestored = false;
 
-        playTrailer = false;
+        isTrailer.setValue(false);
         trailerVideoId = null;
 
         updateAvailablePlayerModes();
@@ -255,11 +254,13 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         if (playerUrl == null) {
             playerUrl = new MutableLiveData<>();
         }
-        Video video = repo.getVideoSync(videoId);
-        video.playerAudioUrl = null;
-        video.playerVideoUrl = null;
-        updatePlayerUrl(video);
-        loadPlayer();
+        if (!isTrailer.getValue()) {
+            Video video = repo.getVideoSync(videoId);
+            video.playerAudioUrl = null;
+            video.playerVideoUrl = null;
+            updatePlayerUrl(video);
+            loadPlayer();
+        }
         return playerUrl;
     }
 
@@ -418,18 +419,18 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     // Trailer
 
-    public boolean isPlayTrailer() {
-        return playTrailer;
+    public LiveData<Boolean> isTrailer() {
+        return isTrailer;
     }
 
     public void setTrailerVideoId(String trailerVideoId) {
         this.trailerVideoId = trailerVideoId;
         if (TextUtils.isEmpty(trailerVideoId)) {
-            playTrailer = false;
+            isTrailer.setValue(false);
             updatePlayerUrl(repo.getVideoSync(videoId));
         }
         else {
-            playTrailer = true;
+            isTrailer.setValue(true);
             loadVideoPlayer(null, null);
         }
     }
@@ -465,7 +466,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 Logger.d("loadVideoPlayer()::onCompleted(): url=" + url);
 
                 // In play trailer mode just update player url
-                if (playTrailer) {
+                if (isTrailer.getValue()) {
                     playerUrl.setValue(url);
                     return;
                 }
@@ -552,7 +553,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     private void loadVideoPlayer(String accessToken, String uuid) {
-        if (playTrailer) {
+        if (isTrailer.getValue()) {
             api.getPlayer(trailerVideoId, false, accessToken, uuid,
                     getApplication().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME,
                     createVideoPlayerListener(accessToken, uuid));

@@ -77,7 +77,7 @@ public class SummaryFragment extends Fragment {
             if (!TextUtils.isEmpty(video.episode)) {
                 textVideoEpisode.setVisibility(View.VISIBLE);
                 textVideoEpisode.setText(String.format(getActivity().getString(R.string.videos_episode), video.episode));
-            }else{
+            } else {
                 textVideoEpisode.setVisibility(View.GONE);
             }
             textDescription.setText(video.description);
@@ -89,12 +89,7 @@ public class SummaryFragment extends Fragment {
             }
             else {
                 buttonPlayTrailer.setVisibility(View.VISIBLE);
-                buttonPlayTrailer.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        playTrailer(previewIds.get(0));
-                    }
-                });
+                buttonPlayTrailer.setOnClickListener(v -> playTrailer(previewIds.get(0)));
             }
 
         };

@@ -305,7 +305,8 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             fragment = getFragment(isChromeCastConnected, mVideoId);
         }
         else {
-            fragment = ThumbnailFragment.newInstance(mVideoId);
+            fragment = ThumbnailFragment.newInstance();
+//            fragment = ThumbnailFragment.newInstance(mVideoId);
         }
         if (fragment != null) {
             showFragment(fragment);
