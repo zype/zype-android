@@ -266,6 +266,15 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         playerViewModel.getPlayerMode().observe(this, playerModeObserver);
         playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
         playerViewModel.onPlayerError().observe(this, playerErrorObserver);
+        if (playerViewModel.isTrailer().getValue()) {
+            ImageButton buttonCloseTrailer = getView().findViewById(R.id.buttonCloseTrailer);
+            buttonCloseTrailer.setVisibility(View.VISIBLE);
+            buttonCloseTrailer.setOnClickListener(v -> {
+                stop();
+                videoViewModel.onVideoFinished(true);
+                playerViewModel.setTrailerVideoId(null);
+            });
+        }
 
         videoViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
         videoViewModel.getVideo().observe(this, video -> {
@@ -407,13 +416,15 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
                 MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playerUrl);
                 if (mediaSource != null) {
-                    if (videoViewModel.getVideoSync().onAir != 1) {
+                    if (videoViewModel.getVideoSync().onAir != 1
+                        && !playerViewModel.isTrailer().getValue()) {
                         player.seekTo(playerViewModel.getPlaybackPosition());
                         playerViewModel.onPlaybackPositionRestored();
                     }
                     player.prepare(mediaSource, false, false);
-
-                    startAds();
+                    if (!playerViewModel.isTrailer().getValue()) {
+                        startAds();
+                    }
                 }
                 updateNextPreviousButtons();
             }

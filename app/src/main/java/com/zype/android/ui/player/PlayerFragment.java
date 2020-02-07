@@ -351,7 +351,7 @@ public class PlayerFragment extends BaseFragment implements
         sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
         videoDetailViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
 
-        if (playerViewModel.isPlayTrailer()) {
+        if (playerViewModel.isTrailer().getValue()) {
             ImageButton buttonCloseTrailer = getView().findViewById(R.id.buttonCloseTrailer);
             buttonCloseTrailer.setVisibility(View.VISIBLE);
             buttonCloseTrailer.setOnClickListener(new View.OnClickListener() {
@@ -867,7 +867,7 @@ public class PlayerFragment extends BaseFragment implements
                 showControls();
                 if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_EPG) {
                     if (playWhenReady) {
-                        if (playerViewModel.isPlayTrailer()) {
+                        if (playerViewModel.isTrailer().getValue()) {
                             videoDetailViewModel.onVideoFinished(true);
                             playerViewModel.setTrailerVideoId(null);
                         }

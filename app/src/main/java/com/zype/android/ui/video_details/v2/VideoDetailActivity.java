@@ -71,6 +71,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
     private PlayerViewModel playerViewModel;
 
     Observer<Video> videoObserver = null;
+    Observer<Boolean> playerIsTrailerObserver = null;
     Observer<PlayerViewModel.Error> playerErrorObserver = null;
 
     private FrameLayout layoutPlayer;
@@ -133,10 +134,14 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         model.getVideo().observe(this, videoObserver);
 
         playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class);
+        if (playerIsTrailerObserver == null) {
+            playerIsTrailerObserver = createPlayerIsTrailerObserver();
+        }
         if (playerErrorObserver == null) {
             playerErrorObserver = createPlayerErrorObserver();
         }
 
+        playerViewModel.isTrailer().observe(this, playerIsTrailerObserver);
         playerViewModel.onPlayerError().observe(this, playerErrorObserver);
         playerViewModel.getPlaybackState().observe(this, state -> {
             if (state != null) {
@@ -234,8 +239,21 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
                 }
                 else {
                     // Show paywall view
-                    showThumbnailFragment(video);
+                    hideProgress();
+                    showThumbnailFragment();
                 }
+            }
+        };
+    }
+
+    private Observer<Boolean> createPlayerIsTrailerObserver() {
+        return isTrailer -> {
+            if (isTrailer == null) {
+                return;
+            }
+            Logger.e("isTrailer()::onChanged(): " + isTrailer);
+            if (isTrailer) {
+                showPlayerFragment();
             }
         };
     }
@@ -301,9 +319,9 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         fragmentTransaction.commit();
     }
 
-    private void showThumbnailFragment(Video video) {
+    private void showThumbnailFragment() {
         Logger.d("showThumbnailView()");
-        Fragment fragment = ThumbnailFragment.newInstance(video.id);
+        Fragment fragment = ThumbnailFragment.newInstance();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.player_container, fragment, PlayerFragment.TAG);

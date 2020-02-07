@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.zype.android.Auth.AuthHelper;
-import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.core.provider.helpers.VideoHelper;
@@ -30,17 +29,18 @@ import com.zype.android.webapi.model.video.Thumbnail;
  */
 public class ThumbnailFragment extends Fragment {
 
-    private String videoId;
-
+//    private String videoId;
+//
     private VideoDetailViewModel model;
-    Observer<Video> videoDetailObserver;
+    private Observer<Video> videoObserver;
 
     public ThumbnailFragment() {}
 
-    public static ThumbnailFragment newInstance(String videoId) {
+//    public static ThumbnailFragment newInstance(String videoId) {
+    public static ThumbnailFragment newInstance() {
         ThumbnailFragment fragment = new ThumbnailFragment();
         Bundle args = new Bundle();
-        args.putString(BundleConstants.VIDEO_ID, videoId);
+//        args.putString(BundleConstants.VIDEO_ID, videoId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -48,12 +48,12 @@ public class ThumbnailFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            videoId = getArguments().getString(BundleConstants.VIDEO_ID);
-        }
-        else {
-            throw new IllegalStateException("VideoId can not be empty");
-        }
+//        if (getArguments() != null) {
+//            videoId = getArguments().getString(BundleConstants.VIDEO_ID);
+//        }
+//        else {
+//            throw new IllegalStateException("VideoId can not be empty");
+//        }
 
         initialize();
     }
@@ -88,16 +88,16 @@ public class ThumbnailFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         model = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
-        model.getVideo(videoId).observe(this, videoDetailObserver);
+        model.getVideo().observe(this, videoObserver);
     }
 
     private void initialize() {
-        if (videoDetailObserver == null) {
-            videoDetailObserver = createVideoDetailObserver();
+        if (videoObserver == null) {
+            videoObserver = createVideoObserver();
         }
     }
 
-    private Observer<Video> createVideoDetailObserver() {
+    private Observer<Video> createVideoObserver() {
         return video -> {
             Logger.d("getVideo(): onChanged()");
 
@@ -127,13 +127,8 @@ public class ThumbnailFragment extends Fragment {
                 }
                 else {
                     buttonWatchNow.setVisibility(View.VISIBLE);
-                    buttonWatchNow.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            NavigationHelper.getInstance(getActivity())
-                                    .handleUnauthorizedVideo(getActivity(), video, null);
-                        }
-                    });
+                    buttonWatchNow.setOnClickListener(v -> NavigationHelper.getInstance(getActivity())
+                            .handleUnauthorizedVideo(getActivity(), video, null));
                 }
             }
         };

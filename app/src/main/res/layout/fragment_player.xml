@@ -26,4 +26,12 @@
             android:visibility="gone"
             />
     </LinearLayout>
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:id="@+id/buttonCloseTrailer"
+        android:src="@drawable/mr_dialog_close_dark"
+        android:visibility="gone"
+        />
 </FrameLayout>
