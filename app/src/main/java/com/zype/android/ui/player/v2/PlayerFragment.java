@@ -213,12 +213,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         buttonFullscreen.setOnClickListener(view -> {
             boolean fullscreen = UiUtils.isLandscapeOrientation(getActivity());
             if (fullscreen) {
-                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-                listenForDeviceRotation(Configuration.ORIENTATION_PORTRAIT);
+                setPortraitOrientation();
             }
             else {
-                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-                listenForDeviceRotation(Configuration.ORIENTATION_LANDSCAPE);
+                setLandscapeOrientation();
             }
         });
 
@@ -255,6 +253,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         initMediaSession();
 
+        sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
+
         playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
         if (playerModeObserver == null)
             playerModeObserver = createPlayerModeObserver();
@@ -273,7 +273,9 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 stop();
                 videoViewModel.onVideoFinished(true);
                 playerViewModel.setTrailerVideoId(null);
+                setPortraitOrientation();
             });
+            setLandscapeOrientation();
         }
 
         videoViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
@@ -287,8 +289,6 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         videoViewModel.isFullscreen().observe(this, fullscreen -> {
             updateFullscreenButton(fullscreen);
         });
-
-        sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
     }
 
     @Override
@@ -446,6 +446,16 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     // UI
+
+    private void setPortraitOrientation() {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+        listenForDeviceRotation(Configuration.ORIENTATION_PORTRAIT);
+    }
+
+    private void setLandscapeOrientation() {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        listenForDeviceRotation(Configuration.ORIENTATION_LANDSCAPE);
+    }
 
     private void enablePlayerControls() {
         playerView.setUseController(true);
@@ -679,6 +689,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     if (playerViewModel.isTrailer().getValue()) {
                         videoViewModel.onVideoFinished(true);
                         playerViewModel.setTrailerVideoId(null);
+                        setPortraitOrientation();
                         break;
                     }
                     if (playerViewModel.getPlaybackState().getValue() != playbackState) {
