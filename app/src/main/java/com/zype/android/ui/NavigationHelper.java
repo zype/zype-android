@@ -221,7 +221,7 @@ public class NavigationHelper {
             if (AuthHelper.isVideoUnlocked(activity, video.id, playlistId)) {
                 switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
             } else {
-                handleUnauthorizedVideo(activity, video, null);
+                handleUnauthorizedVideo(activity, video, playlistId);
             }
         }
     }
