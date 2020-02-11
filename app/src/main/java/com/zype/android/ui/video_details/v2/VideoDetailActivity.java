@@ -99,7 +99,8 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         super.onNewIntent(intent);
         Logger.d("onNewIntent()");
 
-        if (!playerViewModel.isInBackground()) {
+        if (!playerViewModel.isInBackground()
+            && !playerViewModel.isTrailer().getValue()) {
             initialize(intent);
         }
     }
@@ -233,7 +234,9 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
                 if (AuthHelper.isVideoUnlocked(VideoDetailActivity.this,
                         video.id, model.getPlaylistId())) {
                     // Show player view
-                    playerViewModel.init(video.id, model.getPlaylistId(), PlayerViewModel.PlayerMode.VIDEO);
+                    if (playerViewModel.isTrailer() != null && !playerViewModel.isTrailer().getValue()) {
+                        playerViewModel.init(video.id, model.getPlaylistId(), PlayerViewModel.PlayerMode.VIDEO);
+                    }
                     showPlayerFragment();
                 }
                 else {

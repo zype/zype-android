@@ -285,8 +285,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             initProgress(video);
         });
         videoViewModel.isFullscreen().observe(this, fullscreen -> {
-            updateFullscreenButton(fullscreen);
+            if (fullscreen != null) {
+                updateFullscreenButton(fullscreen);
+            }
         });
+
     }
 
     @Override
@@ -413,7 +416,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 attachPlayerToAnalyticsManager(playerUrl);
 
                 MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playerUrl);
-                if (mediaSource != null) {
+                if (mediaSource != null && player != null) {
                     if (videoViewModel.getVideoSync().onAir != 1
                         && !playerViewModel.isTrailer().getValue()) {
                         player.seekTo(playerViewModel.getPlaybackPosition());
