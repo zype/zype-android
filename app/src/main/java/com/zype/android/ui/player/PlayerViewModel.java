@@ -52,6 +52,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private String videoId;
     private String playlistId;
     private String trailerVideoId;
+    private String trailerUrl;
 
     private List<AdSchedule> adSchedule;
     private AnalyticBeacon analyticBeacon;
@@ -95,6 +96,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         availablePlayerModes = new MutableLiveData<>();
         availablePlayerModes.setValue(new ArrayList<>());
         playerMode = new MutableLiveData<>();
+
+        isTrailer.setValue(false);
     }
 
     @Override
@@ -179,6 +182,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public void onPlaybackStarted() {
+        if (isTrailer.getValue()) {
+            return;
+        }
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
 
@@ -190,6 +196,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public void onPlaybackFinished() {
+        if (isTrailer.getValue()) {
+            return;
+        }
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
 
@@ -231,11 +240,14 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     // Player url
 
-    public MutableLiveData<String> getPlayerUrl() {
+    public LiveData<String> getPlayerUrl() {
         if (playerUrl == null) {
             playerUrl = new MutableLiveData<>();
         }
-        if (!isTrailer.getValue()) {
+        if (isTrailer.getValue()) {
+            playerUrl.setValue(trailerUrl);
+        }
+        else {
             Video video = repo.getVideoSync(videoId);
             video.playerAudioUrl = null;
             video.playerVideoUrl = null;
@@ -283,7 +295,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     // Player mode
 
-    public MutableLiveData<PlayerMode> getPlayerMode() {
+    public LiveData<PlayerMode> getPlayerMode() {
         return playerMode;
     }
 
@@ -298,7 +310,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
     }
 
-    public MutableLiveData<List<PlayerMode>> getAvailablePlayerModes() {
+    public LiveData<List<PlayerMode>> getAvailablePlayerModes() {
         return availablePlayerModes;
     }
 
@@ -408,10 +420,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         this.trailerVideoId = trailerVideoId;
         if (TextUtils.isEmpty(trailerVideoId)) {
             isTrailer.setValue(false);
+            trailerUrl = null;
             updatePlayerUrl(repo.getVideoSync(videoId));
         }
         else {
             isTrailer.setValue(true);
+            playerUrl.setValue(trailerUrl);
             loadVideoPlayer(null, null);
         }
     }
@@ -445,7 +459,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
                 // In play trailer mode just update player url
                 if (isTrailer.getValue()) {
-                    playerUrl.setValue(url);
+                    trailerUrl = url;
+                    playerUrl.setValue(trailerUrl);
                     return;
                 }
 
