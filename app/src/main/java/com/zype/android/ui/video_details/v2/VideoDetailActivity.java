@@ -250,7 +250,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
             if (isTrailer == null) {
                 return;
             }
-            Logger.e("isTrailer()::onChanged(): " + isTrailer);
+            Logger.d("isTrailer()::onChanged(): " + isTrailer);
             if (isTrailer) {
                 showPlayerFragment();
             }

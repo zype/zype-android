@@ -675,6 +675,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     break;
                 }
                 case Player.STATE_ENDED: {
+                    if (playerViewModel.isTrailer().getValue()) {
+                        videoViewModel.onVideoFinished(true);
+                        playerViewModel.setTrailerVideoId(null);
+                        break;
+                    }
                     if (playerViewModel.getPlaybackState().getValue() != playbackState) {
                         AnalyticsManager.getInstance().trackStop();
 

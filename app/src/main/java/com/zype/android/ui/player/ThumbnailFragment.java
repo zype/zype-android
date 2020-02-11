@@ -128,7 +128,7 @@ public class ThumbnailFragment extends Fragment {
                 else {
                     buttonWatchNow.setVisibility(View.VISIBLE);
                     buttonWatchNow.setOnClickListener(v -> NavigationHelper.getInstance(getActivity())
-                            .handleUnauthorizedVideo(getActivity(), video, null));
+                            .handleUnauthorizedVideo(getActivity(), video, model.getPlaylistId()));
                 }
             }
         };
