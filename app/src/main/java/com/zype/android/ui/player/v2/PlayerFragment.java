@@ -167,6 +167,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public PlayerFragment() {}
 
     public static PlayerFragment newInstance(String videoId) {
+        Logger.d("newInstance()");
         PlayerFragment fragment = new PlayerFragment();
         Bundle args = new Bundle();
         args.putString(ARG_VIDEO_ID, videoId);
@@ -382,6 +383,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     // View model observers
 
     private Observer<PlayerViewModel.PlayerMode> createPlayerModeObserver() {
+        Logger.d("createPlayerModeObserver()");
         return playerMode -> {
             Logger.d("getPlayerMode(): playerMode=" + playerMode);
             if (playerMode != null) {
@@ -402,10 +404,12 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     private Observer<String> createPlayerUrlObserver() {
+        Logger.d("createPlayerUrlObserver()");
         return playerUrl -> {
             Logger.d("getPlayerUrl(): playerUrl=" + playerUrl);
             if (!TextUtils.isEmpty(playerUrl)) {
-                if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.AUDIO
+                if (player != null
+                        && playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.AUDIO
                         && !playerViewModel.isMediaTypeAvailable(PlayerViewModel.PlayerMode.VIDEO)
                         && player.getRendererCount() > 0) {
                     playerViewModel.onPlaybackPositionRestored();
@@ -602,7 +606,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     private void unregisterReceivers() {
-        if (callReceiver != null) {
+        if (callReceiver != null && isReceiversRegistered) {
             try {
                 getActivity().unregisterReceiver(callReceiver);
             } catch (IllegalArgumentException e) {
@@ -781,7 +785,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         boolean result = false;
         for (int i = 0; i < trackGroups.length; i++) {
             if (trackGroups.get(i).length > 0
-                    && MimeTypes.isVideo(trackGroups.get(0).getFormat(0).sampleMimeType)) {
+                    && MimeTypes.isVideo(trackGroups.get(i).getFormat(0).sampleMimeType)) {
                 result = true;
                 break;
             }
@@ -1069,10 +1073,12 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public void onAdError(AdErrorEvent adErrorEvent) {
         Logger.e("Ad error: " + adErrorEvent.getError().getMessage());
         updateNextAd();
-        if (!checkNextAd(player.getCurrentPosition())) {
-            // Resume video
-            enablePlayerControls();
-            play();
+        if (player != null) {
+            if (!checkNextAd(player.getCurrentPosition())) {
+                // Resume video
+                enablePlayerControls();
+                play();
+            }
         }
     }
 
