@@ -674,7 +674,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
             }
             else {
                 result = new HlsMediaSource.Factory(dataSourceFactory)
-                        .setAllowChunklessPreparation(true)
+//                        .setAllowChunklessPreparation(true)
                         .createMediaSource(Uri.parse(contentUri));
             }
         }
