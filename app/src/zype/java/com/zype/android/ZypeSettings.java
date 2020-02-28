@@ -47,6 +47,10 @@ public class ZypeSettings {
     public static final boolean PLAYLIST_GALLERY_ITEM_INLINE_TITLES = true;
     public static final boolean SHARE_VIDEO_ENABLED = false;
 
+    // Anaylitics
+    public static final boolean SEGMENT_ANALYTICS = false;
+    public static final String SEGMENT_ANALYTICS_WRITE_KEY = "etP6NsW0ahoGMsH7JnoCuCpdd5lFGUio";
+
     //Live
     public static final boolean SHOW_LIVE = false;
     public static final String LIVE_VIDEO_ID = "5c8faa013bbf420fc200bc40";

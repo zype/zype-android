@@ -34,9 +34,11 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
 import com.onesignal.OneSignal;
+import com.segment.analytics.Analytics;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.MarketplaceGateway;
+import com.zype.android.analytics.SegmentAnalytics;
 import com.zype.android.aws.PushListenerService;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
@@ -65,6 +67,8 @@ import io.fabric.sdk.android.Fabric;
 
 
 public class ZypeApp extends MultiDexApplication {
+    private static ZypeApp INSTANCE;
+
     public static final double VOLUME_INCREMENT = 0.05;
     public static final int NOTIFICATION_ID = 100;
     public static final String NOTIFICATION_CHANNEL_ID = "ZypeChannel";
@@ -89,6 +93,10 @@ public class ZypeApp extends MultiDexApplication {
         return (ZypeApp) context.getApplicationContext();
     }
 
+    public static ZypeApp getInstance() {
+        return ZypeApp.INSTANCE;
+    }
+
     @NonNull
     public static GoogleAnalytics analytics() {
         return analytics;
@@ -101,6 +109,7 @@ public class ZypeApp extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        INSTANCE = this;
 
         createNotificationChannel();
 
@@ -111,6 +120,11 @@ public class ZypeApp extends MultiDexApplication {
         WebApiManager.getInstance().subscribe(this);
 
         initApp();
+
+        // Analytics
+        if (appConfiguration.segmentAnalytics()) {
+            SegmentAnalytics.init();
+        }
 
         // Fabric
         // TODO: Uncomment following line to use Fabric

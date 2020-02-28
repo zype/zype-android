@@ -230,6 +230,9 @@ dependencies {
     implementation('com.amazonaws:aws-android-sdk-mobile-client:2.7.+@aar') {
         transitive = true
     }
+
+    // Segment Analytics
+    implementation 'com.segment.analytics.android:analytics:4.+'
 }
 
 // Uncomment below line if using AWS Pinpoint

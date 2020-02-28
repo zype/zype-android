@@ -14,4 +14,12 @@ public class AppConfiguration {
 
     public String marketplace;
 
+    // Analytics
+    public boolean segmentAnalytics() {
+        return ZypeSettings.SEGMENT_ANALYTICS;
+    }
+
+    public String segmentAnalyticsWriteKey() {
+        return ZypeSettings.SEGMENT_ANALYTICS_WRITE_KEY;
+    }
 }
