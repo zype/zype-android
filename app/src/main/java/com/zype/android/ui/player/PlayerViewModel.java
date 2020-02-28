@@ -413,14 +413,17 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     public void loadPlayer() {
         Logger.d("loadPlayer(): videoId=" + videoId);
-        String uuid = null;
-        if (AuthHelper.isLoggedIn()) {
-            AuthHelper.onLoggedIn(isLoggedIn ->
-                    loadVideoPlayer(AuthHelper.getAccessToken(), uuid));
-        }
-        else {
-            loadVideoPlayer(null, uuid);
-        }
+//        String uuid = null;
+        AdMacrosHelper.fetchDeviceId(getApplication().getApplicationContext(), deviceId -> {
+            Logger.d("onDeviceId(): deviceId=" + deviceId);
+            if (AuthHelper.isLoggedIn()) {
+                AuthHelper.onLoggedIn(isLoggedIn ->
+                        loadVideoPlayer(AuthHelper.getAccessToken(), null));
+            }
+            else {
+                loadVideoPlayer(null, null);
+            }
+        });
     }
 
     IZypeApiListener createVideoPlayerListener(String accessToken, String uuid) {

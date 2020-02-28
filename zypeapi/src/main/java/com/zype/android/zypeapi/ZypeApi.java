@@ -404,7 +404,8 @@ public class ZypeApi {
 
     public void getPlayer(@NonNull String videoId, boolean isAudio, String accessToken,
                           String uuid, String appName,
-                          @NonNull final IZypeApiListener listener,HashMap<String, String> params) {
+                          @NonNull final IZypeApiListener listener,
+                          HashMap<String, String> params) {
         if (TextUtils.isEmpty(accessToken)) {
             params.put(ZypeApi.APP_KEY, appKey);
         }
