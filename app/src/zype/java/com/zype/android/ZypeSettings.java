@@ -48,7 +48,7 @@ public class ZypeSettings {
     public static final boolean SHARE_VIDEO_ENABLED = false;
 
     // Anaylitics
-    public static final boolean SEGMENT_ANALYTICS = false;
+    public static final boolean SEGMENT_ANALYTICS = true;
     public static final String SEGMENT_ANALYTICS_WRITE_KEY = "etP6NsW0ahoGMsH7JnoCuCpdd5lFGUio";
 
     //Live

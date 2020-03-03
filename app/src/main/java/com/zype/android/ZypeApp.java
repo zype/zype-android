@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.arch.lifecycle.Observer;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,12 +32,11 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
 import com.onesignal.OneSignal;
-import com.segment.analytics.Analytics;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.MarketplaceGateway;
-import com.zype.android.analytics.SegmentAnalytics;
-import com.zype.android.aws.PushListenerService;
+import com.zype.android.analytics.AnalyticsManager;
+import com.zype.android.analytics.segment.SegmentAnalytics;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.StorageUtils;
@@ -49,7 +46,6 @@ import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.app.AppEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
-import com.zype.android.webapi.model.app.App;
 import com.zype.android.webapi.model.app.AppData;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.zypeapi.ZypeApi;
@@ -122,9 +118,7 @@ public class ZypeApp extends MultiDexApplication {
         initApp();
 
         // Analytics
-        if (appConfiguration.segmentAnalytics()) {
-            SegmentAnalytics.init();
-        }
+        AnalyticsManager.getInstance().init();
 
         // Fabric
         // TODO: Uncomment following line to use Fabric

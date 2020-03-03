@@ -30,6 +30,8 @@ import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.analytics.AnalyticsEvents;
+import com.zype.android.analytics.AnalyticsManager;
 import com.zype.android.core.provider.helpers.PlaylistHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.AdMacrosHelper;
@@ -54,6 +56,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private MutableLiveData<PlayerMode> playerMode;
     private MutableLiveData<String> playerUrl;
     private MutableLiveData<Integer> playbackState = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isPlaying = new MutableLiveData<>();
     private MutableLiveData<Error> error = new MutableLiveData<>();
 
     private String videoId;
@@ -65,8 +68,10 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     private long playbackPosition = 0;
     private boolean isPlaybackPositionRestored;
+    private boolean isPlaybackStarted = false;
     private boolean isUrlLoaded = false;
     private boolean inBackground = false;
+
     private static final String APP_BUNDLE = "app_bundle";
     private static final String APP_DOMAIN = "app_domain";
     private static final String APP_ID = "app_id";
@@ -77,6 +82,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private static final String DEVICE_MODEL = "device_model";
     private static final String UUID = "uuid";
     private static final String VPI = "vpi";
+
     public enum PlayerMode {
         AUDIO,
         VIDEO
@@ -97,8 +103,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
     }
 
-    DataRepository repo;
-    ZypeApi api;
+    private DataRepository repo;
+    private ZypeApi api;
     WebApiManager oldApi;
 
     public PlayerViewModel(Application application) {
@@ -125,7 +131,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
         Video video = repo.getVideoSync(videoId);
         playbackPosition = video.playTime;
+        isPlaybackStarted = false;
         isPlaybackPositionRestored = false;
+        isPlaying.setValue(false);
 
         updateAvailablePlayerModes();
         if (mediaType != null || isMediaTypeAvailable(mediaType)) {
@@ -168,8 +176,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         return playbackPosition;
     }
 
-    public void savePlaybackPosition(long position) {
+    public void setPlaybackPosition(long position) {
         this.playbackPosition = position;
+    }
+
+    public void savePlaybackPosition(long position) {
+        setPlaybackPosition(position);
 
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
@@ -191,13 +203,28 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         isPlaybackPositionRestored = true;
     }
 
-    public void onPlaybackStarted() {
+    public void onPlaybackResumed() {
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
-
             if (video != null) {
                 video.isPlayStarted = 1;
                 repo.updateVideo(video);
+
+                if (!isPlaybackStarted) {
+                    isPlaybackStarted = true;
+                    AnalyticsManager.getInstance()
+                            .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_STARTED, video, playbackPosition);
+                }
+            }
+        }
+    }
+
+    public void onPlayback() {
+        if(!TextUtils.isEmpty(videoId)) {
+            Video video = repo.getVideoSync(videoId);
+            if (video != null) {
+                AnalyticsManager.getInstance()
+                        .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK, video, playbackPosition);
             }
         }
     }
@@ -205,11 +232,13 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     public void onPlaybackFinished() {
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
-
             if (video != null) {
                 video.isPlayStarted = 1;
                 video.isPlayFinished = 1;
                 repo.updateVideo(video);
+
+                AnalyticsManager.getInstance()
+                        .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_FINISHED, video, playbackPosition);
             }
         }
     }
@@ -230,6 +259,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     public void setPlaybackState(int state) {
         playbackState.setValue(state);
+    }
+
+    public LiveData<Boolean> getIsPlaying() { return isPlaying; }
+
+    public void setIsPlaying(boolean value) {
+        isPlaying.setValue(value);
     }
 
     // On air
@@ -497,8 +532,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
         ApplicationInfo appInfo = getApplication().getApplicationInfo();
         // App data
-//        params.put(APP_BUNDLE, appInfo.packageName);
-        params.put(APP_BUNDLE, "com.zype.thisoldhouse");
+        params.put(APP_BUNDLE, appInfo.packageName);
         params.put(APP_DOMAIN, appInfo.packageName);
         params.put(APP_ID, appInfo.packageName);
         params.put(APP_NAME, (appInfo.labelRes == 0) ? appInfo.nonLocalizedLabel.toString() : getApplication().getString(appInfo.labelRes));

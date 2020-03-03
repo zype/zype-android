@@ -56,12 +56,10 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultControlDispatcher;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroup;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
@@ -165,6 +163,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private Runnable runnableTimer;
     private Calendar liveStreamTimeStart;
 
+    // Analytics
+    private static final int ANALYTICS_PLAYBACK_INTERVAL = 5000;
+    private Runnable runnableAnalyticsPlayback;
+
 
     public PlayerFragment() {}
 
@@ -196,6 +198,18 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 }
                 else {
                     Logger.d("runnablePlaybackTime: Player is not ready");
+                }
+            }
+        };
+
+        // Listener to detect current playback time
+        runnableAnalyticsPlayback = () -> {
+            if (player != null) {
+                long currentPosition = player.getCurrentPosition();
+                playerViewModel.setPlaybackPosition(currentPosition);
+                playerViewModel.onPlayback();
+                if (player.getPlayWhenReady()) {
+                    handlerTimer.postDelayed(runnableAnalyticsPlayback, ANALYTICS_PLAYBACK_INTERVAL);
                 }
             }
         };
@@ -328,6 +342,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 //                player.setBackgrounded(true);
             }
             else {
+                handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
                 stopTimer();
             }
         }
@@ -626,6 +641,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         Logger.d("releasePlayer()");
         AnalyticsManager.getInstance().trackStop();
 
+        handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
         if (player != null) {
             player.release();
             player = null;
@@ -653,13 +669,18 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             imageThumbnail.setVisibility(GONE);
             switch (playbackState) {
                 case Player.STATE_IDLE:
+                    handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
                     imageThumbnail.setVisibility(VISIBLE);
                     break;
                 case Player.STATE_READY: {
                     mediaSession.setActive(true);
                     if (player != null) {
                         if (player.getPlayWhenReady()) {
-                            playerViewModel.onPlaybackStarted();
+                            handlerTimer.postDelayed(runnableAnalyticsPlayback, ANALYTICS_PLAYBACK_INTERVAL);
+                            playerViewModel.onPlaybackResumed();
+                        }
+                        else {
+                            handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
                         }
                     }
                     break;
@@ -668,8 +689,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     if (playerViewModel.getPlaybackState().getValue() != playbackState) {
                         AnalyticsManager.getInstance().trackStop();
 
-                        playerViewModel.savePlaybackPosition(0);
+                        handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
+                        playerViewModel.setPlaybackPosition(player.getCurrentPosition());
                         playerViewModel.onPlaybackFinished();
+                        playerViewModel.savePlaybackPosition(0);
 
                         if (ZypeConfiguration.autoplayEnabled(getActivity())
                                 && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
@@ -680,6 +703,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 }
             }
             playerViewModel.setPlaybackState(playbackState);
+            playerViewModel.setIsPlaying(playWhenReady);
         }
 
         @Override

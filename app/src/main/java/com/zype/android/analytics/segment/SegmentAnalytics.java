@@ -1,4 +1,4 @@
-package com.zype.android.analytics;
+package com.zype.android.analytics.segment;
 
 import android.content.Context;
 import android.os.Build;
@@ -9,18 +9,21 @@ import com.segment.analytics.Analytics;
 import com.segment.analytics.Properties;
 import com.zype.android.AppConfiguration;
 import com.zype.android.ZypeApp;
+import com.zype.android.analytics.AnalyticsTags;
+import com.zype.android.analytics.IAnalytics;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK;
 import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_FINISHED;
 import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_STARTED;
 
-public class SegmentAnalytics {
+public class SegmentAnalytics implements IAnalytics {
     private static final String TAG = SegmentAnalytics.class.getSimpleName();
 
-    public static void init() {
+    public void init() {
         AppConfiguration appConfig = ZypeApp.getInstance().getAppConfiguration();
         // Create an analytics client with the given context and Segment write key.
         Analytics analytics = new Analytics.Builder(ZypeApp.getInstance().getApplicationContext(),
@@ -31,10 +34,16 @@ public class SegmentAnalytics {
 
         // Set the initialized instance as a globally accessible instance.
         Analytics.setSingletonInstance(analytics);
+   }
+
+    @Override
+    public void trackPlayerEvent(String event, Map<String, Object> attributes) {
+        Log.d(TAG, "trackPlayerEvent(): " + event);
+        Properties properties = attributesToProperties(attributes);
+        trackEvent(event, properties);
     }
 
-    public static void trackEvent(String event, HashMap<String, Object> attributes) {
-        Properties properties = attributesToProperties(attributes);
+    private void trackEvent(String event, Properties properties) {
         Context context = ZypeApp.getInstance().getApplicationContext();
         switch (event) {
             case EVENT_PLAYBACK_STARTED:
@@ -49,7 +58,7 @@ public class SegmentAnalytics {
         }
     }
 
-    private static Properties attributesToProperties(Map<String, Object> attributes) {
+    private Properties attributesToProperties(Map<String, Object> attributes) {
         Properties properties = new Properties();
 
         String contentCmsCategory = null;
@@ -103,7 +112,7 @@ public class SegmentAnalytics {
         properties.putValue("videoName", title);
 
         // airdate
-        String airdate = (String) attributes.get(AnalyticsTags.VIDEO_AIRDATE);
+        String airdate = (String) attributes.get(AnalyticsTags.VIDEO_PUBLISHED_AT);
         if (TextUtils.isEmpty(airdate)) {
             airdate = null;
         }
