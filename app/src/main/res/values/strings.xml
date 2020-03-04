@@ -206,7 +206,7 @@
     <string name="subscribe_or_login_subtitle">Get access to Premium Content across all devices</string>
 
     <!-- Videos -->
-    <string name="video_detail_button_play_trailer">Play Trailer</string>
+    <string name="video_detail_button_play_trailer">Trailer</string>
     <string name="video_detail_button_watch_now">Watch Now</string>
     <string name="video_error_bad_request">We’re sorry, but there’s an issue playing this video.
         Please try again later, or try watching another video.</string>
