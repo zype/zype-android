@@ -38,7 +38,8 @@ import retrofit2.http.QueryMap;
  */
 
 public interface IZypeApi {
-    String HEADER_USER_AGENT = "Dalvik/2.1.0 (Zype Android; Linux; U; Android 5.0.2; One X Build/LRX22G)";
+//    String HEADER_USER_AGENT = "Dalvik/2.1.0 (Zype Android; Linux; U; Android 5.0.2; One X Build/LRX22G)";
+    String HEADER_USER_AGENT = System.getProperty("http.agent") + " Zype Android ";
 
     String PARAM_PAGE = "page";
 

@@ -58,7 +58,8 @@ public class AdMacrosHelper {
         Map<String, String> result = new HashMap<>();
         ApplicationInfo appInfo = context.getApplicationContext().getApplicationInfo();
         // App data
-        result.put(APP_BUNDLE, appInfo.packageName);
+//        result.put(APP_BUNDLE, appInfo.packageName);
+        result.put(APP_BUNDLE, "com.zype.thisoldhouse");
         result.put(APP_DOMAIN, appInfo.packageName);
         result.put(APP_ID, appInfo.packageName);
         result.put(APP_NAME, (appInfo.labelRes == 0) ? appInfo.nonLocalizedLabel.toString() : context.getString(appInfo.labelRes));
