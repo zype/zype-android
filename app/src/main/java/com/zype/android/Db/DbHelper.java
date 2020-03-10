@@ -210,6 +210,7 @@ public class DbHelper {
         entity.requestCount = String.valueOf(videoData.requestCount);
         entity.season = videoData.season;
         entity.segments = new Gson().toJson(videoData.segments);
+        entity.serializedPlaylistIds = new Gson().toJson(videoData.serializablePlaylistIds);
         entity.shortDescription = videoData.shortDescription;
         entity.siteId = videoData.siteId;
         entity.startAt = videoData.startAt;

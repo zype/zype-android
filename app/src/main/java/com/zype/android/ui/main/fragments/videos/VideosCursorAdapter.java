@@ -7,8 +7,6 @@ import com.google.gson.reflect.TypeToken;
 
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.SubscriptionsHelper;
-import com.zype.android.Db.Entity.Playlist;
-import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
@@ -19,7 +17,6 @@ import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
-import com.zype.android.ui.Gallery.GalleryRowItemsAdapter;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.dialog.VideoMenuDialogFragment;

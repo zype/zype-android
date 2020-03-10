@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.text.TextUtils;
 
 import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
@@ -13,6 +14,7 @@ import com.zype.android.ui.v2.base.BaseViewModel;
 import com.zype.android.ui.v2.base.DataState;
 import com.zype.android.ui.v2.base.StatefulData;
 import com.zype.android.ui.v2.videos.VideoActionsHelper;
+import com.zype.android.ui.v2.videos.VideosViewModel;
 import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
 import com.zype.android.zypeapi.ZypeApiResponse;
@@ -27,40 +29,36 @@ import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_UNFAVORITE
 /**
  * Created by Evgeny Cherkasov on 21.05.2019.
  */
-public class SearchViewModel  extends BaseViewModel {
-    private MutableLiveData<StatefulData<List<Video>>> videos;
+public class SearchViewModel  extends VideosViewModel {
+    private String query;
+    private String playlistId;
 
     public SearchViewModel(Application application) {
         super(application);
     }
 
-    public LiveData<StatefulData<List<Video>>> getVideos() {
-        if (videos == null) {
-            videos = new MutableLiveData<>();
-            videos.setValue(new StatefulData<>(null, null, DataState.READY));
+    protected void retrieveVideos(boolean forceLoad) {
+        if (TextUtils.isEmpty(query)) {
+            updateVideos(new StatefulData<>(null, null, DataState.READY));
         }
-        return videos;
+        else {
+            loadSearchResult(query, playlistId);
+        }
     }
 
     public void search(String query, String playlistId) {
-        if (videos == null) {
-            videos = new MutableLiveData<>();
-        }
-        videos.setValue(new StatefulData<>(null, null, DataState.LOADING));
-        loadSearchResult(query, playlistId);
+        updateVideos(new StatefulData<>(null, null, DataState.LOADING));
+        this.query = query;
+        this.playlistId = playlistId;
+        retrieveVideos(true);
     }
 
     public void clearSearchResults() {
-        if (videos == null) {
-            videos = new MutableLiveData<>();
-        }
-        videos.setValue(new StatefulData<>(null, null, DataState.READY));
+        updateVideos(new StatefulData<>(null, null, DataState.READY));
     }
 
     public void refresh() {
-        if (videos != null) {
-            videos.setValue(videos.getValue());
-        }
+        updateVideos(new StatefulData<>(getVideos().getValue().data, null, DataState.READY));
     }
 
     private void loadSearchResult(String query, String playlistId) {
@@ -82,7 +80,7 @@ public class SearchViewModel  extends BaseViewModel {
                     if (videosResponse.pagination.current == videosResponse.pagination.pages
                         || videosResponse.pagination.pages == 0) {
                         repo.insertVideos(result);
-                        videos.setValue(new StatefulData<>(result, null, DataState.READY));
+                        updateVideos(new StatefulData<>(result, null, DataState.READY));
                     }
                     else {
                         api.searchVideos(query, playlistId, videosResponse.pagination.next, this);
@@ -90,26 +88,15 @@ public class SearchViewModel  extends BaseViewModel {
                 }
                 else {
                     if (videosResponse != null) {
-                        videos.setValue(new StatefulData<>(null, videosResponse.message, DataState.ERROR));
+                        updateVideos(new StatefulData<>(null, videosResponse.message, DataState.ERROR));
                     }
                     else {
-                        videos.setValue(new StatefulData<>(null, getApplication().getString(R.string.videos_error), DataState.ERROR));
+                        updateVideos(new StatefulData<>(null, getApplication().getString(R.string.videos_error), DataState.ERROR));
                     }
                 }
             }
         };
         api.searchVideos(query, playlistId, 1, listener);
-    }
-
-    public void handleVideoAction(int action, Video video, VideoActionsHelper.IVideoActionCallback listener) {
-        switch (action) {
-            case ACTION_FAVORITE:
-                VideoActionsHelper.onFavorite(video, getApplication(), listener);
-                break;
-            case ACTION_UNFAVORITE:
-                VideoActionsHelper.onUnfavorite(video, getApplication(), listener);
-                break;
-        }
     }
 
 }

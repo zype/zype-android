@@ -10,8 +10,10 @@ public class BundleConstants {
     public static final int REQUEST_LOGIN = 6700;
     public static final int REQUEST_USER = 6710;
 
-    public static final int REQUEST_SUBSCRIPTION = 6800;
-    public static final int REQUEST_SUBSCRIBE_OR_LOGIN = 6810;
+    public static final int REQUEST_PAYWALL = 6810;
+    public static final int REQUEST_PURCHASE = 6811;
+    public static final int REQUEST_SUBSCRIPTION = 6820;
+    public static final int REQUEST_SUBSCRIBE_OR_LOGIN = 6830;
 
     public static final String MEDIA_TYPE = "MediaType";
     public static final String PLAYLIST_ID = "PlaylistId";

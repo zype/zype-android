@@ -6,6 +6,8 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
@@ -17,7 +19,10 @@ import com.zype.android.ui.Subscription.SubscriptionHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.model.video.VideoData;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Evgeny Cherkasov on 21.05.2018.
@@ -103,19 +108,33 @@ public class AuthHelper {
     public static boolean isVideoUnlocked(Context context,
                                           String videoId, String playlistId) {
         boolean result = true;
+        DataRepository repo = DataRepository.getInstance((Application) context.getApplicationContext());
 
-        Video video = DataRepository.getInstance((Application) context.getApplicationContext())
-                .getVideoSync(videoId);
+        Video video = repo.getVideoSync(videoId);
         if (video == null) {
             return false;
         }
 
-        Playlist playlist = null;
-        if (!TextUtils.isEmpty(playlistId)) {
-            playlist = DataRepository.getInstance((Application) context.getApplicationContext())
-                    .getPlaylistSync(playlistId);
+        List<Playlist> playlists = new ArrayList<>();
+        if (TextUtils.isEmpty(playlistId)) {
+            Type type = new TypeToken<List<String>>(){}.getType();
+            List<String> playlistIds = new Gson().fromJson(video.serializedPlaylistIds, type);
+            if (playlistIds != null) {
+                for (String id : playlistIds) {
+                    Playlist playlist = repo.getPlaylistSync(id);
+                    if (playlist != null) {
+                        playlists.add(playlist);
+                    }
+                }
+            }
         }
-        if (playlist != null) {
+        else {
+            Playlist playlist = repo.getPlaylistSync(playlistId);
+            if (playlist != null) {
+                playlists.add(playlist);
+            }
+        }
+        for (Playlist playlist : playlists) {
             if (playlist.purchaseRequired == 1) {
                 if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
                     if (video.isEntitled != null && video.isEntitled == 1) {

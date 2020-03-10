@@ -360,15 +360,17 @@ public class LoginActivity extends BaseActivity {
         String email = emailWrapper.getEditText().getText().toString();
         String password = passwordWrapper.getEditText().getText().toString();
 
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            passwordWrapper.setError(getString(R.string.error_invalid_password));
-        }
-
         if (TextUtils.isEmpty(email)) {
             emailWrapper.setError(getString(R.string.error_field_required));
         }
         else if (!isEmailValid(email)) {
             emailWrapper.setError(getString(R.string.error_invalid_email));
+        }
+        else if (TextUtils.isEmpty(password)) {
+            passwordWrapper.setError(getString(R.string.error_field_required));
+        }
+        else if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+            passwordWrapper.setError(getString(R.string.error_invalid_password));
         }
         else {
             emailWrapper.setErrorEnabled(false);
@@ -498,10 +500,12 @@ public class LoginActivity extends BaseActivity {
 
         AuthHelper.onLoginStateChanged();
 
-        DataRepository.getInstance(this.getApplication()).loadVideoFavorites(null);
-
-        setResult(RESULT_OK);
-        finish();
+        DataRepository.getInstance(this.getApplication()).loadVideoFavorites(success -> {
+            DataRepository.getInstance(this.getApplication()).loadVideoEntitlements(success1 -> {
+                setResult(RESULT_OK);
+                finish();
+            });
+        });
     }
 
     @Override

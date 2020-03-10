@@ -49,7 +49,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -245,7 +244,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         imageVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!AuthHelper.isVideoUnlocked(VideoDetailActivity.this, mVideoId, null)) {
+                if (!AuthHelper.isVideoUnlocked(VideoDetailActivity.this, mVideoId, playlistId)) {
                     NavigationHelper.getInstance(VideoDetailActivity.this)
                             .handleNotAuthorizedVideo(VideoDetailActivity.this, mVideoId, playlistId);
                 }
@@ -418,7 +417,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     }
 
     private void checkVideoAuthorization() {
-        if (!AuthHelper.isVideoUnlocked(this, mVideoId, null)) {
+        if (!AuthHelper.isVideoUnlocked(this, mVideoId, playlistId)) {
             showVideoThumbnail();
             NavigationHelper.getInstance(this).handleNotAuthorizedVideo(this, mVideoId, playlistId);
         }
