@@ -571,12 +571,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         if (isTrailer.getValue()) {
             api.getPlayer(trailerVideoId, false, accessToken, uuid,
                     getApplication().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME,
-                    createVideoPlayerListener(accessToken, uuid));
+                    createVideoPlayerListener(accessToken, uuid), getValues());
         }
         else {
             api.getPlayer(videoId, false, accessToken, uuid,
                     getApplication().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME,
-                    createVideoPlayerListener(accessToken, uuid));
+                    createVideoPlayerListener(accessToken, uuid), getValues());
         }
     }
 
@@ -615,7 +615,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private void loadAudioPlayer(String accessToken, String uuid) {
         api.getPlayer(videoId, true, accessToken, uuid,
                 getApplication().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME,
-                createAudioPlayerListener(accessToken, uuid),getValues());
+                createAudioPlayerListener(accessToken, uuid), getValues());
     }
 
     // 'CustomPlayer.InfoListener' implementation

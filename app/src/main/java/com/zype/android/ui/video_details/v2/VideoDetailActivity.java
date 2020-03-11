@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import android.widget.ProgressBar;
 import com.google.android.exoplayer2.Player;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
@@ -79,6 +81,9 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
     private VideoDetailPager pagerSections;
     private FrameLayout layoutSummary;
 
+    Handler handler;
+    Runnable runnableHideSystemUi;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +96,27 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initialize(getIntent());
+
+        handler = new Handler();
+        runnableHideSystemUi = new Runnable() {
+            @Override
+            public void run() {
+                hideSystemUI();
+            }
+        };
+        View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener
+                (new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility) {
+                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                            if (UiUtils.isLandscapeOrientation(VideoDetailActivity.this)) {
+                                handler.postDelayed(runnableHideSystemUi, 2000);
+                            }
+                        } else {
+                        }
+                    }
+                });
         onScreenOrientationChanged();
     }
 
@@ -296,6 +322,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
             layoutPlayer.invalidate();
         }
         else {
+            handler.removeCallbacks(runnableHideSystemUi);
             showSystemUI();
             findViewById(R.id.layoutRoot).setFitsSystemWindows(true);
             if (hasOptions(model.getVideo().getValue().id)) {
