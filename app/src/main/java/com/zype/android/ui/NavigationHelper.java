@@ -266,6 +266,7 @@ public class NavigationHelper {
                 if (ZypeConfiguration.isNativeTvodEnabled(activity)) {
                     extras.putSerializable(EXTRA_PAYWALL_TYPE, PaywallType.PLAYLIST_TVOD);
                     switchToPaywallScreen(activity, extras);
+                    return;
                 }
             }
         }
