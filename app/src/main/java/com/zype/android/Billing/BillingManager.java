@@ -10,6 +10,7 @@ import com.android.billingclient.api.BillingClient.FeatureType;
 import com.android.billingclient.api.BillingClient.SkuType;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
@@ -176,7 +177,8 @@ public class BillingManager implements PurchasesUpdatedListener {
     /**
      * Query SKUs available for purchase
      */
-    public void querySkuDetailsAsync(@SkuType final String itemType, final List<String> skuList, final SkuDetailsResponseListener listener) {
+    public void querySkuDetailsAsync(@SkuType final String itemType, final List<String> skuList,
+                                     final SkuDetailsResponseListener listener) {
         // Creating a runnable from the request to use it inside our connection retry policy below
         Runnable queryRequest = new Runnable() {
             @Override
@@ -242,5 +244,26 @@ public class BillingManager implements PurchasesUpdatedListener {
 
     public List<Purchase> getPurchases() {
         return this.purchases;
+    }
+
+    /**
+     * Consumes all purchases.
+     * Used only for testing one-time purchases
+     */
+    public void clearPurchases() {
+        if (purchases != null) {
+            for (Purchase purchase : purchases) {
+                ConsumeResponseListener listener = new ConsumeResponseListener() {
+                    @Override
+                    public void onConsumeResponse(int result, String outToken) {
+                        if (result == BillingResponse.OK) {
+                            // Handle the success of the consume operation.
+                            // For example, increase the number of coins inside the user's basket.
+                        }
+                    }
+                };
+                mBillingClient.consumeAsync(purchase.getPurchaseToken(), listener);
+            }
+        }
     }
 }

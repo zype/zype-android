@@ -3,6 +3,7 @@ package com.zype.android.ui.v2.videos;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.text.TextUtils;
 
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ui.v2.base.BaseViewModel;
@@ -20,11 +21,17 @@ import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_UNFAVORITE
 public abstract class VideosViewModel extends BaseViewModel {
 
     private MutableLiveData<StatefulData<List<Video>>> videos;
+    protected String playlistId;
+    private MutableLiveData<Video> selectedVideo = new MutableLiveData<>();
 
     public VideosViewModel(Application application) {
         super(application);
         videos = new MutableLiveData<>();
         videos.setValue(new StatefulData<>(null, null, DataState.READY));
+    }
+
+    public void setPlaylistId(String playlistId) {
+        this.playlistId = playlistId;
     }
 
     public LiveData<StatefulData<List<Video>>> getVideos() {
@@ -33,11 +40,26 @@ public abstract class VideosViewModel extends BaseViewModel {
         return videos;
     }
 
-    protected void updateVideos(StatefulData<List<Video>> videos) {
-        this.videos.setValue(videos);
+    public LiveData<Video> getSelectedVideo() {
+        return selectedVideo;
     }
 
-    protected abstract void retrieveVideos(boolean forceLoad);
+    // Actions
+
+    public void onVideoClicked(Video video) {
+        if (TextUtils.isEmpty(playlistId)) {
+            repo.loadVideoPlaylistIds(video.id, response -> {
+                selectedVideo.setValue(repo.getVideoSync(video.id));
+            });
+        }
+        else {
+            selectedVideo.setValue(video);
+        }
+    }
+
+    public void onSelectedVideoProcessed() {
+        selectedVideo.setValue(null);
+    }
 
     public void handleVideoAction(int action, Video video, VideoActionsHelper.IVideoActionCallback listener) {
         switch (action) {
@@ -49,4 +71,13 @@ public abstract class VideosViewModel extends BaseViewModel {
                 break;
         }
     }
+
+    //
+
+    protected void updateVideos(StatefulData<List<Video>> videos) {
+        this.videos.setValue(videos);
+    }
+
+    protected abstract void retrieveVideos(boolean forceLoad);
+
 }

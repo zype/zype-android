@@ -1,0 +1,81 @@
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    <data>
+        <import type="android.view.View" />
+        <variable name="numberOfVideos" type="Integer" />
+        <variable name="playlistPrice" type="String" />
+        <variable name="isSignedIn" type="Boolean" />
+    </data>
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.zype.android.ui.Subscription.SubscribeOrLoginFragment">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/paywall_splash"
+            android:scaleType="centerCrop"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:id="@+id/textTitle"
+            android:text="@{@string/paywall_title(@string/app_name)}"
+            android:gravity="center_horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            app:layout_constraintBottom_toTopOf="@id/textSubtitle"
+            tools:text="@string/paywall_title"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_marginBottom="32dp"
+            android:id="@+id/textSubtitle"
+            android:text="@string/paywall_subtitle"
+            android:gravity="center_horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintBottom_toTopOf="@id/buttonBuyPlaylist"
+            />
+        <Button
+            android:id="@+id/buttonBuyPlaylist"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:text="@{@string/paywall_button_buy_playlist(numberOfVideos, playlistPrice)}"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toTopOf="@id/buttonSignIn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+        <Button
+            android:id="@+id/buttonSignIn"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_sign_in"
+            android:theme="@style/ButtonBorder"
+            android:visibility="@{isSignedIn ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="@id/guidelineBottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+        <android.support.constraint.Guideline
+            android:id="@+id/guidelineBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_end="32dp"
+            />
+    </android.support.constraint.ConstraintLayout>
+</layout>

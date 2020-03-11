@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ui.NavigationHelper;
+import com.zype.android.ui.v2.base.DataState;
 import com.zype.android.utils.Logger;
 
 import java.util.List;
@@ -68,31 +69,40 @@ public class VideosFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         model = ViewModelProviders.of(this).get(PlaylistVideosViewModel.class);
+        model.setPlaylistId(playlistId);
 
         showProgress();
-        model.getVideos(playlistId).observe(this, new Observer<List<Video>>() {
-            @Override
-            public void onChanged(@Nullable List<Video> videos) {
-                Logger.d("getVideos(): size=" + videos.size());
-
-                adapter.setData(videos);
+        model.getVideos().observe(this, videos -> {
+            if (videos.state == DataState.READY) {
+                Logger.d("getVideos(): size=" + videos.data.size());
+                adapter.setData(videos.data);
                 hideProgress();
             }
-        });
-        model.getErrorMessage().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String errorMessage) {
-                if (!TextUtils.isEmpty(errorMessage)) {
+            else if (videos.state == DataState.LOADING) {
+                showProgress();
+            }
+            else if (videos.state == DataState.ERROR) {
+                hideProgress();
+                if (!TextUtils.isEmpty(videos.errorMessage)) {
                     hideProgress();
-                    Snackbar.make(getView(), errorMessage, Snackbar.LENGTH_INDEFINITE).show();
+                    Snackbar.make(getView(), videos.errorMessage, Snackbar.LENGTH_INDEFINITE).show();
                 }
             }
         });
-
+        model.getSelectedVideo().observe(this, video -> {
+            if (video != null) {
+                NavigationHelper navigationHelper = NavigationHelper.getInstance(getActivity());
+                navigationHelper.handleVideoClick(getActivity(), video, playlistId, false);
+                model.onSelectedVideoProcessed();
+            }
+        });
+        adapter.setVideoListener((video) -> {
+            model.onVideoClicked(video);
+        });
         adapter.setPopupMenuListener((action, video) -> {
             model.handleVideoAction(action, video, success -> {
                 if (success) {
-//                    model.retrieveVideos(false);
+                    model.retrieveVideos(false);
                 }
                 else {
                     NavigationHelper.getInstance(getActivity()).switchToLoginScreen(getActivity());
@@ -101,6 +111,12 @@ public class VideosFragment extends Fragment {
         });
 
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        model.retrieveVideos(false);
     }
 
     private void showProgress() {

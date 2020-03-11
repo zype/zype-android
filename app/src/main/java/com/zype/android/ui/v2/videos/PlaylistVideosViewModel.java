@@ -9,6 +9,8 @@ import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
+import com.zype.android.ui.v2.base.DataState;
+import com.zype.android.ui.v2.base.StatefulData;
 import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
 import com.zype.android.zypeapi.ZypeApiResponse;
@@ -23,47 +25,21 @@ import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_UNFAVORITE
 /**
  * Created by Evgeny Cherkasov on 11.02.2019.
  */
-public class PlaylistVideosViewModel extends AndroidViewModel {
-    DataRepository repo;
-    ZypeApi api;
-
-    LiveData<List<Video>> videos;
-    MutableLiveData<String> errorMessage;
+public class PlaylistVideosViewModel extends VideosViewModel {
 
     public PlaylistVideosViewModel(Application application) {
         super(application);
-        repo = DataRepository.getInstance(application);
-        api = ZypeApi.getInstance();
     }
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-    }
-
-    public LiveData<List<Video>> getVideos(String playlistId) {
-        if (videos == null) {
-            videos = repo.getPlaylistVideos(playlistId);
+    protected void retrieveVideos(boolean forceLoad) {
+        updateVideos(new StatefulData<>(repo.getPlaylistVideosSync(playlistId), null, DataState.READY));
+        if (forceLoad) {
+            loadVideos(playlistId);
         }
-        loadVideos(playlistId);
-        return videos;
-    }
-
-    public LiveData<String> getErrorMessage() {
-        if (errorMessage == null) {
-            errorMessage = new MutableLiveData<>();
-        }
-        return errorMessage;
-    }
-
-    public LiveData<String> onError() {
-        if (errorMessage == null) {
-            errorMessage = new MutableLiveData<>();
-        }
-        return errorMessage;
     }
 
     private void loadVideos(final String playlistId) {
+        updateVideos(new StatefulData<>(null, null, DataState.LOADING));
         final List<Video> result = new ArrayList<>();
         final IZypeApiListener listener = new IZypeApiListener() {
             @Override
@@ -83,6 +59,7 @@ public class PlaylistVideosViewModel extends AndroidViewModel {
                         repo.insertVideos(result);
                         repo.deletePlaylistVideos(playlistId);
                         repo.insertPlaylistVideos(DbHelper.videosToPlaylistVideos(result, playlistId));
+                        updateVideos(new StatefulData<>(repo.getPlaylistVideosSync(playlistId), null, DataState.READY));
                     }
                     else {
                         api.getPlaylistVideos(playlistId, videosResponse.pagination.next, this);
@@ -90,26 +67,17 @@ public class PlaylistVideosViewModel extends AndroidViewModel {
                 }
                 else {
                     if (videosResponse != null) {
-                        errorMessage.setValue(videosResponse.message);
+                        updateVideos(new StatefulData<>(null, videosResponse.message, DataState.ERROR));
+//                        errorMessage.setValue(videosResponse.message);
                     }
                     else {
-                        errorMessage.setValue(getApplication().getString(R.string.videos_error));
+                        updateVideos(new StatefulData<>(null, getApplication().getString(R.string.videos_error), DataState.ERROR));
+//                        errorMessage.setValue(getApplication().getString(R.string.videos_error));
                     }
                 }
             }
         };
         api.getPlaylistVideos(playlistId, 1, listener);
-    }
-
-    public void handleVideoAction(int action, Video video, VideoActionsHelper.IVideoActionCallback listener) {
-        switch (action) {
-            case ACTION_FAVORITE:
-                VideoActionsHelper.onFavorite(video, getApplication(), listener);
-                break;
-            case ACTION_UNFAVORITE:
-                VideoActionsHelper.onUnfavorite(video, getApplication(), listener);
-                break;
-        }
     }
 
 }

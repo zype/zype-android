@@ -181,18 +181,16 @@ public class ZypeApp extends MultiDexApplication {
         });
 
         // Setup marketplace connect
-        if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
+        if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)
+            || (ZypeConfiguration.isNativeTvodEnabled(this) && ZypeConfiguration.isUniversalTVODEnabled(this))) {
             marketplaceGateway = new MarketplaceGateway(this, ZypeConfiguration.getAppKey(),
                     ZypeConfiguration.getPlanIds());
             marketplaceGateway.setup();
         }
 
-        AuthHelper.onLoggedIn(new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean isLoggedIn) {
-                if (isLoggedIn) {
-                    loadConsumer();
-                }
+        AuthHelper.onLoggedIn(isLoggedIn -> {
+            if (isLoggedIn) {
+                loadConsumer();
             }
         });
     }
