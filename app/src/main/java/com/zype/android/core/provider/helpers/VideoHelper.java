@@ -359,6 +359,10 @@ public class VideoHelper {
         return previewIds;
     }
 
+    public static boolean hasTrailer(Video video) {
+        return !getPreviewIdsList(video).isEmpty();
+    }
+
     /**
      * Find a thumbnail of the video that is most close to specified height
      *

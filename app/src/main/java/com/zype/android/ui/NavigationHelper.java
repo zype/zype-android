@@ -18,6 +18,7 @@ import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.Auth.LoginActivity;
 import com.zype.android.ui.Consumer.UnAuthorizedUserActivity;
@@ -233,9 +234,11 @@ public class NavigationHelper {
 
     // Video
 
+    // TODO: REFACTORING - Remove 'autoplay' parameter
     public void handleVideoClick(Activity activity, @NonNull Video video, String playlistId, boolean autoplay) {
-        if (ZypeApp.get(activity).getAppConfiguration().updatedPaywalls) {
-            // New paywall flow
+        if (VideoHelper.hasTrailer(video)) {
+            // If the video has a trailer, always open the video detail screen, so a user would be
+            // able to play the trailer video.
             switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
         }
         else {
@@ -247,7 +250,8 @@ public class NavigationHelper {
 
             if (AuthHelper.isVideoUnlocked(activity, video.id, playlistId)) {
                 switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
-            } else {
+            }
+            else {
                 handleLockedVideo(activity, video, playlist);
             }
         }
@@ -290,7 +294,7 @@ public class NavigationHelper {
             }
             else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {
                 if (AuthHelper.isLoggedIn()) {
-                    // TODO: Update getting purchases
+                    // TODO: REFACTORING - Move subcription paywall logic to 'PaywallActivity'
                     List<Purchase> purchases = ZypeApp.marketplaceGateway.getBillingManager().getPurchases();
                     if (purchases != null && purchases.size() > 0) {
                         switchToSubscribeOrLoginScreen(activity, extras);

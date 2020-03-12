@@ -108,13 +108,13 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         Logger.d("onCreate()");
         super.onCreate(savedInstanceState);
 
-        if (ZypeApp.get(this).getAppConfiguration().updatedPaywalls) {
-            initObservers();
-            initModels();
-        }
-        else {
+//        if (ZypeApp.get(this).getAppConfiguration().updatedPaywalls) {
+//            initObservers();
+//            initModels();
+//        }
+//        else {
             checkForRegistration();
-        }
+//        }
     }
 
     private void initialize() {
@@ -643,10 +643,10 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     @Subscribe
     public void handleError(ErrorEvent err) {
         Logger.e("handleError()");
-        if (ZypeApp.get(this).getAppConfiguration().updatedPaywalls) {
-            Logger.e("handleError(): Updated paywall is used, skipping this error handling");
-            return;
-        }
+//        if (ZypeApp.get(this).getAppConfiguration().updatedPaywalls) {
+//            Logger.e("handleError(): Updated paywall is used, skipping this error handling");
+//            return;
+//        }
         if (err.getError() == null) {
             if (err.getEventData() != WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO
                     && err.getEventData() != WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO

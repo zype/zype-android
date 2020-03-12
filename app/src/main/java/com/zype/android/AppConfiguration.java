@@ -14,8 +14,8 @@ public class AppConfiguration {
 
     public String marketplace;
 
-    /* Setting to "true" enables the new paywall flow, that allows user to open the paywalled
-        video detail screen even the user is not signed in / entitled.
-     */
-    public Boolean updatedPaywalls;
+//    /* Setting to "true" enables the new paywall flow, that allows user to open the paywalled
+//        video detail screen even the user is not signed in / entitled.
+//     */
+//    public Boolean updatedPaywalls;
 }

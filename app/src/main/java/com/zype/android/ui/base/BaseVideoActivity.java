@@ -755,16 +755,16 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             if(epgAppendUrl != null) {
                 requestVideoUrl(mVideoId);
             }
-            else
-            if (!ZypeApp.get(this).getAppConfiguration().updatedPaywalls) {
-                if (AuthHelper.isVideoUnlocked(this, mVideoId, null)) {
-                    Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
-                    if (video != null &&
-                            (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video))) {
-                        requestVideoUrl(mVideoId);
-                    }
-                }
-            }
+//            else
+//            if (!ZypeApp.get(this).getAppConfiguration().updatedPaywalls) {
+//                if (AuthHelper.isVideoUnlocked(this, mVideoId, null)) {
+//                    Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
+//                    if (video != null &&
+//                            (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video))) {
+//                        requestVideoUrl(mVideoId);
+//                    }
+//                }
+//            }
         }
     }
 

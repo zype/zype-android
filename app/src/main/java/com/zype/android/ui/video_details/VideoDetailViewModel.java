@@ -61,6 +61,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
     private DataRepository repo;
     private ZypeApi api;
+    // TODO: REFACTORING - Replace any usage of 'WebApiManager' to 'ZypeApi'
     private WebApiManager oldApi;
 
     public VideoDetailViewModel(Application application) {
