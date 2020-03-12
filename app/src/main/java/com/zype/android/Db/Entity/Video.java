@@ -6,6 +6,9 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Evgeny Cherkasov on 13.06.2018
  */
@@ -136,6 +139,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "playlists")
     public String playlists;
 
+    @ColumnInfo(name = "preview_ids")
+    public String previewIds;
+
     @ColumnInfo(name = "published_at")
     public String publishedAt;
 
@@ -210,4 +216,5 @@ public class Video implements PlaylistItem {
     public String getTitle() {
         return title;
     }
+
 }

@@ -41,6 +41,7 @@ import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.accessibility.CaptioningManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -82,6 +83,7 @@ import com.zype.android.ui.chromecast.LivePlayerActivity;
 import com.zype.android.ui.dialog.ErrorDialogFragment;
 import com.zype.android.ui.dialog.SubtitlesDialogFragment;
 import com.zype.android.ui.video_details.VideoDetailActivity;
+import com.zype.android.ui.video_details.VideoDetailViewModel;
 import com.zype.android.ui.video_details.fragments.video.MediaControlInterface;
 import com.zype.android.ui.video_details.fragments.video.OnVideoAudioListener;
 import com.zype.android.utils.BundleConstants;
@@ -122,6 +124,7 @@ public class PlayerFragment extends BaseFragment implements
     public static final int TYPE_AUDIO_LIVE = 5;
     public static final int TYPE_VIDEO_LIVE = 6;
     public static final int TYPE_VIDEO_EPG = 7;
+    public static final int TYPE_VIDEO_TRAILER = 8;
 
     public static final String CONTENT_TYPE_TYPE = "content_type";
     public static final String CONTENT_URL = "content_url";
@@ -199,6 +202,7 @@ public class PlayerFragment extends BaseFragment implements
     // Sensors
     PlayerViewModel playerViewModel;
     SensorViewModel sensorViewModel;
+    VideoDetailViewModel videoDetailViewModel;
 
     public static PlayerFragment newInstance(int mediaType, String filePath, String fileId) {
         PlayerFragment fragment = new PlayerFragment();
@@ -345,6 +349,20 @@ public class PlayerFragment extends BaseFragment implements
         });
 
         sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
+        videoDetailViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
+
+        if (playerViewModel.isTrailer().getValue()) {
+            ImageButton buttonCloseTrailer = getView().findViewById(R.id.buttonCloseTrailer);
+            buttonCloseTrailer.setVisibility(View.VISIBLE);
+            buttonCloseTrailer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    stop();
+                    videoDetailViewModel.onVideoFinished(true);
+                    playerViewModel.setTrailerVideoId(null);
+                }
+            });
+        }
 
         setHasOptionsMenu(true);
     }
@@ -409,7 +427,9 @@ public class PlayerFragment extends BaseFragment implements
         mListener.onFullscreenChanged(UiUtils.isLandscapeOrientation(getActivity()));
         registerReceivers();
         if (player == null) {
-            analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
+            if (!TextUtils.isEmpty(fileId)) {
+                analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
+            }
             preparePlayer(true);
         }
         else {
@@ -417,7 +437,9 @@ public class PlayerFragment extends BaseFragment implements
                 player.setBackgrounded(false);
             }
 
-            analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
+            if (!TextUtils.isEmpty(fileId)) {
+                analytics = VideoHelper.getAnalytics(getActivity().getContentResolver(), fileId);
+            }
             attachPlayerToAnalyticsManager();
 
             player.getPlayerControl().start();
@@ -688,6 +710,7 @@ public class PlayerFragment extends BaseFragment implements
             case TYPE_VIDEO_LIVE:
             case TYPE_AUDIO_WEB:
             case TYPE_AUDIO_LIVE:
+            case TYPE_VIDEO_TRAILER:
                 if (contentUri != null &&
                         (contentUri.contains(".mp4") || contentUri.contains(".m4a") || contentUri.contains(".mp3"))) {
                     return new ExtractorRendererBuilder(getContext(), userAgent, Uri.parse(contentUri), new Mp4Extractor());
@@ -795,7 +818,7 @@ public class PlayerFragment extends BaseFragment implements
         player.setSurface(surfaceView.getHolder().getSurface());
         player.setPlayWhenReady(playWhenReady);
 
-        if (playWhenReady && !adSchedule.isEmpty()) {
+        if (playWhenReady && adSchedule != null && !adSchedule.isEmpty() && !TextUtils.isEmpty(fileId)) {
             long playTime = DataHelper.getPlayTime(getActivity().getContentResolver(), fileId);
             nextAdIndex = seekAdByPosition(playTime);
             if (!checkNextAd(playTime)) {
@@ -844,7 +867,13 @@ public class PlayerFragment extends BaseFragment implements
                 showControls();
                 if (contentType == TYPE_VIDEO_LOCAL || contentType == TYPE_VIDEO_WEB || contentType == TYPE_VIDEO_EPG) {
                     if (playWhenReady) {
-                        mListener.videoFinished();
+                        if (playerViewModel.isTrailer().getValue()) {
+                            videoDetailViewModel.onVideoFinished(true);
+                            playerViewModel.setTrailerVideoId(null);
+                        }
+                        else {
+                            mListener.videoFinished();
+                        }
                     }
                 } else if (contentType == TYPE_AUDIO_LOCAL || contentType == TYPE_AUDIO_WEB) {
                     mListener.audioFinished();
@@ -861,7 +890,7 @@ public class PlayerFragment extends BaseFragment implements
             case ExoPlayer.STATE_READY:
                 mediaSession.setActive(true);
 
-                if (isNeedToSeekToLatestListenPosition && contentType != TYPE_VIDEO_EPG) {
+                if (isNeedToSeekToLatestListenPosition && contentType != TYPE_VIDEO_EPG && !TextUtils.isEmpty(fileId)) {
                     long playerPosition = 0;
                     if (contentType != TYPE_AUDIO_LIVE && contentType != TYPE_VIDEO_LIVE) {
                         playerPosition = DataHelper.getPlayTime(getActivity().getContentResolver(), fileId);
@@ -907,7 +936,7 @@ public class PlayerFragment extends BaseFragment implements
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (deleteFileBeforeExit) {
+        if (deleteFileBeforeExit && !TextUtils.isEmpty(fileId)) {
             Logger.d("ExoPlayer.STATE_ENDED remove download content");
             if (contentType == TYPE_VIDEO_LOCAL) {
                 FileUtils.deleteVideoFile(fileId, getActivity());
@@ -1142,7 +1171,7 @@ public class PlayerFragment extends BaseFragment implements
 
     public void showNotification(boolean isLive, int mediaType) {
         Logger.d("showNotification()");
-        if (player == null) {
+        if (player == null || TextUtils.isEmpty(fileId)) {
             return;
         }
 

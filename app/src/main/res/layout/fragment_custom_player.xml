@@ -29,6 +29,13 @@
             android:id="@+id/thumbnailView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
     </com.google.android.exoplayer.AspectRatioFrameLayout>
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:id="@+id/buttonCloseTrailer"
+        android:src="@drawable/mr_dialog_close_dark"
+        android:visibility="gone"
+        />
 </FrameLayout>

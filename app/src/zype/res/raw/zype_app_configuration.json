@@ -4,5 +4,7 @@
   "hideFavoritesActionWhenSignedOut": false,
 
   "OneSignal": "false",
-  "AWSPinpoint": "false"
+  "AWSPinpoint": "false",
+
+  "updatedPaywalls": "true"
 }

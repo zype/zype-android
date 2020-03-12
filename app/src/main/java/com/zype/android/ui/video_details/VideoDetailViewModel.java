@@ -61,6 +61,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
     private DataRepository repo;
     private ZypeApi api;
+    // TODO: REFACTORING - Replace any usage of 'WebApiManager' to 'ZypeApi'
     private WebApiManager oldApi;
 
     public VideoDetailViewModel(Application application) {
@@ -152,6 +153,13 @@ public class VideoDetailViewModel extends AndroidViewModel {
         }
         else {
             return null;
+        }
+    }
+
+    public void onVideoFinished(boolean isTrailer) {
+        if (isTrailer) {
+            // When trailer playback is finished just fire video detail event with existing data
+            videoLiveData.setValue(videoLiveData.getValue());
         }
     }
 

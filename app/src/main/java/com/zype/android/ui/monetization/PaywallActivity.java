@@ -43,7 +43,7 @@ public class PaywallActivity extends AppCompatActivity {
         setTitle(String.format(getString(R.string.subscribe_or_login_title), getString(R.string.app_name)));
 
         // TODO: REMOVE clearing purchases in the release
-        ZypeApp.marketplaceGateway.getBillingManager().clearPurchases();
+//        ZypeApp.marketplaceGateway.getBillingManager().clearPurchases();
 
         model = ViewModelProviders.of(this).get(PaywallViewModel.class);
         model.setPaywallType((PaywallType) getIntent().getSerializableExtra(EXTRA_PAYWALL_TYPE));
@@ -84,6 +84,15 @@ public class PaywallActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (model.getState().getValue() == PaywallViewModel.State.READY_FOR_PURCHASE) {
+            model.setState(PaywallViewModel.State.SIGNED_IN);
+            return;
+        }
+        super.onBackPressed();
     }
 
     private Observer<Boolean> createPurchasePlaylistVerificationListener() {
@@ -152,7 +161,7 @@ public class PaywallActivity extends AppCompatActivity {
                     }
                 }
                 else {
-                    close();
+//                    close();
                 }
                 break;
             case REQUEST_LOGIN:
@@ -166,7 +175,7 @@ public class PaywallActivity extends AppCompatActivity {
                     }
                 }
                 else {
-                    close();
+//                    close();
                 }
                 break;
             case REQUEST_PURCHASE:
@@ -174,7 +183,7 @@ public class PaywallActivity extends AppCompatActivity {
                     openVideo();
                 }
                 else {
-                    close();
+//                    close();
                 }
                 break;
         }

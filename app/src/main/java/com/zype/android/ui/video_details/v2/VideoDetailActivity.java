@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -22,10 +23,10 @@ import android.widget.ProgressBar;
 import com.google.android.exoplayer2.Player;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.events.ForbiddenErrorEvent;
 import com.zype.android.core.provider.DataHelper;
@@ -37,6 +38,7 @@ import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerViewModel;
+import com.zype.android.ui.player.ThumbnailFragment;
 import com.zype.android.ui.player.v2.PlayerFragment;
 import com.zype.android.ui.video_details.VideoDetailPager;
 import com.zype.android.ui.video_details.VideoDetailPagerAdapter;
@@ -69,6 +71,8 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
     private VideoDetailViewModel model;
     private PlayerViewModel playerViewModel;
 
+    Observer<Video> videoObserver = null;
+    Observer<Boolean> playerIsTrailerObserver = null;
     Observer<PlayerViewModel.Error> playerErrorObserver = null;
 
     private FrameLayout layoutPlayer;
@@ -76,6 +80,9 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
     private TabLayout tabs;
     private VideoDetailPager pagerSections;
     private FrameLayout layoutSummary;
+
+    Handler handler;
+    Runnable runnableHideSystemUi;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,6 +96,27 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initialize(getIntent());
+
+        handler = new Handler();
+        runnableHideSystemUi = new Runnable() {
+            @Override
+            public void run() {
+                hideSystemUI();
+            }
+        };
+        View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener
+                (new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility) {
+                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                            if (UiUtils.isLandscapeOrientation(VideoDetailActivity.this)) {
+                                handler.postDelayed(runnableHideSystemUi, 2000);
+                            }
+                        } else {
+                        }
+                    }
+                });
         onScreenOrientationChanged();
     }
 
@@ -97,7 +125,8 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         super.onNewIntent(intent);
         Logger.d("onNewIntent()");
 
-        if (!playerViewModel.isInBackground()) {
+        if (!playerViewModel.isInBackground()
+            && !playerViewModel.isTrailer().getValue()) {
             initialize(intent);
         }
     }
@@ -125,19 +154,20 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         model = ViewModelProviders.of(this).get(VideoDetailViewModel.class)
                 .setVideoId(videoId)
                 .setPlaylistId(playlistId);
-        model.getVideo().observe(this, video -> {
-            if (video != null) {
-                getSupportActionBar().setTitle(video.title);
-                playerViewModel.init(video.id, playlistId, PlayerViewModel.PlayerMode.VIDEO);
-                showPlayerFragment();
-            }
-        });
+        if (videoObserver == null) {
+            videoObserver = createVideoObserver();
+        }
+        model.getVideo().observe(this, videoObserver);
 
         playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class);
+        if (playerIsTrailerObserver == null) {
+            playerIsTrailerObserver = createPlayerIsTrailerObserver();
+        }
         if (playerErrorObserver == null) {
             playerErrorObserver = createPlayerErrorObserver();
         }
 
+        playerViewModel.isTrailer().observe(this, playerIsTrailerObserver);
         playerViewModel.onPlayerError().observe(this, playerErrorObserver);
         playerViewModel.getPlaybackState().observe(this, state -> {
             if (state != null) {
@@ -167,9 +197,9 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
                 || !ZypeApp.get(this).getAppConfiguration().hideFavoritesActionWhenSignedOut) {
             return true;
         }
-        if (ZypeSettings.SHARE_VIDEO_ENABLED) {
-            return true;
-        }
+//        if (ZypeSettings.SHARE_VIDEO_ENABLED) {
+//            return true;
+//        }
         if (ZypeConfiguration.isDownloadsEnabled(this) &&
                 (isAudioDownloadUrlExists(videoId) || isVideoDownloadUrlExists(videoId))) {
             return true;
@@ -217,6 +247,45 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
 
     // View model observers
 
+    private Observer<Video> createVideoObserver() {
+        return video -> {
+            Logger.d("getVideo(): onChanged()");
+            if (video == null) {
+                // Show no video view
+            }
+            else {
+                // Update title
+                getSupportActionBar().setTitle(video.title);
+                // Check video authorization
+                if (AuthHelper.isVideoUnlocked(VideoDetailActivity.this,
+                        video.id, model.getPlaylistId())) {
+                    // Show player view
+                    if (playerViewModel.isTrailer() != null && !playerViewModel.isTrailer().getValue()) {
+                        playerViewModel.init(video.id, model.getPlaylistId(), PlayerViewModel.PlayerMode.VIDEO);
+                    }
+                    showPlayerFragment();
+                }
+                else {
+                    // Show paywall view
+                    hideProgress();
+                    showThumbnailFragment();
+                }
+            }
+        };
+    }
+
+    private Observer<Boolean> createPlayerIsTrailerObserver() {
+        return isTrailer -> {
+            if (isTrailer == null) {
+                return;
+            }
+            Logger.d("isTrailer()::onChanged(): " + isTrailer);
+            if (isTrailer) {
+                showPlayerFragment();
+            }
+        };
+    }
+
     private Observer<PlayerViewModel.Error> createPlayerErrorObserver() {
         return error -> {
             if (error == null) {
@@ -253,6 +322,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
             layoutPlayer.invalidate();
         }
         else {
+            handler.removeCallbacks(runnableHideSystemUi);
             showSystemUI();
             findViewById(R.id.layoutRoot).setFitsSystemWindows(true);
             if (hasOptions(model.getVideo().getValue().id)) {
@@ -273,6 +343,15 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         showProgress();
 
         PlayerFragment fragment = PlayerFragment.newInstance(getIntent().getStringExtra(EXTRA_VIDEO_ID));
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.player_container, fragment, PlayerFragment.TAG);
+        fragmentTransaction.commit();
+    }
+
+    private void showThumbnailFragment() {
+        Logger.d("showThumbnailView()");
+        Fragment fragment = ThumbnailFragment.newInstance();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.player_container, fragment, PlayerFragment.TAG);
