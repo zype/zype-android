@@ -86,6 +86,15 @@ public class PaywallActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if (model.getState().getValue() == PaywallViewModel.State.READY_FOR_PURCHASE) {
+            model.setState(PaywallViewModel.State.SIGNED_IN);
+            return;
+        }
+        super.onBackPressed();
+    }
+
     private Observer<Boolean> createPurchasePlaylistVerificationListener() {
         return result -> {
             PaywallActivity.this.hideProgress();
