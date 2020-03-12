@@ -445,7 +445,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         else {
             isTrailer.setValue(true);
             playerUrl.setValue(trailerUrl);
-            loadVideoPlayer(null, null);
+            loadPlayer();
         }
     }
 
