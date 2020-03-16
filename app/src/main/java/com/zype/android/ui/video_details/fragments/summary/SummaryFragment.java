@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.ns.developer.tagview.widget.TagCloudLinkView;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.ui.base.BaseFragment;
@@ -83,15 +84,19 @@ public class SummaryFragment extends Fragment {
             textDescription.setText(video.description);
 
             Button buttonPlayTrailer = getView().findViewById(R.id.buttonPlayTrailer);
-            final List<String> previewIds = VideoHelper.getPreviewIdsList(video);
-            if (previewIds.isEmpty()) {
-                buttonPlayTrailer.setVisibility(View.GONE);
+            if (ZypeConfiguration.trailers()) {
+                final List<String> previewIds = VideoHelper.getPreviewIdsList(video);
+                if (previewIds.isEmpty()) {
+                    buttonPlayTrailer.setVisibility(View.GONE);
+                }
+                else {
+                    buttonPlayTrailer.setVisibility(View.VISIBLE);
+                    buttonPlayTrailer.setOnClickListener(v -> playTrailer(previewIds.get(0)));
+                }
             }
             else {
-                buttonPlayTrailer.setVisibility(View.VISIBLE);
-                buttonPlayTrailer.setOnClickListener(v -> playTrailer(previewIds.get(0)));
+                buttonPlayTrailer.setVisibility(View.GONE);
             }
-
         };
     }
 

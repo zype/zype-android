@@ -213,4 +213,12 @@ public class ZypeConfiguration {
     public static boolean playlistGalleryItemInlineTitles() {
         return ZypeSettings.PLAYLIST_GALLERY_ITEM_INLINE_TITLES;
     }
+
+    public static boolean playerPaywall() {
+        return ZypeSettings.PLAYER_PAYWALL_ENABLED;
+    }
+
+    public static boolean trailers() {
+        return ZypeSettings.TRAILERS_ENABLED;
+    }
 }

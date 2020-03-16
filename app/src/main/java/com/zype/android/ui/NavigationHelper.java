@@ -236,9 +236,11 @@ public class NavigationHelper {
 
     // TODO: REFACTORING - Remove 'autoplay' parameter
     public void handleVideoClick(Activity activity, @NonNull Video video, String playlistId, boolean autoplay) {
-        if (VideoHelper.hasTrailer(video)) {
-            // If the video has a trailer, always open the video detail screen, so a user would be
-            // able to play the trailer video.
+        if (ZypeConfiguration.playerPaywall()
+                || ZypeConfiguration.trailers() && VideoHelper.hasTrailer(video)) {
+            // If the 'Player paywall' feature is enabled,
+            // or the 'Trailers' feature is enabled and the video has a trailer,
+            // open the video detail screen, where user can play the trailer or purchase the video.
             switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
         }
         else {
