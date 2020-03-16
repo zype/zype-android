@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -212,7 +213,10 @@ public class PaywallViewModel extends BaseViewModel {
     }
 
     public void updateEntitlements(DataRepository.IDataLoading listener) {
-        repo.loadVideoEntitlements(listener);
+        Handler handler = new Handler();
+        handler.postDelayed(() -> {
+                repo.loadVideoEntitlements(listener);
+            }, 5000);
     }
 
     // Util

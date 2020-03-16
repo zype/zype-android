@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.ZypeApp;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
@@ -64,12 +65,15 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
         billingManager = new BillingManager(context, this);
 
         // Load Zype plans
-        subscriptionsLiveData = new MutableLiveData<>();
-        final Map<String, Subscription> subscriptions = new LinkedHashMap<>();
-        subscriptionsLiveData.setValue(subscriptions);
+        if (ZypeConfiguration.isNativeSubscriptionEnabled(context)
+            || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(context)) {
+            subscriptionsLiveData = new MutableLiveData<>();
+            final Map<String, Subscription> subscriptions = new LinkedHashMap<>();
+            subscriptionsLiveData.setValue(subscriptions);
 
-        for (final String planId : planIds) {
-            loadPlan(planId);
+            for (final String planId : planIds) {
+                loadPlan(planId);
+            }
         }
     }
 

@@ -97,13 +97,14 @@ public class PaywallActivity extends AppCompatActivity {
 
     private Observer<Boolean> createPurchasePlaylistVerificationListener() {
         return result -> {
-            PaywallActivity.this.hideProgress();
             if (result) {
                 model.updateEntitlements(success -> {
+                    PaywallActivity.this.hideProgress();
                     PaywallActivity.this.setResult(RESULT_OK);
                     PaywallActivity.this.openVideo();
                 });
             } else {
+                PaywallActivity.this.hideProgress();
                 DialogHelper.showErrorAlert(PaywallActivity.this,
                         PaywallActivity.this.getString(R.string.paywall_error_validation));
             }

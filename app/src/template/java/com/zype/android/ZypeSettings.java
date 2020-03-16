@@ -30,6 +30,7 @@ public class ZypeSettings {
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = Boolean.valueOf("<SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED>");
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<UNIVERSAL_SUBSCRIPTION_ENABLED>");
     public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("<UNIVERSAL_TVOD>");
+    public static final boolean PLAYER_PAYWALL_ENABLED = false;
 
     // Features
     public static final boolean AUTOPLAY = Boolean.valueOf("<AUTOPLAY>");
@@ -49,6 +50,7 @@ public class ZypeSettings {
     public static final boolean PLAYLIST_GALLERY_ITEM_INLINE_TITLES = false;
     public static final boolean SHARE_VIDEO_ENABLED = false;
     public static final boolean SHOW_LIVE = false;
+    public static final boolean TRAILERS_ENABLED = true;
 
     public static final String LIVE_VIDEO_ID = "";
 
