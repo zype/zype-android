@@ -17,7 +17,7 @@ import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
-import com.zype.android.Billing.SubscriptionsHelper;
+import com.zype.android.Billing.SubscriptionHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
 import com.zype.android.Db.Entity.Video;
@@ -46,17 +46,14 @@ import com.zype.android.utils.ListUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.builder.DownloadAudioParamsBuilder;
 import com.zype.android.webapi.builder.DownloadVideoParamsBuilder;
 import com.zype.android.webapi.builder.FavoriteParamsBuilder;
 import com.zype.android.webapi.builder.SettingsParamsBuilder;
-import com.zype.android.webapi.events.consumer.ConsumerEvent;
 import com.zype.android.webapi.events.download.DownloadAudioEvent;
 import com.zype.android.webapi.events.download.DownloadVideoEvent;
 import com.zype.android.webapi.events.favorite.FavoriteEvent;
 import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
-import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.File;
 import com.zype.android.zypeapi.ZypeApi;
@@ -478,7 +475,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
-            SubscriptionsHelper.updateSubscriptionCount(purchases);
+            SubscriptionHelper.updateSubscriptionCount(purchases);
         }
     }
 

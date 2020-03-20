@@ -8,7 +8,7 @@ public class AuthState {
         this.consumer = consumer;
     }
 
-    boolean isAuthenticated;
+    public boolean isAuthenticated;
 
-    ConsumerData consumer;
+    public ConsumerData consumer;
 }

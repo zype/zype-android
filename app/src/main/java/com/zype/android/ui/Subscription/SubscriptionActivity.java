@@ -17,10 +17,9 @@ import android.widget.TextView;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
-import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.Subscription;
-import com.zype.android.Billing.SubscriptionsHelper;
+import com.zype.android.Billing.SubscriptionHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
@@ -30,9 +29,6 @@ import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
-import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.events.ErrorEvent;
-import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -230,7 +226,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             if (purchases != null && !purchases.isEmpty()) {
                 result = true;
             }
-            SubscriptionsHelper.updateSubscriptionCount(purchases);
+            SubscriptionHelper.updateSubscriptionCount(purchases);
         }
         else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
             if (purchases != null && !purchases.isEmpty()) {

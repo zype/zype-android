@@ -425,7 +425,7 @@ public class ZypeApp extends MultiDexApplication {
         return pinpointManager;
     }
 
-    AuthState getAuthState() {
+    public AuthState getAuthState() {
         return authState;
     }
 

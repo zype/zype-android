@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import com.zype.android.Auth.AuthHelper;
-import com.zype.android.Billing.SubscriptionsHelper;
+import com.zype.android.Billing.SubscriptionHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
@@ -438,7 +438,7 @@ public class VideosCursorAdapter extends CursorAdapter {
             }
         }
         if (holder.subscriptionRequired) {
-            if (SubscriptionsHelper.isUserSubscribed(mActivity)) {
+            if (SubscriptionHelper.isUserSubscribed(mActivity)) {
                 return true;
             }
         }
