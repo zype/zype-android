@@ -445,11 +445,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
     }
 
-    private void requestConsumerData() {
-        ConsumerParamsBuilder builder = new ConsumerParamsBuilder()
-                .addAccessToken();
-        getApi().executeRequest(WebApiManager.Request.CONSUMER_GET, builder.build());
-    }
+//    private void requestConsumerData() {
+//        ConsumerParamsBuilder builder = new ConsumerParamsBuilder()
+//                .addAccessToken();
+//        getApi().executeRequest(WebApiManager.Request.CONSUMER_GET, builder.build());
+//    }
 
     protected View getBaseView() {
         return ((ViewGroup) this
@@ -491,13 +491,13 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
 //    -------------------SUBSCRIBE-------------------
 
-    @Subscribe
-    public void handleConsumer(ConsumerEvent event) {
-        Logger.d("handleConsumer");
-        Consumer data = event.getEventData().getModelData();
-        int subscriptionCount = data.getConsumerData().getSubscriptionCount();
-        SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
-    }
+//    @Subscribe
+//    public void handleConsumer(ConsumerEvent event) {
+//        Logger.d("handleConsumer");
+//        Consumer data = event.getEventData().getModelData();
+//        int subscriptionCount = data.getConsumerData().getSubscriptionCount();
+//        SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
+//    }
 
     @Subscribe
     public void handleDownloadVideo(DownloadVideoEvent event) {

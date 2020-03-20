@@ -69,6 +69,10 @@ public class VideoData {
     @Expose
     public boolean onAir;
 
+    @SerializedName("plan_ids")
+    @Expose
+    public List<String> planIds = new ArrayList<>();
+
     @SerializedName("preview_ids")
     @Expose
     public List<String> previewIds = new ArrayList<>();
