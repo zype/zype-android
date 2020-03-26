@@ -502,7 +502,9 @@ public class LoginActivity extends BaseActivity {
 
         DataRepository.getInstance(this.getApplication()).loadVideoFavorites(success -> {
             DataRepository.getInstance(this.getApplication()).loadVideoEntitlements(success1 -> {
-                setResult(RESULT_OK);
+                Intent resultData = new Intent();
+                resultData.putExtras(getIntent().getExtras());
+                setResult(RESULT_OK, resultData);
                 finish();
             });
         });

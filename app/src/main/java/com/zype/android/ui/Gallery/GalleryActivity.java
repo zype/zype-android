@@ -13,6 +13,7 @@ import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.utils.BundleConstants;
 
+import static com.zype.android.utils.BundleConstants.REQUEST_LOGIN;
 import static com.zype.android.utils.BundleConstants.REQUEST_USER;
 
 public class GalleryActivity extends BaseActivity {
@@ -58,6 +59,7 @@ public class GalleryActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         switch (requestCode) {
             case REQUEST_USER:
+            case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     if (data != null) {
                         Bundle extras = data.getExtras();

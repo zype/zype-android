@@ -1,7 +1,7 @@
 package com.zype.android.ui.v2.videos;
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -13,13 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.v2.base.DataState;
+import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.Logger;
 
-import java.util.List;
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Evgeny Cherkasov on 12.02.2019
@@ -117,6 +117,18 @@ public class VideosFragment extends Fragment {
     public void onResume() {
         super.onResume();
         model.retrieveVideos(false);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case BundleConstants.REQUEST_LOGIN:
+                if (resultCode == RESULT_OK) {
+                    model.retrieveVideos(false);
+                }
+                return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void showProgress() {
