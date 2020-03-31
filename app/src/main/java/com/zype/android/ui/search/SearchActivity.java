@@ -5,7 +5,7 @@ import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
-import com.zype.android.Billing.SubscriptionsHelper;
+import com.zype.android.Billing.SubscriptionHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.Contract;
@@ -509,7 +509,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
-            SubscriptionsHelper.updateSubscriptionCount(purchases);
+            SubscriptionHelper.updateSubscriptionCount(purchases);
         }
     }
 

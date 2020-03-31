@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 
 import com.android.billingclient.api.Purchase;
 import com.zype.android.Billing.Subscription;
+import com.zype.android.Billing.SubscriptionHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ui.NavigationHelper;

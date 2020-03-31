@@ -23,7 +23,7 @@ public class AppData {
 
     @SerializedName("_id")
     @Expose
-    public String Id;
+    public String id;
 
     @SerializedName("featured_playlist_id")
     @Expose

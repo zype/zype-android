@@ -8,14 +8,13 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.zype.android.Billing.SubscriptionHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
-import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.Subscription.SubscriptionHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.model.video.VideoData;
 
@@ -192,17 +191,18 @@ public class AuthHelper {
                 }
             }
             else if (ZypeConfiguration.isUniversalSubscriptionEnabled(context)) {
-                if (isLoggedIn()) {
-                    if (SubscriptionHelper.hasSubscription()) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-                else {
-                    return false;
-                }
+                return SubscriptionHelper.videoBelongToAnySubscription(context, video);
+//                if (isLoggedIn()) {
+//                    if (SubscriptionHelper.hasSubscription()) {
+//                        return true;
+//                    }
+//                    else {
+//                        return false;
+//                    }
+//                }
+//                else {
+//                    return false;
+//                }
             }
             else {
                 // Video requires subscription, but NSVOD and USVOD options are turned off

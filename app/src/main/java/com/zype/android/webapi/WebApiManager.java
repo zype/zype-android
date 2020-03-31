@@ -72,7 +72,6 @@ import com.zype.android.webapi.model.auth.RefreshAccessToken;
 import com.zype.android.webapi.model.auth.RetrieveAccessToken;
 import com.zype.android.webapi.model.epg.Channel;
 import com.zype.android.webapi.model.epg.ChannelResponse;
-import com.zype.android.webapi.model.epg.Program;
 import com.zype.android.webapi.model.epg.ProgramResponse;
 import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectBodyData;
 import com.zype.android.webapi.model.marketplaceconnect.MarketplaceConnectResponse;
@@ -102,19 +101,14 @@ import com.zype.android.webapi.model.video.VideoListResponse;
 import com.zype.android.webapi.model.video.VideoResponse;
 import com.zype.android.webapi.model.zobjects.ZObjectResponse;
 
-import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.OkClient;
-import retrofit.client.Response;
 
 /**
  * @author vasya

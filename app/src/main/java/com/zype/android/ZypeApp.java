@@ -36,6 +36,7 @@ import com.google.gson.Gson;
 import com.onesignal.OneSignal;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Auth.AuthState;
 import com.zype.android.Billing.MarketplaceGateway;
 import com.zype.android.aws.PushListenerService;
 import com.zype.android.core.settings.SettingsProvider;
@@ -47,10 +48,14 @@ import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.app.AppEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
-import com.zype.android.webapi.model.app.App;
-import com.zype.android.webapi.model.app.AppData;
 import com.zype.android.webapi.model.consumers.Consumer;
+import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
+import com.zype.android.zypeapi.ZypeApiResponse;
+import com.zype.android.zypeapi.model.AppData;
+import com.zype.android.zypeapi.model.AppResponse;
+import com.zype.android.zypeapi.model.ConsumerData;
+import com.zype.android.zypeapi.model.ConsumerResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,7 +84,10 @@ public class ZypeApp extends MultiDexApplication {
     public static boolean needToLoadData = true;
     public static AppData appData;
     private AppConfiguration appConfiguration;
+
     public static MarketplaceGateway marketplaceGateway;
+
+    private AuthState authState;
 
     // AWS
     private static PinpointManager pinpointManager;
@@ -108,7 +116,7 @@ public class ZypeApp extends MultiDexApplication {
         SettingsProvider.create(this);
         WebApiManager.create(this);
 
-        WebApiManager.getInstance().subscribe(this);
+//        WebApiManager.getInstance().subscribe(this);
 
         initApp();
 
@@ -192,12 +200,15 @@ public class ZypeApp extends MultiDexApplication {
             if (isLoggedIn) {
                 loadConsumer();
             }
+            else {
+                authState = new AuthState(false, null);
+            }
         });
     }
 
     @Override
     public void onTerminate() {
-        WebApiManager.getInstance().unsubscribe(this);
+//        WebApiManager.getInstance().unsubscribe(this);
 
         super.onTerminate();
     }
@@ -222,11 +233,18 @@ public class ZypeApp extends MultiDexApplication {
     private void initApp() {
         appConfiguration = readAppConfiguration();
 
-        ZypeApi.getInstance().init(ZypeConfiguration.getAppKey());
+        ZypeApi api = ZypeApi.getInstance();
+        api.init(ZypeConfiguration.getAppKey());
 
         appData = null;
-        AppParamsBuilder builder = new AppParamsBuilder();
-        WebApiManager.getInstance().executeRequest(WebApiManager.Request.APP, builder.build());
+        api.getApp((IZypeApiListener<AppResponse>) response -> {
+            if (response.isSuccessful) {
+                appData = response.data.data;
+                Logger.d("initApp(): App data loaded");
+            }
+        });
+//        AppParamsBuilder builder = new AppParamsBuilder();
+//        WebApiManager.getInstance().executeRequest(WebApiManager.Request.APP, builder.build());
     }
 
     private AppConfiguration readAppConfiguration() {
@@ -246,37 +264,46 @@ public class ZypeApp extends MultiDexApplication {
     }
 
     private void loadConsumer() {
-        ConsumerParamsBuilder builder = new ConsumerParamsBuilder()
-                .addAccessToken();
-        WebApiManager.getInstance().executeRequest(WebApiManager.Request.CONSUMER_GET, builder.build());
+        ZypeApi.getInstance().getConsumer(
+                SettingsProvider.getInstance().getAccessTokenResourceOwnerId(),
+                AuthHelper.getAccessToken(),
+                (IZypeApiListener<ConsumerResponse>) response -> {
+                    if (response.isSuccessful) {
+                        Logger.d("loadConsumer(): Consumer data loaded");
+                        authState = new AuthState(true, response.data.consumerData);
+                    }
+                });
+//        ConsumerParamsBuilder builder = new ConsumerParamsBuilder()
+//                .addAccessToken();
+//        WebApiManager.getInstance().executeRequest(WebApiManager.Request.CONSUMER_GET, builder.build());
     }
 
-    @Subscribe
-    public void handleApp(AppEvent event) {
-        appData = event.getEventData().getModelData().getAppData();
-        Logger.i("handleApp(): App data successfully loaded");
-    }
+//    @Subscribe
+//    public void handleApp(AppEvent event) {
+//        appData = event.getEventData().getModelData().getAppData();
+//        Logger.i("handleApp(): App data successfully loaded");
+//    }
+//
+//    @Subscribe
+//    public void handleConsumer(ConsumerEvent event) {
+//        Logger.d("handleConsumer()");
+//        if (event.getRequest() == WebApiManager.Request.CONSUMER_FORGOT_PASSWORD) {
+//            return;
+//        }
+//        Consumer data = event.getEventData().getModelData();
+//        int subscriptionCount = data.getConsumerData().getSubscriptionCount();
+//        SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
+//        String consumerId = data.getConsumerData().getId();
+//        SettingsProvider.getInstance().saveConsumerId(consumerId);
+//        SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, data.getConsumerData().getEmail());
+//    }
 
-    @Subscribe
-    public void handleConsumer(ConsumerEvent event) {
-        Logger.d("handleConsumer()");
-        if (event.getRequest() == WebApiManager.Request.CONSUMER_FORGOT_PASSWORD) {
-            return;
-        }
-        Consumer data = event.getEventData().getModelData();
-        int subscriptionCount = data.getConsumerData().getSubscriptionCount();
-        SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
-        String consumerId = data.getConsumerData().getId();
-        SettingsProvider.getInstance().saveConsumerId(consumerId);
-        SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, data.getConsumerData().getEmail());
-    }
-
-    @Subscribe
-    public void handleError(ErrorEvent event) {
-        if (event.getEventData() == WebApiManager.Request.APP) {
-            Logger.e("handleError(): Retrieving app data failed");
-        }
-    }
+//    @Subscribe
+//    public void handleError(ErrorEvent event) {
+//        if (event.getEventData() == WebApiManager.Request.APP) {
+//            Logger.e("handleError(): Retrieving app data failed");
+//        }
+//    }
 
     private void initFabric() {
         if (!BuildConfig.DEBUG) {
@@ -398,6 +425,9 @@ public class ZypeApp extends MultiDexApplication {
         return pinpointManager;
     }
 
+    public AuthState getAuthState() {
+        return authState;
+    }
 
     // Util
 

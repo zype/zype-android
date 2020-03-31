@@ -6,6 +6,8 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.zype.android.zypeapi.model.AppResponse;
+import com.zype.android.zypeapi.model.ConsumerResponse;
 import com.zype.android.zypeapi.model.ErrorBody;
 import com.zype.android.zypeapi.model.MarketplaceConnectBody;
 import com.zype.android.zypeapi.model.MarketplaceConnectBodyData;
@@ -194,24 +196,6 @@ public class ZypeApi {
 //        }
 //    }
 //
-//    public AppResponse getApp() {
-//        try {
-//            HashMap<String, String> params = new HashMap<>();
-//            params.put(APP_KEY, ZypeSettings.APP_KEY);
-//            Response response = apiImpl.getApp(params).execute();
-//            if (response.isSuccessful()) {
-//                return (AppResponse) response.body();
-//            }
-//            else {
-//                return null;
-//            }
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-//
 //    public DevicePinResponse getDevicePin(String deviceId) {
 //        try {
 //            HashMap<String, String> params = new HashMap<>();
@@ -270,23 +254,6 @@ public class ZypeApi {
 //        }
 //    }
 //
-//    public ConsumerResponse getConsumer(String consumerId, String accessToken) {
-//        try {
-//            HashMap<String, String> params = new HashMap<>();
-//            params.put(ACCESS_TOKEN, accessToken);
-//            Response response = apiImpl.getConsumer(consumerId, params).execute();
-//            if (response.isSuccessful()) {
-//                return (ConsumerResponse) response.body();
-//            }
-//            else {
-//                return null;
-//            }
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
 //
 //    public VideoEntitlementsResponse getVideoEntitlements(String accessToken, int page, int perPage) {
 //        try {
@@ -406,6 +373,63 @@ public class ZypeApi {
 //            return null;
 //        }
 //    }
+
+    // App
+
+    public void getApp(@NonNull final IZypeApiListener listener) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(ZypeApi.APP_KEY, appKey);
+        getApi().getApp(params).enqueue(new Callback<AppResponse>() {
+            @Override
+            public void onResponse(Call<AppResponse> call, Response<AppResponse> response) {
+                listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+            }
+
+            @Override
+            public void onFailure(Call<AppResponse> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse<PlaylistsResponse>(null, false));
+            }
+        });
+    }
+
+    // Consumer
+
+    public void getConsumer(String consumerId, String accessToken,
+                            @NonNull final IZypeApiListener listener) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(ZypeApi.ACCESS_TOKEN, accessToken);
+        getApi().getConsumer(consumerId, params).enqueue(new Callback<ConsumerResponse>() {
+            @Override
+            public void onResponse(Call<ConsumerResponse> call, Response<ConsumerResponse> response) {
+                if (response.isSuccessful()) {
+                    listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                }
+                else {
+                    listener.onCompleted(new ZypeApiResponse<>(response.body(), false));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ConsumerResponse> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse<PlaylistsResponse>(null, false));
+            }
+        });
+//        try {
+//            HashMap<String, String> params = new HashMap<>();
+//            params.put(ACCESS_TOKEN, accessToken);
+//            Response response = apiImpl.getConsumer(consumerId, params).execute();
+//            if (response.isSuccessful()) {
+//                return (ConsumerResponse) response.body();
+//            }
+//            else {
+//                return null;
+//            }
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+    }
 
     // Marketplace connect
 

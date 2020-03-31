@@ -127,6 +127,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "on_air")
     public Integer onAir;
 
+    @ColumnInfo(name = "plan_ids")
+    public String planIds;
+
     @ColumnInfo(name = "play_time")
     public Long playTime;
 
@@ -217,4 +220,10 @@ public class Video implements PlaylistItem {
         return title;
     }
 
+    public boolean belongToPlan(String planId) {
+        if (planIds !=  null) {
+            return planIds.contains(planId);
+        }
+        return false;
+    }
 }

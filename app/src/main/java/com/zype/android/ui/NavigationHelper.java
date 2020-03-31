@@ -140,17 +140,17 @@ public class NavigationHelper {
         switchToLoginScreen(activity, null);
     }
 
-    public void handleUnAuthorizedVideo(Activity activity) {
-        Intent intent = new Intent(activity, UnAuthorizedUserActivity.class);
-        activity.startActivityForResult(intent, BundleConstants.REQUEST_USER);
-    }
-
     public void switchToLoginScreen(Activity activity, Bundle extras) {
         Intent intent = new Intent(context, LoginActivity.class);
         if (extras != null) {
             intent.putExtras(extras);
         }
         activity.startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
+    }
+
+    public void handleUnAuthorizedVideo(Activity activity) {
+        Intent intent = new Intent(activity, UnAuthorizedUserActivity.class);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_USER);
     }
 
     public void switchToUnauthorizedUserScreen(Activity activity, Bundle extras) {
@@ -291,7 +291,8 @@ public class NavigationHelper {
                     DialogHelper.showSubscriptionAlertIssue(activity);
                 }
                 else {
-                    DialogHelper.showLoginAlert(activity);
+                    switchToLoginScreen(activity, extras);
+//                    DialogHelper.showLoginAlert(activity);
                 }
             }
             else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(activity)) {

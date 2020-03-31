@@ -203,6 +203,7 @@ public class DbHelper {
         entity.keywords = new Gson().toJson(videoData.keywords);
         entity.matureContent = String.valueOf(videoData.matureContent ? 1 : 0);
         entity.onAir = videoData.onAir ? 1 : 0;
+        entity.planIds = new Gson().toJson(videoData.planIds);
         entity.previewIds = new Gson().toJson(videoData.previewIds);
         entity.publishedAt = videoData.publishedAt;
         entity.purchaseRequired = String.valueOf(videoData.purchaseRequired ? 1 : 0);
