@@ -22,8 +22,7 @@
         android:id="@+id/textTitle"
         android:text="@string/subscribe_or_login_title"
         android:gravity="center_horizontal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title.Inverse"
         app:layout_constraintBottom_toTopOf="@id/textSubtitle"
         />
     <TextView
@@ -31,11 +30,13 @@
         android:layout_height="wrap_content"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:layout_marginBottom="32dp"
+        android:paddingTop="16dp"
+        android:layout_marginBottom="100dp"
         android:id="@+id/textSubtitle"
         android:text="@string/subscribe_or_login_subtitle"
         android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@id/buttonSubscribe"
         />
     <Button
@@ -43,6 +44,7 @@
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
+        android:textAllCaps="false"
         android:text="@string/subscribe_or_login_button_subscribe_now"
         app:layout_constraintBottom_toTopOf="@id/buttonLogin"
         app:layout_constraintEnd_toEndOf="parent"
@@ -55,6 +57,7 @@
         android:layout_marginTop="16dp"
         android:text="@string/button_sign_in"
         android:theme="@style/ButtonBorder"
+        android:textAllCaps="false"
         app:layout_constraintBottom_toTopOf="@id/buttonRestorePurchases"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
