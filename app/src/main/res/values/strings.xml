@@ -198,6 +198,7 @@
     <string name="subscription_logged_in">Signed in as: </string>
     <string name="subscription_title">Select Plan</string>
     <string name="subscription_verify">Verifying subscription</string>
+    <string name="subscription_trial_days"> (after %1$d day free trial)</string>
 
     <string name="subscribe_or_login_button_restore">Restore Purchases</string>
     <string name="subscribe_or_login_button_subscribe_now">Subscribe Now</string>
