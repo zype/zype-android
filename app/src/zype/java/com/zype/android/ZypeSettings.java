@@ -55,8 +55,9 @@ public class ZypeSettings {
 
     public static final String THEME = ZypeConfiguration.THEME_DARK;
 
-    // Appsflyer
-    public static final String AF_DEV_KEY="";
+    // Anaylitics
+    public static final boolean APPSFLYER_ANALYTICS = false;
+    public static final String APPSFLYER_ANALYTICS_DEV_KEY = "";
 
 }
 

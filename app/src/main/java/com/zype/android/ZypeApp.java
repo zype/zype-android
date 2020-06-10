@@ -61,8 +61,6 @@ import java.util.Map;
 
 import io.fabric.sdk.android.Fabric;
 
-import static com.zype.android.ZypeSettings.AF_DEV_KEY;
-
 /**
  * @author vasya
  * @version 1
@@ -120,6 +118,11 @@ public class ZypeApp extends MultiDexApplication {
         // ThreeTenABP library is used for parsing durations
         AndroidThreeTen.init(this);
 
+        // Analytics
+        if (appConfiguration.appsflyerAnalytics()) {
+            initAppsflyer();
+        }
+
         // Fabric
         // TODO: Uncomment following line to use Fabric
 //        initFabric();
@@ -154,9 +157,6 @@ public class ZypeApp extends MultiDexApplication {
         // Google Analytics
         // TODO: Uncomment following line to use Google Analytics
 //        initGoogleAnalytics();
-
-        // Appsflyer
-        initAppsflyer();
 
         initVideoCastManager();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
@@ -354,7 +354,8 @@ public class ZypeApp extends MultiDexApplication {
                 Logger.d("AppsFlyerConversionListener(): error onAttributionFailure : " + errorMessage);
             }
         };
-        AppsFlyerLib.getInstance().init(AF_DEV_KEY, conversionListener, this);
+        AppsFlyerLib.getInstance().init(appConfiguration.appsflyerAnalyticsDevKey(),
+                conversionListener, this);
         AppsFlyerLib.getInstance().startTracking(this);
     }
 

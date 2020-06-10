@@ -18,4 +18,14 @@ public class AppConfiguration {
 //        video detail screen even the user is not signed in / entitled.
 //     */
 //    public Boolean updatedPaywalls;
+
+    // Analytics
+
+    public boolean appsflyerAnalytics() {
+        return ZypeSettings.APPSFLYER_ANALYTICS;
+    }
+
+    public String appsflyerAnalyticsDevKey() {
+        return ZypeSettings.APPSFLYER_ANALYTICS_DEV_KEY;
+    }
 }
