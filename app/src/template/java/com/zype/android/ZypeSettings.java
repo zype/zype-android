@@ -50,7 +50,7 @@ public class ZypeSettings {
     public static final boolean PLAYLIST_GALLERY_ITEM_INLINE_TITLES = false;
     public static final boolean SHARE_VIDEO_ENABLED = false;
     public static final boolean SHOW_LIVE = false;
-    public static final boolean TRAILERS_ENABLED = true;
+    public static final boolean TRAILERS_ENABLED = false;
 
     public static final String LIVE_VIDEO_ID = "";
 
