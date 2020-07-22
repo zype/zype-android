@@ -34,6 +34,8 @@ import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 
+import org.threeten.bp.Period;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -298,10 +300,9 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
                 else {
                     price = String.format("%1$s/%2$s", holder.item.getMarketplace().getPrice(), periodText);
                 }
-                if (!TextUtils.isEmpty(holder.item.getMarketplace().getFreeTrialPeriod())) {
-                    price += " (After Free Trial)";
-                }
                 holder.textPrice.setText(price);
+                String trialText = getTrialText(holder.item.getMarketplace().getFreeTrialPeriod());
+                holder.textTrial.setText(trialText);
                 holder.textDescription.setText(holder.item.getMarketplace().getDescription());
                 holder.buttonContinue.setText(String.format(getString(R.string.subscription_item_button_continue), holder.item.getMarketplace().getTitle()));
                 holder.buttonContinue.setOnClickListener(new View.OnClickListener() {
@@ -324,6 +325,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
             public Subscription item;
             public TextView textTitle;
             public TextView textPrice;
+            public TextView textTrial;
             public TextView textDescription;
             public Button buttonContinue;
 
@@ -332,6 +334,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
                 this.view = view;
                 textTitle = view.findViewById(R.id.textTitle);
                 textPrice = view.findViewById(R.id.textPrice);
+                textTrial = view.findViewById(R.id.textTrial);
                 textDescription = view.findViewById(R.id.textDescription);
                 buttonContinue = view.findViewById(R.id.buttonContinue);
             }
@@ -346,6 +349,14 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
                 default:
                     return "";
             }
+        }
+
+        private String getTrialText(String trialPeriod) {
+            if (TextUtils.isEmpty(trialPeriod)) {
+                return "";
+            }
+            int freeTrialDays = Period.parse(trialPeriod).getDays();
+            return String.format(getString(R.string.subscription_trial_days), freeTrialDays);
         }
     }
 

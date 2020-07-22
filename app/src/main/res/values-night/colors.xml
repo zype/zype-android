@@ -25,7 +25,7 @@
     <color name="video_background">#000000</color>
 
     <!--Launch-->
-    <color name="launch_background">#FFFFFF</color>
+    <color name="launch_background">#000000</color>
 
     <!--TAB-->
     <color name="tabBackground">@color/colorPrimaryWhite</color>

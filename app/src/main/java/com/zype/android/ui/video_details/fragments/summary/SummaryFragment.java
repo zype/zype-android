@@ -11,21 +11,28 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.ns.developer.tagview.widget.TagCloudLinkView;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.ui.base.BaseFragment;
+import com.zype.android.ui.player.PlayerViewModel;
 import com.zype.android.ui.video_details.VideoDetailViewModel;
+import com.zype.android.utils.Logger;
 import com.zype.android.webapi.model.video.VideoData;
+
+import java.util.List;
 
 public class SummaryFragment extends Fragment {
     public static final String TAG = SummaryFragment.class.getSimpleName();
 
     private VideoDetailViewModel videoViewModel;
+    private PlayerViewModel playerViewModel;
 
     private Observer<Video> videoObserver;
 
@@ -61,6 +68,8 @@ public class SummaryFragment extends Fragment {
             videoObserver = createVideoObserver();
         }
         videoViewModel.getVideo().observe(this, videoObserver);
+
+        playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
     }
 
     private Observer<Video> createVideoObserver() {
@@ -69,10 +78,25 @@ public class SummaryFragment extends Fragment {
             if (!TextUtils.isEmpty(video.episode)) {
                 textVideoEpisode.setVisibility(View.VISIBLE);
                 textVideoEpisode.setText(String.format(getActivity().getString(R.string.videos_episode), video.episode));
-            }else{
+            } else {
                 textVideoEpisode.setVisibility(View.GONE);
             }
             textDescription.setText(video.description);
+
+            Button buttonPlayTrailer = getView().findViewById(R.id.buttonPlayTrailer);
+            if (ZypeConfiguration.trailers()) {
+                final List<String> previewIds = VideoHelper.getPreviewIdsList(video);
+                if (previewIds.isEmpty()) {
+                    buttonPlayTrailer.setVisibility(View.GONE);
+                }
+                else {
+                    buttonPlayTrailer.setVisibility(View.VISIBLE);
+                    buttonPlayTrailer.setOnClickListener(v -> playTrailer(previewIds.get(0)));
+                }
+            }
+            else {
+                buttonPlayTrailer.setVisibility(View.GONE);
+            }
         };
     }
 
@@ -80,4 +104,10 @@ public class SummaryFragment extends Fragment {
 //    protected String getFragmentName() {
 //        return getString(R.string.fragment_name_summary);
 //    }
+
+    private void playTrailer(String previewId) {
+        Logger.d("playTrailer(): previewId = " + previewId);
+        playerViewModel.setTrailerVideoId(previewId);
+    }
+
 }

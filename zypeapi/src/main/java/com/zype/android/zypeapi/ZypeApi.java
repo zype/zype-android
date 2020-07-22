@@ -5,7 +5,10 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.zype.android.zypeapi.model.ErrorBody;
+import com.zype.android.zypeapi.model.MarketplaceConnectBody;
+import com.zype.android.zypeapi.model.MarketplaceConnectBodyData;
 import com.zype.android.zypeapi.model.PlayerResponse;
 import com.zype.android.zypeapi.model.PlaylistsResponse;
 import com.zype.android.zypeapi.model.VideoEntitlementsResponse;
@@ -42,6 +45,7 @@ public class ZypeApi {
     public static final String CONSUMER_EMAIL = "consumer[email]";
     public static final String CONSUMER_ID = "consumer_id";
     public static final String CONSUMER_PASSWORD = "consumer[password]";
+    private static final String INCLUDE_PLAYLIST_IDS = "include_playlist_ids";
     private static final String LINKED_DEVICE_ID = "linked_device_id";
     private static final String PAGE = "page";
     private static final String PARENT_ID = "parent_id";
@@ -81,10 +85,13 @@ public class ZypeApi {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(client)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
             apiImpl = retrofit.create(IZypeApi.class);
         }
@@ -400,11 +407,48 @@ public class ZypeApi {
 //        }
 //    }
 
+    // Marketplace connect
+
+    public void verifyTvodPurchaseGoogle(String appId, String siteId, String consumerId,
+                                         String playlistId, String purchaseToken, String amount,
+                                         String receipt, String signature,
+                                         @NonNull final IZypeApiListener listener) {
+        MarketplaceConnectBody body = new MarketplaceConnectBody();
+        body.appId = appId;
+        body.consumerId = consumerId;
+        body.playlistId = playlistId;
+        body.purchaseToken = purchaseToken;
+        body.siteId = siteId;
+        body.amount = amount;
+        body.transactionType = "purchase";
+        MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
+        bodyData.receipt = receipt;
+        bodyData.signature = signature;
+        body.data = bodyData;
+        getApi().verifyTvodPurchaseGoogle(body).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                }
+                else {
+                    listener.onCompleted(new ZypeApiResponse<>(response.body(), false));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse<PlaylistsResponse>(null, false));
+            }
+        });
+    }
+
     // Player
 
     public void getPlayer(@NonNull String videoId, boolean isAudio, String accessToken,
                           String uuid, String appName,
-                          @NonNull final IZypeApiListener listener,HashMap<String, String> params) {
+                          @NonNull final IZypeApiListener listener,
+                          HashMap<String, String> params) {
         if (TextUtils.isEmpty(accessToken)) {
             params.put(ZypeApi.APP_KEY, appKey);
         }
@@ -499,8 +543,12 @@ public class ZypeApi {
         });
     }
 
-    public void getVideo(@NonNull String videoId, @NonNull final IZypeApiListener listener) {
+    public void getVideo(@NonNull String videoId, boolean includePlaylistIds,
+                         @NonNull final IZypeApiListener listener) {
         HashMap<String, String> params = new HashMap<>();
+        if (includePlaylistIds) {
+            params.put(INCLUDE_PLAYLIST_IDS, "true");
+        }
         params.put(ZypeApi.APP_KEY, appKey);
         getApi().getVideo(videoId, params).enqueue(new Callback<VideoResponse>() {
             @Override

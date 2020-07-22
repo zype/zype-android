@@ -14,7 +14,7 @@ import com.zype.android.core.provider.Contract;
  */
 public class ZypeDatabase extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 12;
+    public static final int DATABASE_VERSION = 13;
     public static final String DATABASE_NAME = "zype.db";
 
     private static final String TYPE_TEXT = " TEXT ";
@@ -88,6 +88,7 @@ public class ZypeDatabase extends SQLiteOpenHelper {
                 + Contract.Video.COLUMN_SEGMENTS + TYPE_TEXT + COMMA_SEP
                 + Contract.Video.ENTITLEMENT_UPDATED_AT + TYPE_TEXT + COMMA_SEP
                 + Contract.Video.IS_ENTITLED + TYPE_INTEGER + COMMA_SEP
+                + Contract.Video.PREVIEW_IDS + TYPE_TEXT + COMMA_SEP
                 + Contract.Video.PURCHASE_REQUIRED + TYPE_TEXT + COMMA_SEP
                 + Contract.Video.COLUMN_REGISTRATION_REQUIRED + TYPE_TEXT
                 + ");";

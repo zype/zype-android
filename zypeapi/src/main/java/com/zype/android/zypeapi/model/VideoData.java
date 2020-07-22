@@ -69,6 +69,10 @@ public class VideoData {
     @Expose
     public boolean onAir;
 
+    @SerializedName("preview_ids")
+    @Expose
+    public List<String> previewIds = new ArrayList<>();
+
     @SerializedName("published_at")
     @Expose
     public String publishedAt;
@@ -93,6 +97,10 @@ public class VideoData {
 
     @Expose
     public List<Segment> segments = new ArrayList<>();
+
+    @SerializedName("serializable_playlist_ids")
+    @Expose
+    public List<String> serializablePlaylistIds = new ArrayList<>();
 
     @SerializedName("short_description")
     @Expose

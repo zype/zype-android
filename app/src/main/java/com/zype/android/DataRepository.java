@@ -24,6 +24,7 @@ import com.zype.android.zypeapi.model.VideoResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Evgeny Cherkasov on 13.06.2018
@@ -162,7 +163,29 @@ public class DataRepository {
     }
 
     public void loadVideo(String videoId, IZypeApiListener listener) {
-        ZypeApi.getInstance().getVideo(videoId,
+        ZypeApi.getInstance().getVideo(videoId, false,
+                (IZypeApiListener<VideoResponse>) response -> {
+                    if (response.isSuccessful) {
+                        if (response.data != null) {
+                            Video video = getVideoSync(response.data.videoData.id);
+                            List<Video> videoList = new ArrayList<>();
+                            if (video != null) {
+                                videoList.add(DbHelper.videoUpdateEntityByApi(video, response.data.videoData));
+                            } else {
+                                videoList.add(DbHelper.videoApiToEntity(response.data.videoData));
+                            }
+                            insertVideos(videoList);
+
+                            if (listener != null) {
+                                listener.onCompleted(response);
+                            }
+                        }
+                    }
+                });
+    }
+
+    public void loadVideoPlaylistIds(String videoId, IZypeApiListener listener) {
+        ZypeApi.getInstance().getVideo(videoId, true,
                 (IZypeApiListener<VideoResponse>) response -> {
                     if (response.isSuccessful) {
                         if (response.data != null) {

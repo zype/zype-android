@@ -54,13 +54,16 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     private MutableLiveData<List<PlayerMode>> availablePlayerModes;
     private MutableLiveData<PlayerMode> playerMode;
-    private MutableLiveData<String> playerUrl;
+    private MutableLiveData<String> playerUrl = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isTrailer = new MutableLiveData<>();
     private MutableLiveData<Integer> playbackState = new MutableLiveData<>();
     private MutableLiveData<Boolean> isPlaying = new MutableLiveData<>();
     private MutableLiveData<Error> error = new MutableLiveData<>();
 
     private String videoId;
     private String playlistId;
+    private String trailerVideoId;
+    private String trailerUrl;
 
     private List<AdSchedule> adSchedule;
     private AnalyticBeacon analyticBeacon;
@@ -115,8 +118,10 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         oldApi.subscribe(this);
 
         availablePlayerModes = new MutableLiveData<>();
-        availablePlayerModes.setValue(new ArrayList<PlayerMode>());
+        availablePlayerModes.setValue(new ArrayList<>());
         playerMode = new MutableLiveData<>();
+
+        isTrailer.setValue(false);
     }
 
     @Override
@@ -134,6 +139,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         isPlaybackStarted = false;
         isPlaybackPositionRestored = false;
         isPlaying.setValue(false);
+
+        isTrailer.setValue(false);
+        trailerVideoId = null;
 
         updateAvailablePlayerModes();
         if (mediaType != null || isMediaTypeAvailable(mediaType)) {
@@ -204,6 +212,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public void onPlaybackResumed() {
+        if (isTrailer.getValue()) {
+            return;
+        }
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
             if (video != null) {
@@ -230,6 +241,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public void onPlaybackFinished() {
+        if (isTrailer.getValue()) {
+            return;
+        }
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
             if (video != null) {
@@ -279,15 +293,20 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     // Player url
 
-    public MutableLiveData<String> getPlayerUrl() {
+    public LiveData<String> getPlayerUrl() {
         if (playerUrl == null) {
             playerUrl = new MutableLiveData<>();
         }
-        Video video = repo.getVideoSync(videoId);
-        video.playerAudioUrl = null;
-        video.playerVideoUrl = null;
-        updatePlayerUrl(video);
-        loadPlayer();
+        if (isTrailer.getValue()) {
+            playerUrl.setValue(trailerUrl);
+        }
+        else {
+            Video video = repo.getVideoSync(videoId);
+            video.playerAudioUrl = null;
+            video.playerVideoUrl = null;
+            updatePlayerUrl(video);
+            loadPlayer();
+        }
         return playerUrl;
     }
 
@@ -329,7 +348,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     // Player mode
 
-    public MutableLiveData<PlayerMode> getPlayerMode() {
+    public LiveData<PlayerMode> getPlayerMode() {
         return playerMode;
     }
 
@@ -344,7 +363,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
     }
 
-    public MutableLiveData<List<PlayerMode>> getAvailablePlayerModes() {
+    public LiveData<List<PlayerMode>> getAvailablePlayerModes() {
         return availablePlayerModes;
     }
 
@@ -444,18 +463,41 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         return error;
     }
 
+    // Trailer
+
+    public LiveData<Boolean> isTrailer() {
+        return isTrailer;
+    }
+
+    public void setTrailerVideoId(String trailerVideoId) {
+        this.trailerVideoId = trailerVideoId;
+        if (TextUtils.isEmpty(trailerVideoId)) {
+            isTrailer.setValue(false);
+            trailerUrl = null;
+            updatePlayerUrl(repo.getVideoSync(videoId));
+        }
+        else {
+            isTrailer.setValue(true);
+            playerUrl.setValue(trailerUrl);
+            loadPlayer();
+        }
+    }
+
     //
 
     public void loadPlayer() {
         Logger.d("loadPlayer(): videoId=" + videoId);
-        String uuid = null;
-        if (AuthHelper.isLoggedIn()) {
-            AuthHelper.onLoggedIn(isLoggedIn ->
-                    loadVideoPlayer(AuthHelper.getAccessToken(), uuid));
-        }
-        else {
-            loadVideoPlayer(null, uuid);
-        }
+//        String uuid = null;
+        AdMacrosHelper.fetchDeviceId(getApplication().getApplicationContext(), deviceId -> {
+            Logger.d("onDeviceId(): deviceId=" + deviceId);
+            if (AuthHelper.isLoggedIn()) {
+                AuthHelper.onLoggedIn(isLoggedIn ->
+                        loadVideoPlayer(AuthHelper.getAccessToken(), null));
+            }
+            else {
+                loadVideoPlayer(null, null);
+            }
+        });
     }
 
     IZypeApiListener createVideoPlayerListener(String accessToken, String uuid) {
@@ -470,6 +512,13 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 // Take first source in the list
                 String url = files.get(0).url;
                 Logger.d("loadVideoPlayer()::onCompleted(): url=" + url);
+
+                // In play trailer mode just update player url
+                if (isTrailer.getValue()) {
+                    trailerUrl = url;
+                    playerUrl.setValue(trailerUrl);
+                    return;
+                }
 
                 // Ad tags
                 repo.deleteAdSchedule(videoId);
@@ -552,9 +601,16 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     private void loadVideoPlayer(String accessToken, String uuid) {
-        api.getPlayer(videoId, false, accessToken, uuid,
-                getApplication().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME,
-                createVideoPlayerListener(accessToken, uuid),getValues());
+        if (isTrailer.getValue()) {
+            api.getPlayer(trailerVideoId, false, accessToken, uuid,
+                    getApplication().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME,
+                    createVideoPlayerListener(accessToken, uuid), getValues());
+        }
+        else {
+            api.getPlayer(videoId, false, accessToken, uuid,
+                    getApplication().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME,
+                    createVideoPlayerListener(accessToken, uuid), getValues());
+        }
     }
 
     IZypeApiListener createAudioPlayerListener(String accessToken, String uuid) {
@@ -592,7 +648,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private void loadAudioPlayer(String accessToken, String uuid) {
         api.getPlayer(videoId, true, accessToken, uuid,
                 getApplication().getString(R.string.app_name) + "/" + BuildConfig.VERSION_NAME,
-                createAudioPlayerListener(accessToken, uuid),getValues());
+                createAudioPlayerListener(accessToken, uuid), getValues());
     }
 
     // 'CustomPlayer.InfoListener' implementation
@@ -656,7 +712,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
             }
             else {
                 result = new HlsMediaSource.Factory(dataSourceFactory)
-                        .setAllowChunklessPreparation(true)
+//                        .setAllowChunklessPreparation(true)
                         .createMediaSource(Uri.parse(contentUri));
             }
         }

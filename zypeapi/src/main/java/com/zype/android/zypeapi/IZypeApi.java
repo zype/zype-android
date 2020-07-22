@@ -102,6 +102,9 @@ public interface IZypeApi {
     @POST("https://mkt.zype.com/v1/amazon/transactions")
     Call<MarketplaceConnectResponse> verifyPurchaseAmazon(@Body MarketplaceConnectBody body);
 
+    @POST("https://mkt.zype.com/v1/googleplay/transactions")
+    Call<ResponseBody> verifyTvodPurchaseGoogle(@Body MarketplaceConnectBody body);
+
     // Playlist
     @GET("/playlists")
     Call<PlaylistsResponse> getPlaylists(@Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);

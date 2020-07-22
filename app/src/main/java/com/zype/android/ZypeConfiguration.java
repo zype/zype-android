@@ -25,6 +25,7 @@ public class ZypeConfiguration {
     private static final String PREFERENCE_DOWNLOADS = "ZypeDownloads";
     private static final String PREFERENCE_DOWNLOADS_FOR_GUESTS = "ZypeDownloadsForGuests";
     private static final String PREFERENCE_NATIVE_SUBSCRIPTION = "ZypeNativeSubscription";
+    private static final String PREFERENCE_NATIVE_TVOD = "ZypeNativeTvod";
     private static final String PREFERENCE_NATIVE_TO_UNIVERSAL_SUBSCRIPTION = "ZypeNativeToUniversalSubscription";
     private static final String PREFERENCE_PLAYLIST_GALLERY_VIEW = "ZypePlaylistGalleryView";
     private static final String PREFERENCE_PLAYLIST_GALLERY_HERO_IMAGES = "ZypePlaylistGalleryHeroImages";
@@ -162,6 +163,10 @@ public class ZypeConfiguration {
         return getBooleanPreference(PREFERENCE_UNIVERSAL_TVOD, ZypeSettings.UNIVERSAL_TVOD, context);
     }
 
+    public static boolean isNativeTvodEnabled(Context context) {
+        return getBooleanPreference(PREFERENCE_NATIVE_TVOD, ZypeSettings.NATIVE_TVOD, context);
+    }
+
     // Features
     //
     public static boolean autoplayEnabled(Context context) {
@@ -207,5 +212,13 @@ public class ZypeConfiguration {
 
     public static boolean playlistGalleryItemInlineTitles() {
         return ZypeSettings.PLAYLIST_GALLERY_ITEM_INLINE_TITLES;
+    }
+
+    public static boolean playerPaywall() {
+        return ZypeSettings.PLAYER_PAYWALL_ENABLED;
+    }
+
+    public static boolean trailers() {
+        return ZypeSettings.TRAILERS_ENABLED;
     }
 }

@@ -86,8 +86,9 @@ public class Contract {
         public static final String COLUMN_ZOBJECT_IDS = "zobjectIds";
         public static final String COLUMN_SEGMENTS = "segments";
 
-        public static final String ENTITLEMENT_UPDATED_AT = "EntitlementUpdatedAt";
-        public static final String IS_ENTITLED = "IsEntitled";
+        public static final String ENTITLEMENT_UPDATED_AT = "entitlement_updated_at";
+        public static final String IS_ENTITLED = "is_entitled";
+        public static final String PREVIEW_IDS = "preview_ids";
         public static final String PURCHASE_REQUIRED = "PurchaseRequired";
         public static final String COLUMN_REGISTRATION_REQUIRED = "registration_required";
     }

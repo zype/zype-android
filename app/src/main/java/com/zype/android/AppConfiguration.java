@@ -22,4 +22,9 @@ public class AppConfiguration {
     public String segmentAnalyticsWriteKey() {
         return ZypeSettings.SEGMENT_ANALYTICS_WRITE_KEY;
     }
+  
+//    /* Setting to "true" enables the new paywall flow, that allows user to open the paywalled
+//        video detail screen even the user is not signed in / entitled.
+//     */
+//    public Boolean updatedPaywalls;
 }

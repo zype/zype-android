@@ -60,12 +60,12 @@ public class ConsumerActivity extends BaseActivity {
 
         initParameters(savedInstanceState);
 
-        TextView textTitle = findViewById(R.id.textTitle);
-        textTitle.setText(String.format(getString(R.string.consumer_create_form_subtitle),
-                getString(R.string.app_name)));
-        TextView textDescription = findViewById(R.id.textDescription);
-        textDescription.setText(String.format(getString(R.string.consumer_create_form_description),
-                getString(R.string.app_name)));
+//        TextView textTitle = findViewById(R.id.textTitle);
+//        textTitle.setText(String.format(getString(R.string.consumer_create_form_subtitle),
+//                getString(R.string.app_name)));
+//        TextView textDescription = findViewById(R.id.textDescription);
+//        textDescription.setText(String.format(getString(R.string.consumer_create_form_description),
+//                getString(R.string.app_name)));
 
         layoutEmail = findViewById(R.id.layoutEmail);
         layoutPassword = findViewById(R.id.layoutPassword);
@@ -172,7 +172,7 @@ public class ConsumerActivity extends BaseActivity {
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     setResult(RESULT_OK);
-                    NavigationHelper.getInstance(this).switchToSubscriptionScreen(this, null);
+//                    NavigationHelper.getInstance(this).switchToSubscriptionScreen(this, null);
                     finish();
                 }
                 break;
@@ -221,13 +221,24 @@ public class ConsumerActivity extends BaseActivity {
             layoutPassword.setErrorEnabled(true);
         }
         else {
-            layoutPassword.setErrorEnabled(false);
+            if (!isPasswordValid(consumer.password)) {
+                result = false;
+                layoutPassword.setError(getString(R.string.error_invalid_password));
+                layoutPassword.setErrorEnabled(true);
+            }
+            else {
+                layoutPassword.setErrorEnabled(false);
+            }
         }
         return result;
     }
 
     private boolean isEmailValid(String value) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches();
+    }
+
+    private boolean isPasswordValid(String password) {
+        return password.length() > 4;
     }
 
     private void updateConsumer() {

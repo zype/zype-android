@@ -267,7 +267,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
         ZypeApi zypeApi = ZypeApi.getInstance();
 
-        zypeApi.getVideo(ZypeSettings.LIVE_VIDEO_ID, response -> {
+        zypeApi.getVideo(ZypeSettings.LIVE_VIDEO_ID, false, response -> {
             progressBar.setVisibility(View.GONE);
             if(response.isSuccessful) {
                 VideoResponse videoResponse = (VideoResponse) response.data;
@@ -275,11 +275,14 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                 Video video = repo.getVideoSync(ZypeSettings.LIVE_VIDEO_ID);
                 if (video != null) {
                     video = DbHelper.videoUpdateEntityByApi(video, videoResponse.videoData);
+                    repo.updateVideo(video);
                 }
                 else {
                     video = DbHelper.videoApiToEntity(videoResponse.videoData);
+                    List<Video> videos = new ArrayList<>();
+                    videos.add(video);
+                    repo.insertVideos(videos);
                 }
-                repo.updateVideo(video);
 
                 NavigationHelper.getInstance(this)
                         .switchToVideoDetailsScreen(this, video.id, null, false);

@@ -11,6 +11,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
+import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;
@@ -60,6 +61,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
     private DataRepository repo;
     private ZypeApi api;
+    // TODO: REFACTORING - Replace any usage of 'WebApiManager' to 'ZypeApi'
     private WebApiManager oldApi;
 
     public VideoDetailViewModel(Application application) {
@@ -98,6 +100,15 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
     public String getPlaylistId() {
         return playlistId;
+    }
+
+    public Playlist getPlaylistSync() {
+        if (!TextUtils.isEmpty(playlistId)) {
+            return repo.getPlaylistSync(playlistId);
+        }
+        else {
+            return null;
+        }
     }
 
     private void initVideo() {
@@ -142,6 +153,13 @@ public class VideoDetailViewModel extends AndroidViewModel {
         }
         else {
             return null;
+        }
+    }
+
+    public void onVideoFinished(boolean isTrailer) {
+        if (isTrailer) {
+            // When trailer playback is finished just fire video detail event with existing data
+            videoLiveData.setValue(videoLiveData.getValue());
         }
     }
 
@@ -238,7 +256,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
                 }
             }
         };
-        api.getVideo(videoId, listener);
+        api.getVideo(videoId, false, listener);
 
 //        VideoParamsBuilder builder = new VideoParamsBuilder()
 //                .addVideoId(videoId);

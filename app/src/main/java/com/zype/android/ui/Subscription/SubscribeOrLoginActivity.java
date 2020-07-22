@@ -71,7 +71,7 @@ public class SubscribeOrLoginActivity extends BaseActivity {
                     }
                 }
                 else {
-                    onCancel();
+//                    onCancel();
                 }
                 break;
             case REQUEST_LOGIN:
@@ -88,7 +88,7 @@ public class SubscribeOrLoginActivity extends BaseActivity {
                     }
                 }
                 else {
-                    onCancel();
+//                    onCancel();
                 }
                 break;
             case REQUEST_SUBSCRIPTION:
@@ -100,7 +100,7 @@ public class SubscribeOrLoginActivity extends BaseActivity {
                     finish();
                 }
                 else {
-                    onCancel();
+//                    onCancel();
                 }
                 break;
         }

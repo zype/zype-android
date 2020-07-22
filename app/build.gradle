@@ -72,6 +72,9 @@ android {
             }
         }
     }
+    dataBinding {
+        enabled = true
+    }
 
     buildTypes {
         release {
@@ -197,6 +200,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.7.1'
 
     implementation 'joda-time:joda-time:2.7'
+    // ThreeTenABP, parsing durations
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.1'
 
     implementation 'io.reactivex:rxjava:1.1.0'
     implementation 'io.reactivex:rxandroid:1.1.0'

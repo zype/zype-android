@@ -9,7 +9,6 @@ public class ZypeSettings {
     public static final String APP_KEY = "<APP_KEY>";
     // OAuth credentials
     public static final String CLIENT_ID = "<CLIENT_ID>";
-    //    public static final String CLIENT_SECRET = "<CLIENT_SECRET>";
     // Playlist
     public static final String ROOT_PLAYLIST_ID = "<ROOT_PLAYLIST_ID>";
 
@@ -24,12 +23,14 @@ public class ZypeSettings {
 
     // Monetization
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_SUBSCRIPTION_ENABLED>");
+    public static final boolean NATIVE_TVOD = Boolean.valueOf("true");
     // NOTE: This is a gated feature that REQUIRES Zype to configure. Please reach out to Zype Support for help on setting up this feature.
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED>");
     public static final String[] PLAN_IDS = new String[] { "<PLAN_IDS>" };
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = Boolean.valueOf("<SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED>");
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<UNIVERSAL_SUBSCRIPTION_ENABLED>");
     public static final boolean UNIVERSAL_TVOD = Boolean.valueOf("<UNIVERSAL_TVOD>");
+    public static final boolean PLAYER_PAYWALL_ENABLED = false;
 
     // Features
     public static final boolean AUTOPLAY = Boolean.valueOf("<AUTOPLAY>");
@@ -49,6 +50,7 @@ public class ZypeSettings {
     public static final boolean PLAYLIST_GALLERY_ITEM_INLINE_TITLES = false;
     public static final boolean SHARE_VIDEO_ENABLED = false;
     public static final boolean SHOW_LIVE = false;
+    public static final boolean TRAILERS_ENABLED = false;
 
     // Anaylitics
     public static final boolean SEGMENT_ANALYTICS = false;

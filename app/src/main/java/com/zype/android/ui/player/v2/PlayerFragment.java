@@ -171,6 +171,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public PlayerFragment() {}
 
     public static PlayerFragment newInstance(String videoId) {
+        Logger.d("newInstance()");
         PlayerFragment fragment = new PlayerFragment();
         Bundle args = new Bundle();
         args.putString(ARG_VIDEO_ID, videoId);
@@ -227,12 +228,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         buttonFullscreen.setOnClickListener(view -> {
             boolean fullscreen = UiUtils.isLandscapeOrientation(getActivity());
             if (fullscreen) {
-                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-                listenForDeviceRotation(Configuration.ORIENTATION_PORTRAIT);
+                setPortraitOrientation();
             }
             else {
-                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-                listenForDeviceRotation(Configuration.ORIENTATION_LANDSCAPE);
+                setLandscapeOrientation();
             }
         });
 
@@ -269,6 +268,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         initMediaSession();
 
+        sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
+
         playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
         if (playerModeObserver == null)
             playerModeObserver = createPlayerModeObserver();
@@ -280,6 +281,17 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         playerViewModel.getPlayerMode().observe(this, playerModeObserver);
         playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
         playerViewModel.onPlayerError().observe(this, playerErrorObserver);
+        if (playerViewModel.isTrailer().getValue()) {
+            ImageButton buttonCloseTrailer = getView().findViewById(R.id.buttonCloseTrailer);
+            buttonCloseTrailer.setVisibility(View.VISIBLE);
+            buttonCloseTrailer.setOnClickListener(v -> {
+                stop();
+                videoViewModel.onVideoFinished(true);
+                playerViewModel.setTrailerVideoId(null);
+                setPortraitOrientation();
+            });
+            setLandscapeOrientation();
+        }
 
         videoViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
         videoViewModel.getVideo().observe(this, video -> {
@@ -290,10 +302,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             initProgress(video);
         });
         videoViewModel.isFullscreen().observe(this, fullscreen -> {
-            updateFullscreenButton(fullscreen);
+            if (fullscreen != null) {
+                updateFullscreenButton(fullscreen);
+            }
         });
 
-        sensorViewModel = ViewModelProviders.of(getActivity()).get(SensorViewModel.class);
     }
 
     @Override
@@ -387,6 +400,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     // View model observers
 
     private Observer<PlayerViewModel.PlayerMode> createPlayerModeObserver() {
+        Logger.d("createPlayerModeObserver()");
         return playerMode -> {
             Logger.d("getPlayerMode(): playerMode=" + playerMode);
             if (playerMode != null) {
@@ -407,10 +421,12 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     private Observer<String> createPlayerUrlObserver() {
+        Logger.d("createPlayerUrlObserver()");
         return playerUrl -> {
             Logger.d("getPlayerUrl(): playerUrl=" + playerUrl);
             if (!TextUtils.isEmpty(playerUrl)) {
-                if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.AUDIO
+                if (player != null
+                        && playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.AUDIO
                         && !playerViewModel.isMediaTypeAvailable(PlayerViewModel.PlayerMode.VIDEO)
                         && player.getRendererCount() > 0) {
                     playerViewModel.onPlaybackPositionRestored();
@@ -421,14 +437,16 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 attachPlayerToAnalyticsManager(playerUrl);
 
                 MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playerUrl);
-                if (mediaSource != null) {
-                    if (videoViewModel.getVideoSync().onAir != 1) {
+                if (mediaSource != null && player != null) {
+                    if (videoViewModel.getVideoSync().onAir != 1
+                        && !playerViewModel.isTrailer().getValue()) {
                         player.seekTo(playerViewModel.getPlaybackPosition());
                         playerViewModel.onPlaybackPositionRestored();
                     }
                     player.prepare(mediaSource, false, false);
-
-                    startAds();
+                    if (!playerViewModel.isTrailer().getValue()) {
+                        startAds();
+                    }
                 }
                 updateNextPreviousButtons();
             }
@@ -450,6 +468,16 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     // UI
+
+    private void setPortraitOrientation() {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+        listenForDeviceRotation(Configuration.ORIENTATION_PORTRAIT);
+    }
+
+    private void setLandscapeOrientation() {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        listenForDeviceRotation(Configuration.ORIENTATION_LANDSCAPE);
+    }
 
     private void enablePlayerControls() {
         playerView.setUseController(true);
@@ -595,7 +623,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     private void unregisterReceivers() {
-        if (callReceiver != null) {
+        if (callReceiver != null && isReceiversRegistered) {
             try {
                 getActivity().unregisterReceiver(callReceiver);
             } catch (IllegalArgumentException e) {
@@ -655,7 +683,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             if (playerViewModel.getPlaybackState() != null) {
                 if (playerViewModel.getPlaybackState().getValue() == Player.STATE_IDLE) {
                     NavigationHelper.getInstance(getActivity())
-                            .handleUnauthorizedVideo(getActivity(), videoViewModel.getVideoSync(), videoViewModel.getPlaylistId());
+                            .handleLockedVideo(getActivity(),
+                                    videoViewModel.getVideoSync(), videoViewModel.getPlaylistSync());
                 }
             }
             return super.dispatchSetPlayWhenReady(player, playWhenReady);
@@ -686,6 +715,12 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     break;
                 }
                 case Player.STATE_ENDED: {
+                    if (playerViewModel.isTrailer().getValue()) {
+                        videoViewModel.onVideoFinished(true);
+                        playerViewModel.setTrailerVideoId(null);
+                        setPortraitOrientation();
+                        break;
+                    }
                     if (playerViewModel.getPlaybackState().getValue() != playbackState) {
                         AnalyticsManager.getInstance().trackStop();
 
@@ -776,7 +811,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         boolean result = false;
         for (int i = 0; i < trackGroups.length; i++) {
             if (trackGroups.get(i).length > 0
-                    && MimeTypes.isVideo(trackGroups.get(0).getFormat(0).sampleMimeType)) {
+                    && MimeTypes.isVideo(trackGroups.get(i).getFormat(0).sampleMimeType)) {
                 result = true;
                 break;
             }
@@ -1064,10 +1099,12 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public void onAdError(AdErrorEvent adErrorEvent) {
         Logger.e("Ad error: " + adErrorEvent.getError().getMessage());
         updateNextAd();
-        if (!checkNextAd(player.getCurrentPosition())) {
-            // Resume video
-            enablePlayerControls();
-            play();
+        if (player != null) {
+            if (!checkNextAd(player.getCurrentPosition())) {
+                // Resume video
+                enablePlayerControls();
+                play();
+            }
         }
     }
 
