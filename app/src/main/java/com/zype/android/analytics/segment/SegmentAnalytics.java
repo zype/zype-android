@@ -67,17 +67,17 @@ public class SegmentAnalytics implements IAnalytics {
         String adType = null;
         properties.putValue("Ad Type", adType);
 
-        String contentShownOnPlatform = "ott";
+        String contentShownOnPlatform = "";
         properties.putValue("contentShownOnPlatform", contentShownOnPlatform);
 
 //        String streamingDevice = (String) attributes.get(AnalyticsTags.ATTRIBUTE_CONTENT_ANALYTICS_DEVICE);
         String streamingDevice = Build.MANUFACTURER + " " + Build.MODEL;
         properties.putValue("streaming_device", streamingDevice);
 
-        String videoAccountId = "416418724";
+        String videoAccountId = "";
         properties.putValue("videoAccountId", videoAccountId);
 
-        String videoAccountName = "People";
+        String videoAccountName = "";
         properties.putValue("videoAccountName", videoAccountName);
 
         String videoAdDuration = null;
