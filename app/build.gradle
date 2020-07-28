@@ -41,7 +41,7 @@ android {
     }
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
-    def zypeTemplateVersion = "2.7.3"
+    def zypeTemplateVersion = "2.8.0"
 
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
@@ -235,6 +235,9 @@ dependencies {
     implementation('com.amazonaws:aws-android-sdk-mobile-client:2.7.+@aar') {
         transitive = true
     }
+
+    // Segment Analytics
+    implementation 'com.segment.analytics.android:analytics:4.+'
 }
 
 // Uncomment below line if using AWS Pinpoint

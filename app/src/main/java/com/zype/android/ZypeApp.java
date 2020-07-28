@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.arch.lifecycle.Observer;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,7 +36,8 @@ import com.onesignal.OneSignal;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.MarketplaceGateway;
-import com.zype.android.aws.PushListenerService;
+import com.zype.android.analytics.AnalyticsManager;
+import com.zype.android.analytics.segment.SegmentAnalytics;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.StorageUtils;
@@ -48,7 +47,6 @@ import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.app.AppEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
-import com.zype.android.webapi.model.app.App;
 import com.zype.android.webapi.model.app.AppData;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.zypeapi.ZypeApi;
@@ -66,6 +64,8 @@ import io.fabric.sdk.android.Fabric;
 
 
 public class ZypeApp extends MultiDexApplication {
+    private static ZypeApp INSTANCE;
+
     public static final double VOLUME_INCREMENT = 0.05;
     public static final int NOTIFICATION_ID = 100;
     public static final String NOTIFICATION_CHANNEL_ID = "ZypeChannel";
@@ -90,6 +90,10 @@ public class ZypeApp extends MultiDexApplication {
         return (ZypeApp) context.getApplicationContext();
     }
 
+    public static ZypeApp getInstance() {
+        return ZypeApp.INSTANCE;
+    }
+
     @NonNull
     public static GoogleAnalytics analytics() {
         return analytics;
@@ -102,6 +106,7 @@ public class ZypeApp extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        INSTANCE = this;
 
         createNotificationChannel();
 
@@ -114,6 +119,9 @@ public class ZypeApp extends MultiDexApplication {
         initApp();
         // ThreeTenABP library is used for parsing durations
         AndroidThreeTen.init(this);
+
+        // Analytics
+        AnalyticsManager.getInstance().init();
 
         // Fabric
         // TODO: Uncomment following line to use Fabric

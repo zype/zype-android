@@ -52,6 +52,10 @@ public class ZypeSettings {
     public static final boolean SHOW_LIVE = false;
     public static final boolean TRAILERS_ENABLED = false;
 
+    // Anaylitics
+    public static final boolean SEGMENT_ANALYTICS = false;
+    public static final String SEGMENT_ANALYTICS_WRITE_KEY = "";
+
     public static final String LIVE_VIDEO_ID = "";
 
     /**
