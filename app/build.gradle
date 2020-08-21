@@ -237,7 +237,7 @@ dependencies {
     }
 
     // Segment Analytics
-    implementation 'com.segment.analytics.android:analytics:4.+'
+    implementation 'com.segment.analytics.android:analytics:4.7.1'
 }
 
 // Uncomment below line if using AWS Pinpoint
