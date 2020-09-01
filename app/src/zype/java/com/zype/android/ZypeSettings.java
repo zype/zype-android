@@ -10,7 +10,7 @@ public class ZypeSettings {
     // OAuth credentials
     public static final String CLIENT_ID = "57cc5ab74d238d644523311362c6ccdb4ab4b163c02d703d9d10df1753195912";
     // Playlist
-    static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
+    public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
 
     // Google Analytics Tracking Id
     public static final String GA_TRACKING_ID = "";
