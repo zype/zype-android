@@ -19,6 +19,8 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.BuildConfig;
@@ -701,8 +703,18 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     public MediaSource getMediaSource(Context context, String contentUri) {
         MediaSource result = null;
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
-                Util.getUserAgent(context, WebApiManager.CUSTOM_HEADER_VALUE));
+
+        String userAgent = Util.getUserAgent(context, WebApiManager.CUSTOM_HEADER_VALUE);
+        DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(
+                userAgent,
+                null,
+                DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+                DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
+                true
+        );
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, null,
+                httpDataSourceFactory);
+        
         if (contentUri.contains("http:") || contentUri.contains("https:")) {
             if (contentUri.contains(".mp4")
                     || contentUri.contains(".m4a")
