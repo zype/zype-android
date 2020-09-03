@@ -41,7 +41,7 @@ public class AnalyticsManager {
     }
 
     public void onPlayerEvent(String event, Video video, long position) {
-        Log.d(TAG, "onPLayerEvent(): " + event);
+        Log.d(TAG, "onPlayerEvent(): " + event);
 
         Map<String, Object> attributes = new HashMap<>();
         attributes.putAll(getVideoAttributes(video));

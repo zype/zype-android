@@ -405,7 +405,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                     break;
             }
             playerViewModel.init(video.id, playlistId, mediaType);
-            playerViewModel.onPlayerError().observe(this, playerErrorObserver);
+            playerViewModel.getPlayerError().observe(this, playerErrorObserver);
             playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
 
             if (video.isZypeLive == 0) {

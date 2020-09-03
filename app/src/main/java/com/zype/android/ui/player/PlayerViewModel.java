@@ -49,6 +49,7 @@ import com.zype.android.zypeapi.model.PlayerResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -68,6 +69,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private MutableLiveData<Error> error = new MutableLiveData<>();
 
     private String videoId;
+    private Video video;
     private String playlistId;
     private String trailerVideoId;
     private String trailerUrl;
@@ -77,6 +79,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private boolean onAir;
 
     private long playbackPosition = 0;
+    private long previousPlaybackPosition = -1;
     private boolean isPlaybackPositionRestored;
     private boolean isPlaybackStarted = false;
     private boolean isUrlLoaded = false;
@@ -99,6 +102,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public enum ErrorType {
+        INVALID_VIDEO_ID,
         LOCKED,
         UNKNOWN
     }
@@ -141,8 +145,13 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         this.videoId = videoId;
         this.playlistId = playlistId;
 
-        Video video = repo.getVideoSync(videoId);
-        playbackPosition = video.playTime;
+        video = repo.getVideoSync(videoId);
+        if (video == null) {
+            error.setValue(new Error(ErrorType.INVALID_VIDEO_ID, ""));
+            return;
+        }
+
+        setPlaybackPosition(video.playTime);
         isPlaybackStarted = false;
         isPlaybackPositionRestored = false;
         isPlaying.setValue(false);
@@ -176,7 +185,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         return adSchedule;
     }
 
-    // Analytics beacon
+    // Analytics
 
     private void updateAnalyticsBeacon() {
         analyticBeacon = repo.getAnalyticsBeaconSync(videoId);
@@ -186,6 +195,25 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         return analyticBeacon;
     }
 
+    private void analyticsContentCompletion() {
+        if (previousPlaybackPosition < 3000 && playbackPosition >= 3000) {
+            AnalyticsManager.getInstance()
+                    .onPlayerEvent(AnalyticsEvents.EVENT_CONTENT_STARTED, video, playbackPosition);
+        }
+        else if (previousPlaybackPosition < video.duration * 250 && playbackPosition >= video.duration * 250) {
+            AnalyticsManager.getInstance()
+                    .onPlayerEvent(AnalyticsEvents.EVENT_CONTENT_COMPLETED_25, video, playbackPosition);
+        }
+        else if (previousPlaybackPosition < video.duration * 500 && playbackPosition >= video.duration * 500) {
+            AnalyticsManager.getInstance()
+                    .onPlayerEvent(AnalyticsEvents.EVENT_CONTENT_COMPLETED_50, video, playbackPosition);
+        }
+        else if (previousPlaybackPosition < video.duration * 750 && playbackPosition >= video.duration * 750) {
+            AnalyticsManager.getInstance()
+                    .onPlayerEvent(AnalyticsEvents.EVENT_CONTENT_COMPLETED_75, video, playbackPosition);
+        }
+    }
+
     // Playback position
 
     public long getPlaybackPosition() {
@@ -193,7 +221,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public void setPlaybackPosition(long position) {
-        this.playbackPosition = position;
+        previousPlaybackPosition = playbackPosition;
+        playbackPosition = position;
+        analyticsContentCompletion();
     }
 
     public void savePlaybackPosition(long position) {
@@ -234,18 +264,34 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                     AnalyticsManager.getInstance()
                             .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_STARTED, video, playbackPosition);
                 }
+                else {
+                    AnalyticsManager.getInstance()
+                            .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_RESUMED, video, playbackPosition);
+                }
             }
         }
     }
 
+    public void onPlaybackPaused() {
+        AnalyticsManager.getInstance()
+                .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_PAUSED, video, playbackPosition);
+    }
+
     public void onPlayback() {
-        if(!TextUtils.isEmpty(videoId)) {
+        if (!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
             if (video != null) {
                 AnalyticsManager.getInstance()
                         .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK, video, playbackPosition);
             }
         }
+    }
+
+    public void onSeekTo(long position) {
+        AnalyticsManager.getInstance()
+                .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_SEEK_STARTED, video, position);
+        AnalyticsManager.getInstance()
+                .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_SEEK_COMPLETED, video, position);
     }
 
     public void onPlaybackFinished() {
@@ -261,6 +307,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
                 AnalyticsManager.getInstance()
                         .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_FINISHED, video, playbackPosition);
+                AnalyticsManager.getInstance()
+                        .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_COMPLETED, video, playbackPosition);
             }
         }
     }
@@ -470,11 +518,16 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     // Error
 
-    public LiveData<Error> onPlayerError() {
+    public LiveData<Error> getPlayerError() {
         if (error == null) {
             error = new MutableLiveData<>();
         }
         return error;
+    }
+
+    public void onPlayerError() {
+        AnalyticsManager.getInstance()
+                .onPlayerEvent(AnalyticsEvents.EVENT_PLAYER_ERROR, video, playbackPosition);
     }
 
     // Trailer
@@ -726,7 +779,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         );
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, null,
                 httpDataSourceFactory);
-        
+
         if (contentUri.contains("http:") || contentUri.contains("https:")) {
             if (contentUri.contains(".mp4")
                     || contentUri.contains(".m4a")

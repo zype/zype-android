@@ -16,9 +16,19 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static com.zype.android.analytics.AnalyticsEvents.EVENT_CONTENT_COMPLETED_25;
+import static com.zype.android.analytics.AnalyticsEvents.EVENT_CONTENT_COMPLETED_50;
+import static com.zype.android.analytics.AnalyticsEvents.EVENT_CONTENT_COMPLETED_75;
+import static com.zype.android.analytics.AnalyticsEvents.EVENT_CONTENT_STARTED;
 import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK;
+import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_COMPLETED;
 import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_FINISHED;
+import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_PAUSED;
+import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_RESUMED;
+import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_SEEK_COMPLETED;
+import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_SEEK_STARTED;
 import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_STARTED;
+import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYER_ERROR;
 
 public class SegmentAnalytics implements IAnalytics {
     private static final String TAG = SegmentAnalytics.class.getSimpleName();
@@ -46,14 +56,47 @@ public class SegmentAnalytics implements IAnalytics {
     private void trackEvent(String event, Properties properties) {
         Context context = ZypeApp.getInstance().getApplicationContext();
         switch (event) {
+//            case EVENT_PLAYBACK_STARTED:
+//                Analytics.with(context).track("Video Content Started", properties);
+//                break;
+//            case EVENT_PLAYBACK:
+//                Analytics.with(context).track("Video Content Playing", properties);
+//                break;
+//            case EVENT_PLAYBACK_FINISHED:
+//                Analytics.with(context).track("Video Content Completed", properties);
+//                break;
+            case EVENT_CONTENT_STARTED:
+                Analytics.with(context).track("Video Content Started (after 3 seconds)", properties);
+                break;
+            case EVENT_CONTENT_COMPLETED_25:
+                Analytics.with(context).track("Video Content Completed 25 percent", properties);
+                break;
+            case EVENT_CONTENT_COMPLETED_50:
+                Analytics.with(context).track("Video Content Completed 50 percent", properties);
+                break;
+            case EVENT_CONTENT_COMPLETED_75:
+                Analytics.with(context).track("Video Content Completed 75 percent", properties);
+                break;
             case EVENT_PLAYBACK_STARTED:
-                Analytics.with(context).track("Video Content Started", properties);
+                Analytics.with(context).track("Video Playback Started", properties);
                 break;
-            case EVENT_PLAYBACK:
-                Analytics.with(context).track("Video Content Playing", properties);
+            case EVENT_PLAYBACK_COMPLETED:
+                Analytics.with(context).track("Video Playback Completed", properties);
                 break;
-            case EVENT_PLAYBACK_FINISHED:
-                Analytics.with(context).track("Video Content Completed", properties);
+            case EVENT_PLAYBACK_PAUSED:
+                Analytics.with(context).track("Video Playback Paused", properties);
+                break;
+            case EVENT_PLAYBACK_RESUMED:
+                Analytics.with(context).track("Video Playback Resumed", properties);
+                break;
+            case EVENT_PLAYBACK_SEEK_STARTED:
+                Analytics.with(context).track("Video Playback Seek Started", properties);
+                break;
+            case EVENT_PLAYBACK_SEEK_COMPLETED:
+                Analytics.with(context).track("Video Playback Seek Completed", properties);
+                break;
+            case EVENT_PLAYER_ERROR:
+                Analytics.with(context).track("Video Player Error", properties);
                 break;
         }
     }
