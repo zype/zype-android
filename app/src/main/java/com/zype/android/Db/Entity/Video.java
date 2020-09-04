@@ -160,6 +160,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "season")
     public String season;
 
+    @ColumnInfo(name = "series_id")
+    public String seriesId;
+
     @ColumnInfo(name = "segment")
     public Integer segment;
 

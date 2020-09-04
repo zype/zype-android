@@ -143,8 +143,11 @@ public class SegmentAnalytics implements IAnalytics {
         String videoCreatedAt = (String) attributes.get(AnalyticsTags.VIDEO_CREATED_AT);
         properties.putValue("videoCreatedAt", videoCreatedAt);
 
-        String videoFranchise  = null;
-        properties.putValue("videoFranchise ", videoFranchise );
+        String videoFranchise = (String) attributes.get(AnalyticsTags.VIDEO_SERIES_ID);
+        if (TextUtils.isEmpty(videoFranchise)) {
+            videoFranchise = "null";
+        }
+        properties.putValue("videoFranchise", videoFranchise);
 
         // asset_id
         String videoId = (String) attributes.get(AnalyticsTags.VIDEO_ID);
