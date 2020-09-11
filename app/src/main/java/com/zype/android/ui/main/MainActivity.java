@@ -153,11 +153,19 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     private void setupSections() {
         sections = new LinkedHashMap<>();
         sections.put(R.id.menuNavigationHome, new Section(getString(R.string.menu_navigation_home)));
-        sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
-        sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_live)));
+        if (ZypeSettings.EPG_ENABLED) {
+            sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
+        }
+        if (ZypeSettings.SHOW_LIVE) {
+            sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_live)));
+        }
         sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
-        sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
-        sections.put(R.id.menuNavigationLibrary, new Section(getString(R.string.menu_navigation_library)));
+        if (ZypeConfiguration.isDownloadsEnabled(this)) {
+            sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
+        }
+        if (ZypeSettings.LIBRARY_ENABLED) {
+            sections.put(R.id.menuNavigationLibrary, new Section(getString(R.string.menu_navigation_library)));
+        }
         sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings)));
         adapterSections.setData(sections);
     }
