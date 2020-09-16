@@ -164,6 +164,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 playerMode.setValue(null);
             }
         }
+        setPlayerUrl(null);
     }
 
     // Ad schedule
@@ -305,17 +306,23 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         if (playerUrl == null) {
             playerUrl = new MutableLiveData<>();
         }
-        if (isTrailer.getValue()) {
-            playerUrl.setValue(trailerUrl);
-        }
-        else {
-            Video video = repo.getVideoSync(videoId);
-            video.playerAudioUrl = null;
-            video.playerVideoUrl = null;
-            updatePlayerUrl(video);
-            loadPlayer();
+        if (playerUrl.getValue() == null) {
+            if (isTrailer.getValue()) {
+                setPlayerUrl(trailerUrl);
+            } else {
+                Video video = repo.getVideoSync(videoId);
+                video.playerAudioUrl = null;
+                video.playerVideoUrl = null;
+                updatePlayerUrl(video);
+                loadPlayer();
+            }
         }
         return playerUrl;
+    }
+
+    private void setPlayerUrl(String value) {
+        Logger.d("setPlayerUrl(): value=" + value);
+        playerUrl.setValue(value);
     }
 
     private void updatePlayerUrl(Video video) {
@@ -344,12 +351,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         updateAnalyticsBeacon();
         if (playerUrl.getValue() == null) {
             if (newPlayerUrl != null) {
-                playerUrl.setValue(newPlayerUrl);
+                setPlayerUrl(newPlayerUrl);
             }
         }
         else {
             if (!playerUrl.getValue().equals(newPlayerUrl)) {
-                playerUrl.setValue(newPlayerUrl);
+                setPlayerUrl(newPlayerUrl);
             }
         }
     }
@@ -486,7 +493,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
         else {
             isTrailer.setValue(true);
-            playerUrl.setValue(trailerUrl);
+            setPlayerUrl(trailerUrl);
             loadPlayer();
         }
     }
@@ -524,7 +531,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 // In play trailer mode just update player url
                 if (isTrailer.getValue()) {
                     trailerUrl = url;
-                    playerUrl.setValue(trailerUrl);
+                    setPlayerUrl(trailerUrl);
                     return;
                 }
 
