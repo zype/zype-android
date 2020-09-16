@@ -288,8 +288,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         Logger.d("onActivityCreated()");
 
         // Initialize Google Cast
-        castContext = CastContext.getSharedInstance(getActivity());
-        castSessionManager = CastContext.getSharedInstance(getActivity()).getSessionManager();
+        castContext = CastContext.getSharedInstance();
+        castSessionManager = CastContext.getSharedInstance().getSessionManager();
         setupCastListener();
 
         initIMA();
@@ -907,11 +907,13 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
             // When we are in VIDEO player mode, check if the player actually has video track to play.
             // If it has no video tracks available, switch to AUDIO mode
-            if (!isCastConnected()) {
-                if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.VIDEO) {
-                    if (!hasVideoTrack(trackGroups)) {
-                        playerViewModel.setMediaTypeAvailable(PlayerViewModel.PlayerMode.VIDEO, false);
-                        playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.AUDIO);
+            if (!trackGroups.isEmpty()) {
+                if (currentPlayer != castPlayer) {
+                    if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.VIDEO) {
+                        if (!hasVideoTrack(trackGroups)) {
+                            playerViewModel.setMediaTypeAvailable(PlayerViewModel.PlayerMode.VIDEO, false);
+                            playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.AUDIO);
+                        }
                     }
                 }
             }
