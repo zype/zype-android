@@ -31,6 +31,8 @@ import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -59,17 +61,25 @@ import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.ext.cast.CastPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.DefaultTimeBar;
+import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.ui.TimeBar;
 import com.google.android.exoplayer2.ui.TrackSelectionView;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.cast.MediaQueueItem;
+import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.SessionManager;
+import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.zype.android.BuildConfig;
 import com.zype.android.Db.Entity.AdSchedule;
 import com.zype.android.Db.Entity.AnalyticBeacon;
@@ -110,6 +120,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public static final String TAG = PlayerFragment.class.getSimpleName();
 
     private static final String ARG_VIDEO_ID = "VideoId";
+
+    private Player currentPlayer;
 
     private SimpleExoPlayer player;
     private DefaultTrackSelector trackSelector;
@@ -167,6 +179,13 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private static final int ANALYTICS_PLAYBACK_INTERVAL = 5000;
     private Runnable runnableAnalyticsPlayback;
 
+    // Google Cast
+    private CastContext castContext;
+    private CastSession castSession;
+    private SessionManager castSessionManager;
+    private SessionManagerListener<CastSession> castSessionManagerListener;
+    private PlayerControlView castControlView;
+    private CastPlayer castPlayer;
 
     public PlayerFragment() {}
 
@@ -182,6 +201,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
 
         handlerTimer = new Handler();
 
@@ -256,6 +277,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         textDurationLive = playerView.findViewById(R.id.textDurationLive);
         viewTimeBar = playerView.findViewById(R.id.exo_progress);
 
+        castControlView = rootView.findViewById(R.id.cast_control_view);
+
         return rootView;
     }
 
@@ -263,6 +286,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Logger.d("onActivityCreated()");
+
+        // Initialize Google Cast
+        castContext = CastContext.getSharedInstance(getActivity());
+        castSessionManager = CastContext.getSharedInstance(getActivity()).getSessionManager();
+        setupCastListener();
 
         initIMA();
 
@@ -319,6 +347,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
     @Override
     public void onResume() {
+        // Google Cast
+        castSession = castSessionManager.getCurrentCastSession();
+        castSessionManager.addSessionManagerListener(castSessionManagerListener, CastSession.class);
+
         super.onResume();
         Logger.d("onResume()");
 
@@ -350,6 +382,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         super.onPause();
 
         Logger.d("onPause()");
+
+        // Google Cast
+        castSessionManager.removeSessionManagerListener(castSessionManagerListener, CastSession.class);
+        castSession = null;
+
         if (player != null) {
             if (playerViewModel.isBackgroundPlaybackEnabled()) {
 //                player.setBackgrounded(true);
@@ -397,6 +434,16 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         super.onDestroy();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.cast_player_menu, menu);
+        CastButtonFactory.setUpMediaRouteButton(getContext().getApplicationContext(),
+                menu,
+                R.id.media_route_menu_item);
+        super.onCreateOptionsMenu(menu, inflater);
+
+    }
+
     // View model observers
 
     private Observer<PlayerViewModel.PlayerMode> createPlayerModeObserver() {
@@ -436,18 +483,19 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
                 attachPlayerToAnalyticsManager(playerUrl);
 
-                MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playerUrl);
-                if (mediaSource != null && player != null) {
-                    if (videoViewModel.getVideoSync().onAir != 1
-                        && !playerViewModel.isTrailer().getValue()) {
-                        player.seekTo(playerViewModel.getPlaybackPosition());
-                        playerViewModel.onPlaybackPositionRestored();
-                    }
-                    player.prepare(mediaSource, false, false);
-                    if (!playerViewModel.isTrailer().getValue()) {
-                        startAds();
-                    }
-                }
+//                MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playerUrl);
+//                if (mediaSource != null && player != null) {
+//                    if (videoViewModel.getVideoSync().onAir != 1
+//                        && !playerViewModel.isTrailer().getValue()) {
+//                        player.seekTo(playerViewModel.getPlaybackPosition());
+//                        playerViewModel.onPlaybackPositionRestored();
+//                    }
+//                    player.prepare(mediaSource, false, false);
+//                    if (!playerViewModel.isTrailer().getValue()) {
+//                        startAds();
+//                    }
+//                }
+                preparePlayer(playerUrl);
                 updateNextPreviousButtons();
             }
         };
@@ -647,14 +695,23 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private void initPlayer() {
         Logger.d("initPlayer()");
 
-        if (player == null) {
+        if (currentPlayer == null) {
             trackSelector = new DefaultTrackSelector();
 
+            PlayerEventListener playerEventListener = new PlayerEventListener();
+
             player = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
-            player.addListener(new PlayerEventListener());
+            player.addListener(playerEventListener);
 
             playerView.setPlayer(player);
             playerView.setControlDispatcher(new PlayerControlDispatcher());
+
+            castPlayer = new CastPlayer(castContext);
+            castPlayer.addListener(playerEventListener);
+            castPlayer.setSessionAvailabilityListener(new CastSessionAvailabilityListener());
+            castControlView.setPlayer(castPlayer);
+
+            setCurrentPlayer(castPlayer.isCastSessionAvailable() ? castPlayer : player);
         }
 
         if (isPlayerControlsEnabled()) {
@@ -665,15 +722,104 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         }
     }
 
+    private void preparePlayer(String playUrl) {
+        if (currentPlayer == player) {
+            MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playUrl);
+            if (mediaSource != null && player != null) {
+                if (videoViewModel.getVideoSync().onAir != 1
+                        && !playerViewModel.isTrailer().getValue()) {
+                    player.seekTo(playerViewModel.getPlaybackPosition());
+                    playerViewModel.onPlaybackPositionRestored();
+                }
+                player.prepare(mediaSource, false, false);
+                if (!playerViewModel.isTrailer().getValue()) {
+                    startAds();
+                }
+            }
+        }
+        else {
+            MediaQueueItem[] items = new MediaQueueItem[1];
+            items[0] = playerViewModel.buildMediaQueueItem(videoViewModel.getVideoSync(), playUrl);
+            castPlayer.loadItems(items,
+                    0,
+                    playerViewModel.getPlaybackPosition(),
+                    Player.REPEAT_MODE_OFF);
+        }
+    }
+
     private void releasePlayer() {
         Logger.d("releasePlayer()");
         AnalyticsManager.getInstance().trackStop();
 
         handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
+        currentPlayer = null;
         if (player != null) {
             player.release();
             player = null;
             trackSelector = null;
+        }
+        if (castPlayer != null) {
+            castPlayer.setSessionAvailabilityListener(null);
+            castPlayer.release();
+        }
+    }
+
+    private void setCurrentPlayer(Player currentPlayer) {
+        if (this.currentPlayer == currentPlayer) {
+            return;
+        }
+
+        Logger.d("setCurrentPlayer(): currentPlayer=" + currentPlayer.toString());
+        // View management.
+        if (currentPlayer == player) {
+            playerView.setVisibility(View.VISIBLE);
+            castControlView.hide();
+        } else {
+            playerView.setVisibility(View.GONE);
+            castControlView.show();
+        }
+
+        // Player state management.
+        long playbackPositionMs = C.TIME_UNSET;
+        int windowIndex = C.INDEX_UNSET;
+        boolean playWhenReady = false;
+        if (this.currentPlayer != null) {
+            int playbackState = this.currentPlayer.getPlaybackState();
+            if (playbackState != Player.STATE_ENDED) {
+                playbackPositionMs = this.currentPlayer.getCurrentPosition();
+                playWhenReady = this.currentPlayer.getPlayWhenReady();
+                windowIndex = this.currentPlayer.getCurrentWindowIndex();
+//                if (windowIndex != currentItemIndex) {
+//                    playbackPositionMs = C.TIME_UNSET;
+//                    windowIndex = currentItemIndex;
+//                }
+            }
+            this.currentPlayer.stop(true);
+        } else {
+            // This is the initial setup. No need to save any state.
+        }
+
+        this.currentPlayer = currentPlayer;
+
+//        // Media queue management.
+//        castMediaQueueCreationPending = currentPlayer == castPlayer;
+//        if (currentPlayer == exoPlayer) {
+//            dynamicConcatenatingMediaSource = new DynamicConcatenatingMediaSource();
+//            for (int i = 0; i < mediaQueue.size(); i++) {
+//                dynamicConcatenatingMediaSource.addMediaSource(buildMediaSource(mediaQueue.get(i)));
+//            }
+//            exoPlayer.prepare(dynamicConcatenatingMediaSource);
+//        }
+//
+//        // Playback transition.
+//        if (windowIndex != C.INDEX_UNSET) {
+//            setCurrentItem(windowIndex, playbackPositionMs, playWhenReady);
+//        }
+
+        if (playerViewModel.getPlayerUrl().getValue() != null) {
+            preparePlayer(playerViewModel.getPlayerUrl().getValue());
+            currentPlayer.seekTo(playbackPositionMs);
+            currentPlayer.setPlayWhenReady(playWhenReady);
         }
     }
 
@@ -761,10 +907,12 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
             // When we are in VIDEO player mode, check if the player actually has video track to play.
             // If it has no video tracks available, switch to AUDIO mode
-            if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.VIDEO) {
-                if (!hasVideoTrack(trackGroups)) {
-                    playerViewModel.setMediaTypeAvailable(PlayerViewModel.PlayerMode.VIDEO, false);
-                    playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.AUDIO);
+            if (!isCastConnected()) {
+                if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.VIDEO) {
+                    if (!hasVideoTrack(trackGroups)) {
+                        playerViewModel.setMediaTypeAvailable(PlayerViewModel.PlayerMode.VIDEO, false);
+                        playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.AUDIO);
+                    }
                 }
             }
         }
@@ -1372,6 +1520,95 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 //            }
             default:
                 break;
+        }
+    }
+
+    // Google Cast
+
+    private void setupCastListener() {
+        castSessionManagerListener = new SessionManagerListener<CastSession>() {
+
+            @Override
+            public void onSessionEnded(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionResumed(CastSession session, boolean wasSuspended) {
+                onApplicationConnected(session);
+            }
+
+            @Override
+            public void onSessionResumeFailed(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionStarted(CastSession session, String sessionId) {
+                onApplicationConnected(session);
+            }
+
+            @Override
+            public void onSessionStartFailed(CastSession session, int error) {
+                onApplicationDisconnected();
+            }
+
+            @Override
+            public void onSessionStarting(CastSession session) {}
+
+            @Override
+            public void onSessionEnding(CastSession session) {}
+
+            @Override
+            public void onSessionResuming(CastSession session, String sessionId) {}
+
+            @Override
+            public void onSessionSuspended(CastSession session, int reason) {}
+
+            private void onApplicationConnected(CastSession castSession) {
+                PlayerFragment.this.castSession = castSession;
+//                if (null != mSelectedMedia) {
+//
+//                    if (mPlaybackState == PlaybackState.PLAYING) {
+//                        mVideoView.pause();
+//                        loadRemoteMedia(mSeekbar.getProgress(), true);
+//                        return;
+//                    } else {
+//                        mPlaybackState = PlaybackState.IDLE;
+//                        updatePlaybackLocation(PlaybackLocation.REMOTE);
+//                    }
+//                }
+//                updatePlayButton(mPlaybackState);
+//                supportInvalidateOptionsMenu();
+            }
+
+            private void onApplicationDisconnected() {
+//                updatePlaybackLocation(PlaybackLocation.LOCAL);
+//                mPlaybackState = PlaybackState.IDLE;
+//                mLocation = PlaybackLocation.LOCAL;
+//                updatePlayButton(mPlaybackState);
+//                supportInvalidateOptionsMenu();
+            }
+        };
+    }
+
+    public boolean isCastConnected() {
+//        CastSession castSession = CastContext.getSharedInstance(getActivity())
+//                .getSessionManager()
+//                .getCurrentCastSession();
+        return (castSession != null
+                && (castSession.isConnected() || castSession.isConnecting()));
+    }
+
+    private class CastSessionAvailabilityListener implements CastPlayer.SessionAvailabilityListener {
+        @Override
+        public void onCastSessionAvailable() {
+            setCurrentPlayer(castPlayer);
+        }
+
+        @Override
+        public void onCastSessionUnavailable() {
+            setCurrentPlayer(player);
         }
     }
 }

@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.google.android.exoplayer2.Player;
+import com.google.android.gms.cast.framework.CastContext;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Db.Entity.Video;
@@ -94,6 +95,8 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        CastContext castContext = CastContext.getSharedInstance(this);
 
         initialize(getIntent());
 

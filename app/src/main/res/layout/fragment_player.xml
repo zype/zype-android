@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -35,4 +36,11 @@
         android:src="@drawable/mr_dialog_close_dark"
         android:visibility="gone"
         />
+    <com.google.android.exoplayer2.ui.PlayerControlView
+        android:id="@+id/cast_control_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:repeat_toggle_modes="all|one"
+        app:show_timeout="-1"/>
 </FrameLayout>
