@@ -495,6 +495,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 //                        startAds();
 //                    }
 //                }
+                setCurrentPlayer(castPlayer.isCastSessionAvailable() ? castPlayer : player);
                 preparePlayer(playerUrl);
                 updateNextPreviousButtons();
             }
@@ -710,8 +711,6 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             castPlayer.addListener(playerEventListener);
             castPlayer.setSessionAvailabilityListener(new CastSessionAvailabilityListener());
             castControlView.setPlayer(castPlayer);
-
-            setCurrentPlayer(castPlayer.isCastSessionAvailable() ? castPlayer : player);
         }
 
         if (isPlayerControlsEnabled()) {
@@ -782,7 +781,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         // Player state management.
         long playbackPositionMs = C.TIME_UNSET;
         int windowIndex = C.INDEX_UNSET;
-        boolean playWhenReady = false;
+        boolean playWhenReady = true;
         if (this.currentPlayer != null) {
             int playbackState = this.currentPlayer.getPlaybackState();
             if (playbackState != Player.STATE_ENDED) {
@@ -794,7 +793,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 //                    windowIndex = currentItemIndex;
 //                }
             }
-            this.currentPlayer.stop(true);
+            this.currentPlayer.stop(false);
         } else {
             // This is the initial setup. No need to save any state.
         }
@@ -816,11 +815,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 //            setCurrentItem(windowIndex, playbackPositionMs, playWhenReady);
 //        }
 
-        if (playerViewModel.getPlayerUrl().getValue() != null) {
-            preparePlayer(playerViewModel.getPlayerUrl().getValue());
-            currentPlayer.seekTo(playbackPositionMs);
-            currentPlayer.setPlayWhenReady(playWhenReady);
-        }
+        currentPlayer.seekTo(playbackPositionMs);
+        currentPlayer.setPlayWhenReady(playWhenReady);
     }
 
     private class PlayerControlDispatcher extends DefaultControlDispatcher {
@@ -1532,6 +1528,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
             @Override
             public void onSessionEnded(CastSession session, int error) {
+                currentPlayer.stop(true);
                 onApplicationDisconnected();
             }
 
@@ -1606,11 +1603,13 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         @Override
         public void onCastSessionAvailable() {
             setCurrentPlayer(castPlayer);
+            preparePlayer(playerViewModel.getPlayerUrl().getValue());
         }
 
         @Override
         public void onCastSessionUnavailable() {
             setCurrentPlayer(player);
+            preparePlayer(playerViewModel.getPlayerUrl().getValue());
         }
     }
 }
