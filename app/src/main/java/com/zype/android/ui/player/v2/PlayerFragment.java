@@ -621,6 +621,12 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         textPositionLive.setText("-" + Util.getStringForTime(builder, formatter, duration - position));
     }
 
+    private void updateCastControls(PlayerControlView playerControlView) {
+        playerControlView.findViewById(R.id.buttonNext).setVisibility(GONE);
+        playerControlView.findViewById(R.id.buttonPrevious).setVisibility(GONE);
+        playerControlView.findViewById(R.id.exo_fullscreen).setVisibility(GONE);
+    }
+
     private void showThumbnail() {
         if (thumbnail != null) {
             UiUtils.loadImage(getActivity(), thumbnail.getUrl(), R.drawable.placeholder_video,
@@ -776,6 +782,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         } else {
             playerView.setVisibility(View.GONE);
             castControlView.show();
+            updateCastControls(castControlView);
         }
 
         // Player state management.
