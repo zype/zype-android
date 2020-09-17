@@ -437,9 +437,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.cast_player_menu, menu);
-        CastButtonFactory.setUpMediaRouteButton(getContext().getApplicationContext(),
-                menu,
-                R.id.media_route_menu_item);
+        if (ZypeConfiguration.cromecastSupport()) {
+            CastButtonFactory.setUpMediaRouteButton(getContext().getApplicationContext(),
+                    menu,
+                    R.id.media_route_menu_item);
+        }
         super.onCreateOptionsMenu(menu, inflater);
 
     }

@@ -181,6 +181,9 @@ public class ZypeConfiguration {
         return getBooleanPreference(PREFERENCE_BACKGROUND_AUDIO_PLAYBACK, ZypeSettings.BACKGROUND_AUDIO_PLAYBACK_ENABLED, context);
     }
 
+    public static boolean cromecastSupport() {
+        return ZypeSettings.CHROMECAST_SUPPORT;
+    }
 
     public static boolean isDeviceLinkingEnabled(Context context) {
         return getBooleanPreference(PREFERENCE_DEVICE_LINKING, ZypeSettings.DEVICE_LINKING, context);
