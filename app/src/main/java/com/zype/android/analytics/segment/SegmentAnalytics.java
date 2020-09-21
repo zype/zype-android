@@ -38,6 +38,7 @@ public class SegmentAnalytics implements IAnalytics {
         // Create an analytics client with the given context and Segment write key.
         Analytics analytics = new Analytics.Builder(ZypeApp.getInstance().getApplicationContext(),
                 appConfig.segmentAnalyticsWriteKey())
+//                .logLevel(Analytics.LogLevel.DEBUG)
                 .trackApplicationLifecycleEvents() // Enable this to record certain application events automatically!
 //                .recordScreenViews() // Enable this to record screen views automatically!
                 .build();
@@ -56,15 +57,16 @@ public class SegmentAnalytics implements IAnalytics {
     private void trackEvent(String event, Properties properties) {
         Context context = ZypeApp.getInstance().getApplicationContext();
         switch (event) {
-//            case EVENT_PLAYBACK_STARTED:
-//                Analytics.with(context).track("Video Content Started", properties);
-//                break;
-//            case EVENT_PLAYBACK:
-//                Analytics.with(context).track("Video Content Playing", properties);
-//                break;
-//            case EVENT_PLAYBACK_FINISHED:
-//                Analytics.with(context).track("Video Content Completed", properties);
-//                break;
+            case EVENT_PLAYBACK_STARTED:
+                Analytics.with(context).track("Video Content Started", properties);
+                Analytics.with(context).track("Video Playback Started", properties);
+                break;
+            case EVENT_PLAYBACK:
+                Analytics.with(context).track("Video Content Playing", properties);
+                break;
+            case EVENT_PLAYBACK_FINISHED:
+                Analytics.with(context).track("Video Content Completed", properties);
+                break;
             case EVENT_CONTENT_STARTED:
                 Analytics.with(context).track("Video Content Started (after 3 seconds)", properties);
                 break;
@@ -77,9 +79,9 @@ public class SegmentAnalytics implements IAnalytics {
             case EVENT_CONTENT_COMPLETED_75:
                 Analytics.with(context).track("Video Content Completed 75 percent", properties);
                 break;
-            case EVENT_PLAYBACK_STARTED:
-                Analytics.with(context).track("Video Playback Started", properties);
-                break;
+//            case EVENT_PLAYBACK_STARTED:
+//                Analytics.with(context).track("Video Playback Started", properties);
+//                break;
             case EVENT_PLAYBACK_COMPLETED:
                 Analytics.with(context).track("Video Playback Completed", properties);
                 break;
