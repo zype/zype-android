@@ -64,7 +64,10 @@ public class SummaryFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        videoViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
+
+        if (getActivity() != null)
+            videoViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
+
         if (videoObserver == null) {
             videoObserver = createVideoObserver();
         }
@@ -79,7 +82,10 @@ public class SummaryFragment extends Fragment {
                 textTitle.setText(video.title);
                 if (!TextUtils.isEmpty(video.episode)) {
                     textVideoEpisode.setVisibility(View.VISIBLE);
+
+                    if (getActivity() != null)
                     textVideoEpisode.setText(String.format(getActivity().getString(R.string.videos_episode), video.episode));
+
                 } else {
                     textVideoEpisode.setVisibility(View.GONE);
                 }

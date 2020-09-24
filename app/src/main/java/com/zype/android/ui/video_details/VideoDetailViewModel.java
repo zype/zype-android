@@ -113,7 +113,8 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
     private void initVideo() {
         Video video = repo.getVideoSync(videoId);
-        videoLiveData.setValue(video);
+        if(video != null)
+           videoLiveData.setValue(video);
 
         loadVideo(videoId);
 
@@ -297,7 +298,9 @@ public class VideoDetailViewModel extends AndroidViewModel {
             }
         }
         repo.updateVideo(dbVideo);
-        videoLiveData.setValue(dbVideo);
+
+        if(dbVideo != null)
+            videoLiveData.setValue(dbVideo);
     }
 
     /**
