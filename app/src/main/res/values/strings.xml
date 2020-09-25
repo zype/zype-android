@@ -73,6 +73,9 @@
     <string name="download_maxsize_exceeded">Max Downloads folder size exceeded. Please сheck Download Preferences in Settings menu.</string>
     <string name="title_activity_playlist">Back</string>
 
+    <!-- Cast -->
+    <string name="cast_title">Casting...</string>
+
     <!-- Closed captions -->
     <string name="subtitles_dialog_empty">Closed captions are not available for this video</string>
     <string name="subtitles_off">Turn off</string>
