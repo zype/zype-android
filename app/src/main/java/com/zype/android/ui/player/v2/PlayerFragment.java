@@ -35,8 +35,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.request.target.BaseTarget;
@@ -184,6 +186,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private CastSession castSession;
     private SessionManager castSessionManager;
     private SessionManagerListener<CastSession> castSessionManagerListener;
+    private LinearLayout castView;
     private PlayerControlView castControlView;
     private CastPlayer castPlayer;
 
@@ -277,6 +280,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         textDurationLive = playerView.findViewById(R.id.textDurationLive);
         viewTimeBar = playerView.findViewById(R.id.exo_progress);
 
+        castView = rootView.findViewById(R.id.layoutCast);
         castControlView = rootView.findViewById(R.id.cast_control_view);
 
         return rootView;
@@ -780,9 +784,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         // View management.
         if (currentPlayer == player) {
             playerView.setVisibility(View.VISIBLE);
+            castView.setVisibility(View.GONE);
             castControlView.hide();
         } else {
             playerView.setVisibility(View.GONE);
+            castView.setVisibility(View.VISIBLE);
             castControlView.show();
             updateCastControls(castControlView);
         }

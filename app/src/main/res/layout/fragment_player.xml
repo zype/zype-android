@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
-    android:keepScreenOn="true"
-    >
+    android:keepScreenOn="true">
     <com.google.android.exoplayer2.ui.PlayerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -36,6 +35,27 @@
         android:src="@drawable/mr_dialog_close_dark"
         android:visibility="gone"
         />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="36dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:id="@+id/layoutCast"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/quantum_ic_cast_white_36"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cast_title"
+            android:gravity="center_horizontal"
+            tools:text="Casting..."
+            />
+    </LinearLayout>
     <com.google.android.exoplayer2.ui.PlayerControlView
         android:id="@+id/cast_control_view"
         android:layout_width="match_parent"
