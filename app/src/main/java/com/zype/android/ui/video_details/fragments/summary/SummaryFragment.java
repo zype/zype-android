@@ -27,6 +27,7 @@ import com.zype.android.utils.Logger;
 import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SummaryFragment extends Fragment {
     public static final String TAG = SummaryFragment.class.getSimpleName();
@@ -63,7 +64,8 @@ public class SummaryFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        videoViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
+         videoViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
+
         if (videoObserver == null) {
             videoObserver = createVideoObserver();
         }
@@ -74,29 +76,35 @@ public class SummaryFragment extends Fragment {
 
     private Observer<Video> createVideoObserver() {
         return video -> {
-            textTitle.setText(video.title);
-            if (!TextUtils.isEmpty(video.episode)) {
-                textVideoEpisode.setVisibility(View.VISIBLE);
-                textVideoEpisode.setText(String.format(getActivity().getString(R.string.videos_episode), video.episode));
-            } else {
-                textVideoEpisode.setVisibility(View.GONE);
+            if(video == null){
+                return;
             }
-            textDescription.setText(video.description);
+                textTitle.setText(video.title);
+                if (!TextUtils.isEmpty(video.episode)) {
+                    textVideoEpisode.setVisibility(View.VISIBLE);
 
-            Button buttonPlayTrailer = getView().findViewById(R.id.buttonPlayTrailer);
-            if (ZypeConfiguration.trailers()) {
-                final List<String> previewIds = VideoHelper.getPreviewIdsList(video);
-                if (previewIds.isEmpty()) {
-                    buttonPlayTrailer.setVisibility(View.GONE);
+                    if (getActivity() != null)
+                    textVideoEpisode.setText(String.format(getActivity().getString(R.string.videos_episode), video.episode));
+
+                } else {
+                    textVideoEpisode.setVisibility(View.GONE);
+                }
+                textDescription.setText(video.description);
+
+                Button buttonPlayTrailer = Objects.requireNonNull(getView()).findViewById(R.id.buttonPlayTrailer);
+                if (ZypeConfiguration.trailers()) {
+                    final List<String> previewIds = VideoHelper.getPreviewIdsList(video);
+                    if (previewIds.isEmpty()) {
+                        buttonPlayTrailer.setVisibility(View.GONE);
+                    }
+                    else {
+                        buttonPlayTrailer.setVisibility(View.VISIBLE);
+                        buttonPlayTrailer.setOnClickListener(v -> playTrailer(previewIds.get(0)));
+                    }
                 }
                 else {
-                    buttonPlayTrailer.setVisibility(View.VISIBLE);
-                    buttonPlayTrailer.setOnClickListener(v -> playTrailer(previewIds.get(0)));
+                    buttonPlayTrailer.setVisibility(View.GONE);
                 }
-            }
-            else {
-                buttonPlayTrailer.setVisibility(View.GONE);
-            }
         };
     }
 

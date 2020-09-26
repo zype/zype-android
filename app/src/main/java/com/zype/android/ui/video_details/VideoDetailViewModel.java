@@ -113,11 +113,12 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
     private void initVideo() {
         Video video = repo.getVideoSync(videoId);
-        videoLiveData.setValue(video);
+        if(video != null)
+           videoLiveData.setValue(video);
 
         loadVideo(videoId);
 
-        if (video.onAir != 1) {
+        if (video != null && video.onAir != 1) {
             if (ZypeConfiguration.isDownloadsEnabled(getApplication())
                     && (ZypeConfiguration.isDownloadsForGuestsEnabled(getApplication())
                     || SettingsProvider.getInstance().isLoggedIn())) {
@@ -297,7 +298,9 @@ public class VideoDetailViewModel extends AndroidViewModel {
             }
         }
         repo.updateVideo(dbVideo);
-        videoLiveData.setValue(dbVideo);
+
+        if(dbVideo != null)
+            videoLiveData.setValue(dbVideo);
     }
 
     /**
