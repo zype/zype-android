@@ -28,6 +28,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
+import com.zype.android.DataRepository;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.Contract;
@@ -47,6 +48,7 @@ import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
 import com.zype.android.utils.Logger;
+import com.zype.android.utils.SharedPref;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.EntitlementParamsBuilder;
@@ -431,7 +433,9 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         Logger.d("onLoadFinished(): size=" + cursor.getCount());
         if (cursor.getCount() == 0) {
-            mTvEmpty.setText(R.string.videos_empty);
+            if (SharedPref.getBoolean(playlistId)){
+                mTvEmpty.setText(R.string.videos_empty);
+            }
             mAdapter.changeCursor(null);
         }
         else {
@@ -463,6 +467,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
             if (result.size() > 0) {
                 if (mVideoList == null || pagination.getCurrent() == 1) {
                     mVideoList = new ArrayList<>(result);
+                    SharedPref.save(playlistId, true);
                 }
                 else {
                     mVideoList.addAll(result);
@@ -510,7 +515,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         if (file != null) {
             url = file.getUrl();
             String fileId = event.mFileId;
-            DownloadHelper.addVideoToDownloadList(getApplicationContext(), url, fileId);
+            DataRepository.getInstance(getApplication()).updateDownloadUrl(fileId, url);
         } else {
 //            throw new IllegalStateException("url is null");
             UiUtils.showErrorSnackbar(mListView, "Server has returned an empty url for video file");

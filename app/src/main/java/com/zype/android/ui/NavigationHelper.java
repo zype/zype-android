@@ -372,6 +372,12 @@ public class NavigationHelper {
                         context.getString(R.string.dialog_update_app_message));
             }
         }
+        else
+        if (video.registrationRequired == 1) {
+            if (!AuthHelper.isLoggedIn()) {
+                switchToUnauthorizedUserScreen(activity, extras);
+            }
+        }
     }
 
     // Playlist
