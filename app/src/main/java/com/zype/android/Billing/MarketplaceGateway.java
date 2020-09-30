@@ -115,10 +115,10 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
         if (subscriptionVerified == null) {
             subscriptionVerified = new MutableLiveData<>();
         }
-        else {
-            Logger.w("validateSubscription(): Can't verify subscription now.");
-            return null;
-        }
+//        else {
+//            Logger.w("validateSubscription(): Can't verify subscription now.");
+//            return null;
+//        }
 
         String sku = subscription.getMarketplace().getSku();
         for (Purchase item : billingManager.getPurchases()) {
