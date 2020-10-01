@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -47,6 +48,7 @@ import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
 import com.zype.android.utils.Logger;
+import com.zype.android.utils.SharedPref;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.EntitlementParamsBuilder;
@@ -95,7 +97,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     private ArrayList<VideoData> mVideoList;
     private String playlistId = null;
     private String selectedVideoId = null;
-
+    private boolean contentLoaded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +125,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
                 mOnVideoItemActionListener, mOnLoginListener);
         mListView.setAdapter(mAdapter);
         mTvEmpty = (TextView) findViewById(R.id.empty);
+        mTvEmpty.setText("");
 
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)
                 || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
@@ -402,7 +405,11 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
 
     protected void startLoadCursors() {
         mAdapter.changeCursor(null);
-        mTvEmpty.setText(R.string.videos_loading);
+        new Handler().postDelayed(() -> {
+            if(!contentLoaded) {
+                mTvEmpty.setText(R.string.videos_loading);
+            }
+        }, 1000);
 
         if (mLoader == null) {
             mLoader = getSupportLoaderManager();
@@ -431,10 +438,14 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         Logger.d("onLoadFinished(): size=" + cursor.getCount());
         if (cursor.getCount() == 0) {
-            mTvEmpty.setText(R.string.videos_empty);
+            if (SharedPref.getBoolean(playlistId)){
+                contentLoaded = true;
+                mTvEmpty.setText(R.string.videos_empty);
+            }
             mAdapter.changeCursor(null);
         }
         else {
+            contentLoaded = true;
             mAdapter.changeCursor(cursor);
         }
     }
@@ -463,6 +474,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
             if (result.size() > 0) {
                 if (mVideoList == null || pagination.getCurrent() == 1) {
                     mVideoList = new ArrayList<>(result);
+                    SharedPref.save(playlistId, true);
                 }
                 else {
                     mVideoList.addAll(result);
