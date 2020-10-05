@@ -40,6 +40,7 @@ import com.zype.android.analytics.AnalyticsManager;
 import com.zype.android.analytics.segment.SegmentAnalytics;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
+import com.zype.android.utils.SharedPref;
 import com.zype.android.utils.StorageUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.AppParamsBuilder;
@@ -204,6 +205,7 @@ public class ZypeApp extends MultiDexApplication {
                 loadConsumer();
             }
         });
+        SharedPref.init(this);
     }
 
     @Override
