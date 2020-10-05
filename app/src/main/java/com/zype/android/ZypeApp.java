@@ -159,7 +159,7 @@ public class ZypeApp extends MultiDexApplication {
         // TODO: Uncomment following line to use Google Analytics
 //        initGoogleAnalytics();
 
-        initVideoCastManager();
+//        initVideoCastManager();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(Activity activity, Bundle bundle) {

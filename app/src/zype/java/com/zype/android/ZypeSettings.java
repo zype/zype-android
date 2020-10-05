@@ -36,6 +36,7 @@ public class ZypeSettings {
     public static final boolean AUTOPLAY = true;
     public static final boolean BACKGROUND_AUDIO_PLAYBACK_ENABLED = true;
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
+    public static final boolean CHROMECAST_SUPPORT = true;
     public static final boolean DEVICE_LINKING = false;
     public static final String DEVICE_LINKING_URL = "https://www.zype.com";
     public static final boolean DOWNLOADS_ENABLED = true;

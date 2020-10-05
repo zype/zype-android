@@ -22,6 +22,10 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaQueueItem;
+import com.google.android.gms.common.images.WebImage;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.BuildConfig;
 import com.zype.android.DataRepository;
@@ -35,10 +39,12 @@ import com.zype.android.ZypeConfiguration;
 import com.zype.android.analytics.AnalyticsEvents;
 import com.zype.android.analytics.AnalyticsManager;
 import com.zype.android.core.provider.helpers.PlaylistHelper;
+import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.AdMacrosHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.model.video.Thumbnail;
 import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
 import com.zype.android.zypeapi.model.Advertising;
@@ -158,6 +164,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 playerMode.setValue(null);
             }
         }
+        setPlayerUrl(null);
     }
 
     // Ad schedule
@@ -299,17 +306,23 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         if (playerUrl == null) {
             playerUrl = new MutableLiveData<>();
         }
-        if (isTrailer.getValue()) {
-            playerUrl.setValue(trailerUrl);
-        }
-        else {
-            Video video = repo.getVideoSync(videoId);
-            video.playerAudioUrl = null;
-            video.playerVideoUrl = null;
-            updatePlayerUrl(video);
-            loadPlayer();
+        if (playerUrl.getValue() == null) {
+            if (isTrailer.getValue()) {
+                setPlayerUrl(trailerUrl);
+            } else {
+                Video video = repo.getVideoSync(videoId);
+                video.playerAudioUrl = null;
+                video.playerVideoUrl = null;
+                updatePlayerUrl(video);
+                loadPlayer();
+            }
         }
         return playerUrl;
+    }
+
+    private void setPlayerUrl(String value) {
+        Logger.d("setPlayerUrl(): value=" + value);
+        playerUrl.setValue(value);
     }
 
     private void updatePlayerUrl(Video video) {
@@ -338,12 +351,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         updateAnalyticsBeacon();
         if (playerUrl.getValue() == null) {
             if (newPlayerUrl != null) {
-                playerUrl.setValue(newPlayerUrl);
+                setPlayerUrl(newPlayerUrl);
             }
         }
         else {
             if (!playerUrl.getValue().equals(newPlayerUrl)) {
-                playerUrl.setValue(newPlayerUrl);
+                setPlayerUrl(newPlayerUrl);
             }
         }
     }
@@ -480,7 +493,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
         else {
             isTrailer.setValue(true);
-            playerUrl.setValue(trailerUrl);
+            setPlayerUrl(trailerUrl);
             loadPlayer();
         }
     }
@@ -518,7 +531,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 // In play trailer mode just update player url
                 if (isTrailer.getValue()) {
                     trailerUrl = url;
-                    playerUrl.setValue(trailerUrl);
+                    setPlayerUrl(trailerUrl);
                     return;
                 }
 
@@ -735,4 +748,35 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         return result;
     }
 
+    public MediaQueueItem buildMediaQueueItem(Video video, String contentUri) {
+        int mediaType;
+        String contentType;
+        if (playerMode.getValue() == PlayerMode.AUDIO) {
+            mediaType = MediaMetadata.MEDIA_TYPE_MUSIC_TRACK;
+            contentType = "audio/mp4";
+        }
+        else {
+            mediaType = MediaMetadata.MEDIA_TYPE_MOVIE;
+            if (contentUri.contains("mp4")) {
+                contentType = "video/mp4";
+            }
+            else {
+                contentType = "application/x-mpegurl";
+            }
+        }
+        MediaMetadata mediaMetadata = new MediaMetadata(mediaType);
+        mediaMetadata.putString(MediaMetadata.KEY_TITLE, video.title);
+        Uri imageUri = Uri.EMPTY;
+        Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 480);
+        if (thumbnail != null) {
+            imageUri = Uri.parse(thumbnail.getUrl());
+        }
+        mediaMetadata.addImage(new WebImage(imageUri));
+        MediaInfo mediaInfo = new MediaInfo.Builder(contentUri)
+                .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+                .setContentType(contentType)
+                .setMetadata(mediaMetadata)
+                .build();
+        return new MediaQueueItem.Builder(mediaInfo).build();
+    }
 }
