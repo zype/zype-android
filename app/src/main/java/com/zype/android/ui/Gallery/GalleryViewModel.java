@@ -272,7 +272,7 @@ public class GalleryViewModel extends AndroidViewModel {
             @Override
             public void onCompleted(ZypeApiResponse response) {
                 VideosResponse videosResponse = (VideosResponse) response.data;
-                if (response.isSuccessful) {
+                if (response.isSuccessful && videosResponse != null) {
                     List<Video> result = new ArrayList<>();
                     for (com.zype.android.zypeapi.model.VideoData item : videosResponse.videoData) {
                         Video video = repo.getVideoSync(item.id);
