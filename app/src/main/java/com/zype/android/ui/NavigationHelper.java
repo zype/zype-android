@@ -268,7 +268,7 @@ public class NavigationHelper {
         if (playlist != null) {
             extras.putString(BundleConstants.PLAYLIST_ID, playlist.id);
 
-            if (playlist.purchaseRequired == 1) {
+            if (playlist.purchaseRequired == 1 || Integer.parseInt(video.purchaseRequired) == 1) {
                 if (ZypeConfiguration.isNativeTvodEnabled(activity)) {
                     extras.putSerializable(EXTRA_PAYWALL_TYPE, PaywallType.PLAYLIST_TVOD);
                     switchToPaywallScreen(activity, extras);
