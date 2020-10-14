@@ -5,6 +5,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.android.exoplayer2.Player;
 import com.segment.analytics.Analytics;
 import com.segment.analytics.Properties;
 import com.zype.android.AppConfiguration;
@@ -35,6 +36,16 @@ public class SegmentAnalytics implements IAnalytics {
         // Set the initialized instance as a globally accessible instance.
         Analytics.setSingletonInstance(analytics);
    }
+
+    @Override
+    public void onStartVideoSession(Player player, Map<String, Object> attributes) {
+        Log.d(TAG, "onStartVideoSession(): Not implemented");
+    }
+
+    @Override
+    public void onEndVideoSession() {
+        Log.d(TAG, "onEndVideoSession(): Not implemented");
+    }
 
     @Override
     public void trackPlayerEvent(String event, Map<String, Object> attributes) {

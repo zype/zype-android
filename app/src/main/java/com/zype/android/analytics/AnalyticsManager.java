@@ -1,7 +1,9 @@
 package com.zype.android.analytics;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.google.android.exoplayer2.Player;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeApp;
 import com.zype.android.analytics.mediamelon.MediaMelon;
@@ -48,8 +50,26 @@ public class AnalyticsManager {
         }
     }
 
+    public void onStartVideoSession(Player player, String url, Video video) {
+        Log.d(TAG, "onStartVideoSession(): ");
+
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.putAll(getVideoAttributes(video));
+        attributes.put(AnalyticsTags.VIDEO_URL, url);
+
+        for (IAnalytics analyticsImpl : analyticsImpls) {
+            analyticsImpl.onStartVideoSession(player, attributes);
+        }
+    }
+
+    public void onEndVideoSession() {
+        for (IAnalytics analyticsImpl : analyticsImpls) {
+            analyticsImpl.onEndVideoSession();
+        }
+    }
+
     public void onPlayerEvent(String event, Video video, long position) {
-        Log.d(TAG, "onPLayerEvent(): " + event);
+        Log.d(TAG, "onPlayerEvent(): " + event);
 
         Map<String, Object> attributes = new HashMap<>();
         attributes.putAll(getVideoAttributes(video));

@@ -9,4 +9,5 @@ public class AnalyticsTags {
     public static final String VIDEO_TITLE = "VIDEO_TITLE";
     public static final String VIDEO_THUMBNAIL = "VIDEO_THUMBNAIL";
     public static final String VIDEO_UPDATED_AT = "VIDEO_UPDATED_AT";
+    public static final String VIDEO_URL = "VIDEO_URL";
 }
