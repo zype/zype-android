@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeApp;
+import com.zype.android.analytics.mediamelon.MediaMelon;
 import com.zype.android.analytics.segment.SegmentAnalytics;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.webapi.model.video.Thumbnail;
@@ -37,6 +38,13 @@ public class AnalyticsManager {
             segmentAnalytics.init();
             analyticsImpls.add(segmentAnalytics);
             Log.d(TAG, "init(): Segment Analytics is added");
+        }
+        // MediaMelon
+        if (ZypeApp.getInstance().getAppConfiguration().mediaMelon()) {
+            MediaMelon mediaMelon = new MediaMelon();
+            mediaMelon.init();
+            analyticsImpls.add(mediaMelon);
+            Log.d(TAG, "init(): MediaMelon is added");
         }
     }
 

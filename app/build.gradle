@@ -149,7 +149,8 @@ public def store(File to, Properties properties) {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    implementation fileTree(include: ['*.jar','*.aar'], dir: 'libs')
 
     implementation 'androidx.multidex:multidex:2.0.0'
 
