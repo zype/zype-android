@@ -15,6 +15,7 @@ import com.zype.android.analytics.IAnalytics;
 import java.util.Map;
 
 import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_STARTED;
+import static com.zype.android.analytics.AnalyticsTags.CONSUMER_ID;
 import static com.zype.android.analytics.AnalyticsTags.VIDEO_ID;
 import static com.zype.android.analytics.AnalyticsTags.VIDEO_TITLE;
 import static com.zype.android.analytics.AnalyticsTags.VIDEO_URL;
@@ -45,12 +46,14 @@ public class MediaMelon implements IAnalytics, MMSmartStreamingObserver {
                 (SimpleExoPlayer) player,
                 MMQBRMode.QBRModeDisabled,
                 (String) attributes.get(VIDEO_URL),
-                "",
+                null,
                 (String) attributes.get(VIDEO_ID),
                 (String) attributes.get(VIDEO_TITLE),
                 (String) attributes.get(VIDEO_ID),
                 this
         );
+        MMSmartStreamingExo2.getInstance().reportCustomMetadata("ConsumerId", (String) attributes.get(CONSUMER_ID));
+        MMSmartStreamingExo2.getInstance().reportCustomMetadata("SubscriptionId", "");
     }
 
     @Override

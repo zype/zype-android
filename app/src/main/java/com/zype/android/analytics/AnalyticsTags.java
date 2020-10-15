@@ -1,6 +1,9 @@
 package com.zype.android.analytics;
 
 public class AnalyticsTags {
+
+    public static final String CONSUMER_ID = "CONSUMER_ID";
+
     public static final String VIDEO_CREATED_AT = "VIDEO_CREATED_AT";
     public static final String VIDEO_CURRENT_POSITION = "VIDEO_CURRENT_POSITION";
     public static final String VIDEO_DURATION = "VIDEO_DURATION";

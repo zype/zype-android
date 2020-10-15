@@ -9,6 +9,7 @@ import com.zype.android.ZypeApp;
 import com.zype.android.analytics.mediamelon.MediaMelon;
 import com.zype.android.analytics.segment.SegmentAnalytics;
 import com.zype.android.core.provider.helpers.VideoHelper;
+import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.webapi.model.video.Thumbnail;
 
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class AnalyticsManager {
 
         Map<String, Object> attributes = new HashMap<>();
         attributes.putAll(getVideoAttributes(video));
+        attributes.putAll(getConsumerAttributes());
         attributes.put(AnalyticsTags.VIDEO_URL, url);
 
         for (IAnalytics analyticsImpl : analyticsImpls) {
@@ -94,6 +96,12 @@ public class AnalyticsManager {
             result.put(AnalyticsTags.VIDEO_THUMBNAIL, thumbnail.getUrl());
         }
 
+        return result;
+    }
+
+    private Map<String, Object> getConsumerAttributes() {
+        Map<String, Object> result = new HashMap<>();
+        result.put(AnalyticsTags.CONSUMER_ID, SettingsProvider.getInstance().getConsumerId());
         return result;
     }
 }
