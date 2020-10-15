@@ -29,6 +29,7 @@ import com.zype.android.Auth.AuthLiveData;
 import com.zype.android.DataRepository;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.NavigationHelper;
@@ -158,6 +159,10 @@ public class LoginActivity extends BaseActivity {
 
         textForgotPassword = findViewById(R.id.textForgotPassword);
         textSignUp = findViewById(R.id.textSignUp);
+
+        if(ZypeConfiguration.isUniversalTVODEnabled(this)) {
+            textSignUp.setVisibility(View.INVISIBLE);
+        }
 
         layoutReset = findViewById(R.id.layoutReset);
         mLoginFormView = findViewById(R.id.login_form);
