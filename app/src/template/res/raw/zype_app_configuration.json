@@ -3,6 +3,6 @@
 
   "hideFavoritesActionWhenSignedOut": false,
 
-  "OneSignal": "true",
+  "OneSignal": "false",
   "AWSPinpoint": "false"
 }
