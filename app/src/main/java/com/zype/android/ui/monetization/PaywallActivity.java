@@ -61,6 +61,12 @@ public class PaywallActivity extends AppCompatActivity {
             }
         });
 
+        model.startUserLogin().observe(this, start-> {
+            if(start) {
+                NavigationHelper.getInstance(this).switchToLoginScreen(this);
+            }
+        });
+
         model.getState().observe(this, state -> {
             Log.d(TAG, "getState(): " + state.name());
             switch(state) {
@@ -73,6 +79,8 @@ public class PaywallActivity extends AppCompatActivity {
                     break;
             }
         });
+
+        model.init();
     }
 
     @Override
@@ -176,7 +184,9 @@ public class PaywallActivity extends AppCompatActivity {
                     }
                 }
                 else {
-//                    close();
+                    if(model.startUserLogin().getValue() == Boolean.TRUE) {
+                        close();
+                    }
                 }
                 break;
             case REQUEST_PURCHASE:

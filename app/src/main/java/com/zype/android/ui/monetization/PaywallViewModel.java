@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.billingclient.api.BillingClient;
@@ -34,6 +35,7 @@ public class PaywallViewModel extends BaseViewModel {
     private MutableLiveData<List<PurchaseItem>> purchaseItems = new MutableLiveData<>();
     private MutableLiveData<State> state = new MutableLiveData<>();
     private PurchaseItem selectedItem;
+    private final MutableLiveData<Boolean> startUserLogin = new MutableLiveData<>();
 
     private String playlistId;
     private PaywallType paywallType;
@@ -45,6 +47,23 @@ public class PaywallViewModel extends BaseViewModel {
         READY_FOR_PURCHASE,
         SIGN_IN_REQUIRED,
         SIGNED_IN
+    }
+
+    public LiveData<Boolean> startUserLogin() {
+        return startUserLogin;
+    }
+
+    void init() {
+        Playlist playlist = getPlaylist();
+        Video video = getVideo();
+
+        if(!AuthHelper.isLoggedIn()) {
+            if(playlist != null && playlist.purchaseRequired != 1) {
+                if(video != null && !TextUtils.isEmpty(video.purchaseRequired) && Integer.parseInt(video.purchaseRequired) == 1) {
+                    startUserLogin.setValue(true);
+                }
+            }
+        }
     }
 
     public PaywallViewModel(Application application) {

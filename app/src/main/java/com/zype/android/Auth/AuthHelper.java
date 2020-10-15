@@ -137,7 +137,7 @@ public class AuthHelper {
         for (Playlist playlist : playlists) {
             if (playlist.purchaseRequired == 1) {
                 if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
-                    if (video.isEntitled != null && video.isEntitled == 1) {
+                    if (isLoggedIn() && video.isEntitled != null && video.isEntitled == 1) {
                         return true;
                     }
                     else {
@@ -160,7 +160,7 @@ public class AuthHelper {
         }
         if (Integer.valueOf(video.purchaseRequired) == 1) {
             if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
-                if (video.isEntitled != null && Integer.valueOf(video.isEntitled) == 1) {
+                if (isLoggedIn() && video.isEntitled != null && Integer.valueOf(video.isEntitled) == 1) {
                     return true;
                 }
                 else {

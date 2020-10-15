@@ -40,6 +40,7 @@ import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.WebApiManager.Request;
 import com.zype.android.webapi.builder.AuthParamsBuilder;
 import com.zype.android.webapi.builder.ConsumerForgotPasswordParamsBuilder;
 import com.zype.android.webapi.builder.ConsumerParamsBuilder;
@@ -524,7 +525,11 @@ public class LoginActivity extends BaseActivity {
             DialogHelper.showErrorAlert(this, event.getErrMessage());
             return;
         }
-        SettingsProvider.getInstance().logout();
+
+        if(event.getEventData() == Request.AUTH_RETRIEVE_ACCESS_TOKEN) {
+            SettingsProvider.getInstance().logout();
+        }
+
         UiUtils.showErrorSnackbar(findViewById(R.id.root_view), event.getErrMessage());
     }
 
