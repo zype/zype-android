@@ -22,6 +22,7 @@ import com.zype.android.ui.video_details.VideoDetailViewModel;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
 import com.zype.android.ui.main.fragments.videos.VideosMenuItem;
 import com.zype.android.ui.player.PlayerFragment;
+import com.zype.android.ui.video_details.v2.VideoDetailActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.FileUtils;
 import com.zype.android.utils.Logger;
@@ -440,7 +441,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
             }
             // Get audio and video download urls if not exist
             if (!downloadUrlExist) {
-                ((BaseVideoActivity) getActivity()).getDownloadUrls(videoId);
+              //  ((VideoDetailActivity) getActivity()).down(videoId);
             }
         }
         final VideoMenuDialogFragment fragment = VideoMenuDialogFragment.newInstance(downloadItems);
