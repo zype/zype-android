@@ -53,6 +53,8 @@ import com.zype.android.webapi.model.auth.TokenInfo;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.linking.DevicePinData;
 
+import java.util.HashSet;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -495,6 +497,8 @@ public class LoginActivity extends BaseActivity {
         Consumer data = event.getEventData().getModelData();
         int subscriptionCount = data.getConsumerData().getSubscriptionCount();
         SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);
+        HashSet<String> subscriptionIds = new HashSet<>(data.getConsumerData().subscriptionIds);
+        SettingsProvider.getInstance().saveSubscriptionIds(subscriptionIds);
         String consumerId = data.getConsumerData().getId();
         SettingsProvider.getInstance().saveConsumerId(consumerId);
         SettingsProvider.getInstance().setString(SettingsProvider.CONSUMER_EMAIL, data.getConsumerData().getEmail());

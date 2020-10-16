@@ -2,9 +2,11 @@ package com.zype.android.analytics.mediamelon;
 
 import android.util.Log;
 
+import com.google.ads.interactivemedia.v3.api.AdsLoader;
 import com.google.android.exoplayer2.ExoPlayerLibraryInfo;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.mediamelon.smartstreaming.MMAnalyticsBridge;
 import com.mediamelon.smartstreaming.MMQBRMode;
 import com.mediamelon.smartstreaming.MMSmartStreamingExo2;
 import com.mediamelon.smartstreaming.MMSmartStreamingInitializationStatus;
@@ -16,20 +18,22 @@ import java.util.Map;
 
 import static com.zype.android.analytics.AnalyticsEvents.EVENT_PLAYBACK_STARTED;
 import static com.zype.android.analytics.AnalyticsTags.CONSUMER_ID;
+import static com.zype.android.analytics.AnalyticsTags.SUBSCRIPTION_ID;
 import static com.zype.android.analytics.AnalyticsTags.VIDEO_ID;
+import static com.zype.android.analytics.AnalyticsTags.VIDEO_SITE_ID;
 import static com.zype.android.analytics.AnalyticsTags.VIDEO_TITLE;
 import static com.zype.android.analytics.AnalyticsTags.VIDEO_URL;
 
 public class MediaMelon implements IAnalytics, MMSmartStreamingObserver {
     private static final String TAG = MediaMelon.class.getSimpleName();
 
-    public void init() {
+    public void init(Map<String, Object> attributes) {
         MMSmartStreamingExo2.enableLogTrace(true);
         if (!MMSmartStreamingExo2.getRegistrationStatus()) {
             MMSmartStreamingExo2.registerMMSmartStreaming(
                     "ExoPlayer_" + ExoPlayerLibraryInfo.VERSION,
                     ZypeApp.getInstance().getAppConfiguration().mediaMelonCustomerId(),
-                    null,       // SubscriberId
+                    (String) attributes.get(CONSUMER_ID),       // SubscriberId
                     "",         // DomainName
                     "",         // SubscriberType
                     ""          // SubscriberTag
@@ -47,13 +51,13 @@ public class MediaMelon implements IAnalytics, MMSmartStreamingObserver {
                 MMQBRMode.QBRModeDisabled,
                 (String) attributes.get(VIDEO_URL),
                 null,
-                (String) attributes.get(VIDEO_ID),
-                (String) attributes.get(VIDEO_TITLE),
+                "",     // AssetId
+                "",     // AssetName
                 (String) attributes.get(VIDEO_ID),
                 this
         );
-        MMSmartStreamingExo2.getInstance().reportCustomMetadata("ConsumerId", (String) attributes.get(CONSUMER_ID));
-        MMSmartStreamingExo2.getInstance().reportCustomMetadata("SubscriptionId", "");
+        MMSmartStreamingExo2.getInstance().reportCustomMetadata("siteId", (String) attributes.get(VIDEO_SITE_ID));
+        MMSmartStreamingExo2.getInstance().reportCustomMetadata("subscriptionId", (String) attributes.get(SUBSCRIPTION_ID));
     }
 
     @Override

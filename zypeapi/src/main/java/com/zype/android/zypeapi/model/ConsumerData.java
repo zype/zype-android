@@ -45,6 +45,10 @@ public class ConsumerData {
     @Expose
     public int subscriptionCount;
 
+    @SerializedName("subscription_ids")
+    @Expose
+    public List<String> subscriptionIds = new ArrayList<>();
+
     @SerializedName("linked_devices")
     @Expose
     public List<String> linkedDevices = new ArrayList<>();

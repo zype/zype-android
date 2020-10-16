@@ -1,6 +1,5 @@
 package com.zype.android.analytics;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.google.android.exoplayer2.Player;
@@ -10,12 +9,16 @@ import com.zype.android.analytics.mediamelon.MediaMelon;
 import com.zype.android.analytics.segment.SegmentAnalytics;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.Subscription.SubscriptionHelper;
 import com.zype.android.webapi.model.video.Thumbnail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.zype.android.analytics.AnalyticsTags.CONSUMER_ID;
+import static com.zype.android.analytics.AnalyticsTags.SUBSCRIPTION_ID;
 
 public class AnalyticsManager {
     private static final String TAG = AnalyticsManager.class.getSimpleName();
@@ -45,7 +48,9 @@ public class AnalyticsManager {
         // MediaMelon
         if (ZypeApp.getInstance().getAppConfiguration().mediaMelon()) {
             MediaMelon mediaMelon = new MediaMelon();
-            mediaMelon.init();
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put(CONSUMER_ID, SettingsProvider.getInstance().getConsumerId());
+            mediaMelon.init(attributes);
             analyticsImpls.add(mediaMelon);
             Log.d(TAG, "init(): MediaMelon is added");
         }
@@ -88,6 +93,7 @@ public class AnalyticsManager {
         result.put(AnalyticsTags.VIDEO_DURATION, (long) video.duration);
         result.put(AnalyticsTags.VIDEO_ID, video.id);
         result.put(AnalyticsTags.VIDEO_PUBLISHED_AT, video.publishedAt);
+        result.put(AnalyticsTags.VIDEO_SITE_ID, video.siteId);
         result.put(AnalyticsTags.VIDEO_TITLE, video.title);
         result.put(AnalyticsTags.VIDEO_UPDATED_AT, video.updatedAt);
 
@@ -101,7 +107,8 @@ public class AnalyticsManager {
 
     private Map<String, Object> getConsumerAttributes() {
         Map<String, Object> result = new HashMap<>();
-        result.put(AnalyticsTags.CONSUMER_ID, SettingsProvider.getInstance().getConsumerId());
+        result.put(CONSUMER_ID, SettingsProvider.getInstance().getConsumerId());
+        result.put(SUBSCRIPTION_ID, SubscriptionHelper.getSubscriptionId());
         return result;
     }
 }

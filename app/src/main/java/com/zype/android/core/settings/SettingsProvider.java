@@ -16,6 +16,7 @@ import com.zype.android.webapi.model.settings.Settings;
 import com.zype.android.webapi.model.settings.SettingsData;
 import com.zype.android.webapi.model.zobjects.Picture;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -87,6 +88,7 @@ public class SettingsProvider extends CommonPreferences {
     // Consumer
     public static final String CONSUMER_EMAIL = "ConsumerEmail";
     public static final String CONSUMER_PASSWORD = "ConsumerPassword";
+    public static final String CONSUMER_SUBSCRIPTION_IDS = "ConsumerSubscriptionIds";
 
     // Live stream
     private static final String LIVE_STREAM_LIMIT = "LiveStreamLimit";
@@ -420,6 +422,14 @@ public class SettingsProvider extends CommonPreferences {
 
     public int getSubscriptionCount() {
         return get(CONSUMER_SUBSCRIPTION_COUNT, 0);
+    }
+
+    public HashSet<String> getSubscriptionIds() {
+        return get(CONSUMER_SUBSCRIPTION_IDS, new HashSet<>());
+    }
+
+    public void saveSubscriptionIds(HashSet<String> subscriptionIds) {
+        set(CONSUMER_SUBSCRIPTION_IDS, subscriptionIds);
     }
 
     public String getConsumerId() {
