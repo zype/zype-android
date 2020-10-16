@@ -1,15 +1,10 @@
 package com.zype.android.ui.player;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.android.exoplayer.TimeRange;
@@ -54,6 +49,10 @@ import com.zype.android.zypeapi.model.PlayerResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 /**
  * Created by Evgeny Cherkasov on 23.07.2018

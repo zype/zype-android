@@ -1,7 +1,6 @@
 package com.zype.android;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
 
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Db.DbHelper;
@@ -25,6 +24,8 @@ import com.zype.android.zypeapi.model.VideoResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import androidx.lifecycle.LiveData;
 
 /**
  * Created by Evgeny Cherkasov on 13.06.2018

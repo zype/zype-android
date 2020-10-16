@@ -1,6 +1,5 @@
 package com.zype.android.ui.Gallery;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,8 @@ import com.zype.android.ui.Gallery.Model.GalleryRow;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by Evgeny Cherkasov on 14.06.2018

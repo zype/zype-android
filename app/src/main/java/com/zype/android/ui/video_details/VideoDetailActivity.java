@@ -1,11 +1,12 @@
 package com.zype.android.ui.video_details;
 
+import com.google.android.material.tabs.TabLayout;
+
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
-import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.events.ForbiddenErrorEvent;
@@ -18,7 +19,7 @@ import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.player.PlayerFragment;
 import com.zype.android.ui.player.PlayerViewModel;
-import com.zype.android.ui.player.ThumbnailFragment;
+import com.zype.android.ui.player.PlayerViewModel.Error;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.ListUtils;
@@ -44,14 +45,15 @@ import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.webapi.model.zobjects.ZobjectData;
 
 import android.app.Activity;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,7 +81,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     VideoDetailViewModel videoDetailViewModel;
     PlayerViewModel playerViewModel;
 
-    Observer<PlayerViewModel.Error> playerErrorObserver = null;
+    Observer<Error> playerErrorObserver = null;
     Observer<String> contentUriObserver;    // Used in updated paywall flow
     Observer<String> playerUrlObserver = null;
     Observer<Video> videoDetailObserver;

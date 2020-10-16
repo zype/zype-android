@@ -18,8 +18,7 @@ package com.google.android.libraries.cast.companionlibrary.cast.callbacks;
 
 import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.common.ConnectionResult;
-
-import android.support.v7.media.MediaRouter.RouteInfo;
+import androidx.mediarouter.media.MediaRouter.RouteInfo;
 
 /**
  * A no-op implementation of the {@link BaseCastConsumer}

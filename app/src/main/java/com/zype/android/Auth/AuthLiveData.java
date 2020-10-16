@@ -1,6 +1,5 @@
 package com.zype.android.Auth;
 
-import android.arch.lifecycle.LiveData;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.core.settings.SettingsProvider;
@@ -9,6 +8,8 @@ import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.AuthParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.auth.RefreshAccessTokenEvent;
+
+import androidx.lifecycle.LiveData;
 
 /**
  * Created by Evgeny Cherkasov on 14.09.2018

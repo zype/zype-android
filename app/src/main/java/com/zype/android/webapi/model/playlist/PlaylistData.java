@@ -1,13 +1,13 @@
 package com.zype.android.webapi.model.playlist;
 
-import android.support.annotation.Nullable;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.zype.android.zypeapi.model.MarketplaceIds;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
 
 /**
  * @author vasya

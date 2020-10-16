@@ -1,8 +1,5 @@
 package com.zype.android.ui.monetization;
 
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +11,9 @@ import com.zype.android.R;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class PurchaseItemsAdapter extends RecyclerView.Adapter<PurchaseItemsAdapter.ViewHolder> {
     private List<PurchaseItem> items;

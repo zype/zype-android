@@ -1,11 +1,8 @@
 package com.zype.android.ui.Subscription;
 
 import android.app.ProgressDialog;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +14,6 @@ import android.widget.TextView;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
-import com.squareup.otto.Subscribe;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.Subscription;
 import com.zype.android.Billing.SubscriptionsHelper;
@@ -30,15 +26,16 @@ import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
-import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.events.ErrorEvent;
-import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 
 import org.threeten.bp.Period;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by Evgeny Cherkasov on 27.06.2017.

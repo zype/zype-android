@@ -2,10 +2,7 @@ package com.zype.android.ui.monetization;
 
 import android.app.Activity;
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.billingclient.api.BillingClient;
@@ -26,6 +23,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 public class PaywallViewModel extends BaseViewModel {
     private static final String TAG = PaywallViewModel.class.getSimpleName();

@@ -6,7 +6,7 @@ import com.zype.android.ui.main.MainActivity;
 import com.zype.android.webapi.model.video.VideoData;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 
 import java.io.File;

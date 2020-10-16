@@ -9,7 +9,6 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.crashlytics.android.Crashlytics;
 import com.zype.android.R;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.webapi.WebApiManager;
@@ -156,7 +155,7 @@ public class WebViewVideoFragment extends BaseFragment implements MediaControlIn
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             super.onReceivedError(view, request, error);
-            Crashlytics.log("MyWebViewClient onReceivedError request:" + request + " error:" + error );
+           // Crashlytics.log("MyWebViewClient onReceivedError request:" + request + " error:" + error );
         }
 
 //        @Override

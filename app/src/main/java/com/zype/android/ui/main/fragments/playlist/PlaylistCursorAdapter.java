@@ -14,7 +14,6 @@ import com.zype.android.webapi.model.video.Thumbnail;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +25,8 @@ import android.widget.TextView;
 
 import java.lang.reflect.Type;
 import java.util.List;
+
+import androidx.cursoradapter.widget.CursorAdapter;
 
 public class PlaylistCursorAdapter extends CursorAdapter {
 

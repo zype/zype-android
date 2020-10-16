@@ -20,7 +20,7 @@ import com.google.android.gms.cast.CastDevice;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.OnFailedListener;
 
-import android.support.v7.media.MediaRouter.RouteInfo;
+import androidx.mediarouter.media.MediaRouter.RouteInfo;
 
 /**
  * An interface for receiving callbacks around the connectivity status to a Cast device.
@@ -61,7 +61,7 @@ public interface BaseCastConsumer extends OnFailedListener {
     /**
      * Called when the number of cast devices present on the network changes from 0 to a positive
      * number or vice versa. Can be used, for example, to control the visibility of {@link
-     * android.support.v7.app.MediaRouteButton}
+     * androidx.appcompat.app.MediaRouteButton}
      *
      * @param castPresent set to <code>true</code> if at least one device becomes available,
      * <code>false</code> otherwise

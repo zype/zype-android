@@ -16,6 +16,7 @@ import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.ui.dialog.VideoMenuDialogFragment;
 import com.zype.android.ui.player.PlayerViewModel;
+import com.zype.android.ui.player.PlayerViewModel.PlayerMode;
 import com.zype.android.ui.v2.videos.VideoActionsHelper;
 import com.zype.android.ui.video_details.VideoDetailViewModel;
 import com.zype.android.ui.video_details.fragments.OnDetailActivityFragmentListener;
@@ -26,21 +27,12 @@ import com.zype.android.utils.FileUtils;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +41,16 @@ import android.widget.AdapterView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class OptionsFragment extends BaseFragment implements OptionsAdapter.OptionClickListener {
 
@@ -209,7 +211,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
             }
 
             playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
-            playerViewModel.getAvailablePlayerModes().observe(this, new Observer<List<PlayerViewModel.PlayerMode>>() {
+            playerViewModel.getAvailablePlayerModes().observe(this, new Observer<List<PlayerMode>>() {
                 @Override
                 public void onChanged(@Nullable List<PlayerViewModel.PlayerMode> playerModes) {
                     if (mAdapter != null) {

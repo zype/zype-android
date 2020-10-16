@@ -3,7 +3,6 @@ package com.zype.android.ui.main.fragments.settings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +24,8 @@ import com.zype.android.utils.AppUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.fragment.app.Fragment;
 
 public class SettingsFragment extends Fragment implements ListView.OnItemClickListener {
 

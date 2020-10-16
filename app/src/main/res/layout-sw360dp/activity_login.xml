@@ -141,12 +141,12 @@
                     android:paddingRight="16dp"
                     android:orientation="vertical"
                     >
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/emailWrapper"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         >
-                        <android.support.design.widget.TextInputEditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/email"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -156,14 +156,14 @@
                             android:inputType="textEmailAddress"
                             android:maxLines="1"
                             />
-                    </android.support.design.widget.TextInputLayout>
-                    <android.support.design.widget.TextInputLayout
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/passwordWrapper"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         >
-                        <android.support.design.widget.TextInputEditText
+                        <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/password"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -174,7 +174,7 @@
                             android:inputType="textPassword"
                             android:maxLines="1"
                             />
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
                 <Button
                     android:layout_width="match_parent"
@@ -230,7 +230,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:gravity="center_horizontal"
             />
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="16dp"
@@ -238,7 +238,7 @@
             android:layout_marginBottom="20dp"
             android:id="@+id/layoutEmailReset"
             >
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:focusable="true"
@@ -247,7 +247,7 @@
                 android:inputType="textEmailAddress"
                 android:maxLines="1"
                 />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

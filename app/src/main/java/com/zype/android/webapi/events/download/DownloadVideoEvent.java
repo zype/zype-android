@@ -1,10 +1,10 @@
 package com.zype.android.webapi.events.download;
 
-import android.support.annotation.NonNull;
-
 import com.zype.android.webapi.RequestTicket;
 import com.zype.android.webapi.events.DataEvent;
 import com.zype.android.webapi.model.download.DownloadVideoResponse;
+
+import androidx.annotation.NonNull;
 
 public class DownloadVideoEvent extends DataEvent<DownloadVideoResponse> {
 
