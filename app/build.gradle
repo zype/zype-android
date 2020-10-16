@@ -97,10 +97,11 @@ android {
     productFlavors {
         zype {
             versionName zypeTemplateVersion
-            applicationId 'com.zype.android.template'
+            applicationId 'com.zype.android'
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      onesignal_app_id: "",
-                                     onesignal_google_project_number: 'REMOTE'
+                                     onesignal_google_project_number: 'REMOTE',
+                                     crashlyticsCollectionEnabled: "true"
             ]
         }
         template {
@@ -109,7 +110,8 @@ android {
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      // TODO: Provide valid app_id for OneSignal
                                      onesignal_app_id: '',
-                                     onesignal_google_project_number: 'REMOTE'
+                                     onesignal_google_project_number: 'REMOTE',
+                                     crashlyticsCollectionEnabled: "true"
             ]
         }
     }
