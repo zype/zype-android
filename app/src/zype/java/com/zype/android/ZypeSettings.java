@@ -51,8 +51,8 @@ public class ZypeSettings {
     public static final boolean TRAILERS_ENABLED = false;
 
     // Analytics
-    public static final boolean MEDIAMELON_ENABLED = true;
-    public static final String MEDIAMELON_CUSTOMER_ID = "1432265447";
+    public static final boolean ADVANCED_ANALYTICS_ENABLED = true;
+    public static final String ADVANCED_ANALYTICS_CUSTOMER_ID = "1432265447";
     public static final boolean SEGMENT_ANALYTICS = false;
     public static final String SEGMENT_ANALYTICS_WRITE_KEY = "";
 

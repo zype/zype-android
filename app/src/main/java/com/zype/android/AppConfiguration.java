@@ -16,11 +16,11 @@ public class AppConfiguration {
 
     // Analytics
     public boolean mediaMelon() {
-        return ZypeSettings.MEDIAMELON_ENABLED;
+        return ZypeSettings.ADVANCED_ANALYTICS_ENABLED;
     }
 
     public String mediaMelonCustomerId() {
-        return ZypeSettings.MEDIAMELON_CUSTOMER_ID;
+        return ZypeSettings.ADVANCED_ANALYTICS_CUSTOMER_ID;
     }
 
     public boolean segmentAnalytics() {
