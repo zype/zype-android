@@ -18,6 +18,8 @@ import groovy.json.JsonSlurper
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.firebase-perf'
+
 // TODO: Uncomment following line to use Fabric
 //apply plugin: 'io.fabric'
 
@@ -243,6 +245,9 @@ dependencies {
 
     // Segment Analytics
     implementation 'com.segment.analytics.android:analytics:4.7.1'
+
+    implementation 'com.google.firebase:firebase-perf:19.0.9'
+
 }
 
 // Uncomment below line if using AWS Pinpoint
