@@ -123,31 +123,31 @@ public class PaywallViewModel extends BaseViewModel {
         }
         // TODO: We can also add a video to 'itemsToPurchase' and 'skuList', if we will need this option
         billingManager.querySkuDetailsAsync(BillingClient.SkuType.INAPP, skuList,
-            (responseCode, skuDetailsList) -> {
-              if (responseCode != BillingClient.BillingResponse.OK) {
-                Log.e(TAG, "onSkuDetailsResponse(): Error retrieving sku details from Google Play");
-              }
-              else {
-                if (skuDetailsList != null) {
-                  if (skuDetailsList.size() != skuList.size()) {
-                    Log.e(TAG, "onSkuDetailsResponse(): Unexpected number of items (" +
-                        skuDetailsList.size() + ") in Google Play");
+                (responseCode, skuDetailsList) -> {
+                  if (responseCode != BillingClient.BillingResponse.OK) {
+                    Log.e(TAG, "onSkuDetailsResponse(): Error retrieving sku details from Google Play");
                   }
                   else {
-                    List<PurchaseItem> result = new ArrayList<>();
-                    for (SkuDetails skuDetails : skuDetailsList) {
-                      PurchaseItem item = new PurchaseItem();
-                      item.product = skuDetails;
-                      if (itemsToPurchase.get(skuDetails.getSku()) instanceof Playlist) {
-                        item.playlist = (Playlist) itemsToPurchase.get(skuDetails.getSku());
-                        result.add(item);
+                    if (skuDetailsList != null) {
+                      if (skuDetailsList.size() != skuList.size()) {
+                        Log.e(TAG, "onSkuDetailsResponse(): Unexpected number of items (" +
+                                skuDetailsList.size() + ") in Google Play");
+                      }
+                      else {
+                        List<PurchaseItem> result = new ArrayList<>();
+                        for (SkuDetails skuDetails : skuDetailsList) {
+                          PurchaseItem item = new PurchaseItem();
+                          item.product = skuDetails;
+                          if (itemsToPurchase.get(skuDetails.getSku()) instanceof Playlist) {
+                            item.playlist = (Playlist) itemsToPurchase.get(skuDetails.getSku());
+                            result.add(item);
+                          }
+                        }
+                        purchaseItems.setValue(result);
                       }
                     }
-                    purchaseItems.setValue(result);
                   }
-                }
-              }
-            });
+                });
         break;
     }
   }
@@ -209,7 +209,7 @@ public class PaywallViewModel extends BaseViewModel {
     if (item.playlist != null) {
       Log.d(TAG, "makePurchase(): playlist, sku=" + item.product.getSku());
       billingManager.initiatePurchaseFlow(activity,
-          item.product.getSku(), BillingClient.SkuType.INAPP);
+              item.product.getSku(), BillingClient.SkuType.INAPP);
     }
   }
 
