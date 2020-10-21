@@ -1,10 +1,8 @@
 package com.zype.android.ui.Subscription;
 
 import android.app.ProgressDialog;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 
 import com.android.billingclient.api.Purchase;
 import com.zype.android.Billing.Subscription;
@@ -17,6 +15,9 @@ import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 
 import static com.zype.android.utils.BundleConstants.REQUEST_CONSUMER;
 import static com.zype.android.utils.BundleConstants.REQUEST_LOGIN;

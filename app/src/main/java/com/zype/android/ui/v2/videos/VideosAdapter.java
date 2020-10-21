@@ -1,8 +1,9 @@
 package com.zype.android.ui.v2.videos;
 
 import android.app.Activity;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,6 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
-import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.dialog.VideoMenuDialogFragment;
 import com.zype.android.ui.main.fragments.videos.VideosMenuItem;
 import com.zype.android.utils.FileUtils;

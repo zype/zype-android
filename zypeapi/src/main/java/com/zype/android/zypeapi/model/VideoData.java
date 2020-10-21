@@ -1,12 +1,13 @@
 package com.zype.android.zypeapi.model;
 
-import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
 
 /**
  * Created by Evgeny Cherkasov on 25.05.2017.

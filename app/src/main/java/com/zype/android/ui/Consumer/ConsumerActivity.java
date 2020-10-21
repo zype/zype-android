@@ -1,8 +1,9 @@
 package com.zype.android.ui.Consumer;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.design.widget.TextInputLayout;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;

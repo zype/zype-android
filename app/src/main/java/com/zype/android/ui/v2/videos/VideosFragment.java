@@ -1,25 +1,23 @@
 package com.zype.android.ui.v2.videos;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import com.google.android.material.snackbar.Snackbar;
+
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.v2.base.DataState;
 import com.zype.android.utils.Logger;
 
-import java.util.List;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by Evgeny Cherkasov on 12.02.2019

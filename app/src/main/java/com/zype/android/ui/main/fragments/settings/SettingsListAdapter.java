@@ -2,7 +2,7 @@ package com.zype.android.ui.main.fragments.settings;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

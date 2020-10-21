@@ -1,8 +1,6 @@
 package com.zype.android.ui.v2.videos;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.text.TextUtils;
 
 import com.zype.android.Db.Entity.Video;
@@ -11,6 +9,9 @@ import com.zype.android.ui.v2.base.DataState;
 import com.zype.android.ui.v2.base.StatefulData;
 
 import java.util.List;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_FAVORITE;
 import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_UNFAVORITE;

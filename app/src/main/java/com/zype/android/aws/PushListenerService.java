@@ -2,7 +2,6 @@ package com.zype.android.aws;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.amazonaws.mobileconnectors.pinpoint.targeting.notification.NotificationClient;
 import com.amazonaws.mobileconnectors.pinpoint.targeting.notification.NotificationDetails;
@@ -13,6 +12,8 @@ import com.zype.android.ZypeApp;
 import com.zype.android.utils.Logger;
 
 import java.util.HashMap;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class PushListenerService extends FirebaseMessagingService {
     public static final String TAG = PushListenerService.class.getSimpleName();
