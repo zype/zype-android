@@ -1,6 +1,5 @@
 package com.zype.android.Billing;
 
-import android.arch.lifecycle.LiveData;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.ui.Gallery.Model.HeroImage;
@@ -15,6 +14,8 @@ import com.zype.android.webapi.model.zobjects.ZobjectData;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.lifecycle.LiveData;
 
 /**
  * Created by Evgeny Cherkasov on 23.06.2018

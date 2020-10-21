@@ -1,14 +1,12 @@
 package com.zype.android.ui.Auth;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentTransaction;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -25,7 +23,6 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
-import com.zype.android.Auth.AuthLiveData;
 import com.zype.android.DataRepository;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
@@ -57,6 +54,10 @@ import com.zype.android.webapi.model.auth.RetrieveAccessToken;
 import com.zype.android.webapi.model.auth.TokenInfo;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.linking.DevicePinData;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentTransaction;
 
 public class LoginActivity extends BaseActivity {
 

@@ -3,9 +3,10 @@ package com.zype.android.core.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.support.annotation.NonNull;
 
 import com.zype.android.core.provider.Contract;
+
+import androidx.annotation.NonNull;
 
 /**
  * @author vasya

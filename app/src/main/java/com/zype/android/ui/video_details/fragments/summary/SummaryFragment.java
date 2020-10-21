@@ -1,12 +1,7 @@
 package com.zype.android.ui.video_details.fragments.summary;
 
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,20 +9,21 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.ns.developer.tagview.widget.TagCloudLinkView;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.core.provider.CursorHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
-import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.player.PlayerViewModel;
 import com.zype.android.ui.video_details.VideoDetailViewModel;
 import com.zype.android.utils.Logger;
-import com.zype.android.webapi.model.video.VideoData;
 
 import java.util.List;
 import java.util.Objects;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 public class SummaryFragment extends Fragment {
     public static final String TAG = SummaryFragment.class.getSimpleName();

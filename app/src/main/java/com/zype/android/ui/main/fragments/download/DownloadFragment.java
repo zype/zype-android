@@ -2,23 +2,21 @@ package com.zype.android.ui.main.fragments.download;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.zype.android.R;
-import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.main.fragments.AbstractTabFragment;
 import com.zype.android.ui.main.fragments.videos.VideosCursorAdapter;
 import com.zype.android.ui.player.PlayerFragment;
+
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 
 import static com.zype.android.ui.base.BaseVideoActivity.TYPE_UNKNOWN;
 
