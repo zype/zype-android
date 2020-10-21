@@ -6,20 +6,20 @@ package com.zype.android;
 
 public class ZypeSettings {
     // Zype app key
-    public static final String APP_KEY = "<APP_KEY>";
+    public static final String APP_KEY = "zCNqYpQAzxTg8aZOPeiQCovML09M7pQsQ6Mb_aRtW7riYdv1tzCcKDW7BkPMvf17";
     // OAuth credentials
-    public static final String CLIENT_ID = "<CLIENT_ID>";
+    public static final String CLIENT_ID = "03fe1c1c964ceeff2312f25dcbc7ff3b70d10bb776d78b272b943a48fba2afd0";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "<ROOT_PLAYLIST_ID>";
+    public static final String ROOT_PLAYLIST_ID = "5c59b7be45793d112d003a7b";
 
     // Google Analytics Tracking Id
     public static final String GA_TRACKING_ID = "";
 
     // Social
-    public static final String FACEBOOK_ID = "";
-    public static final String INSTAGRAM_ID = "";
-    public static final String TWITTER_ID = "";
-    public static final String WEB_URL = "";
+    public static final String FACEBOOK_ID = "zypevideo";
+    public static final String INSTAGRAM_ID = "zype";
+    public static final String TWITTER_ID = "zype";
+    public static final String WEB_URL = "https://www.zype.com/";
 
     // Monetization
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
