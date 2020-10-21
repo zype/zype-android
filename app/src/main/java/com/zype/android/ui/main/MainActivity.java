@@ -214,7 +214,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         // Settings
         bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationSettings,
                 Menu.NONE, R.string.menu_navigation_settings)
-                .setIcon(R.drawable.baseline_settings_black_24);
+                .setIcon(R.drawable.baseline_more_black_24);
 
 
         adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());

@@ -26,6 +26,6 @@
         android:title="@string/menu_navigation_library" />
     <item
         android:id="@+id/menuNavigationSettings"
-        android:icon="@drawable/baseline_settings_black_24"
+        android:icon="@drawable/baseline_more_black_24"
         android:title="@string/menu_navigation_settings" />
 </menu>
