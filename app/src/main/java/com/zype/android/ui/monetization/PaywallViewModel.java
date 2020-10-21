@@ -5,10 +5,13 @@ import android.app.Application;
 import android.os.Handler;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.gson.Gson;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
@@ -24,10 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
 public class PaywallViewModel extends BaseViewModel {
     private static final String TAG = PaywallViewModel.class.getSimpleName();
 
@@ -42,12 +41,6 @@ public class PaywallViewModel extends BaseViewModel {
 
     private BillingManager billingManager;
 
-    public enum State {
-        READY_FOR_PURCHASE,
-        SIGN_IN_REQUIRED,
-        SIGNED_IN
-    }
-
     public PaywallViewModel(Application application) {
         super(application);
 
@@ -55,43 +48,43 @@ public class PaywallViewModel extends BaseViewModel {
         billingManager = new BillingManager(getApplication(), createBillingUpdatesListener());
     }
 
-    public void setPaywallType(PaywallType paywallType) {
-        this.paywallType = paywallType;
-    }
-
     public PaywallType getPaywallType() {
         return paywallType;
     }
 
-    public void setPlaylistId(String playlistId) {
-        this.playlistId = playlistId;
+    public void setPaywallType(PaywallType paywallType) {
+        this.paywallType = paywallType;
     }
 
     public String getPlaylistId() {
         return playlistId;
     }
 
-    public Playlist getPlaylist() {
-        return repo.getPlaylistSync(playlistId);
+    public void setPlaylistId(String playlistId) {
+        this.playlistId = playlistId;
     }
 
-    public void setVideoId(String videoId) {
-        this.videoId = videoId;
+    public Playlist getPlaylist() {
+        return repo.getPlaylistSync(playlistId);
     }
 
     public String getVideoId() {
         return videoId;
     }
 
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
+    }
+
     public Video getVideo() {
         return repo.getVideoSync(videoId);
     }
 
-    //
-
     public LiveData<Boolean> isPurchased() {
         return isPurchased;
     }
+
+    //
 
     public LiveData<List<PurchaseItem>> getPurchaseItems() {
         queryPurchaseItems();
@@ -126,14 +119,12 @@ public class PaywallViewModel extends BaseViewModel {
                         (responseCode, skuDetailsList) -> {
                             if (responseCode != BillingClient.BillingResponse.OK) {
                                 Log.e(TAG, "onSkuDetailsResponse(): Error retrieving sku details from Google Play");
-                            }
-                            else {
+                            } else {
                                 if (skuDetailsList != null) {
                                     if (skuDetailsList.size() != skuList.size()) {
                                         Log.e(TAG, "onSkuDetailsResponse(): Unexpected number of items (" +
                                                 skuDetailsList.size() + ") in Google Play");
-                                    }
-                                    else {
+                                    } else {
                                         List<PurchaseItem> result = new ArrayList<>();
                                         for (SkuDetails skuDetails : skuDetailsList) {
                                             PurchaseItem item = new PurchaseItem();
@@ -159,8 +150,7 @@ public class PaywallViewModel extends BaseViewModel {
                 Log.d(TAG, "BillingManager::onBillingClientSetupFinished()");
                 if (AuthHelper.isLoggedIn()) {
                     state.setValue(State.SIGNED_IN);
-                }
-                else {
+                } else {
                     state.setValue(State.SIGN_IN_REQUIRED);
                 }
             }
@@ -197,8 +187,6 @@ public class PaywallViewModel extends BaseViewModel {
         return false;
     }
 
-    // Actions
-
     public void makePurchase(Activity activity, PurchaseItem item) {
         selectedItem = item;
         if (isPurchased.getValue()) {
@@ -213,17 +201,25 @@ public class PaywallViewModel extends BaseViewModel {
         }
     }
 
+    // Actions
+
     public void updateEntitlements(DataRepository.IDataLoading listener) {
         Handler handler = new Handler();
         handler.postDelayed(() -> {
-                repo.loadVideoEntitlements(listener);
-            }, 5000);
+            repo.loadVideoEntitlements(listener);
+        }, 5000);
     }
-
-    // Util
 
     private String getPlaylistMarketplaceId(@NonNull Playlist playlist) {
         MarketplaceIds marketplaceIds = new Gson().fromJson(playlist.marketplaceIds, MarketplaceIds.class);
         return marketplaceIds.googleplay;
+    }
+
+    // Util
+
+    public enum State {
+        READY_FOR_PURCHASE,
+        SIGN_IN_REQUIRED,
+        SIGNED_IN
     }
 }

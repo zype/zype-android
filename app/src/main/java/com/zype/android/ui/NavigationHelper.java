@@ -278,6 +278,13 @@ public class NavigationHelper {
             }
         }
 
+        if(Integer.parseInt(video.purchaseRequired) == 1) {
+            if (!AuthHelper.isLoggedIn()) {
+                switchToLoginScreen(activity, extras);
+                return;
+            }
+        }
+
         if (video.registrationRequired == 1) {
             if (!AuthHelper.isLoggedIn()) {
                 switchToUnauthorizedUserScreen(activity, extras);

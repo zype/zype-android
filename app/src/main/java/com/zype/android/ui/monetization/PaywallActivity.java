@@ -176,7 +176,7 @@ public class PaywallActivity extends AppCompatActivity {
                     }
                 }
                 else {
-//                    close();
+                  //      close();
                 }
                 break;
             case REQUEST_PURCHASE:
