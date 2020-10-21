@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.billingclient.api.BillingClient;
