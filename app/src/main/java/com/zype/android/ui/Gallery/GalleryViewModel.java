@@ -181,7 +181,7 @@ public class GalleryViewModel extends AndroidViewModel {
             @Override
             public void onCompleted(ZypeApiResponse response) {
                 PlaylistsResponse playlistsResponse = (PlaylistsResponse) response.data;
-                if (response.isSuccessful) {
+                if (playlistsResponse != null && response.isSuccessful) {
                     for (com.zype.android.zypeapi.model.PlaylistData item : playlistsResponse.response) {
                         Playlist playlist = repo.getPlaylistSync(item.id);
                         if (playlist != null) {
