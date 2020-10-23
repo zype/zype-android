@@ -103,7 +103,8 @@ android {
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      onesignal_app_id: "",
                                      onesignal_google_project_number: 'REMOTE',
-                                     crashlyticsCollectionEnabled: "true"
+                                     crashlyticsCollectionEnabled: "true",
+                                     performanceCollectionEnabled : "true"
             ]
         }
         template {
@@ -113,7 +114,8 @@ android {
                                      // TODO: Provide valid app_id for OneSignal
                                      onesignal_app_id: '',
                                      onesignal_google_project_number: 'REMOTE',
-                                     crashlyticsCollectionEnabled: "true"
+                                     crashlyticsCollectionEnabled: "true",
+                                     performanceCollectionEnabled : "true"
             ]
         }
     }

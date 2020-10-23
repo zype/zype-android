@@ -67,10 +67,6 @@
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
             android:value="com.zype.android.ui.player.cast.CastOptionsProvider" />
 
-        <meta-data
-            android:name="firebase_performance_logcat_enabled"
-            android:value="true" />
-
         <activity
             android:name=".ui.Consumer.ConsumerActivity"
             android:theme="@style/AppThemeWithActionBar"
@@ -309,6 +305,10 @@
       <meta-data
         android:name="firebase_crashlytics_collection_enabled"
         android:value="${crashlyticsCollectionEnabled}"/>
+
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="${performanceCollectionEnabled}" />
 
     </application>
 
