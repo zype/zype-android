@@ -51,4 +51,6 @@
     <color name="black_12">#1F000000</color>
     <color name="white">#FFFFFF</color>
     <color name="white_50">#80FFFFFF</color>
+    <color name="setting_icon_color">#ffffff</color>
+
 </resources>

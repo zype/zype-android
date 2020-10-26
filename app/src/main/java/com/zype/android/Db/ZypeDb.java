@@ -1,12 +1,6 @@
 package com.zype.android.Db;
 
 import android.app.Application;
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.migration.Migration;
-import android.content.Context;
 
 import com.zype.android.Db.Entity.AdSchedule;
 import com.zype.android.Db.Entity.AnalyticBeacon;
@@ -14,6 +8,10 @@ import com.zype.android.Db.Entity.FavoriteVideo;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
+
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 /**
  * Created by Evgeny Cherkasov on 13.06.2018

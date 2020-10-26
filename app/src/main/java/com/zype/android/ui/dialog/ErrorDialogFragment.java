@@ -4,10 +4,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
 
 import com.zype.android.R;
+
+import androidx.fragment.app.DialogFragment;
 
 /**
  * Created by Evgeny Cherkasov on 04.10.2016.

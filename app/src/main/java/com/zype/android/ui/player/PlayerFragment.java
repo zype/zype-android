@@ -2,7 +2,6 @@ package com.zype.android.ui.player;
 
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,11 +15,14 @@ import android.media.MediaCodec;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.media.app.NotificationCompat.MediaStyle;
-import android.support.v4.media.session.MediaButtonReceiver;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.media.app.NotificationCompat.MediaStyle;
+import androidx.media.session.MediaButtonReceiver;
+
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -1653,7 +1655,7 @@ public class PlayerFragment extends BaseFragment implements
     // Sensors
     //
     private void listenForDeviceRotation(final int requiredOrientation) {
-        sensorViewModel.getOrientation().observe(this, new android.arch.lifecycle.Observer<Integer>() {
+        sensorViewModel.getOrientation().observe(this, new androidx.lifecycle.Observer<Integer>() {
             @Override
             public void onChanged(@Nullable Integer orientation) {
                 Logger.d("listenForDeviceRotation(): orientation=" + orientation);

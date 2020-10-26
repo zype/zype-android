@@ -44,9 +44,11 @@
         tools:ignore="AllowBackup"
         android:networkSecurityConfig="@xml/network_security_config"
         >
+<!--
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+-->
         <meta-data
             android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/analytics_global_config" />
@@ -60,6 +62,10 @@
         <meta-data
             android:name="com.zype.android.TouTube.ApiKey"
             android:value="AIzaSyAOfxiG4aV66h3XmssCEkP3qCvCqMbDGDI" />
+        <!-- Google Cast -->
+        <meta-data
+            android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
+            android:value="com.zype.android.ui.player.cast.CastOptionsProvider" />
 
         <activity
             android:name=".ui.Consumer.ConsumerActivity"
@@ -295,6 +301,10 @@
                 <action android:name="com.amazonaws.intent.baidu.NOTIFICATION_OPEN" />
             </intent-filter>
         </receiver>
+
+      <meta-data
+        android:name="firebase_crashlytics_collection_enabled"
+        android:value="${crashlyticsCollectionEnabled}"/>
 
     </application>
 

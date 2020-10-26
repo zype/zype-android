@@ -6,11 +6,11 @@ package com.zype.android;
 
 public class ZypeSettings {
     // Zype app key
-    public static final String APP_KEY = "eIqvZ7K4fJLZgQvWGH8oolqKq5G-J1oUPtY07nTunWlZnuOeahcPhqATaXr3zmi_";
+    public static final String APP_KEY = "<APP_KEY>";
     // OAuth credentials
-    public static final String CLIENT_ID = "57cc5ab74d238d644523311362c6ccdb4ab4b163c02d703d9d10df1753195912";
+    public static final String CLIENT_ID = "<CLIENT_ID>";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "5c91b0d2be3b9e14f51c450e";
+    public static final String ROOT_PLAYLIST_ID = "<ROOT_PLAYLIST_ID>";
 
     // Google Analytics Tracking Id
     public static final String GA_TRACKING_ID = "";
@@ -36,6 +36,7 @@ public class ZypeSettings {
     public static final boolean AUTOPLAY = true;
     public static final boolean BACKGROUND_AUDIO_PLAYBACK_ENABLED = true;
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = false;
+    public static final boolean CHROMECAST_SUPPORT = true;
     public static final boolean DEVICE_LINKING = false;
     public static final String DEVICE_LINKING_URL = "https://www.zype.com";
     public static final boolean DOWNLOADS_ENABLED = true;
@@ -58,6 +59,5 @@ public class ZypeSettings {
     public static final String LIVE_VIDEO_ID = "5c8faa013bbf420fc200bc40";
 
     public static final String THEME = ZypeConfiguration.THEME_DARK;
-
 }
 

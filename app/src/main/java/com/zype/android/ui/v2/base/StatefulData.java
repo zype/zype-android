@@ -1,7 +1,5 @@
 package com.zype.android.ui.v2.base;
 
-import android.app.SharedElementCallback;
-import android.arch.lifecycle.MutableLiveData;
 
 public class StatefulData<T> {
     public T data;

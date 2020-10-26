@@ -14,6 +14,7 @@
 
     <!-- Search -->
     <color name="searchBackground">@color/primaryDark</color>
+    <color name="search_background">@color/primaryDark</color>
 
     <color name="white">#FFFFFF</color>
 
@@ -52,5 +53,6 @@
     <color name="black_38">#61000000</color>
     <color name="black_12">#1F000000</color>
     <color name="white_50">#80FFFFFF</color>
+    <color name="setting_icon_color">#61000000</color>
 
 </resources>

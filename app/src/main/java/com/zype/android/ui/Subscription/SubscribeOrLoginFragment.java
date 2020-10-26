@@ -2,10 +2,7 @@ package com.zype.android.ui.Subscription;
 
 
 import android.app.ProgressDialog;
-import android.arch.lifecycle.Observer;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,21 +10,20 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.billingclient.api.Purchase;
-import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.Subscription;
-import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
-import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
-import com.zype.android.webapi.events.ErrorEvent;
-import com.zype.android.webapi.events.marketplaceconnect.MarketplaceConnectEvent;
 
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 import static android.app.Activity.RESULT_OK;
 

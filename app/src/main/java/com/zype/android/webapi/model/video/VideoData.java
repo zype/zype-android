@@ -6,9 +6,6 @@ package com.zype.android.webapi.model.video;
  * date 6/29/15
  */
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.zype.android.webapi.model.player.AdvertisingSchedule;
@@ -17,6 +14,9 @@ import com.zype.android.webapi.model.zobjects.ZObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class VideoData {
 

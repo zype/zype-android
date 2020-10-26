@@ -1,17 +1,18 @@
 package com.zype.android;
 
 import android.app.Activity;
+import android.app.Application.ActivityLifecycleCallbacks;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.multidex.MultiDexApplication;
-import android.support.v7.app.AppCompatDelegate;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.multidex.MultiDexApplication;
+
 import android.text.TextUtils;
 import android.webkit.WebView;
 
@@ -20,7 +21,6 @@ import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
 import com.amazonaws.mobileconnectors.pinpoint.PinpointConfiguration;
 import com.amazonaws.mobileconnectors.pinpoint.PinpointManager;
-import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -37,7 +37,6 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.MarketplaceGateway;
 import com.zype.android.analytics.AnalyticsManager;
-import com.zype.android.analytics.segment.SegmentAnalytics;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.SharedPref;
@@ -55,7 +54,6 @@ import com.zype.android.zypeapi.ZypeApi;
 import java.io.IOException;
 import java.io.InputStream;
 
-import io.fabric.sdk.android.Fabric;
 
 /**
  * @author vasya
@@ -159,7 +157,7 @@ public class ZypeApp extends MultiDexApplication {
         // TODO: Uncomment following line to use Google Analytics
 //        initGoogleAnalytics();
 
-        initVideoCastManager();
+//        initVideoCastManager();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(Activity activity, Bundle bundle) {
@@ -291,18 +289,6 @@ public class ZypeApp extends MultiDexApplication {
         }
     }
 
-    private void initFabric() {
-        if (!BuildConfig.DEBUG) {
-            Fabric.with(this, new Crashlytics());
-        }
-        else {
-            final Fabric fabric = new Fabric.Builder(this)
-                    .kits(new Crashlytics())
-                    .debuggable(true)
-                    .build();
-            Fabric.with(fabric);
-        }
-    }
 
     private void initVideoCastManager() {
         String applicationId = CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID;

@@ -1,9 +1,6 @@
 package com.zype.android.ui.Gallery;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.text.TextUtils;
 
 import com.squareup.otto.Subscribe;
@@ -28,6 +25,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 /**
  * Created by Evgeny Cherkasov on 18.06.2018

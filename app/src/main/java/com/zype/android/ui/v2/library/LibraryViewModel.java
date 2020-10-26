@@ -1,9 +1,6 @@
 package com.zype.android.ui.v2.library;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.util.Log;
 
 import com.zype.android.Auth.AuthHelper;
@@ -22,6 +19,8 @@ import com.zype.android.zypeapi.model.VideosResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.lifecycle.Observer;
 
 import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_FAVORITE;
 import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_UNFAVORITE;

@@ -5,7 +5,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.android.billingclient.api.Purchase;
@@ -38,6 +37,8 @@ import com.zype.android.utils.Logger;
 
 import java.lang.reflect.Type;
 import java.util.List;
+
+import androidx.annotation.NonNull;
 
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 import static com.zype.android.ui.monetization.PaywallActivity.EXTRA_PAYWALL_TYPE;
@@ -274,6 +275,13 @@ public class NavigationHelper {
                     switchToPaywallScreen(activity, extras);
                     return;
                 }
+            }
+        }
+
+        if(Integer.parseInt(video.purchaseRequired) == 1) {
+            if (!AuthHelper.isLoggedIn()) {
+                switchToLoginScreen(activity, extras);
+                return;
             }
         }
 

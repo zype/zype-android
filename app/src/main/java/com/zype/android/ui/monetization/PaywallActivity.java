@@ -1,13 +1,13 @@
 package com.zype.android.ui.monetization;
 
 import android.app.ProgressDialog;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -176,7 +176,7 @@ public class PaywallActivity extends AppCompatActivity {
                     }
                 }
                 else {
-//                    close();
+                  //      close();
                 }
                 break;
             case REQUEST_PURCHASE:

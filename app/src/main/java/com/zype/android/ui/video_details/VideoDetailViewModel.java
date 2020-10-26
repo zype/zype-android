@@ -1,10 +1,6 @@
 package com.zype.android.ui.video_details;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.squareup.otto.Subscribe;
@@ -38,6 +34,11 @@ import com.zype.android.zypeapi.model.VideoResponse;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import androidx.annotation.Nullable;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import static com.zype.android.webapi.WebApiManager.WorkerHandler.BAD_REQUEST;
 
