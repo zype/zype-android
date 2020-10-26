@@ -2,9 +2,6 @@ package com.zype.android.Db.Entity;
 
 import android.text.TextUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
