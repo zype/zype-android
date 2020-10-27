@@ -104,7 +104,7 @@ android {
                                      onesignal_app_id: "",
                                      onesignal_google_project_number: 'REMOTE',
                                      crashlyticsCollectionEnabled: "true",
-                                     performanceCollectionEnabled : "true"
+                                     performanceMonitoringEnabled : "true"
             ]
         }
         template {
@@ -115,7 +115,7 @@ android {
                                      onesignal_app_id: '',
                                      onesignal_google_project_number: 'REMOTE',
                                      crashlyticsCollectionEnabled: "true",
-                                     performanceCollectionEnabled : "true"
+                                     performanceMonitoringEnabled : "true"
             ]
         }
     }
