@@ -101,7 +101,8 @@ android {
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      onesignal_app_id: "",
                                      onesignal_google_project_number: 'REMOTE',
-                                     crashlyticsCollectionEnabled: "true"
+                                     crashlyticsCollectionEnabled: "true",
+                                     facebook_sdk_enabled: "true"
             ]
         }
         template {
@@ -111,7 +112,8 @@ android {
                                      // TODO: Provide valid app_id for OneSignal
                                      onesignal_app_id: '',
                                      onesignal_google_project_number: 'REMOTE',
-                                     crashlyticsCollectionEnabled: "true"
+                                     crashlyticsCollectionEnabled: "true",
+                                     facebook_sdk_enabled: "true"
             ]
         }
     }
@@ -243,6 +245,9 @@ dependencies {
 
     // Segment Analytics
     implementation 'com.segment.analytics.android:analytics:4.7.1'
+
+    //facebook sdk
+    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
 }
 
 // Uncomment below line if using AWS Pinpoint

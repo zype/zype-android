@@ -231,4 +231,7 @@
     <string name="login_signup_sign_msg">Please sign up or sign into an account in order to watch this video</string>
     <string name="alert">Alert</string>
     <string name="alert_msg">We\'re sorry, that program is not yet available.</string>
+    <string name="facebook_app_id">299746937966387</string>
+    <string name="fb_login_protocol_scheme">fb299746937966387</string>
+
 </resources>
