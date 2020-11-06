@@ -69,7 +69,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zype.android.utils.BundleConstants.PLAYLIST_ID;
 import static com.zype.android.utils.BundleConstants.REQUEST_USER;
+import static com.zype.android.utils.BundleConstants.VIDEO_ID;
 
 public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
         OnMainActivityFragmentListener, OnVideoItemAction, OnLoginAction,
@@ -117,6 +119,14 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             new BillingManager(this, this);
         }
+
+        checkForPush(getIntent());
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        checkForPush(intent);
     }
 
     @Override
@@ -231,8 +241,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
                     if (data != null) {
                         Bundle extras = data.getExtras();
                         if (extras != null) {
-                            String videoId = extras.getString(BundleConstants.VIDEO_ID);
-                            String playlistId = extras.getString(BundleConstants.PLAYLIST_ID);
+                            String videoId = extras.getString(VIDEO_ID);
+                            String playlistId = extras.getString(PLAYLIST_ID);
                             NavigationHelper.getInstance(this)
                                     .switchToVideoDetailsScreen(this, videoId, playlistId, false);
                         }
@@ -447,8 +457,8 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     public void onRequestSubscription(String videoId) {
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             Bundle extras = new Bundle();
-            extras.putString(BundleConstants.VIDEO_ID, videoId);
-            extras.putString(BundleConstants.PLAYLIST_ID, null);
+            extras.putString(VIDEO_ID, videoId);
+            extras.putString(PLAYLIST_ID, null);
             NavigationHelper.getInstance(this).switchToSubscriptionScreen(this, extras);
         } else {
             DialogHelper.showSubscriptionAlertIssue(this);
@@ -489,6 +499,17 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     public void onPurchasesUpdated(List<Purchase> purchases) {
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             SubscriptionsHelper.updateSubscriptionCount(purchases);
+        }
+    }
+
+    // Deep link
+
+    private void checkForPush(Intent intent) {
+        if(intent.hasExtra(VIDEO_ID)) {
+            final String videoId = intent.getStringExtra(VIDEO_ID);
+            final String playListId = intent.getStringExtra(PLAYLIST_ID);
+            NavigationHelper.getInstance(this).switchToVideoDetailsScreen(this,
+                    videoId, playListId, true);
         }
     }
 
