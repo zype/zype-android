@@ -24,6 +24,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
+import com.zype.android.DataRepository;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.Contract;
@@ -522,7 +523,7 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         if (file != null) {
             url = file.getUrl();
             String fileId = event.mFileId;
-            DownloadHelper.addVideoToDownloadList(getApplicationContext(), url, fileId);
+            DataRepository.getInstance(getApplication()).updateDownloadUrl(fileId, url);
         } else {
 //            throw new IllegalStateException("url is null");
             UiUtils.showErrorSnackbar(mListView, "Server has returned an empty url for video file");
