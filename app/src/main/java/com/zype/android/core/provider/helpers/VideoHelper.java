@@ -373,8 +373,13 @@ public class VideoHelper {
      */
     public static Thumbnail getThumbnailByHeight(Video video, int height) {
         Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
-        List<Thumbnail> thumbnails = new Gson().fromJson(video.thumbnails, thumbnailType);
-        return getThumbnailByHeight(thumbnails, height);
+
+        if (video !=null  && !TextUtils.isEmpty(video.thumbnails)){
+            List<Thumbnail> thumbnails = new Gson().fromJson(video.thumbnails, thumbnailType);
+            return getThumbnailByHeight(thumbnails, height);
+        }
+
+        return getThumbnailByHeight(new ArrayList<Thumbnail>(), height);
     }
 
     // TODO: Remove this method after refactoring to use Room for working with database

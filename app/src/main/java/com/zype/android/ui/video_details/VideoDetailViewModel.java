@@ -119,7 +119,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
         loadVideo(videoId);
 
-        if (video != null && video.onAir != 1) {
+        if (video!= null && video.onAir !=null && video.onAir != 1) {
             if (ZypeConfiguration.isDownloadsEnabled(getApplication())
                     && (ZypeConfiguration.isDownloadsForGuestsEnabled(getApplication())
                     || SettingsProvider.getInstance().isLoggedIn())) {

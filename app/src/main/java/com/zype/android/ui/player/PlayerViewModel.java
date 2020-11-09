@@ -310,9 +310,11 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 setPlayerUrl(trailerUrl);
             } else {
                 Video video = repo.getVideoSync(videoId);
-                video.playerAudioUrl = null;
-                video.playerVideoUrl = null;
-                updatePlayerUrl(video);
+                if (video != null) {
+                    video.playerAudioUrl = null;
+                    video.playerVideoUrl = null;
+                    updatePlayerUrl(video);
+                }
                 loadPlayer();
             }
         }
@@ -726,7 +728,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         );
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, null,
                 httpDataSourceFactory);
-        
+
         if (contentUri.contains("http:") || contentUri.contains("https:")) {
             if (contentUri.contains(".mp4")
                     || contentUri.contains(".m4a")
