@@ -306,6 +306,12 @@
         android:name="firebase_crashlytics_collection_enabled"
         android:value="${crashlyticsCollectionEnabled}"/>
 
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="${applicationId}.firebaseinitprovider"
+            tools:node="remove"
+            />
+
     </application>
 
 </manifest>
