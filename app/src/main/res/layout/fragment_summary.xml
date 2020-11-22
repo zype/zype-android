@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:id="@+id/textVideoTitle"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
             tools:text="Video Title"
             />
         <Button

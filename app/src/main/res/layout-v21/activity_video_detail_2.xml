@@ -69,6 +69,63 @@
                         />
                 </FrameLayout>
             </FrameLayout>
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/layoutDetails"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="vertical"
+                    >
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        app:cardBackgroundColor="@color/card_background"
+                        app:cardCornerRadius="6dp"
+                        app:cardElevation="0dp"
+                        >
+                        <fragment
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/fragmentSummary"
+                            android:name="com.zype.android.ui.video_details.fragments.summary.SummaryFragment"
+                            />
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        app:cardBackgroundColor="@color/card_background"
+                        app:cardCornerRadius="6dp"
+                        app:cardElevation="0dp"
+                        android:id="@+id/actionBuyVideo"
+                        >
+                        <fragment
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/fragmentBuyVideo"
+                            android:name="com.zype.android.ui.monetization.ActionBuyVideoFragment"
+                            />
+                    </androidx.cardview.widget.CardView>
+                    <fragment
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/fragmentOptions"
+                        android:name="com.zype.android.ui.video_details.fragments.options.OptionsFragment"
+                        />
+                </LinearLayout>
+            </ScrollView>
+<!--
             <com.google.android.material.tabs.TabLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -86,6 +143,7 @@
                 android:layout_height="match_parent"
                 android:id="@+id/layoutSummary"
                 />
+-->
         </LinearLayout>
     </FrameLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

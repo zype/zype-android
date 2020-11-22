@@ -35,8 +35,8 @@ public class PaywallViewModel extends BaseViewModel {
     private MutableLiveData<State> state = new MutableLiveData<>();
     private PurchaseItem selectedItem;
 
-    private String playlistId;
     private PaywallType paywallType;
+    private String playlistId;
     private String videoId;
 
     private BillingManager billingManager;
@@ -187,11 +187,12 @@ public class PaywallViewModel extends BaseViewModel {
         return false;
     }
 
+    // Actions
+
     public void makePurchase(Activity activity, PurchaseItem item) {
         selectedItem = item;
         if (isPurchased.getValue()) {
-            // Force receipt validation
-            isPurchased.setValue(true);
+            // TODO: Force receipt validation
             return;
         }
         if (item.playlist != null) {
@@ -199,9 +200,15 @@ public class PaywallViewModel extends BaseViewModel {
             billingManager.initiatePurchaseFlow(activity,
                     item.product.getSku(), BillingClient.SkuType.INAPP);
         }
+        else if (item.video != null) {
+            Log.d(TAG, "makePurchase(): video, sku=" + item.product.getSku());
+            billingManager.initiatePurchaseFlow(activity,
+                    item.product.getSku(), BillingClient.SkuType.INAPP);
+        }
+        else {
+            Log.d(TAG, "makePurchase(): Either playlist or video must be specified");
+        }
     }
-
-    // Actions
 
     public void updateEntitlements(DataRepository.IDataLoading listener) {
         Handler handler = new Handler();
@@ -212,6 +219,11 @@ public class PaywallViewModel extends BaseViewModel {
 
     private String getPlaylistMarketplaceId(@NonNull Playlist playlist) {
         MarketplaceIds marketplaceIds = new Gson().fromJson(playlist.marketplaceIds, MarketplaceIds.class);
+        return marketplaceIds.googleplay;
+    }
+
+    private String getVideoMarketplaceId(@NonNull Video video) {
+        MarketplaceIds marketplaceIds = new Gson().fromJson(video.marketplaceIds, MarketplaceIds.class);
         return marketplaceIds.googleplay;
     }
 

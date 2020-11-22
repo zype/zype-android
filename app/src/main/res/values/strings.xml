@@ -176,6 +176,7 @@
     <string name="notification_channel_description">Zype Notification Channel</string>
 
     <!-- Paywall -->
+    <string name="action_buy_video">Buy for $%1$s</string>
     <string name="paywall_button_buy_playlist">Buy all %1$d videos - $%2$s</string>
     <string name="paywall_error_validation">We\'re sorry, there was a problem validating your purchase.</string>
     <string name="paywall_subtitle">Get access to Premium Content across all devices</string>

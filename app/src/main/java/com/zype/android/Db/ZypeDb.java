@@ -18,7 +18,7 @@ import androidx.room.RoomDatabase;
  */
 
 @Database(entities = {AdSchedule.class, AnalyticBeacon.class, FavoriteVideo.class, Playlist.class, PlaylistVideo.class, Video.class},
-            version = 13)
+            version = 15)
 public abstract class ZypeDb extends RoomDatabase {
     public abstract ZypeDao zypeDao();
 
