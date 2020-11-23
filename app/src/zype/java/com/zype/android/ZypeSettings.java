@@ -57,6 +57,6 @@ public class ZypeSettings {
     public static final boolean SHOW_LIVE = false;
     public static final String LIVE_VIDEO_ID = "5c8faa013bbf420fc200bc40";
 
-    public static final String THEME = ZypeConfiguration.THEME_LIGHT;
+    public static final String THEME = ZypeConfiguration.THEME_DARK;
 }
 
