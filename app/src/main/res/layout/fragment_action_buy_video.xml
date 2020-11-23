@@ -5,12 +5,13 @@
     >
     <data>
         <import type="android.view.View" />
-        <variable name="videoTitle" type="String" />
+        <import type="android.text.TextUtils"/>
         <variable name="videoPrice" type="String" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="40dp"
         android:id="@+id/actionLayout"
         >
         <ImageView
@@ -24,13 +25,13 @@
             android:tint="?attr/colorControlNormal"
             android:src="@drawable/cart_icon"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="@id/textTitle"
-            app:layout_constraintBottom_toBottomOf="@id/textTitle"
+            app:layout_constraintTop_toTopOf="@id/textPrice"
+            app:layout_constraintBottom_toBottomOf="@id/textPrice"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/textTitle"
+            android:id="@+id/textPrice"
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
@@ -40,7 +41,19 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:visibility="@{TextUtils.isEmpty(videoPrice) ? View.GONE : View.VISIBLE}"
             tools:text="@string/action_buy_video"
+            />
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toRightOf="@id/image"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="?android:attr/progressBarStyleSmall"
+            android:visibility="@{TextUtils.isEmpty(videoPrice) ? View.VISIBLE : View.GONE}"
+            android:id="@+id/progressActionBuyVideo"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

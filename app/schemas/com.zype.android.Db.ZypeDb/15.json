@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 15,
-    "identityHash": "e17a60fc8f260254dfe20a63774f257f",
+    "identityHash": "20cf7e908759f1874c044268234978fb",
     "entities": [
       {
         "tableName": "ad_schedule",
@@ -286,7 +286,7 @@
       },
       {
         "tableName": "video",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `active` INTEGER NOT NULL, `ad_video_tag` TEXT, `category` TEXT, `country` TEXT, `createdAt` TEXT NOT NULL, `crunchyroll_id` TEXT, `data_source` TEXT, `description` TEXT NOT NULL, `download_audio_path` TEXT, `download_audio_url` TEXT, `download_video_path` TEXT, `download_video_url` TEXT, `discovery_url` TEXT, `duration` INTEGER NOT NULL, `guest` TEXT, `entitlement_updated_at` TEXT, `episode` TEXT, `expire_at` TEXT, `featured` TEXT, `foreign_id` TEXT, `hulu_id` TEXT, `is_downloaded_video` INTEGER, `is_downloaded_audio` INTEGER, `is_downloaded_video_should_be` INTEGER, `is_downloaded_audio_should_be` INTEGER, `is_entitled` INTEGER, `is_favorite` INTEGER, `is_highlight` INTEGER, `is_play_started` INTEGER, `is_play_finished` INTEGER, `is_zype_live` INTEGER, `keywords` TEXT, `marketplace_ids` TEXT, `mature_content` TEXT, `on_air` INTEGER, `play_time` INTEGER, `player_audio_url` TEXT, `player_video_url` TEXT, `playlists` TEXT, `preview_ids` TEXT, `published_at` TEXT, `PurchaseRequired` TEXT, `rating` TEXT, `related_playlist_ids` TEXT, `request_count` TEXT, `season` TEXT, `segment` INTEGER, `segments` TEXT, `serialized_playlist_ids` TEXT, `short_description` TEXT, `site_id` TEXT, `start_at` TEXT, `status` TEXT, `subscription_required` TEXT, `title` TEXT, `thumbnails` TEXT, `images` TEXT, `transcoded` INTEGER, `updated_at` TEXT, `video_zobject` TEXT, `youtube_id` TEXT, `zobjectIds` TEXT, `registration_required` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` TEXT NOT NULL, `active` INTEGER NOT NULL, `ad_video_tag` TEXT, `category` TEXT, `country` TEXT, `createdAt` TEXT NOT NULL, `crunchyroll_id` TEXT, `data_source` TEXT, `description` TEXT NOT NULL, `download_audio_path` TEXT, `download_audio_url` TEXT, `download_video_path` TEXT, `download_video_url` TEXT, `discovery_url` TEXT, `duration` INTEGER NOT NULL, `guest` TEXT, `entitlement_updated_at` TEXT, `episode` TEXT, `expire_at` TEXT, `featured` TEXT, `foreign_id` TEXT, `hulu_id` TEXT, `is_downloaded_video` INTEGER, `is_downloaded_audio` INTEGER, `is_downloaded_video_should_be` INTEGER, `is_downloaded_audio_should_be` INTEGER, `is_entitled` INTEGER, `is_favorite` INTEGER, `is_highlight` INTEGER, `is_play_started` INTEGER, `is_play_finished` INTEGER, `is_zype_live` INTEGER, `keywords` TEXT, `marketplace_ids` TEXT, `mature_content` TEXT, `on_air` INTEGER, `play_time` INTEGER, `player_audio_url` TEXT, `player_video_url` TEXT, `playlists` TEXT, `preview_ids` TEXT, `published_at` TEXT, `purchase_price` TEXT, `PurchaseRequired` TEXT, `rating` TEXT, `related_playlist_ids` TEXT, `request_count` TEXT, `season` TEXT, `segment` INTEGER, `segments` TEXT, `serialized_playlist_ids` TEXT, `short_description` TEXT, `site_id` TEXT, `start_at` TEXT, `status` TEXT, `subscription_required` TEXT, `title` TEXT, `thumbnails` TEXT, `images` TEXT, `transcoded` INTEGER, `updated_at` TEXT, `video_zobject` TEXT, `youtube_id` TEXT, `zobjectIds` TEXT, `registration_required` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -541,6 +541,12 @@
             "notNull": false
           },
           {
+            "fieldPath": "purchasePrice",
+            "columnName": "purchase_price",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "purchaseRequired",
             "columnName": "PurchaseRequired",
             "affinity": "TEXT",
@@ -685,7 +691,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"e17a60fc8f260254dfe20a63774f257f\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"20cf7e908759f1874c044268234978fb\")"
     ]
   }
 }

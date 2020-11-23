@@ -169,7 +169,7 @@ public class VideoData {
 
     @SerializedName("purchase_price")
     @Expose
-    public float purchasePrice;
+    public String purchasePrice;
 
     @SerializedName("purchase_required")
     @Expose

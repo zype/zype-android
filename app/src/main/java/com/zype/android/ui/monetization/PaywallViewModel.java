@@ -32,6 +32,7 @@ public class PaywallViewModel extends BaseViewModel {
 
     private MutableLiveData<Boolean> isPurchased = new MutableLiveData<>();
     private MutableLiveData<List<PurchaseItem>> purchaseItems = new MutableLiveData<>();
+//    private MutableLiveData<PurchaseItem> purchaseItem = new MutableLiveData<>();
     private MutableLiveData<State> state = new MutableLiveData<>();
     private PurchaseItem selectedItem;
 
@@ -91,6 +92,10 @@ public class PaywallViewModel extends BaseViewModel {
         return purchaseItems;
     }
 
+//    public LiveData<PurchaseItem> getPurchaseItem() {
+//        return purchaseItem;
+//    }
+//
     public LiveData<State> getState() {
         return state;
     }
@@ -105,7 +110,7 @@ public class PaywallViewModel extends BaseViewModel {
 
     private void queryPurchaseItems() {
         switch (paywallType) {
-            case PLAYLIST_TVOD:
+            case PLAYLIST_TVOD: {
                 Map<String, Object> itemsToPurchase = new HashMap<>();
                 List<String> skuList = new ArrayList<>();
                 Playlist playlist = getPlaylist();
@@ -114,7 +119,6 @@ public class PaywallViewModel extends BaseViewModel {
                     itemsToPurchase.put(marketplaceId, playlist);
                     skuList.add(marketplaceId);
                 }
-                // TODO: We can also add a video to 'itemsToPurchase' and 'skuList', if we will need this option
                 billingManager.querySkuDetailsAsync(BillingClient.SkuType.INAPP, skuList,
                         (responseCode, skuDetailsList) -> {
                             if (responseCode != BillingClient.BillingResponse.OK) {
@@ -140,6 +144,34 @@ public class PaywallViewModel extends BaseViewModel {
                             }
                         });
                 break;
+            }
+            case VIDEO_TVOD: {
+                List<String> skuList = new ArrayList<>();
+                Video video = getVideo();
+                if (video != null) {
+                    String marketplaceId = getVideoMarketplaceId(video);
+                    skuList.add(marketplaceId);
+                }
+                billingManager.querySkuDetailsAsync(BillingClient.SkuType.INAPP, skuList,
+                        (responseCode, skuDetailsList) -> {
+                            if (responseCode != BillingClient.BillingResponse.OK) {
+                                Log.e(TAG, "onSkuDetailsResponse(): Error retrieving sku details from Google Play");
+                            } else {
+                                if (skuDetailsList != null) {
+                                    if (skuDetailsList.size() != skuList.size()) {
+                                        Log.e(TAG, "onSkuDetailsResponse(): Unexpected number of items (" +
+                                                skuDetailsList.size() + ") in Google Play");
+                                    } else {
+                                        PurchaseItem item = new PurchaseItem();
+                                        item.product = skuDetailsList.get(0);
+                                        item.video = video;
+                                        selectedItem = item;
+                                    }
+                                }
+                            }
+                        });
+                break;
+            }
         }
     }
 

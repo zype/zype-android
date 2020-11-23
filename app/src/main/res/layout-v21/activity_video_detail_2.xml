@@ -114,7 +114,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:id="@+id/fragmentBuyVideo"
-                            android:name="com.zype.android.ui.monetization.ActionBuyVideoFragment"
+                            android:name="com.zype.android.ui.video_details.v2.ActionBuyVideoFragment"
                             />
                     </androidx.cardview.widget.CardView>
                     <fragment

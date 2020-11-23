@@ -1,4 +1,4 @@
-package com.zype.android.ui.monetization;
+package com.zype.android.ui.video_details.v2;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,13 +11,14 @@ import androidx.lifecycle.ViewModelProviders;
 import com.zype.android.databinding.FragmentActionBuyVideoBinding;
 
 import com.zype.android.Auth.AuthHelper;
-import com.zype.android.Db.Entity.Video;
 import com.zype.android.ui.NavigationHelper;
+import com.zype.android.ui.monetization.PaywallViewModel;
+import com.zype.android.ui.video_details.VideoDetailViewModel;
 
 public class ActionBuyVideoFragment extends Fragment {
     public static final String TAG = ActionBuyVideoFragment.class.getSimpleName();
 
-    private PaywallViewModel model;
+    private VideoDetailViewModel model;
 
     private FragmentActionBuyVideoBinding binding;
 
@@ -37,7 +38,6 @@ public class ActionBuyVideoFragment extends Fragment {
         final NavigationHelper navigationHelper = NavigationHelper.getInstance(getActivity());
         binding.actionLayout.setOnClickListener(v -> {
             if (AuthHelper.isLoggedIn()) {
-                model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
             }
             else {
                 navigationHelper.switchToConsumerScreen(getActivity());
@@ -51,8 +51,12 @@ public class ActionBuyVideoFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        model = ViewModelProviders.of(getActivity()).get(PaywallViewModel.class);
+        model = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
 
-        // TODO: Get price for purchasing video
+        model.getVideo().observe(this, video -> {
+            if (video != null) {
+                binding.setVideoPrice(video.purchasePrice);
+            }
+        });
     }
 }

@@ -146,6 +146,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "published_at")
     public String publishedAt;
 
+    @ColumnInfo(name = "purchase_price")
+    public String purchasePrice;
+
     @ColumnInfo(name = "PurchaseRequired")
     public String purchaseRequired;
 
