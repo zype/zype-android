@@ -215,6 +215,19 @@ public class PaywallViewModel extends BaseViewModel {
                     }
                 }
                 break;
+            case VIDEO_TVOD: {
+                Video video = getVideo();
+                if (video != null) {
+                    String marketplaceId = getVideoMarketplaceId(video);
+                    Log.d(TAG, "isItemPurchased(): sku=" + marketplaceId);
+                    for (Purchase purchase : purchases) {
+                        if (purchase.getSku().equals(marketplaceId)) {
+                            return true;
+                        }
+                    }
+                }
+                break;
+            }
         }
         return false;
     }
@@ -262,6 +275,7 @@ public class PaywallViewModel extends BaseViewModel {
     // Util
 
     public enum State {
+        PURCHASE_COMPLETED,
         READY_FOR_PURCHASE,
         SIGN_IN_REQUIRED,
         SIGNED_IN

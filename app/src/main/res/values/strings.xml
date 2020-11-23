@@ -177,6 +177,14 @@
 
     <!-- Paywall -->
     <string name="action_buy_video">Buy for $%1$s</string>
+    <string name="buy_video_button_back">Go Back</string>
+    <string name="buy_video_button_buy">Buy Now</string>
+    <string name="buy_video_button_play">Watch Now</string>
+    <string name="buy_video_completed_title">Enjoy Your Purchase!</string>
+    <string name="buy_video_completed_message">You have been charged $%1$s and will be sent a receipt to your email from the Google Play Store.</string>
+    <string name="buy_video_review_title">Review Purchase</string>
+    <string name="buy_video_review_message">You will be charged $%1$s for %2$s.</string>
+    <string name="buy_video_review_google">You will be billed through the Google Play Store.</string>
     <string name="paywall_button_buy_playlist">Buy all %1$d videos - $%2$s</string>
     <string name="paywall_error_validation">We\'re sorry, there was a problem validating your purchase.</string>
     <string name="paywall_subtitle">Get access to Premium Content across all devices</string>

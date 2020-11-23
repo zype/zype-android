@@ -15,6 +15,7 @@ import com.zype.android.databinding.FragmentActionBuyVideoBinding;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.monetization.PaywallViewModel;
+import com.zype.android.ui.monetization.PurchaseVideoBottomDialogFragment;
 import com.zype.android.ui.video_details.VideoDetailViewModel;
 import com.zype.android.utils.BundleConstants;
 
@@ -80,5 +81,7 @@ public class ActionBuyVideoFragment extends Fragment {
 
     private void showPurchaseScreen() {
         Log.d(TAG, "showPurchaseScreen()");
+        PurchaseVideoBottomDialogFragment purchaseFragment = PurchaseVideoBottomDialogFragment.getInstance();
+        purchaseFragment.show(getActivity().getSupportFragmentManager(), PurchaseVideoBottomDialogFragment.TAG);
     }
 }
