@@ -101,6 +101,9 @@
                 app:layout_constraintTop_toBottomOf="@id/textMessage"
                 app:layout_constraintLeft_toRightOf="@id/buttonBuyVideo"
                 app:layout_constraintRight_toRightOf="parent"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/buttonBack"
                 >
                 <LinearLayout
@@ -180,6 +183,9 @@
                 app:layout_constraintTop_toBottomOf="@id/textMessageCompleted"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/buttonBackWhenCompleted"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/buttonPlay"
                 >
                 <LinearLayout
@@ -223,6 +229,9 @@
                 app:layout_constraintTop_toBottomOf="@id/textMessageCompleted"
                 app:layout_constraintLeft_toRightOf="@id/buttonPlay"
                 app:layout_constraintRight_toRightOf="parent"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/buttonBackWhenCompleted"
                 >
                 <LinearLayout

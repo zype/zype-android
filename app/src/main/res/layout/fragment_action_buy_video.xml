@@ -13,6 +13,9 @@
         android:layout_height="wrap_content"
         android:minHeight="40dp"
         android:id="@+id/actionLayout"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         >
         <ImageView
             android:id="@+id/image"
