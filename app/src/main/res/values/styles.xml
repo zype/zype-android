@@ -4,14 +4,12 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="android:colorBackground">@color/background</item>
-        <item name="bottomSheetDialogTheme">@style/Theme.Design.BottomSheetDialog</item>
     </style>
     <style name="AppThemeWithActionBar" parent="Theme.AppCompat.DayNight">
         <item name="colorAccent">@color/accent</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="android:colorBackground">@color/background</item>
-        <item name="bottomSheetDialogTheme">@style/Theme.Design.BottomSheetDialog</item>
     </style>
 <!--
     <style name="AppTheme.NoActionBar" parent="AppTheme">
@@ -29,6 +27,12 @@
 
     <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
         <item name="colorAccent">@color/accent</item>
+    </style>
+
+    <style name="BottomSheetDialogDark" parent="Theme.Design.BottomSheetDialog">
+    </style>
+
+    <style name="BottomSheetDialogLight" parent="Theme.Design.Light.BottomSheetDialog">
     </style>
 
     <style name="ButtonBorder" parent="Widget.AppCompat.Button.Colored">

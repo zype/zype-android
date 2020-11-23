@@ -55,6 +55,9 @@
                 app:layout_constraintTop_toBottomOf="@id/textMessage"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/buttonBack"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/buttonBuyVideo"
                 >
                 <LinearLayout

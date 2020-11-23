@@ -13,10 +13,14 @@ import androidx.lifecycle.ViewModelProviders;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Db.Entity.Playlist;
+import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.databinding.FragmentPaywallPlaylistTvodBinding;
 import com.zype.android.databinding.FragmentPurchaseVideoBinding;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.video_details.VideoDetailViewModel;
+
+import static com.zype.android.ZypeConfiguration.THEME_LIGHT;
 
 public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment {
     public static final String TAG = PurchaseVideoBottomDialogFragment.class.getSimpleName();
@@ -98,5 +102,11 @@ public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment
                 binding.setVideoTitle(video.title);
             }
         });
+    }
+
+    @Override
+    public int getTheme() {
+        return ZypeConfiguration.getTheme(getContext()).equals(THEME_LIGHT)
+            ? R.style.BottomSheetDialogLight : R.style.BottomSheetDialogDark;
     }
 }
