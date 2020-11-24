@@ -224,7 +224,7 @@
     <string name="video_detail_button_watch_now">Watch Now</string>
     <string name="video_error_bad_request">We’re sorry, but there’s an issue playing this video.
         Please try again later, or try watching another video.</string>
-    <string name="video_options_play_as_audio">Play as Audio</string>
+    <string name="video_options_play_as_audio">Play Audio Only</string>
     <string name="video_options_play_as_video">Play as Video</string>
     <string name="videos_loading">Gathering videos for you…</string>
     <string name="videos_episode">Episode %1$s</string>

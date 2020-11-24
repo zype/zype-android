@@ -359,7 +359,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         List<Options> list = new ArrayList<>();
 
         if (playerModes != null && playerModes.size() > 1) {
-            list.add(new Options(OPTION_PLAY_AS, getString(R.string.video_options_play_as_audio), -1));
+            list.add(new Options(OPTION_PLAY_AS, getString(R.string.video_options_play_as_audio), R.drawable.audio_only_icon));
         }
         if (AuthHelper.isLoggedIn()
                 || !ZypeApp.get(getContext()).getAppConfiguration().hideFavoritesActionWhenSignedOut) {
@@ -371,7 +371,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         if (ZypeConfiguration.isDownloadsEnabled(getActivity()) &&
                 (isAudioDownloadUrlExists() || isVideoDownloadUrlExists())) {
             if (mListener.getCurrentFragment() != BaseVideoActivity.TYPE_YOUTUBE && !onAir) {
-                list.add(new Options(OPTION_DOWNLOAD, getString(R.string.option_download), R.drawable.icn_downloads));
+                list.add(new Options(OPTION_DOWNLOAD, getString(R.string.option_download), R.drawable.download_icon));
             }
         }
         return list;
@@ -380,9 +380,9 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     @DrawableRes
     private int getFavoriteIcon(boolean isFavorite) {
         if (isFavorite) {
-            return R.drawable.icn_favorites;
+            return R.drawable.favorite_icon;
         } else {
-            return R.drawable.icn_addtofavorites;
+            return R.drawable.favorite_icon;
         }
     }
 

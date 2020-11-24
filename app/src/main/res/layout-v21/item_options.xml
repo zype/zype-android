@@ -23,8 +23,8 @@
         >
         <ImageView
             android:id="@+id/options_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
             android:layout_marginBottom="8dp"
@@ -45,6 +45,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textStyle="bold"
             tools:text="Action"
             />
         <TextView
