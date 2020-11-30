@@ -9,6 +9,7 @@ import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.gson.Gson;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Db.Entity.Playlist;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.settings.SettingsProvider;
@@ -184,6 +185,31 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
             }
         }
         return playlistPurchaseVerified;
+    }
+
+    public void verifyVideoPurchase(@NonNull Video video, PurchaseItem purchaseItem, IPurchaseVerifyingListener listener) {
+        MarketplaceIds marketplaceIds = new Gson().fromJson(video.marketplaceIds, MarketplaceIds.class);
+        final String sku = marketplaceIds.googleplay;
+        for (Purchase item : billingManager.getPurchases()) {
+            if (item.getSku().equals(sku)) {
+                Logger.d("purchase originalJson=" + item.getOriginalJson());
+                Logger.d("purchase signature=" + item.getSignature());
+                ZypeApi.getInstance().verifyVideoPurchaseGoogle(
+                        ZypeApp.appData.id,
+                        ZypeApp.appData.siteId,
+                        SettingsProvider.getInstance().getConsumerId(),
+                        video.id,
+                        item.getPurchaseToken(),
+                        String.valueOf(purchaseItem.product.getPriceAmountMicros() / 1000000),
+                        item.getOriginalJson(),
+                        item.getSignature(),
+                        response -> {
+                            if (listener != null) {
+                                listener.onPurchaseVerified(response.isSuccessful);
+                            }
+                        });
+            }
+        }
     }
 
     //

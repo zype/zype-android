@@ -15,10 +15,12 @@ import com.android.billingclient.api.SkuDetails;
 import com.google.gson.Gson;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
+import com.zype.android.Billing.MarketplaceGateway;
 import com.zype.android.Billing.PurchaseItem;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.ZypeApp;
 import com.zype.android.ui.v2.base.BaseViewModel;
 import com.zype.android.zypeapi.model.MarketplaceIds;
 
@@ -195,6 +197,9 @@ public class PaywallViewModel extends BaseViewModel {
             public void onPurchasesUpdated(List<Purchase> purchases) {
                 Log.d(TAG, "BillingManager::onPurchasesUpdated(): count=" + purchases.size());
                 if (isItemPurchased(purchases)) {
+                    if (state.getValue() == State.PURCHASE_IN_PROGRESS) {
+                        verifyVideoPurchase();
+                    }
                     isPurchased.setValue(true);
                 }
             }
@@ -247,12 +252,25 @@ public class PaywallViewModel extends BaseViewModel {
         }
         else if (item.video != null) {
             Log.d(TAG, "makePurchase(): video, sku=" + item.product.getSku());
+            state.setValue(State.PURCHASE_IN_PROGRESS);
             billingManager.initiatePurchaseFlow(activity,
                     item.product.getSku(), BillingClient.SkuType.INAPP);
         }
         else {
             Log.d(TAG, "makePurchase(): Either playlist or video must be specified");
         }
+    }
+
+    private void verifyVideoPurchase() {
+        state.setValue(State.PURCHASE_VERIFYING);
+        ZypeApp.marketplaceGateway.verifyVideoPurchase(getVideo(), selectedItem, success -> {
+            if (success) {
+                state.setValue(State.PURCHASE_COMPLETED);
+            }
+            else {
+                state.setValue(State.PURCHASE_ERROR_VERIFYING);
+            }
+        });
     }
 
     public void updateEntitlements(DataRepository.IDataLoading listener) {
@@ -275,7 +293,11 @@ public class PaywallViewModel extends BaseViewModel {
     // Util
 
     public enum State {
+        ERROR_PRODUCT_NOT_FOUND,
         PURCHASE_COMPLETED,
+        PURCHASE_ERROR_VERIFYING,
+        PURCHASE_IN_PROGRESS,
+        PURCHASE_VERIFYING,
         READY_FOR_PURCHASE,
         SIGN_IN_REQUIRED,
         SIGNED_IN

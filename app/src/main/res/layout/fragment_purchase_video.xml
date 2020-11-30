@@ -5,11 +5,10 @@
     >
     <data>
         <import type="android.view.View" />
+        <import type="com.zype.android.ui.monetization.PaywallViewModel" />
         <variable name="videoPrice" type="String" />
         <variable name="videoTitle" type="String" />
-        <variable name="isReview" type="Boolean" />
-        <variable name="isReadyForPurchase" type="Boolean" />
-        <variable name="isPurchaseCompleted" type="Boolean" />
+        <variable name="state" type="com.zype.android.ui.monetization.PaywallViewModel.State" />
     </data>
     <FrameLayout
         android:layout_width="match_parent"
@@ -23,7 +22,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{isReview ? View.VISIBLE : View.GONE}"
+            android:visibility="@{state == PaywallViewModel.State.READY_FOR_PURCHASE ? View.VISIBLE : View.GONE}"
             tools:context="com.zype.android.ui.monetization.PaywallActivity">
 
             <TextView
@@ -157,7 +156,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{isPurchaseCompleted ? View.VISIBLE : View.GONE}"
+            android:visibility="@{state == PaywallViewModel.State.PURCHASE_COMPLETED ? View.VISIBLE : View.GONE}"
             tools:context="com.zype.android.ui.monetization.PaywallActivity"
             >
             <TextView
@@ -268,6 +267,21 @@
                         />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{state == PaywallViewModel.State.PURCHASE_IN_PROGRESS || state == PaywallViewModel.State.PURCHASE_VERIFYING ? View.VISIBLE : View.GONE}"
+            tools:context="com.zype.android.ui.monetization.PaywallActivity"
+            >
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 </layout>

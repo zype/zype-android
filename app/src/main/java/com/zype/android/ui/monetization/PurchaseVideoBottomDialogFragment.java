@@ -42,8 +42,6 @@ public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentPurchaseVideoBinding.inflate(inflater, container, false);
-        binding.setIsReview(true);
-        binding.setIsPurchaseCompleted(false);
         binding.buttonBack.setOnClickListener(v -> {
             dismiss();
         });
@@ -70,6 +68,7 @@ public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment
         model.setState(PaywallViewModel.State.SIGNED_IN);
         model.getState().observe(this, state -> {
             Log.d(TAG, "PaywallVideModel::getState(): state=" + state);
+            binding.setState(state);
             switch (state) {
                 case SIGNED_IN:
                     model.getPurchaseItems().observe(this, purchaseItems -> {
@@ -77,19 +76,12 @@ public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment
                             model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
                         }
                         else {
-                            model.setState(PaywallViewModel.State.SIGNED_IN);
+                            model.setState(PaywallViewModel.State.ERROR_PRODUCT_NOT_FOUND);
                         }
                     });
                     break;
-                case READY_FOR_PURCHASE:
-                    binding.setIsReadyForPurchase(true);
-                    break;
-                case PURCHASE_COMPLETED:
-                    binding.setIsReadyForPurchase(false);
-                    binding.setIsPurchaseCompleted(true);
-                    break;
                 default:
-                    Log.d(TAG, "PaywallVideModel::getState(): Unknown state");
+                    Log.d(TAG, "PaywallVideModel::getState(): No additional actions required");
                     break;
             }
         });
