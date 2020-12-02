@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat
 import groovy.json.JsonSlurper
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 // TODO: Uncomment following line to use Fabric
 //apply plugin: 'io.fabric'
@@ -97,7 +97,8 @@ android {
     productFlavors {
         zype {
             versionName zypeTemplateVersion
-            applicationId 'com.zype.android'
+//            applicationId 'com.zype.android'
+            applicationId 'com.zype.isnrelaunch'
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      onesignal_app_id: "",
                                      onesignal_google_project_number: 'REMOTE',

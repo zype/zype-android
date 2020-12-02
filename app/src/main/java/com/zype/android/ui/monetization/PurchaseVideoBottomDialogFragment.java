@@ -53,6 +53,7 @@ public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment
             model.makePurchase(getActivity(), model.getSelectedItem());
         });
         binding.buttonPlay.setOnClickListener(v -> {
+            videoDetailViewModel.setVideoId(videoDetailViewModel.getVideoId());
             dismiss();
         });
         return binding.getRoot();
@@ -64,32 +65,33 @@ public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment
 
         model = ViewModelProviders.of(this).get(PaywallViewModel.class);
         model.setPaywallType(PaywallType.VIDEO_TVOD);
-        // This fragment assumes that we made sure user is signed in
-        model.setState(PaywallViewModel.State.SIGNED_IN);
-        model.getState().observe(this, state -> {
-            Log.d(TAG, "PaywallVideModel::getState(): state=" + state);
-            binding.setState(state);
-            switch (state) {
-                case SIGNED_IN:
-                    model.getPurchaseItems().observe(this, purchaseItems -> {
-                        if (purchaseItems != null && !purchaseItems.isEmpty()) {
-                            model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
-                        }
-                        else {
-                            model.setState(PaywallViewModel.State.ERROR_PRODUCT_NOT_FOUND);
-                        }
-                    });
-                    break;
-                default:
-                    Log.d(TAG, "PaywallVideModel::getState(): No additional actions required");
-                    break;
-            }
-        });
 
         videoDetailViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
         videoDetailViewModel.getVideo().observe(this, video -> {
             if (video != null) {
                 model.setVideoId(video.id);
+                // This fragment assumes that we made sure user is signed in
+                model.setState(PaywallViewModel.State.SIGNED_IN);
+                model.getState().observe(this, state -> {
+                    Log.d(TAG, "PaywallVideModel::getState(): state=" + state);
+                    binding.setState(state);
+                    switch (state) {
+                        case SIGNED_IN:
+                            model.getPurchaseItems().observe(this, purchaseItems -> {
+                                if (purchaseItems != null && !purchaseItems.isEmpty()) {
+                                    model.setState(PaywallViewModel.State.READY_FOR_PURCHASE);
+                                }
+                                else {
+                                    model.setState(PaywallViewModel.State.ERROR_PRODUCT_NOT_FOUND);
+                                }
+                            });
+                            break;
+                        default:
+                            Log.d(TAG, "PaywallVideModel::getState(): No additional actions required");
+                            break;
+                    }
+                });
+
                 binding.setVideoPrice(video.purchasePrice);
                 binding.setVideoTitle(video.title);
             }

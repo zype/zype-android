@@ -246,6 +246,21 @@ public class BillingManager implements PurchasesUpdatedListener {
         return this.purchases;
     }
 
+    public Purchase getPurchase(String sku) {
+        for (Purchase purchase : purchases) {
+            if (purchase.getSku().equals(sku)) return purchase;
+        }
+        return null;
+    }
+
+    public void consumePurchase(Purchase purchase) {
+        if (purchase != null) {
+            mBillingClient.consumeAsync(purchase.getPurchaseToken(), (responseCode, purchaseToken) -> {
+
+            });
+        }
+    }
+
     /**
      * Consumes all purchases.
      * Used only for testing one-time purchases

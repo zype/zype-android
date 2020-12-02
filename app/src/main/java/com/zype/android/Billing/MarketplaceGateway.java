@@ -204,6 +204,15 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
                         item.getOriginalJson(),
                         item.getSignature(),
                         response -> {
+                            if (response.isSuccessful) {
+                                billingManager.consumePurchase(item);
+                            }
+                            else {
+                                if (response.errorBody.status == 400) {
+                                    Logger.e("verifyVideoPurchase(): Error verifying purchase. It is likely because it was processed earlier. Consuming this purchase.");
+                                    billingManager.consumePurchase(item);
+                                }
+                            }
                             if (listener != null) {
                                 listener.onPurchaseVerified(response.isSuccessful);
                             }

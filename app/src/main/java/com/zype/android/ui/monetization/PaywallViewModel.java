@@ -168,6 +168,7 @@ public class PaywallViewModel extends BaseViewModel {
                                         item.product = skuDetailsList.get(0);
                                         item.video = video;
                                         selectedItem = item;
+                                        setState(State.READY_FOR_PURCHASE);
                                     }
                                 }
                             }
@@ -183,9 +184,9 @@ public class PaywallViewModel extends BaseViewModel {
             public void onBillingClientSetupFinished() {
                 Log.d(TAG, "BillingManager::onBillingClientSetupFinished()");
                 if (AuthHelper.isLoggedIn()) {
-                    state.setValue(State.SIGNED_IN);
+                    setState(State.SIGNED_IN);
                 } else {
-                    state.setValue(State.SIGN_IN_REQUIRED);
+                    setState(State.SIGN_IN_REQUIRED);
                 }
             }
 
@@ -242,7 +243,8 @@ public class PaywallViewModel extends BaseViewModel {
     public void makePurchase(Activity activity, PurchaseItem item) {
         selectedItem = item;
         if (isPurchased.getValue()) {
-            // TODO: Force receipt validation
+            setState(State.PURCHASE_IN_PROGRESS);
+            verifyVideoPurchase();
             return;
         }
         if (item.playlist != null) {
@@ -252,9 +254,14 @@ public class PaywallViewModel extends BaseViewModel {
         }
         else if (item.video != null) {
             Log.d(TAG, "makePurchase(): video, sku=" + item.product.getSku());
-            state.setValue(State.PURCHASE_IN_PROGRESS);
-            billingManager.initiatePurchaseFlow(activity,
-                    item.product.getSku(), BillingClient.SkuType.INAPP);
+            setState(State.PURCHASE_IN_PROGRESS);
+            if (isItemPurchased(billingManager.getPurchases())) {
+                verifyVideoPurchase();
+            }
+            else {
+                billingManager.initiatePurchaseFlow(activity,
+                        item.product.getSku(), BillingClient.SkuType.INAPP);
+            }
         }
         else {
             Log.d(TAG, "makePurchase(): Either playlist or video must be specified");
@@ -262,13 +269,22 @@ public class PaywallViewModel extends BaseViewModel {
     }
 
     private void verifyVideoPurchase() {
-        state.setValue(State.PURCHASE_VERIFYING);
+        setState(State.PURCHASE_VERIFYING);
         ZypeApp.marketplaceGateway.verifyVideoPurchase(getVideo(), selectedItem, success -> {
             if (success) {
-                state.setValue(State.PURCHASE_COMPLETED);
+//                billingManager.consumePurchase(billingManager.getPurchase(selectedItem.product.getSku()));
+                updateEntitlements(success1 -> {
+                    if (success1) {
+                        setState(State.PURCHASE_COMPLETED);
+                    }
+                    else {
+                        // TODO: Maybe add a separate error for failed loading entitlements
+                        setState(State.PURCHASE_ERROR_VERIFYING);
+                    }
+                });
             }
             else {
-                state.setValue(State.PURCHASE_ERROR_VERIFYING);
+                setState(State.PURCHASE_ERROR_VERIFYING);
             }
         });
     }

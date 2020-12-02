@@ -466,7 +466,18 @@ public class ZypeApi {
                     listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
                 }
                 else {
-                    listener.onCompleted(new ZypeApiResponse<>(response.body(), false));
+                    try {
+                        String error = response.errorBody().string();
+                        Gson gson = new Gson();
+                        ErrorBody errorBody = gson.fromJson(error, ErrorBody.class);
+                        errorBody.status = response.code();
+                        listener.onCompleted(new ZypeApiResponse<PlayerResponse>(errorBody));
+                    }
+                    catch (Exception e) {
+                        ErrorBody errorBody = new ErrorBody();
+                        errorBody.status = response.code();
+                        listener.onCompleted(new ZypeApiResponse<PlayerResponse>(errorBody));
+                    }
                 }
             }
 
