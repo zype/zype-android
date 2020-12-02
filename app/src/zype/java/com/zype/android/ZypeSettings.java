@@ -6,11 +6,11 @@ package com.zype.android;
 
 public class ZypeSettings {
     // Zype app key
-    public static final String APP_KEY = "M2pPt4TrqGweyYlPvX5uRIOIYukvIP3OZzYWpUVr0Q3FVq6VrUuHEH9jH90LJ-s5";
+    public static final String APP_KEY = "";
     // OAuth credentials
-    public static final String CLIENT_ID = "f97ff3ff1ce1d387c8194e4d0e87b9ba08d05fd1240d2fad56c1fac8489ec4ff";
+    public static final String CLIENT_ID = "";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "5988733935fdb3138d010dcb";
+    public static final String ROOT_PLAYLIST_ID = "";
 
     // Google Analytics Tracking Id
     public static final String GA_TRACKING_ID = "";
