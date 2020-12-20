@@ -24,6 +24,7 @@ public class AdBreakManager {
         this.adBreaks.addAll(adBreaks);
         shownAdBreaks.clear();
         currentAdBreak.setValue(null);
+        lastPlaybackPosition = -1f;
     }
 
     public LiveData<AdBreak> getAdBreak() {
@@ -39,7 +40,9 @@ public class AdBreakManager {
             if (position >= adBreak.offset
                     && !shownAdBreaks.contains(adBreak)) {
                 shownAdBreaks.add(adBreak);
-                return  adBreak;
+                if (lastPlaybackPosition != -1f) {
+                    return adBreak;
+                }
             }
         }
         return null;
@@ -48,8 +51,8 @@ public class AdBreakManager {
     public void onPositionChanged(float position) {
         if (lastPlaybackPosition == position)
             return;
-        lastPlaybackPosition = position;
         AdBreak nextAdBreak = getNextAdBreak(position);
+        lastPlaybackPosition = position;
         if (currentAdBreak.getValue() != nextAdBreak) {
             Logger.d("onPositionChanged(): position=" + position + ", adBreak=" + (nextAdBreak == null ? null : nextAdBreak.toString()));
             currentAdBreak.setValue(nextAdBreak);
