@@ -519,6 +519,14 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 setCurrentPlayer(castPlayer.isCastSessionAvailable() ? castPlayer : player);
                 preparePlayer(playerUrl, false);
                 updateNextPreviousButtons();
+                if (playerViewModel.getPlaybackPosition() == 0 && playerViewModel.adBreakManager.hasPreroll()) {
+                    disablePlayerControls();
+                    pause();
+                }
+                else {
+                    enablePlayerControls();
+                    play();
+                }
             }
         };
     }
@@ -749,16 +757,15 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             castControlView.setPlayer(castPlayer);
         }
 
-        if (isPlayerControlsEnabled()) {
-            play();
-        }
-        else {
-            pause();
-        }
+//        if (isPlayerControlsEnabled()) {
+//            play();
+//        }
+//        else {
+//            pause();
+//        }
     }
 
     private void preparePlayer(String playUrl, boolean isAd) {
-        handlerTimer.post(runnablePlaybackTime);
         if (currentPlayer == player) {
             MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playUrl);
             if (mediaSource != null && player != null) {
@@ -786,6 +793,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     playerViewModel.getPlaybackPosition(),
                     Player.REPEAT_MODE_OFF);
         }
+        handlerTimer.post(runnablePlaybackTime);
     }
 
     private void releasePlayer() {
@@ -1409,6 +1417,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private void pauseContent() {
         pause();
 //        playerViewModel.setPlaybackPosition(currentPlayer.getCurrentPosition());
+        disablePlayerControls();
         isAdDisplayed = true;
     }
 
@@ -1466,6 +1475,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     adsManager = null;
                 }
                 adsLoader.contentComplete();
+                play();
                 break;
 //            case AD_PROGRESS:
 //                if (player.getPlayWhenReady()) {

@@ -17,6 +17,8 @@ public class AdBreakManager {
 
     private MutableLiveData<AdBreak> currentAdBreak = new MutableLiveData<>();
 
+    private float lastPlaybackPosition = -1f;
+
     public void init(List<AdBreak> adBreaks) {
         this.adBreaks.clear();
         this.adBreaks.addAll(adBreaks);
@@ -26,6 +28,10 @@ public class AdBreakManager {
 
     public LiveData<AdBreak> getAdBreak() {
         return currentAdBreak;
+    }
+
+    public boolean hasPreroll() {
+        return adBreaks.size() > 0 && adBreaks.get(0).offset == 0;
     }
 
     private AdBreak getNextAdBreak(float position) {
@@ -40,6 +46,9 @@ public class AdBreakManager {
     }
 
     public void onPositionChanged(float position) {
+        if (lastPlaybackPosition == position)
+            return;
+        lastPlaybackPosition = position;
         AdBreak nextAdBreak = getNextAdBreak(position);
         if (currentAdBreak.getValue() != nextAdBreak) {
             Logger.d("onPositionChanged(): position=" + position + ", adBreak=" + (nextAdBreak == null ? null : nextAdBreak.toString()));

@@ -201,8 +201,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     public void setPlaybackPosition(long position) {
         if (this.playbackPosition != position) {
             this.playbackPosition = position;
-            adBreakManager.onPositionChanged((float) position);
         }
+        adBreakManager.onPositionChanged((float) position);
     }
 
     public void savePlaybackPosition(long position) {
@@ -775,7 +775,10 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
         else {
             mediaType = MediaMetadata.MEDIA_TYPE_MOVIE;
-            if (contentUri.contains("mp4")) {
+            if (contentUri.contains("m3u8")) {
+                contentType = "application/x-mpegurl";
+            }
+            else if (contentUri.contains("mp4")) {
                 contentType = "video/mp4";
             }
             else {
