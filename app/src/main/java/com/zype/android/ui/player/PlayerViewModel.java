@@ -36,6 +36,7 @@ import com.zype.android.analytics.AnalyticsManager;
 import com.zype.android.core.provider.helpers.PlaylistHelper;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.domain.AdBreakManager;
 import com.zype.android.utils.AdMacrosHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
@@ -71,6 +72,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private String playlistId;
     private String trailerVideoId;
     private String trailerUrl;
+
+    public AdBreakManager adBreakManager;
 
     private List<AdSchedule> adSchedule;
     private AnalyticBeacon analyticBeacon;
@@ -164,6 +167,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
             }
         }
         setPlayerUrl(null);
+
+        adBreakManager = new AdBreakManager();
+        adBreakManager.init(repo.getAdBreaks(videoId));
     }
 
     // Ad schedule
@@ -193,11 +199,14 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public void setPlaybackPosition(long position) {
-        this.playbackPosition = position;
+        if (this.playbackPosition != position) {
+            this.playbackPosition = position;
+            adBreakManager.onPositionChanged((float) position);
+        }
     }
 
     public void savePlaybackPosition(long position) {
-        setPlaybackPosition(position);
+//        setPlaybackPosition(position);
 
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
@@ -263,6 +272,10 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                         .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_FINISHED, video, playbackPosition);
             }
         }
+    }
+
+    public boolean getPlaybackStarted() {
+        return isPlaybackStarted;
     }
 
     public boolean isThereNextVideo() {
@@ -730,7 +743,11 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 httpDataSourceFactory);
 
         if (contentUri.contains("http:") || contentUri.contains("https:")) {
-            if (contentUri.contains(".mp4")
+            if (contentUri.contains(".m3u8")) {
+                result = new HlsMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(Uri.parse(contentUri));
+            }
+            else if (contentUri.contains(".mp4")
                     || contentUri.contains(".m4a")
                     || contentUri.contains(".mp3")) {
                 result = new ExtractorMediaSource.Factory(dataSourceFactory)

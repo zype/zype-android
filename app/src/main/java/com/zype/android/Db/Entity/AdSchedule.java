@@ -6,6 +6,8 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.zype.android.domain.model.AdBreak;
+
 /**
  * Created by Evgeny Cherkasov on 19.06.2018
  */
@@ -30,4 +32,7 @@ public class AdSchedule {
     @NonNull
     public String videoId;
 
+    public AdBreak toDomain() {
+        return new AdBreak(tag, offset.floatValue(), 0f, false);
+    }
 }

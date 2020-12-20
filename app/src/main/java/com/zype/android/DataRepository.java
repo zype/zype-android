@@ -13,6 +13,7 @@ import com.zype.android.Db.Entity.PlaylistVideo;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.Db.ZypeDb;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.domain.model.AdBreak;
 import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
 import com.zype.android.zypeapi.ZypeApiResponse;
@@ -56,6 +57,15 @@ public class DataRepository {
     }
 
     // Ad schedule
+
+    public List<AdBreak> getAdBreaks(String videoId) {
+        List<AdBreak> result = new ArrayList<>();
+        List<AdSchedule> adScheduleList = db.zypeDao().getAdScheduleSync(videoId);
+        for (AdSchedule adSchedule : adScheduleList) {
+            result.add(adSchedule.toDomain());
+        }
+        return result;
+    }
 
     public List<AdSchedule> getAdScheduleSync(String videoId) {
         return db.zypeDao().getAdScheduleSync(videoId);

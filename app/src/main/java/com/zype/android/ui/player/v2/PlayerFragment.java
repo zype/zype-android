@@ -51,9 +51,11 @@ import com.google.ads.interactivemedia.v3.api.AdEvent;
 import com.google.ads.interactivemedia.v3.api.AdsLoader;
 import com.google.ads.interactivemedia.v3.api.AdsManager;
 import com.google.ads.interactivemedia.v3.api.AdsManagerLoadedEvent;
+import com.google.ads.interactivemedia.v3.api.AdsRenderingSettings;
 import com.google.ads.interactivemedia.v3.api.AdsRequest;
 import com.google.ads.interactivemedia.v3.api.ImaSdkFactory;
 import com.google.ads.interactivemedia.v3.api.player.ContentProgressProvider;
+import com.google.ads.interactivemedia.v3.api.player.VideoAdPlayer;
 import com.google.ads.interactivemedia.v3.api.player.VideoProgressUpdate;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
@@ -92,10 +94,12 @@ import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.domain.model.AdBreak;
 import com.zype.android.receiver.PhoneCallReceiver;
 import com.zype.android.receiver.RemoteControlReceiver;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.dialog.ErrorDialogFragment;
+import com.zype.android.ui.monetization.PaywallViewModel;
 import com.zype.android.ui.player.PlayerViewModel;
 import com.zype.android.ui.player.SensorViewModel;
 import com.zype.android.ui.video_details.VideoDetailViewModel;
@@ -106,6 +110,7 @@ import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.model.video.Thumbnail;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Formatter;
@@ -162,6 +167,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
     // IMA SDK
 
+    private Observer<AdBreak> adBreakObserver;
+
     // Factory class for creating SDK objects.
     private ImaSdkFactory sdkFactory;
     // The AdsLoader instance exposes the requestAds method.
@@ -170,6 +177,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private AdsManager adsManager;
     // Whether an ad is displayed.
     private boolean isAdDisplayed;
+    private List<VideoAdPlayer.VideoAdPlayerCallback> adCallbacks = new ArrayList<>(1);
 
     private int nextAdIndex = -1;
     private Runnable runnablePlaybackTime;
@@ -216,15 +224,18 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         runnablePlaybackTime = new Runnable() {
             @Override
             public void run() {
-                if (player != null) {
-                    long currentPosition = player.getCurrentPosition();
-                    if (!checkNextAd(currentPosition)) {
-                        handlerTimer.postDelayed(this, 1000);
+                if (!isAdDisplayed) {
+                    if (player != null) {
+                        long currentPosition = player.getCurrentPosition();
+                        playerViewModel.setPlaybackPosition(currentPosition);
+//                    if (!checkNextAd(currentPosition)) {
+//                        handlerTimer.postDelayed(this, 1000);
+//                    }
+                    } else {
+                        Logger.d("runnablePlaybackTime: Player is not ready");
                     }
                 }
-                else {
-                    Logger.d("runnablePlaybackTime: Player is not ready");
-                }
+                handlerTimer.postDelayed(this, 1000);
             }
         };
 
@@ -232,7 +243,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         runnableAnalyticsPlayback = () -> {
             if (player != null) {
                 long currentPosition = player.getCurrentPosition();
-                playerViewModel.setPlaybackPosition(currentPosition);
+//                playerViewModel.setPlaybackPosition(currentPosition);
                 playerViewModel.onPlayback();
                 if (player.getPlayWhenReady()) {
                     handlerTimer.postDelayed(runnableAnalyticsPlayback, ANALYTICS_PLAYBACK_INTERVAL);
@@ -310,10 +321,13 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             playerUrlObserver = createPlayerUrlObserver();
         if (playerErrorObserver == null)
             playerErrorObserver = createPlayerErrorObserver();
+        if (adBreakObserver == null)
+            adBreakObserver = createAdBreakObserver();
 
         playerViewModel.getPlayerMode().observe(this, playerModeObserver);
         playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
         playerViewModel.onPlayerError().observe(this, playerErrorObserver);
+        playerViewModel.adBreakManager.getAdBreak().observe(this, adBreakObserver);
         if (playerViewModel.isTrailer().getValue()) {
             ImageButton buttonCloseTrailer = getView().findViewById(R.id.buttonCloseTrailer);
             buttonCloseTrailer.setVisibility(View.VISIBLE);
@@ -378,8 +392,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         if (adsManager != null && isAdDisplayed) {
             adsManager.resume();
         }
-
-        startAdsTimer();
+//
+//        startAdsTimer();
     }
 
     @Override
@@ -407,8 +421,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         if (adsManager != null && isAdDisplayed) {
             adsManager.pause();
         }
-
-        stopAdsTimer();
+//
+//        stopAdsTimer();
     }
 
     @Override
@@ -503,7 +517,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 //                    }
 //                }
                 setCurrentPlayer(castPlayer.isCastSessionAvailable() ? castPlayer : player);
-                preparePlayer(playerUrl);
+                preparePlayer(playerUrl, false);
                 updateNextPreviousButtons();
             }
         };
@@ -519,6 +533,15 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 //                    playerView.setUseArtwork(true);
 //                    showThumbnail();
                     break;
+            }
+        };
+    }
+
+    private Observer<AdBreak> createAdBreakObserver() {
+        return adBreak -> {
+            Logger.d("getAdBreak(): adBreak=" + adBreak);
+            if (adBreak != null) {
+                requestAd(adBreak);
             }
         };
     }
@@ -734,18 +757,24 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         }
     }
 
-    private void preparePlayer(String playUrl) {
+    private void preparePlayer(String playUrl, boolean isAd) {
+        handlerTimer.post(runnablePlaybackTime);
         if (currentPlayer == player) {
             MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playUrl);
             if (mediaSource != null && player != null) {
-                if (videoViewModel.getVideoSync().onAir != 1
-                        && !playerViewModel.isTrailer().getValue()) {
-                    player.seekTo(playerViewModel.getPlaybackPosition());
-                    playerViewModel.onPlaybackPositionRestored();
+                if (isAd) {
+                    player.prepare(mediaSource, true, true);
                 }
-                player.prepare(mediaSource, false, false);
-                if (!playerViewModel.isTrailer().getValue()) {
-                    startAds();
+                else {
+                    player.prepare(mediaSource, true, true);
+                    if (videoViewModel.getVideoSync().onAir != 1
+                            && !playerViewModel.isTrailer().getValue()) {
+                        player.seekTo(playerViewModel.getPlaybackPosition());
+                        playerViewModel.onPlaybackPositionRestored();
+                    }
+                    if (!playerViewModel.isTrailer().getValue()) {
+//                        startAds();
+                    }
                 }
             }
         }
@@ -763,6 +792,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         Logger.d("releasePlayer()");
         AnalyticsManager.getInstance().trackStop();
 
+        handlerTimer.removeCallbacks(runnablePlaybackTime);
         handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
         currentPlayer = null;
         if (player != null) {
@@ -863,11 +893,29 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     mediaSession.setActive(true);
                     if (player != null) {
                         if (player.getPlayWhenReady()) {
-                            handlerTimer.postDelayed(runnableAnalyticsPlayback, ANALYTICS_PLAYBACK_INTERVAL);
-                            playerViewModel.onPlaybackResumed();
+                            if (isAdDisplayed) {
+                                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                                    if (playerViewModel.getPlaybackStarted())
+                                        callback.onResume();
+                                    else {
+                                        callback.onPlay();
+                                    }
+                                }
+                            }
+                            else {
+                                handlerTimer.postDelayed(runnableAnalyticsPlayback, ANALYTICS_PLAYBACK_INTERVAL);
+                                playerViewModel.onPlaybackResumed();
+                            }
                         }
                         else {
-                            handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
+                            if (isAdDisplayed) {
+                                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                                    callback.onPause();
+                                }
+                            }
+                            else {
+                                handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
+                            }
                         }
                     }
                     break;
@@ -880,23 +928,32 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                         break;
                     }
                     if (playerViewModel.getPlaybackState().getValue() != playbackState) {
-                        AnalyticsManager.getInstance().trackStop();
+                        if (isAdDisplayed) {
+                            for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                                callback.onEnded();
+                            }
+                        }
+                        else {
+                            AnalyticsManager.getInstance().trackStop();
 
-                        handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
-                        playerViewModel.setPlaybackPosition(player.getCurrentPosition());
-                        playerViewModel.onPlaybackFinished();
-                        playerViewModel.savePlaybackPosition(0);
+                            handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
+                            playerViewModel.setPlaybackPosition(player.getCurrentPosition());
+                            playerViewModel.onPlaybackFinished();
+                            playerViewModel.savePlaybackPosition(0);
 
-                        if (ZypeConfiguration.autoplayEnabled(getActivity())
-                                && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
-                            onNext();
+                            if (ZypeConfiguration.autoplayEnabled(getActivity())
+                                    && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
+                                onNext();
+                            }
                         }
                     }
                     break;
                 }
             }
-            playerViewModel.setPlaybackState(playbackState);
-            playerViewModel.setIsPlaying(playWhenReady);
+            if (!isAdDisplayed) {
+                playerViewModel.setPlaybackState(playbackState);
+                playerViewModel.setIsPlaying(playWhenReady);
+            }
         }
 
         @Override
@@ -907,6 +964,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         @Override
         public void onPlayerError(ExoPlaybackException e) {
             Log.e(TAG, "onPlayerError(): " + e.getMessage());
+            if (isAdDisplayed) {
+                for (VideoAdPlayer.VideoAdPlayerCallback callback : adCallbacks) {
+                    callback.onError();
+                }
+            }
         }
 
         @Override
@@ -914,17 +976,19 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
             Logger.d("onTracksChanged():");
 
-            // Update subtitles
-            updateSubtitlesButton(getSubtitlesTrack());
+            if (!isAdDisplayed) {
+                // Update subtitles
+                updateSubtitlesButton(getSubtitlesTrack());
 
-            // When we are in VIDEO player mode, check if the player actually has video track to play.
-            // If it has no video tracks available, switch to AUDIO mode
-            if (!trackGroups.isEmpty()) {
-                if (currentPlayer != castPlayer) {
-                    if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.VIDEO) {
-                        if (!hasVideoTrack(trackGroups)) {
-                            playerViewModel.setMediaTypeAvailable(PlayerViewModel.PlayerMode.VIDEO, false);
-                            playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.AUDIO);
+                // When we are in VIDEO player mode, check if the player actually has video track to play.
+                // If it has no video tracks available, switch to AUDIO mode
+                if (!trackGroups.isEmpty()) {
+                    if (currentPlayer != castPlayer) {
+                        if (playerViewModel.getPlayerMode().getValue() == PlayerViewModel.PlayerMode.VIDEO) {
+                            if (!hasVideoTrack(trackGroups)) {
+                                playerViewModel.setMediaTypeAvailable(PlayerViewModel.PlayerMode.VIDEO, false);
+                                playerViewModel.setPlayerMode(PlayerViewModel.PlayerMode.AUDIO);
+                            }
                         }
                     }
                 }
@@ -934,8 +998,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         @Override
         public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
             Logger.d("PlayerEventListener::onTimelineChanged():");
-            if (videoViewModel.getVideoSync().onAir == 1) {
-                updatePositionLive(timeline, player.getCurrentPosition());
+            if (!isAdDisplayed) {
+                if (videoViewModel.getVideoSync().onAir == 1) {
+                    updatePositionLive(timeline, player.getCurrentPosition());
+                }
             }
         }
     }
@@ -945,7 +1011,9 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         if (player != null) {
             player.setPlayWhenReady(true);
             mediaSession.setActive(true);
-            startAdsTimer();
+//            if (!isAdDisplayed) {
+//                startAdsTimer();
+//            }
         }
     }
 
@@ -953,7 +1021,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         Logger.d("pause()");
         if (player != null) {
             player.setPlayWhenReady(false);
-            stopAdsTimer();
+//            stopAdsTimer();
         }
     }
 
@@ -1000,7 +1068,6 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder()
                 .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PLAY_PAUSE);
         mediaSession.setPlaybackState(stateBuilder.build());
-
         mediaSession.setCallback(new MediaSessionCompat.Callback() {
             @Override
             public void onPlay() {
@@ -1097,18 +1164,80 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 // Attach event and error event listeners.
                 adsManager.addAdErrorListener(PlayerFragment.this);
                 adsManager.addAdEventListener(PlayerFragment.this);
+
+                AdsRenderingSettings adsRenderingSettings =
+                        ImaSdkFactory.getInstance().createAdsRenderingSettings();
+                ArrayList arrayList = new ArrayList();
+                arrayList.add("application/x-mpegURL"); //HLS
+                arrayList.add("application/dash+xml"); //DASH
+                adsRenderingSettings.setMimeTypes(arrayList);
+
+                adsManager.init(adsRenderingSettings);
                 adsManager.init();
             }
         });
     }
 
-    private void requestAds(String adTagUrl) {
+    private void requestAd(AdBreak adBreak) {
+        Logger.d("requestAd(): " + adBreak.toString());
+        VideoAdPlayer videoAdPlayer = new VideoAdPlayer() {
+            @Override
+            public void playAd() {
+//                if (!isAdDisplayed) {
+//                    isAdDisplayed = true;
+//                }
+                play();
+            }
+
+            @Override
+            public void loadAd(String adUrl) {
+//                isAdDisplayed = true;
+                preparePlayer(adUrl, true);
+            }
+
+            @Override
+            public void stopAd() {
+                pause();
+            }
+
+            @Override
+            public void pauseAd() {
+                // We shouldn't get here, because player controls are hidden during ad playback
+                pause();
+            }
+
+            @Override
+            public void resumeAd() {
+                // We shouldn't get here, because player controls are hidden during ad playback
+                play();
+            }
+
+            @Override
+            public void addCallback(VideoAdPlayerCallback videoAdPlayerCallback) {
+                adCallbacks.add(videoAdPlayerCallback);
+            }
+
+            @Override
+            public void removeCallback(VideoAdPlayerCallback videoAdPlayerCallback) {
+                adCallbacks.remove(videoAdPlayerCallback);
+            }
+
+            @Override
+            public VideoProgressUpdate getAdProgress() {
+                if (!isAdDisplayed || (currentPlayer != null && currentPlayer.getDuration() <= 0)) {
+                    return VideoProgressUpdate.VIDEO_TIME_NOT_READY;
+                }
+                return new VideoProgressUpdate(currentPlayer.getCurrentPosition(),
+                        currentPlayer.getDuration());            }
+        };
+
         AdDisplayContainer adDisplayContainer = sdkFactory.createAdDisplayContainer();
         adDisplayContainer.setAdContainer(playerView);
+        adDisplayContainer.setPlayer(videoAdPlayer);
 
         // Create the ads request.
         AdsRequest request = sdkFactory.createAdsRequest();
-        request.setAdTagUrl(adTagUrl);
+        request.setAdTagUrl(adBreak.adTag);
         request.setAdDisplayContainer(adDisplayContainer);
         request.setContentProgressProvider(new ContentProgressProvider() {
             @Override
@@ -1124,35 +1253,109 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         adsLoader.requestAds(request);
     }
 
-    private void startAds() {
-        if (!playerViewModel.getAdSchedule().isEmpty()) {
-            long playTime = playerViewModel.getPlaybackPosition();
-            nextAdIndex = seekAdByPosition(playTime);
-            if (!checkNextAd(playTime)) {
-                startAdsTimer();
-            }
-        }
-    }
+//    private void requestAds(String adTagUrl) {
+//        VideoAdPlayer videoAdPlayer = new VideoAdPlayer() {
+//            @Override
+//            public void playAd() {
+////                if (!isAdDisplayed) {
+////                    isAdDisplayed = true;
+////                }
+//                play();
+//            }
+//
+//            @Override
+//            public void loadAd(String adUrl) {
+////                isAdDisplayed = true;
+//                preparePlayer(adUrl, true);
+//            }
+//
+//            @Override
+//            public void stopAd() {
+//                pause();
+//            }
+//
+//            @Override
+//            public void pauseAd() {
+//                // We shouldn't get here, because player controls are hidden during ad playback
+//                pause();
+//            }
+//
+//            @Override
+//            public void resumeAd() {
+//                // We shouldn't get here, because player controls are hidden during ad playback
+//                play();
+//            }
+//
+//            @Override
+//            public void addCallback(VideoAdPlayerCallback videoAdPlayerCallback) {
+//                adCallbacks.add(videoAdPlayerCallback);
+//            }
+//
+//            @Override
+//            public void removeCallback(VideoAdPlayerCallback videoAdPlayerCallback) {
+//                adCallbacks.remove(videoAdPlayerCallback);
+//            }
+//
+//            @Override
+//            public VideoProgressUpdate getAdProgress() {
+//                if (!isAdDisplayed || currentPlayer.getDuration() <= 0) {
+//                    return VideoProgressUpdate.VIDEO_TIME_NOT_READY;
+//                }
+//                return new VideoProgressUpdate(currentPlayer.getCurrentPosition(),
+//                        currentPlayer.getDuration());            }
+//        };
+//
+//        AdDisplayContainer adDisplayContainer = sdkFactory.createAdDisplayContainer();
+//        adDisplayContainer.setAdContainer(playerView);
+//        adDisplayContainer.setPlayer(videoAdPlayer);
+//
+//        // Create the ads request.
+//        AdsRequest request = sdkFactory.createAdsRequest();
+//        request.setAdTagUrl(adTagUrl);
+//        request.setAdDisplayContainer(adDisplayContainer);
+//        request.setContentProgressProvider(new ContentProgressProvider() {
+//            @Override
+//            public VideoProgressUpdate getContentProgress() {
+//                if (isAdDisplayed || player == null || player.getDuration() <= 0) {
+//                    return VideoProgressUpdate.VIDEO_TIME_NOT_READY;
+//                }
+//                return new VideoProgressUpdate(player.getCurrentPosition(), player.getDuration());
+//            }
+//        });
+//
+//        // Request the ad. After the ad is loaded, onAdsManagerLoaded() will be called.
+//        adsLoader.requestAds(request);
+//    }
 
-    private void startAdsTimer() {
-        if (nextAdIndex == -1)
-            return;
+//    private void startAds() {
+//        if (!playerViewModel.getAdSchedule().isEmpty()) {
+//            long playTime = playerViewModel.getPlaybackPosition();
+//            nextAdIndex = seekAdByPosition(playTime);
+//            if (!checkNextAd(playTime)) {
+//                startAdsTimer();
+//            }
+//        }
+//    }
 
-        stopAdsTimer();
-        if (handlerTimer != null) {
-            if (runnablePlaybackTime != null) {
-                handlerTimer.post(runnablePlaybackTime);
-            }
-        }
-    }
+//    private void startAdsTimer() {
+//        if (nextAdIndex == -1)
+//            return;
+//
+//        stopAdsTimer();
+//        if (handlerTimer != null) {
+//            if (runnablePlaybackTime != null) {
+//                handlerTimer.post(runnablePlaybackTime);
+//            }
+//        }
+//    }
 
-    private void stopAdsTimer() {
-        if (handlerTimer != null) {
-            if (runnablePlaybackTime != null) {
-                handlerTimer.removeCallbacks(runnablePlaybackTime);
-            }
-        }
-    }
+//    private void stopAdsTimer() {
+//        if (handlerTimer != null) {
+//            if (runnablePlaybackTime != null) {
+//                handlerTimer.removeCallbacks(runnablePlaybackTime);
+//            }
+//        }
+//    }
 
     private int seekAdByPosition(long position) {
         List<AdSchedule> adSchedule = playerViewModel.getAdSchedule();
@@ -1181,26 +1384,48 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         }
     }
 
-    private boolean checkNextAd(long position) {
-        List<AdSchedule> adSchedule = playerViewModel.getAdSchedule();
-        if (nextAdIndex >= 0) {
-            if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
-                Logger.d("checkNextAd(): position=" + position + ", nextAdIndex="+ nextAdIndex);
-                if (position >= adSchedule.get(nextAdIndex).offset) {
-                    // Disable media controls and pause the video
-                    disablePlayerControls();
-                    pause();
-                    // Request the ad
-                    Logger.d("checkNextAd(): Requesting ad");
-                    String adTag = AdMacrosHelper.updateAdTagParameters(getActivity(), adSchedule.get(nextAdIndex).tag);
-                    Logger.d("Ad tag with macros: " + adTag);
-                    requestAds(adTag);
-                    // TODO: Show progress while the ad is loading
-                    return true;
-                }
-            }
+//    private boolean checkNextAd(long position) {
+//        List<AdSchedule> adSchedule = playerViewModel.getAdSchedule();
+//        if (nextAdIndex >= 0) {
+//            if (SettingsProvider.getInstance().getSubscriptionCount() <= 0) {
+//                Logger.d("checkNextAd(): position=" + position + ", nextAdIndex="+ nextAdIndex);
+//                if (position >= adSchedule.get(nextAdIndex).offset) {
+//                    // Disable media controls and pause the video
+//                    disablePlayerControls();
+//                    pause();
+//                    // Request the ad
+//                    Logger.d("checkNextAd(): Requesting ad");
+//                    String adTag = AdMacrosHelper.updateAdTagParameters(getActivity(), adSchedule.get(nextAdIndex).tag);
+//                    Logger.d("Ad tag with macros: " + adTag);
+//                    requestAds(adTag);
+//                    // TODO: Show progress while the ad is loading
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
+
+    private void pauseContent() {
+        pause();
+//        playerViewModel.setPlaybackPosition(currentPlayer.getCurrentPosition());
+        isAdDisplayed = true;
+    }
+
+    private void resumeContent() {
+        isAdDisplayed = false;
+        String url = playerViewModel.getPlayerUrl().getValue();
+        if (!TextUtils.isEmpty(url)) {
+            preparePlayer(url, false);
+//            updateNextAd();
+//            if (!checkNextAd(currentPlayer.getCurrentPosition())) {
+                enablePlayerControls();
+                play();
+//            }
         }
-        return false;
+        else {
+            Logger.e("resumeContent(): Player url is empty");
+        }
     }
 
     // 'AdEvent.AdEventListener' implementation
@@ -1217,25 +1442,22 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 // AdsManager.start() begins ad playback. This method is ignored for VMAP or
                 // ad rules playlists, as the SDK will automatically start executing the
                 // playlist.
-                adsManager.start();
+                if (adsManager != null && !isAdDisplayed) {
+                    adsManager.start();
+                }
                 break;
             case CONTENT_PAUSE_REQUESTED:
                 // AdEventType.CONTENT_PAUSE_REQUESTED is fired immediately before a video
                 // ad is played.
-                isAdDisplayed = true;
-//                hideControls();
-                pause();
+                if (!isAdDisplayed) {
+                    pauseContent();
+                }
                 break;
             case CONTENT_RESUME_REQUESTED:
                 // AdEventType.CONTENT_RESUME_REQUESTED is fired when the ad is completed
                 // and you should start playing your content.
-                isAdDisplayed = false;
-                // Update next ad to play
-                updateNextAd();
-                if (!checkNextAd(player.getCurrentPosition())) {
-                    // Resume video
-                    enablePlayerControls();
-                    play();
+                if (isAdDisplayed) {
+                    resumeContent();
                 }
                 break;
             case ALL_ADS_COMPLETED:
@@ -1260,14 +1482,17 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     @Override
     public void onAdError(AdErrorEvent adErrorEvent) {
         Logger.e("Ad error: " + adErrorEvent.getError().getMessage());
-        updateNextAd();
-        if (player != null) {
-            if (!checkNextAd(player.getCurrentPosition())) {
-                // Resume video
-                enablePlayerControls();
-                play();
-            }
+        if (isAdDisplayed) {
+            resumeContent();
         }
+//        updateNextAd();
+//        if (player != null) {
+//            if (!checkNextAd(player.getCurrentPosition())) {
+//                // Resume video
+//                enablePlayerControls();
+//                play();
+//            }
+//        }
     }
 
 
@@ -1619,13 +1844,13 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         @Override
         public void onCastSessionAvailable() {
             setCurrentPlayer(castPlayer);
-            preparePlayer(playerViewModel.getPlayerUrl().getValue());
+            preparePlayer(playerViewModel.getPlayerUrl().getValue(), false);
         }
 
         @Override
         public void onCastSessionUnavailable() {
             setCurrentPlayer(player);
-            preparePlayer(playerViewModel.getPlayerUrl().getValue());
+            preparePlayer(playerViewModel.getPlayerUrl().getValue(), false);
         }
     }
 }
