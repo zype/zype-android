@@ -380,9 +380,9 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     @DrawableRes
     private int getFavoriteIcon(boolean isFavorite) {
         if (isFavorite) {
-            return R.drawable.favorite_icon;
+            return R.drawable.round_star_black_24;
         } else {
-            return R.drawable.favorite_icon;
+            return R.drawable.round_star_border_black_24;
         }
     }
 
