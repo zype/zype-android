@@ -67,5 +67,7 @@ public class ZypeSettings {
      */
     public static final String THEME = "<THEME>";
 
+    public static final boolean FIREBASE_ENABLED = true;
+
 }
 
