@@ -1,8 +1,6 @@
 package com.zype.android.ui.Gallery;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +14,9 @@ import com.zype.android.R;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.UiUtils;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 /**
  * Created by Evgeny Cherkasov on 18.06.2018

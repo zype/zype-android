@@ -1,18 +1,18 @@
 package com.zype.android.ui.monetization;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Db.Entity.Playlist;
-import com.zype.android.R;
 import com.zype.android.databinding.FragmentPaywallPlaylistTvodBinding;
 import com.zype.android.ui.NavigationHelper;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 
 public class PaywallPlaylistTvodFragment extends Fragment {
     public static final String TAG = PaywallPlaylistTvodFragment.class.getSimpleName();

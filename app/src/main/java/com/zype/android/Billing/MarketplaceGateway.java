@@ -1,9 +1,6 @@
 package com.zype.android.Billing;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
@@ -33,6 +30,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import retrofit.RetrofitError;
 
 /**
@@ -115,10 +115,10 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
         if (subscriptionVerified == null) {
             subscriptionVerified = new MutableLiveData<>();
         }
-        else {
-            Logger.w("validateSubscription(): Can't verify subscription now.");
-            return null;
-        }
+//        else {
+//            Logger.w("validateSubscription(): Can't verify subscription now.");
+//            return null;
+//        }
 
         String sku = subscription.getMarketplace().getSku();
         for (Purchase item : billingManager.getPurchases()) {

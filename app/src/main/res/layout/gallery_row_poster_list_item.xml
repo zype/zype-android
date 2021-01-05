@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     >
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:layout_width="90dp"
         android:layout_height="160dp"
         android:layout_gravity="center"
@@ -53,5 +53,5 @@
                 tools:text="Title"
                 />
         </FrameLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

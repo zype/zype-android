@@ -1,18 +1,19 @@
 package com.zype.android.ui.video_details.v2;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.google.android.exoplayer2.Player;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.material.tabs.TabLayout;
+
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Db.Entity.Video;
@@ -94,6 +98,8 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        CastContext castContext = CastContext.getSharedInstance(this);
 
         initialize(getIntent());
 

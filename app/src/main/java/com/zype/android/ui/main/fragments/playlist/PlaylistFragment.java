@@ -1,25 +1,23 @@
 package com.zype.android.ui.main.fragments.playlist;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import android.animation.Animator;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.SearchView;
-import android.text.TextUtils;
-import android.view.KeyEvent;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
+import androidx.cardview.widget.CardView;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,27 +26,21 @@ import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
-import com.zype.android.ZypeSettings;
 import com.zype.android.core.provider.Contract;
-import com.zype.android.core.provider.DataHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.utils.Logger;
-import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.PlaylistParamsBuilder;
 import com.zype.android.webapi.events.playlist.PlaylistEvent;
 import com.zype.android.webapi.events.settings.SettingsEvent;
-import com.zype.android.webapi.model.playlist.Playlist;
 import com.zype.android.webapi.model.playlist.PlaylistData;
 
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.codetail.animation.ViewAnimationUtils;
 
 public class PlaylistFragment extends BaseFragment implements ListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 

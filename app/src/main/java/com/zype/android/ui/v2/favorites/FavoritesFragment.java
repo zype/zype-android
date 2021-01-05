@@ -1,11 +1,6 @@
 package com.zype.android.ui.v2.favorites;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,15 +8,16 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.zype.android.Auth.AuthHelper;
-import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ui.NavigationHelper;
-import com.zype.android.ui.v2.base.StatefulData;
 import com.zype.android.ui.v2.videos.VideosAdapter;
 import com.zype.android.utils.Logger;
 
-import java.util.List;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class FavoritesFragment extends Fragment {
     public static final String TAG = FavoritesFragment.class.getSimpleName();

@@ -1,7 +1,6 @@
 package com.zype.android.ui.epg;
 
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +17,7 @@ import org.joda.time.DateTime;
 
 import java.util.concurrent.TimeUnit;
 
+import androidx.fragment.app.DialogFragment;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.CompositeSubscription;
 

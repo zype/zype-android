@@ -23,8 +23,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.lang.reflect.Type;
@@ -32,6 +30,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * @author vasya
@@ -372,8 +373,13 @@ public class VideoHelper {
      */
     public static Thumbnail getThumbnailByHeight(Video video, int height) {
         Type thumbnailType = new TypeToken<List<Thumbnail>>(){}.getType();
-        List<Thumbnail> thumbnails = new Gson().fromJson(video.thumbnails, thumbnailType);
-        return getThumbnailByHeight(thumbnails, height);
+
+        if (video !=null  && !TextUtils.isEmpty(video.thumbnails)){
+            List<Thumbnail> thumbnails = new Gson().fromJson(video.thumbnails, thumbnailType);
+            return getThumbnailByHeight(thumbnails, height);
+        }
+
+        return getThumbnailByHeight(new ArrayList<Thumbnail>(), height);
     }
 
     // TODO: Remove this method after refactoring to use Room for working with database

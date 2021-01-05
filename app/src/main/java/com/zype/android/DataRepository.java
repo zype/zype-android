@@ -1,7 +1,7 @@
 package com.zype.android;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
+import android.text.TextUtils;
 
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Db.DbHelper;
@@ -24,7 +24,8 @@ import com.zype.android.zypeapi.model.VideoResponse;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import androidx.lifecycle.LiveData;
 
 /**
  * Created by Evgeny Cherkasov on 13.06.2018
@@ -155,11 +156,30 @@ public class DataRepository {
     }
 
     public void updateVideo(Video video) {
-        db.zypeDao().updateVideo(video);
+        if(video != null) {
+            Video dbVideo = getVideoSync(video.id);
+            if(dbVideo != null) {
+                video.update(dbVideo);
+            }
+            db.zypeDao().updateVideo(video);
+        }
     }
 
     public void insertVideos(List<Video> videos) {
         db.zypeDao().insertVideos(videos);
+    }
+
+    public void updateDownloadUrl(String videoId, String url) {
+        if(TextUtils.isEmpty(videoId) || TextUtils.isEmpty(url)) {
+            return;
+        }
+
+        Video video = getVideoSync(videoId);
+
+        if(video != null) {
+            video.downloadVideoUrl = url;
+            updateVideo(video);
+        }
     }
 
     public void loadVideo(String videoId, IZypeApiListener listener) {

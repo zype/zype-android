@@ -1,9 +1,6 @@
 package com.zype.android.ui.v2.videos;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 
 import com.zype.android.DataRepository;
 import com.zype.android.Db.DbHelper;

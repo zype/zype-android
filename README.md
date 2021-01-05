@@ -119,15 +119,15 @@ An example of fully functional app that is using a Zype sandbox account.
 
 **6.** Analytics
 
- **Google Analytics:**
+**Google Analytics:**
  - Update your GA id in [ZypeSettings.java](https://github.com/zype/zype-android/blob/master/app/src/template/java/com/zype/android/ZypeSettings.java)
  - Uncomment init of Google Analytics in [ZypeApp.java](https://github.com/zype/zype-android/blob/master/app/src/main/java/com/zype/android/ZypeApp.java)
 
-**Segment Analytics:**
-
+ **Segment Analytics:**
+ 
  In [ZypeSettings.java](https://github.com/zype/zype-android/blob/master/app/src/template/java/com/template/android/ZypeSettings.java)
- - Set `APPSFLYER_ANALYTICS` to `true`
- - Update `APPSFLYER_ANALYTICS_DEV_KEY` with a value from your Appsflyer account
+ - Set `SEGMENT_ANALYTICS` to `true` 
+ - Update `SEGMENT_ANALYTICS_WRITE_KEY` with a value from your Segment account 
 
 **7.** To use Fabric:
  - In [AndroidManifest.xml](https://github.com/zype/zype-android/blob/master/app/src/main/AndroidManifest.xml) uncomment Fabric section and put you Fabric API key:  

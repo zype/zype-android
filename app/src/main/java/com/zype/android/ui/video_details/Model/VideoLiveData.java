@@ -1,6 +1,5 @@
 package com.zype.android.ui.video_details.Model;
 
-import android.arch.lifecycle.LiveData;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.Db.DbHelper;
@@ -9,6 +8,8 @@ import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.events.video.VideoEvent;
 import com.zype.android.webapi.model.video.VideoData;
+
+import androidx.lifecycle.LiveData;
 
 /**
  * Created by Evgeny Cherkasov on 05.07.2018

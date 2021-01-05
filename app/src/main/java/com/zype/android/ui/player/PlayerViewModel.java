@@ -1,15 +1,10 @@
 package com.zype.android.ui.player;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.android.exoplayer.TimeRange;
@@ -19,7 +14,13 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaQueueItem;
+import com.google.android.gms.common.images.WebImage;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.BuildConfig;
 import com.zype.android.DataRepository;
@@ -30,11 +31,15 @@ import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.analytics.AnalyticsEvents;
+import com.zype.android.analytics.AnalyticsManager;
 import com.zype.android.core.provider.helpers.PlaylistHelper;
+import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.AdMacrosHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.model.video.Thumbnail;
 import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
 import com.zype.android.zypeapi.model.Advertising;
@@ -44,6 +49,10 @@ import com.zype.android.zypeapi.model.PlayerResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 /**
  * Created by Evgeny Cherkasov on 23.07.2018
@@ -55,6 +64,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     private MutableLiveData<String> playerUrl = new MutableLiveData<>();
     private MutableLiveData<Boolean> isTrailer = new MutableLiveData<>();
     private MutableLiveData<Integer> playbackState = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isPlaying = new MutableLiveData<>();
     private MutableLiveData<Error> error = new MutableLiveData<>();
 
     private String videoId;
@@ -68,6 +78,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     private long playbackPosition = 0;
     private boolean isPlaybackPositionRestored;
+    private boolean isPlaybackStarted = false;
+    private boolean isUrlLoaded = false;
     private boolean inBackground = false;
 
     private static final String APP_BUNDLE = "app_bundle";
@@ -101,8 +113,8 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
     }
 
-    DataRepository repo;
-    ZypeApi api;
+    private DataRepository repo;
+    private ZypeApi api;
     WebApiManager oldApi;
 
     public PlayerViewModel(Application application) {
@@ -131,7 +143,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
         Video video = repo.getVideoSync(videoId);
         playbackPosition = video.playTime;
+        isPlaybackStarted = false;
         isPlaybackPositionRestored = false;
+        isPlaying.setValue(false);
 
         isTrailer.setValue(false);
         trailerVideoId = null;
@@ -149,6 +163,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 playerMode.setValue(null);
             }
         }
+        setPlayerUrl(null);
     }
 
     // Ad schedule
@@ -177,8 +192,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         return playbackPosition;
     }
 
-    public void savePlaybackPosition(long position) {
+    public void setPlaybackPosition(long position) {
         this.playbackPosition = position;
+    }
+
+    public void savePlaybackPosition(long position) {
+        setPlaybackPosition(position);
 
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
@@ -200,16 +219,31 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         isPlaybackPositionRestored = true;
     }
 
-    public void onPlaybackStarted() {
+    public void onPlaybackResumed() {
         if (isTrailer.getValue()) {
             return;
         }
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
-
             if (video != null) {
                 video.isPlayStarted = 1;
                 repo.updateVideo(video);
+
+                if (!isPlaybackStarted) {
+                    isPlaybackStarted = true;
+                    AnalyticsManager.getInstance()
+                            .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_STARTED, video, playbackPosition);
+                }
+            }
+        }
+    }
+
+    public void onPlayback() {
+        if(!TextUtils.isEmpty(videoId)) {
+            Video video = repo.getVideoSync(videoId);
+            if (video != null) {
+                AnalyticsManager.getInstance()
+                        .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK, video, playbackPosition);
             }
         }
     }
@@ -220,11 +254,13 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
         if(!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
-
             if (video != null) {
                 video.isPlayStarted = 1;
                 video.isPlayFinished = 1;
                 repo.updateVideo(video);
+
+                AnalyticsManager.getInstance()
+                        .onPlayerEvent(AnalyticsEvents.EVENT_PLAYBACK_FINISHED, video, playbackPosition);
             }
         }
     }
@@ -247,6 +283,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         playbackState.setValue(state);
     }
 
+    public LiveData<Boolean> getIsPlaying() { return isPlaying; }
+
+    public void setIsPlaying(boolean value) {
+        isPlaying.setValue(value);
+    }
+
     // On air
 
     public void setOnAir(boolean onAir) {
@@ -263,17 +305,25 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         if (playerUrl == null) {
             playerUrl = new MutableLiveData<>();
         }
-        if (isTrailer.getValue()) {
-            playerUrl.setValue(trailerUrl);
-        }
-        else {
-            Video video = repo.getVideoSync(videoId);
-            video.playerAudioUrl = null;
-            video.playerVideoUrl = null;
-            updatePlayerUrl(video);
-            loadPlayer();
+        if (playerUrl.getValue() == null) {
+            if (isTrailer.getValue()) {
+                setPlayerUrl(trailerUrl);
+            } else {
+                Video video = repo.getVideoSync(videoId);
+                if (video != null) {
+                    video.playerAudioUrl = null;
+                    video.playerVideoUrl = null;
+                    updatePlayerUrl(video);
+                }
+                loadPlayer();
+            }
         }
         return playerUrl;
+    }
+
+    private void setPlayerUrl(String value) {
+        Logger.d("setPlayerUrl(): value=" + value);
+        playerUrl.setValue(value);
     }
 
     private void updatePlayerUrl(Video video) {
@@ -302,12 +352,12 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         updateAnalyticsBeacon();
         if (playerUrl.getValue() == null) {
             if (newPlayerUrl != null) {
-                playerUrl.setValue(newPlayerUrl);
+                setPlayerUrl(newPlayerUrl);
             }
         }
         else {
             if (!playerUrl.getValue().equals(newPlayerUrl)) {
-                playerUrl.setValue(newPlayerUrl);
+                setPlayerUrl(newPlayerUrl);
             }
         }
     }
@@ -444,7 +494,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         }
         else {
             isTrailer.setValue(true);
-            playerUrl.setValue(trailerUrl);
+            setPlayerUrl(trailerUrl);
             loadPlayer();
         }
     }
@@ -482,7 +532,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
                 // In play trailer mode just update player url
                 if (isTrailer.getValue()) {
                     trailerUrl = url;
-                    playerUrl.setValue(trailerUrl);
+                    setPlayerUrl(trailerUrl);
                     return;
                 }
 
@@ -547,8 +597,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
         ApplicationInfo appInfo = getApplication().getApplicationInfo();
         // App data
-//        params.put(APP_BUNDLE, appInfo.packageName);
-        params.put(APP_BUNDLE, "com.zype.thisoldhouse");
+        params.put(APP_BUNDLE, appInfo.packageName);
         params.put(APP_DOMAIN, appInfo.packageName);
         params.put(APP_ID, appInfo.packageName);
         params.put(APP_NAME, (appInfo.labelRes == 0) ? appInfo.nonLocalizedLabel.toString() : getApplication().getString(appInfo.labelRes));
@@ -668,8 +717,18 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
 
     public MediaSource getMediaSource(Context context, String contentUri) {
         MediaSource result = null;
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
-                Util.getUserAgent(context, WebApiManager.CUSTOM_HEADER_VALUE));
+
+        String userAgent = Util.getUserAgent(context, WebApiManager.CUSTOM_HEADER_VALUE);
+        DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(
+                userAgent,
+                null,
+                DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+                DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
+                true
+        );
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, null,
+                httpDataSourceFactory);
+
         if (contentUri.contains("http:") || contentUri.contains("https:")) {
             if (contentUri.contains(".mp4")
                     || contentUri.contains(".m4a")
@@ -690,4 +749,35 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         return result;
     }
 
+    public MediaQueueItem buildMediaQueueItem(Video video, String contentUri) {
+        int mediaType;
+        String contentType;
+        if (playerMode.getValue() == PlayerMode.AUDIO) {
+            mediaType = MediaMetadata.MEDIA_TYPE_MUSIC_TRACK;
+            contentType = "audio/mp4";
+        }
+        else {
+            mediaType = MediaMetadata.MEDIA_TYPE_MOVIE;
+            if (contentUri.contains("mp4")) {
+                contentType = "video/mp4";
+            }
+            else {
+                contentType = "application/x-mpegurl";
+            }
+        }
+        MediaMetadata mediaMetadata = new MediaMetadata(mediaType);
+        mediaMetadata.putString(MediaMetadata.KEY_TITLE, video.title);
+        Uri imageUri = Uri.EMPTY;
+        Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 480);
+        if (thumbnail != null) {
+            imageUri = Uri.parse(thumbnail.getUrl());
+        }
+        mediaMetadata.addImage(new WebImage(imageUri));
+        MediaInfo mediaInfo = new MediaInfo.Builder(contentUri)
+                .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+                .setContentType(contentType)
+                .setMetadata(mediaMetadata)
+                .build();
+        return new MediaQueueItem.Builder(mediaInfo).build();
+    }
 }

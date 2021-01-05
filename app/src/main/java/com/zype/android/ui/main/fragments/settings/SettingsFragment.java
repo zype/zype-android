@@ -3,7 +3,6 @@ package com.zype.android.ui.main.fragments.settings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,13 +25,15 @@ import com.zype.android.utils.AppUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.fragment.app.Fragment;
+
 public class SettingsFragment extends Fragment implements ListView.OnItemClickListener {
 
     private static final int ITEM_SETTINGS = 0;
     private static final int ITEM_WEB = 1;
-    private static final int ITEM_FACEBOOK = 2;
-    private static final int ITEM_TWITTER = 3;
-    private static final int ITEM_INSTAGRAM = 4;
+    private static final int ITEM_INSTAGRAM = 2;
+    private static final int ITEM_FACEBOOK = 3;
+    private static final int ITEM_TWITTER = 4;
 
     private ListAdapter mAdapter;
     private Button mSigninButton;
@@ -52,11 +53,11 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         List<SettingsItem> settingsItems = new ArrayList<>();
-        settingsItems.add(new SettingsItem(getActivity(), ITEM_SETTINGS, R.drawable.icn_settings, R.color.black_38, R.string.settings));
-        settingsItems.add(new SettingsItem(getActivity(), ITEM_WEB, String.format(getString(R.string.settings_web), getString(R.string.app_name))));
+        settingsItems.add(new SettingsItem(getActivity(), ITEM_SETTINGS, R.drawable.icn_settings, R.color.setting_icon_color, R.string.settings));
+        settingsItems.add(new SettingsItem(getActivity(), ITEM_WEB,R.drawable.ic_web, R.color.setting_icon_color, String.format(getString(R.string.settings_web), getString(R.string.app_name))));
+        settingsItems.add(new SettingsItem(getActivity(), ITEM_INSTAGRAM, R.drawable.instagram, R.color.instagram, String.format(getString(R.string.settings_instagram), getString(R.string.app_name))));
         settingsItems.add(new SettingsItem(getActivity(), ITEM_FACEBOOK, R.drawable.icn_facebook, R.color.facebook_bg_color, String.format(getString(R.string.settings_facebook), getString(R.string.app_name))));
         settingsItems.add(new SettingsItem(getActivity(), ITEM_TWITTER, R.drawable.icn_twitter, R.color.twitter_bg_color, String.format(getString(R.string.settings_twitter), getString(R.string.app_name))));
-        settingsItems.add(new SettingsItem(getActivity(), ITEM_INSTAGRAM, R.drawable.instagram, R.color.instagram, String.format(getString(R.string.settings_instagram), getString(R.string.app_name))));
         mAdapter = new SettingsListAdapter(getActivity(), R.layout.list_item_settings, settingsItems);
     }
 

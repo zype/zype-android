@@ -1,11 +1,13 @@
 package com.zype.android.ui.main;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -153,11 +155,19 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     private void setupSections() {
         sections = new LinkedHashMap<>();
         sections.put(R.id.menuNavigationHome, new Section(getString(R.string.menu_navigation_home)));
-        sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
-        sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_live)));
+        if (ZypeSettings.EPG_ENABLED) {
+            sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
+        }
+        if (ZypeSettings.SHOW_LIVE) {
+            sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_live)));
+        }
         sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
-        sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
-        sections.put(R.id.menuNavigationLibrary, new Section(getString(R.string.menu_navigation_library)));
+        if (ZypeConfiguration.isDownloadsEnabled(this)) {
+            sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
+        }
+        if (ZypeSettings.LIBRARY_ENABLED) {
+            sections.put(R.id.menuNavigationLibrary, new Section(getString(R.string.menu_navigation_library)));
+        }
         sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings)));
         adapterSections.setData(sections);
     }
@@ -204,7 +214,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         // Settings
         bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationSettings,
                 Menu.NONE, R.string.menu_navigation_settings)
-                .setIcon(R.drawable.baseline_settings_black_24);
+                .setIcon(R.drawable.baseline_more_black_24);
 
 
         adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
@@ -248,7 +258,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             case R.id.menuNavigationSettings: {
                 lastSelectedTabId = item.getItemId();
                 Section section = sections.get(item.getItemId());
-                pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()));
+                pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()), false);
                 setTitle(section.title);
                 return true;
             }

@@ -1,19 +1,18 @@
 package com.zype.android;
 
 import android.app.Activity;
+import android.app.Application.ActivityLifecycleCallbacks;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.arch.lifecycle.Observer;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.multidex.MultiDexApplication;
-import android.support.v7.app.AppCompatDelegate;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.multidex.MultiDexApplication;
+
 import android.text.TextUtils;
 import android.webkit.WebView;
 
@@ -40,9 +39,10 @@ import com.onesignal.OneSignal;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.MarketplaceGateway;
-import com.zype.android.aws.PushListenerService;
+import com.zype.android.analytics.AnalyticsManager;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.utils.Logger;
+import com.zype.android.utils.SharedPref;
 import com.zype.android.utils.StorageUtils;
 import com.zype.android.webapi.WebApiManager;
 import com.zype.android.webapi.builder.AppParamsBuilder;
@@ -50,7 +50,6 @@ import com.zype.android.webapi.builder.ConsumerParamsBuilder;
 import com.zype.android.webapi.events.ErrorEvent;
 import com.zype.android.webapi.events.app.AppEvent;
 import com.zype.android.webapi.events.consumer.ConsumerEvent;
-import com.zype.android.webapi.model.app.App;
 import com.zype.android.webapi.model.app.AppData;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.zypeapi.ZypeApi;
@@ -59,7 +58,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import io.fabric.sdk.android.Fabric;
 
 /**
  * @author vasya
@@ -69,6 +67,8 @@ import io.fabric.sdk.android.Fabric;
 
 
 public class ZypeApp extends MultiDexApplication {
+    private static ZypeApp INSTANCE;
+
     public static final double VOLUME_INCREMENT = 0.05;
     public static final int NOTIFICATION_ID = 100;
     public static final String NOTIFICATION_CHANNEL_ID = "ZypeChannel";
@@ -93,6 +93,10 @@ public class ZypeApp extends MultiDexApplication {
         return (ZypeApp) context.getApplicationContext();
     }
 
+    public static ZypeApp getInstance() {
+        return ZypeApp.INSTANCE;
+    }
+
     @NonNull
     public static GoogleAnalytics analytics() {
         return analytics;
@@ -105,6 +109,7 @@ public class ZypeApp extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        INSTANCE = this;
 
         createNotificationChannel();
 
@@ -122,6 +127,7 @@ public class ZypeApp extends MultiDexApplication {
         if (appConfiguration.appsflyerAnalytics()) {
             initAppsflyer();
         }
+        AnalyticsManager.getInstance().init();
 
         // Fabric
         // TODO: Uncomment following line to use Fabric
@@ -158,7 +164,7 @@ public class ZypeApp extends MultiDexApplication {
         // TODO: Uncomment following line to use Google Analytics
 //        initGoogleAnalytics();
 
-        initVideoCastManager();
+//        initVideoCastManager();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(Activity activity, Bundle bundle) {
@@ -204,6 +210,7 @@ public class ZypeApp extends MultiDexApplication {
                 loadConsumer();
             }
         });
+        SharedPref.init(this);
     }
 
     @Override
@@ -289,18 +296,6 @@ public class ZypeApp extends MultiDexApplication {
         }
     }
 
-    private void initFabric() {
-        if (!BuildConfig.DEBUG) {
-            Fabric.with(this, new Crashlytics());
-        }
-        else {
-            final Fabric fabric = new Fabric.Builder(this)
-                    .kits(new Crashlytics())
-                    .debuggable(true)
-                    .build();
-            Fabric.with(fabric);
-        }
-    }
 
     private void initVideoCastManager() {
         String applicationId = CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID;

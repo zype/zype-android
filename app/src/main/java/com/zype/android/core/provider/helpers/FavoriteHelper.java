@@ -2,10 +2,11 @@ package com.zype.android.core.provider.helpers;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
 
 import com.zype.android.core.provider.Contract;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
+
+import androidx.annotation.NonNull;
 
 /**
  * @author vasya

@@ -6,6 +6,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
+import com.zype.android.DataRepository;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.Contract;
@@ -44,12 +45,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+import androidx.cursoradapter.widget.CursorAdapter;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -536,7 +538,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         Logger.d("handleDownloadVideo");
         String url = event.getEventData().getModelData().getResponse().getBody().getFiles().get(0).getUrl();
         String fileId = event.mFileId;
-        DownloadHelper.addVideoToDownloadList(getApplicationContext(), url, fileId);
+        DataRepository.getInstance(getApplication()).updateDownloadUrl(fileId, url);
     }
 
     @Subscribe

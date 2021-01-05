@@ -1,10 +1,10 @@
 package com.zype.android.utils;
 
-import android.support.annotation.Nullable;
-
 import com.zype.android.webapi.model.player.File;
 
 import java.util.List;
+
+import androidx.annotation.Nullable;
 
 /**
  * Created by Evgeny Cherkasov on 12.07.2018

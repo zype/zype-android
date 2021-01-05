@@ -1,15 +1,14 @@
 package com.zype.android.ui.video_details;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.zype.android.R;
-import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.video_details.fragments.options.OptionsFragment;
 import com.zype.android.ui.video_details.fragments.summary.SummaryFragment;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
 /**
  * @author vasya

@@ -1,14 +1,12 @@
 package com.zype.android.ui.Auth;
 
+import com.google.android.material.textfield.TextInputLayout;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentTransaction;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -25,10 +23,10 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
-import com.zype.android.Auth.AuthLiveData;
 import com.zype.android.DataRepository;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.ZypeSettings;
 import com.zype.android.core.events.AuthorizationErrorEvent;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.NavigationHelper;
@@ -40,6 +38,7 @@ import com.zype.android.utils.DialogHelper;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.UiUtils;
 import com.zype.android.webapi.WebApiManager;
+import com.zype.android.webapi.WebApiManager.Request;
 import com.zype.android.webapi.builder.AuthParamsBuilder;
 import com.zype.android.webapi.builder.ConsumerForgotPasswordParamsBuilder;
 import com.zype.android.webapi.builder.ConsumerParamsBuilder;
@@ -55,6 +54,10 @@ import com.zype.android.webapi.model.auth.RetrieveAccessToken;
 import com.zype.android.webapi.model.auth.TokenInfo;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.linking.DevicePinData;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentTransaction;
 
 public class LoginActivity extends BaseActivity {
 
@@ -157,6 +160,10 @@ public class LoginActivity extends BaseActivity {
 
         textForgotPassword = findViewById(R.id.textForgotPassword);
         textSignUp = findViewById(R.id.textSignUp);
+
+        if(ZypeConfiguration.isUniversalTVODEnabled(this)) {
+            textSignUp.setVisibility(View.INVISIBLE);
+        }
 
         layoutReset = findViewById(R.id.layoutReset);
         mLoginFormView = findViewById(R.id.login_form);
@@ -524,7 +531,11 @@ public class LoginActivity extends BaseActivity {
             DialogHelper.showErrorAlert(this, event.getErrMessage());
             return;
         }
-        SettingsProvider.getInstance().logout();
+
+        if(event.getEventData() == Request.AUTH_RETRIEVE_ACCESS_TOKEN) {
+            SettingsProvider.getInstance().logout();
+        }
+
         UiUtils.showErrorSnackbar(findViewById(R.id.root_view), event.getErrMessage());
     }
 

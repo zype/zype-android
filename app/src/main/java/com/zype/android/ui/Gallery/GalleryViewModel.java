@@ -1,14 +1,8 @@
 package com.zype.android.ui.Gallery;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.DataRepository;
@@ -32,6 +26,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.Nullable;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import static com.zype.android.core.settings.SettingsProvider.CONSUMER_SUBSCRIPTION_COUNT;
 import static com.zype.android.ui.Gallery.Model.GalleryRow.State.CREATED;
@@ -180,7 +181,7 @@ public class GalleryViewModel extends AndroidViewModel {
             @Override
             public void onCompleted(ZypeApiResponse response) {
                 PlaylistsResponse playlistsResponse = (PlaylistsResponse) response.data;
-                if (response.isSuccessful) {
+                if (playlistsResponse != null && response.isSuccessful) {
                     for (com.zype.android.zypeapi.model.PlaylistData item : playlistsResponse.response) {
                         Playlist playlist = repo.getPlaylistSync(item.id);
                         if (playlist != null) {
@@ -271,7 +272,7 @@ public class GalleryViewModel extends AndroidViewModel {
             @Override
             public void onCompleted(ZypeApiResponse response) {
                 VideosResponse videosResponse = (VideosResponse) response.data;
-                if (response.isSuccessful) {
+                if (response.isSuccessful && videosResponse != null) {
                     List<Video> result = new ArrayList<>();
                     for (com.zype.android.zypeapi.model.VideoData item : videosResponse.videoData) {
                         Video video = repo.getVideoSync(item.id);

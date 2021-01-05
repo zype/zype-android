@@ -17,6 +17,8 @@ import java.text.SimpleDateFormat
 import groovy.json.JsonSlurper
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 // TODO: Uncomment following line to use Fabric
 //apply plugin: 'io.fabric'
 
@@ -42,9 +44,9 @@ android {
     }
 
     def currentCodeVersion = versionProperties[versionCodeKey].toString().toInteger()
-    def zypeTemplateVersion = "2.8.0"
+    def zypeTemplateVersion = "2.9.0"
 
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion '28.0.3'
 
     lintOptions {
@@ -62,7 +64,7 @@ android {
     }
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 29
         multiDexEnabled true
         versionCode currentCodeVersion
         buildConfigField "String", "ZYPE_TEMPLATE_VERSION", "\"${zypeTemplateVersion}\""
@@ -96,10 +98,11 @@ android {
     productFlavors {
         zype {
             versionName zypeTemplateVersion
-            applicationId 'com.zype.android.template'
+            applicationId 'com.zype.android'
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      onesignal_app_id: "",
-                                     onesignal_google_project_number: 'REMOTE'
+                                     onesignal_google_project_number: 'REMOTE',
+                                     crashlyticsCollectionEnabled: "true"
             ]
         }
         template {
@@ -108,7 +111,8 @@ android {
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      // TODO: Provide valid app_id for OneSignal
                                      onesignal_app_id: '',
-                                     onesignal_google_project_number: 'REMOTE'
+                                     onesignal_google_project_number: 'REMOTE',
+                                     crashlyticsCollectionEnabled: "true"
             ]
         }
     }
@@ -148,7 +152,7 @@ public def store(File to, Properties properties) {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'androidx.multidex:multidex:2.0.0'
 
     implementation project(':zypeapi')
 
@@ -156,18 +160,15 @@ dependencies {
 
     // ViewModel
     def lifecycle_version = "1.1.1"
-    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
 
     // Room
     def room_version = "1.1.1"
-    implementation "android.arch.persistence.room:runtime:$room_version"
-    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
-    testImplementation "android.arch.persistence.room:testing:$room_version"
+    implementation 'androidx.room:room-runtime:2.0.0'
+    annotationProcessor 'androidx.room:room-compiler:2.0.0'
+    testImplementation 'androidx.room:room-testing:2.0.0'
 
 
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
-        transitive = true;
-    }
     androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.4.1'
     implementation project(':CastCompanionLibrary')
 //    compile 'com.google.android.libraries.cast.companionlibrary:ccl:2.9.1'
@@ -176,20 +177,21 @@ dependencies {
 
     //    def androidSupportVersion = "27.1.1"
     def androidSupportVersion = "28.0.0"
-    implementation "com.android.support:appcompat-v7:$androidSupportVersion"
-    implementation "com.android.support:design:$androidSupportVersion"
-    implementation "com.android.support:support-v4:$androidSupportVersion"
-    implementation "com.android.support:cardview-v7:$androidSupportVersion"
-    implementation "com.android.support:recyclerview-v7:$androidSupportVersion"
-    implementation "com.android.support:mediarouter-v7:$androidSupportVersion"
-    implementation "com.android.support:support-media-compat:$androidSupportVersion"
-    implementation "com.android.support:customtabs:$androidSupportVersion"
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.mediarouter:mediarouter:1.0.0'
+    implementation 'androidx.media:media:1.0.0'
+    implementation 'androidx.browser:browser:1.0.0'
 
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
 //    implementation 'com.google.android.exoplayer:exoplayer:r1.5.12'
     implementation 'com.bartoszlipinski:exoplayer1:r1.5.12'
     implementation 'com.google.android.exoplayer:exoplayer:2.9.0'
+    implementation 'com.google.android.exoplayer:extension-cast:2.9.0'
 
     implementation 'com.squareup.retrofit:retrofit:1.9.0'
     implementation 'com.squareup.okhttp:okhttp:2.6.0'
@@ -212,10 +214,11 @@ dependencies {
     }
 
     // Play services
-    implementation 'com.google.android.gms:play-services-gcm:16.0.0'
-    implementation 'com.google.android.gms:play-services-analytics:16.0.4'
-    implementation 'com.google.android.gms:play-services-location:16.0.0'
+    implementation 'com.google.android.gms:play-services-gcm:17.0.0'
+    implementation 'com.google.android.gms:play-services-analytics:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
     implementation 'com.google.android.gms:play-services-cast:16.1.0'
+    implementation 'com.google.android.gms:play-services-cast-framework:16.1.0'
 
     // IMA SDK
     implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.6.0'
@@ -230,8 +233,10 @@ dependencies {
     // AWS
     implementation 'com.amazonaws:aws-android-sdk-core:2.7.+'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
-    implementation 'com.google.firebase:firebase-core:16.0.4'
-    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.google.firebase:firebase-crashlytics:17.0.1'
+    implementation 'com.google.firebase:firebase-core:17.4.3'
+    implementation 'com.google.firebase:firebase-messaging:20.2.0'
+
     implementation 'com.amazonaws:aws-android-sdk-pinpoint:2.7.+'
     implementation('com.amazonaws:aws-android-sdk-mobile-client:2.7.+@aar') {
         transitive = true
@@ -240,6 +245,9 @@ dependencies {
     // Appsflyer
     implementation 'com.appsflyer:af-android-sdk:5.4.0'
     implementation 'com.android.installreferrer:installreferrer:1.1.2'
+
+    // Segment Analytics
+    implementation 'com.segment.analytics.android:analytics:4.7.1'
 }
 
 // Uncomment below line if using AWS Pinpoint
