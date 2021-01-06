@@ -55,6 +55,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
     private String videoId;
     private String playlistId;
+    private boolean autoPlayback = true;
 
     private Timer timer;
     private TimerTask timerTask;
@@ -133,6 +134,14 @@ public class VideoDetailViewModel extends AndroidViewModel {
                 }
             }
         }
+    }
+
+    public boolean getAutoPlayback() {
+        return autoPlayback;
+    }
+
+    public void setAutoPlayback(boolean value) {
+         autoPlayback = value;
     }
 
     // Video

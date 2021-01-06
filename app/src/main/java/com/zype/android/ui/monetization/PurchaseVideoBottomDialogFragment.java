@@ -45,6 +45,11 @@ public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment
         binding.buttonBack.setOnClickListener(v -> {
             dismiss();
         });
+        binding.buttonBackWhenCompleted.setOnClickListener(v -> {
+            videoDetailViewModel.setVideoId(videoDetailViewModel.getVideoId());
+            videoDetailViewModel.setAutoPlayback(false);
+            dismiss();
+        });
         binding.buttonBuyVideo.setOnClickListener(v -> {
             if (model.getSelectedItem() == null) {
                 Log.e(TAG, "buttonBuyVideo::onClick(): No item selected for purchase");
@@ -54,6 +59,7 @@ public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment
         });
         binding.buttonPlay.setOnClickListener(v -> {
             videoDetailViewModel.setVideoId(videoDetailViewModel.getVideoId());
+            videoDetailViewModel.setAutoPlayback(true);
             dismiss();
         });
         return binding.getRoot();

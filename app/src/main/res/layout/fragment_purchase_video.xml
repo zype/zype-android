@@ -23,7 +23,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="@{state == PaywallViewModel.State.READY_FOR_PURCHASE ? View.VISIBLE : View.GONE}"
-            tools:context="com.zype.android.ui.monetization.PaywallActivity">
+            tools:context="com.zype.android.ui.monetization.PaywallActivity"
+            tools:visibility="gone"
+            >
 
             <TextView
                 android:id="@+id/textTitle"
