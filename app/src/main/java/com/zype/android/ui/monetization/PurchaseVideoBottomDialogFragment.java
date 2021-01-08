@@ -46,8 +46,8 @@ public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment
             dismiss();
         });
         binding.buttonBackWhenCompleted.setOnClickListener(v -> {
-            videoDetailViewModel.setVideoId(videoDetailViewModel.getVideoId());
             videoDetailViewModel.setAutoPlayback(false);
+            videoDetailViewModel.setVideoId(videoDetailViewModel.getVideoId());
             dismiss();
         });
         binding.buttonBuyVideo.setOnClickListener(v -> {
@@ -58,8 +58,8 @@ public class PurchaseVideoBottomDialogFragment extends BottomSheetDialogFragment
             model.makePurchase(getActivity(), model.getSelectedItem());
         });
         binding.buttonPlay.setOnClickListener(v -> {
-            videoDetailViewModel.setVideoId(videoDetailViewModel.getVideoId());
             videoDetailViewModel.setAutoPlayback(true);
+            videoDetailViewModel.setVideoId(videoDetailViewModel.getVideoId());
             dismiss();
         });
         return binding.getRoot();
