@@ -28,7 +28,7 @@ public class ZypeSettings {
     public static final String[] PLAN_IDS = new String[] { "5b366329849e2d140c00002f", "5b366368849e2d141400002b" };
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
-    public static final boolean UNIVERSAL_TVOD = true;
+    public static final boolean UNIVERSAL_TVOD = false;
     public static final boolean PLAYER_PAYWALL_ENABLED = true;
 
     // Features
