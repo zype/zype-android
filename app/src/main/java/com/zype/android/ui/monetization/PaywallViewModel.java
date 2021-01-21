@@ -204,6 +204,14 @@ public class PaywallViewModel extends BaseViewModel {
                     isPurchased.setValue(true);
                 }
             }
+
+            @Override
+            public void onPurchaseCancelled() {
+                Log.d(TAG, "BillingManager::onPurchaseCancelled():");
+                if (state.getValue() == State.PURCHASE_IN_PROGRESS) {
+                    setState(State.READY_FOR_PURCHASE);
+                }
+            }
         };
     }
 

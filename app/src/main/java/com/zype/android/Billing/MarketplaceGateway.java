@@ -317,6 +317,9 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
+    }
 
+    @Override
+    public void onPurchaseCancelled() {
     }
 }
