@@ -71,7 +71,7 @@ public class ActionBuyVideoFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case BundleConstants.REQUEST_LOGIN:
-                if (resultCode == RESULT_OK) {
+                if (AuthHelper.isLoggedIn()) {
                     showPurchaseScreen();
                 }
                 return;
