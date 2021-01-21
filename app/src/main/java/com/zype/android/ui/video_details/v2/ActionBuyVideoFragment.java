@@ -59,7 +59,6 @@ public class ActionBuyVideoFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         model = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
-
         model.getVideo().observe(this, video -> {
             if (video != null) {
                 binding.setVideoPrice(video.purchasePrice);
@@ -72,7 +71,14 @@ public class ActionBuyVideoFragment extends Fragment {
         switch (requestCode) {
             case BundleConstants.REQUEST_LOGIN:
                 if (AuthHelper.isLoggedIn()) {
-                    showPurchaseScreen();
+                    if (AuthHelper.isVideoUnlocked(getActivity(), model.getVideoId(), model.getPlaylistId())) {
+                        // If a signed in user has video entitlement, we just refresh the video in the
+                        // model, that causes the Video detail screen to be refreshed
+                        model.setVideoId(model.getVideoId());
+                    }
+                    else {
+                        showPurchaseScreen();
+                    }
                 }
                 return;
         }
