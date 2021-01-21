@@ -15,10 +15,13 @@ buildscript {
 import java.text.SimpleDateFormat
 import groovy.json.JsonSlurper
 
+def FIREBASE_ENABLED = true
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.firebase.crashlytics'
-// TODO: Uncomment following line to use Fabric
-//apply plugin: 'io.fabric'
+
+if(FIREBASE_ENABLED) {
+    apply plugin: 'com.google.gms.google-services'
+}
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -105,7 +108,7 @@ android {
         }
         template {
             versionName '1.0.0'
-            applicationId "<APPLICATION_ID>"
+            applicationId "com.zype.android.template"
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      // TODO: Provide valid app_id for OneSignal
                                      onesignal_app_id: '',

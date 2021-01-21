@@ -109,8 +109,6 @@ public class ZypeApp extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         INSTANCE = this;
-        initializeFirebaseApp();
-
         createNotificationChannel();
 
         StorageUtils.initStorage(this);
@@ -216,20 +214,6 @@ public class ZypeApp extends MultiDexApplication {
 
         super.onTerminate();
     }
-
-    private void initializeFirebaseApp() {
-        if(!ZypeSettings.FIREBASE_ENABLED) {
-            return;
-        }
-
-        FirebaseApp firebaseApp = FirebaseApp.initializeApp(this);
-        if(firebaseApp != null) {
-            Log.i("ZypeApp", "FirebaseApp initialization successful");
-        } else {
-            Log.i("ZypeApp", "FirebaseApp initialization unsuccessful");
-        }
-    }
-
 
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
