@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
+        mavenCentral()
         google()
         jcenter()
         flatDir {
@@ -241,6 +242,10 @@ dependencies {
     implementation('com.amazonaws:aws-android-sdk-mobile-client:2.7.+@aar') {
         transitive = true
     }
+
+    // Appsflyer
+    implementation 'com.appsflyer:af-android-sdk:5.4.0'
+    implementation 'com.android.installreferrer:installreferrer:1.1.2'
 
     // Segment Analytics
     implementation 'com.segment.analytics.android:analytics:4.7.1'

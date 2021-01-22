@@ -557,17 +557,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     private void updateNextPreviousButtons() {
-        if (ZypeConfiguration.autoplayEnabled(getActivity())
-                && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
-            buttonNext.setVisibility(VISIBLE);
-            buttonPrevious.setVisibility(VISIBLE);
-            setButtonEnabled(playerViewModel.isThereNextVideo(), buttonNext);
-            setButtonEnabled(playerViewModel.isTherePreviousVideo(), buttonPrevious);
-        }
-        else {
-            buttonNext.setVisibility(GONE);
-            buttonPrevious.setVisibility(GONE);
-        }
+        buttonNext.setVisibility(VISIBLE);
+        buttonPrevious.setVisibility(VISIBLE);
+        setButtonEnabled(playerViewModel.isThereNextVideo(), buttonNext);
+        setButtonEnabled(playerViewModel.isTherePreviousVideo(), buttonPrevious);
     }
 
     private void updateFullscreenButton(boolean fullscreen) {
