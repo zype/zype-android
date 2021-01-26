@@ -263,6 +263,10 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         }
     }
 
+    @Override
+    public void onPurchaseCancelled() {
+    }
+
     // //////////
     // Data
     //

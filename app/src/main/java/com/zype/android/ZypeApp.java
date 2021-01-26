@@ -199,7 +199,7 @@ public class ZypeApp extends MultiDexApplication {
 
         // Setup marketplace connect
         if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)
-            || (ZypeConfiguration.isNativeTvodEnabled(this) && ZypeConfiguration.isUniversalTVODEnabled(this))) {
+            || (ZypeConfiguration.isNativeTvodEnabled(this))) {
             marketplaceGateway = new MarketplaceGateway(this, ZypeConfiguration.getAppKey(),
                     ZypeConfiguration.getPlanIds());
             marketplaceGateway.setup();

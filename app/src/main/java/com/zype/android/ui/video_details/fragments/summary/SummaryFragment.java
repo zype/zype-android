@@ -78,14 +78,19 @@ public class SummaryFragment extends Fragment {
             textTitle.setText(video.title);
             if (!TextUtils.isEmpty(video.episode)) {
                 textVideoEpisode.setVisibility(View.VISIBLE);
-
                 if (getActivity() != null)
                 textVideoEpisode.setText(String.format(getActivity().getString(R.string.videos_episode), video.episode));
-
             } else {
                 textVideoEpisode.setVisibility(View.GONE);
             }
-            textDescription.setText(video.description);
+
+            if (!TextUtils.isEmpty(video.description)) {
+                textDescription.setVisibility(View.VISIBLE);
+                textDescription.setText(video.description);
+            }
+            else {
+                textDescription.setVisibility(View.GONE);
+            }
 
             Button buttonPlayTrailer = Objects.requireNonNull(getView()).findViewById(R.id.buttonPlayTrailer);
             if (ZypeConfiguration.trailers()) {

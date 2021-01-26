@@ -148,6 +148,7 @@ public class DataRepository {
         if (video != null) {
             if (video.isDownloadedAudio == null) video.isDownloadedAudio = 0;
             if (video.isDownloadedVideo == null) video.isDownloadedVideo = 0;
+            if (video.isFavorite == null) video.isFavorite = 0;
             if (video.isZypeLive == null) video.isZypeLive = 0;
             if (video.onAir == null) video.onAir = 0;
             if (video.playTime == null) video.playTime = 0L;

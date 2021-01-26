@@ -515,6 +515,10 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         }
     }
 
+    @Override
+    public void onPurchaseCancelled() {
+    }
+
     //    -------------------SUBSCRIBE-------------------
 
     @Subscribe

@@ -201,10 +201,12 @@ public class DbHelper {
         entity.huluId = videoData.huluId;
         entity.isZypeLive = videoData.isZypeLive ? 1 : 0;
         entity.keywords = new Gson().toJson(videoData.keywords);
+        entity.marketplaceIds = new Gson().toJson(videoData.marketplaceIds);
         entity.matureContent = String.valueOf(videoData.matureContent ? 1 : 0);
         entity.onAir = videoData.onAir ? 1 : 0;
         entity.previewIds = new Gson().toJson(videoData.previewIds);
         entity.publishedAt = videoData.publishedAt;
+        entity.purchasePrice = videoData.purchasePrice;
         entity.purchaseRequired = String.valueOf(videoData.purchaseRequired ? 1 : 0);
         entity.rating = String.valueOf(videoData.rating);
         entity.registrationRequired = videoData.registrationRequired ? 1 : 0;
