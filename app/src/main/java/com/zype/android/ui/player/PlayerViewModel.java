@@ -9,6 +9,7 @@ import android.text.TextUtils;
 
 import com.google.android.exoplayer.TimeRange;
 import com.google.android.exoplayer.chunk.Format;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
@@ -219,11 +220,27 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         isPlaybackPositionRestored = true;
     }
 
+    public void onStartVideoSession(Player player) {
+        Video video = repo.getVideoSync(videoId);
+        if (video != null) {
+            AnalyticsManager.getInstance()
+                    .onStartVideoSession(player, playerUrl.getValue(), video);
+        }
+    }
+
+    public void onEndVideoSession() {
+        Video video = repo.getVideoSync(videoId);
+        if (video != null) {
+            AnalyticsManager.getInstance()
+                    .onEndVideoSession();
+        }
+    }
+
     public void onPlaybackResumed() {
         if (isTrailer.getValue()) {
             return;
         }
-        if(!TextUtils.isEmpty(videoId)) {
+        if (!TextUtils.isEmpty(videoId)) {
             Video video = repo.getVideoSync(videoId);
             if (video != null) {
                 video.isPlayStarted = 1;

@@ -15,6 +15,14 @@ public class AppConfiguration {
     public String marketplace;
 
     // Analytics
+    public boolean mediaMelon() {
+        return ZypeSettings.ADVANCED_ANALYTICS_ENABLED;
+    }
+
+    public String mediaMelonCustomerId() {
+        return ZypeSettings.ADVANCED_ANALYTICS_CUSTOMER_ID;
+    }
+
     public boolean segmentAnalytics() {
         return ZypeSettings.SEGMENT_ANALYTICS;
     }

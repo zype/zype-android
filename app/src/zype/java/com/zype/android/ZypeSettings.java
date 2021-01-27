@@ -50,6 +50,8 @@ public class ZypeSettings {
     public static final boolean TRAILERS_ENABLED = false;
 
     // Analytics
+    public static final boolean ADVANCED_ANALYTICS_ENABLED = false;
+    public static final String ADVANCED_ANALYTICS_CUSTOMER_ID = "";
     public static final boolean SEGMENT_ANALYTICS = false;
     public static final String SEGMENT_ANALYTICS_WRITE_KEY = "";
 

@@ -503,6 +503,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 //                    }
 //                }
                 setCurrentPlayer(castPlayer.isCastSessionAvailable() ? castPlayer : player);
+                playerViewModel.onStartVideoSession(currentPlayer);
                 preparePlayer(playerUrl);
                 updateNextPreviousButtons();
             }
@@ -959,6 +960,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             playerViewModel.savePlaybackPosition(player.getCurrentPosition());
         }
         releasePlayer();
+        playerViewModel.onEndVideoSession();
         mediaSession.setActive(false);
     }
 
