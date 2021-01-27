@@ -140,7 +140,6 @@ public class GalleryFragment extends Fragment {
         }
         model = ViewModelProviders.of(getActivity()).get(GalleryViewModel.class);
         model.setPlaylistId(parentPlaylistId);
-        showProgress();
         updateGalleryRows();
 //        adapter.notifyDataSetChanged();
     }
@@ -159,7 +158,6 @@ public class GalleryFragment extends Fragment {
     }
 
     private void updateGalleryRows() {
-        showProgress();
 //        model.getGalleryRows(parentPlaylistId).observe(this, new Observer<List<GalleryRow>>() {
 //            @Override
 //            public void onChanged(@Nullable List<GalleryRow> galleryRows) {
@@ -174,6 +172,10 @@ public class GalleryFragment extends Fragment {
     }
 
     private Observer<List<GalleryRow>> createGalleryRowObserver() {
+        showProgress();
+        if (model == null) {
+            hideProgress();
+        }
         return galleryRows -> {
             Logger.d("getGalleryRows()::onChanged(): size=" + galleryRows.size() + ", state=" + model.getGalleryRowsState());
             if (model.getGalleryRowsState() == GalleryRow.State.LOADING) {
