@@ -98,8 +98,7 @@ android {
     productFlavors {
         zype {
             versionName zypeTemplateVersion
-//            applicationId 'com.zype.android'
-            applicationId 'com.zype.isnrelaunch'
+            applicationId 'com.zype.android'
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      onesignal_app_id: "",
                                      onesignal_google_project_number: 'REMOTE',

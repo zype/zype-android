@@ -78,23 +78,21 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
     }
 
     private void initSignInButton() {
-        if (SettingsProvider.getInstance().isLoggedIn()) {
-            mSigninButton.setText(R.string.action_sign_out);
-            mSigninButton.setVisibility(View.VISIBLE);
-            mSigninButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnLoginListener.onLogout();
-                    AuthHelper.onLoginStateChanged();
-                    initSignInButton();
-                }
-            });
-        }
-        else {
-            mSigninButton.setText(R.string.action_sign_in);
-            if (ZypeConfiguration.isUniversalSubscriptionEnabled(getActivity())
-                    || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(getActivity())
-                    || ZypeConfiguration.isUniversalTVODEnabled(getActivity())) {
+        if (ZypeConfiguration.signInEnabled()) {
+            if (SettingsProvider.getInstance().isLoggedIn()) {
+                mSigninButton.setText(R.string.action_sign_out);
+                mSigninButton.setVisibility(View.VISIBLE);
+                mSigninButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mOnLoginListener.onLogout();
+                        AuthHelper.onLoginStateChanged();
+                        initSignInButton();
+                    }
+                });
+            }
+            else {
+                mSigninButton.setText(R.string.action_sign_in);
                 mSigninButton.setVisibility(View.VISIBLE);
                 mSigninButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -103,9 +101,9 @@ public class SettingsFragment extends Fragment implements ListView.OnItemClickLi
                     }
                 });
             }
-            else {
-                mSigninButton.setVisibility(View.GONE);
-            }
+        }
+        else {
+            mSigninButton.setVisibility(View.GONE);
         }
     }
 
