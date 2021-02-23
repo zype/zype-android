@@ -108,7 +108,7 @@ android {
         }
         template {
             versionName '1.0.0'
-            applicationId "com.zype.android.template"
+            applicationId "<APPLICATION_ID>"
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      // TODO: Provide valid app_id for OneSignal
                                      onesignal_app_id: '',
