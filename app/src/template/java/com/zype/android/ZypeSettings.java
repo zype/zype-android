@@ -66,5 +66,9 @@ public class ZypeSettings {
      * @see ZypeConfiguration#THEME_DARK
      */
     public static final String THEME = "<THEME>";
+  
+    // Anaylitics
+    public static final boolean APPSFLYER_ANALYTICS = false;
+    public static final String APPSFLYER_ANALYTICS_DEV_KEY = "";
 }
 

@@ -492,7 +492,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
     }
 
-//    @Override
+    @Override
+    public void onPurchaseCancelled() {
+    }
+
+    //    @Override
 //    public void openVideoFragment(String url) {
 //        Logger.d("openVideoFragment " + url);
 ////        LatestFragment f = (LatestFragment) adapterPager.getItem(0);

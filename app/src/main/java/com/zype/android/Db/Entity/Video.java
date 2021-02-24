@@ -119,6 +119,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "keywords")
     public String keywords;
 
+    @ColumnInfo(name = "marketplace_ids")
+    public String marketplaceIds;
+
     @ColumnInfo(name = "mature_content")
     public String matureContent;
 
@@ -142,6 +145,9 @@ public class Video implements PlaylistItem {
 
     @ColumnInfo(name = "published_at")
     public String publishedAt;
+
+    @ColumnInfo(name = "purchase_price")
+    public String purchasePrice;
 
     @ColumnInfo(name = "PurchaseRequired")
     public String purchaseRequired;

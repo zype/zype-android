@@ -249,6 +249,13 @@
             android:enabled="true"
             android:exported="false" />
 
+        <!-- Appsflyer -->
+        <receiver android:name="com.appsflyer.MultipleInstallBroadcastReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
         <!--
          Optionally, register AnalyticsReceiver and AnalyticsService to support background
          dispatching on non-Google Play devices

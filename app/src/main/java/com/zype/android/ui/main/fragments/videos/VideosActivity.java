@@ -392,6 +392,10 @@ public class VideosActivity extends MainActivity implements ListView.OnItemClick
         }
     }
 
+    @Override
+    public void onPurchaseCancelled() {
+    }
+
     // //////////
     // Data
     //

@@ -76,7 +76,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         tabData = new TabData(TAB_ID_FAVORITES, R.drawable.icn_favorites, R.string.title_tab_favorites);
         tabs.add(tabData);
 
-        if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
+        if (ZypeConfiguration.isNativeTvodEnabled(context)
+                || ZypeConfiguration.isUniversalTVODEnabled(context)) {
             tabData = new TabData(TAB_ID_LIBRARY, R.drawable.icn_downloads, R.string.main_tab_my_library);
             tabs.add(tabData);
         }

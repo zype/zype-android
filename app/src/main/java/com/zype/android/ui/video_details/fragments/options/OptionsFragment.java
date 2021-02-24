@@ -1,6 +1,7 @@
 package com.zype.android.ui.video_details.fragments.options;
 
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
@@ -189,65 +190,48 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getContext();
-        if (getArguments() != null && getArguments().containsKey(ARG_VIDEO_ID)) {
-            videoId = getArguments().getString(ARG_VIDEO_ID);
-            Cursor cursor = CursorHelper.getVideoCursor(getActivity().getContentResolver(), videoId);
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    onAir = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_ON_AIR)) == 1;
-                    if (cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_VIDEO)) == 1) {
-                    }
-                    else if (cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_AUDIO)) == 1) {
-                        playAsVideo = false;
-                    }
-                    else {
-                        playAsVideo = true;
-                    }
-                } else {
-                    throw new IllegalStateException("DB does not contains video with VideoId=" + videoId);
-                }
-                cursor.close();
-            } else {
-                throw new IllegalStateException("DB does not contains video with VideoId=" + videoId);
-            }
-
-            playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
-            playerViewModel.getAvailablePlayerModes().observe(this, new Observer<List<PlayerMode>>() {
-                @Override
-                public void onChanged(@Nullable List<PlayerViewModel.PlayerMode> playerModes) {
-                    if (mAdapter != null) {
-                        mAdapter.changeList(getOptionsList(playerModes));
-                    }
-                }
-            });
-            playerViewModel.getPlayerMode().observe(this, new Observer<PlayerViewModel.PlayerMode>() {
-                @Override
-                public void onChanged(@Nullable PlayerViewModel.PlayerMode playerMode) {
-                    if (mAdapter != null) {
-                        updatePlayAs(playerMode);
-                    }
-                }
-            });
-
-            videoDetailViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
-
-        }
-        else
-            {
-            throw new IllegalStateException("VideoId can not be empty");
-        }
+//        if (getArguments() != null && getArguments().containsKey(ARG_VIDEO_ID)) {
+//            videoId = getArguments().getString(ARG_VIDEO_ID);
+//        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+
         View view = inflater.inflate(R.layout.fragment_options, container, false);
         mOptionList = view.findViewById(R.id.list_options);
 
-        mAdapter = new OptionsAdapter(getOptionsList(), videoId, this);
-        initOptions();
+//        mAdapter = new OptionsAdapter(getOptionsList(), videoId, this);
+//        initOptions();
 
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        videoDetailViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
+        videoDetailViewModel.getVideo().observe(this, video -> {
+            if (video != null) {
+                videoId = video.id;
+                initOptions(video);
+            }
+        });
+
+        playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
+        playerViewModel.getAvailablePlayerModes().observe(this, playerModes -> {
+            if (mAdapter != null) {
+                mAdapter.changeList(getOptionsList(playerModes));
+            }
+        });
+        playerViewModel.getPlayerMode().observe(this, playerMode -> {
+            if (mAdapter != null) {
+                updatePlayAs(playerMode);
+            }
+        });
+
     }
 
     @Override
@@ -281,9 +265,8 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         mListener = null;
     }
 
-    // //////////
     // UI
-    //
+
     private void setPlayAsVariable() {
         switch (mListener.getCurrentFragment()) {
             case PlayerFragment.TYPE_VIDEO_LOCAL:
@@ -303,22 +286,26 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         }
     }
 
-    private void initOptions() {
-        Cursor cursor = CursorHelper.getVideoCursor(getActivity().getContentResolver(), videoId);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                isFavorite = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_FAVORITE)) == 1;
-                isAudioDownloaded = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_AUDIO)) == 1;
-                isVideoDownloaded = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_VIDEO)) == 1;
-            } else {
-                throw new IllegalStateException("DB does not contains video with VideoId=" + videoId);
-            }
-            cursor.close();
-        } else {
-            throw new IllegalStateException("DB does not contains video with VideoId=" + videoId);
-        }
+    private void initOptions(Video video) {
+//        Cursor cursor = CursorHelper.getVideoCursor(getActivity().getContentResolver(), videoId);
+//        if (cursor != null) {
+//            if (cursor.moveToFirst()) {
+//                isFavorite = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_FAVORITE)) == 1;
+//                isAudioDownloaded = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_AUDIO)) == 1;
+//                isVideoDownloaded = cursor.getInt(cursor.getColumnIndexOrThrow(Contract.Video.COLUMN_IS_DOWNLOADED_VIDEO)) == 1;
+//            } else {
+//                throw new IllegalStateException("DB does not contains video with VideoId=" + videoId);
+//            }
+//            cursor.close();
+//        } else {
+//            throw new IllegalStateException("DB does not contains video with VideoId=" + videoId);
+//        }
+
+        isFavorite = video.isFavorite == 1;
+        isAudioDownloaded = video.isDownloadedAudio == 1;
+        isVideoDownloaded = video.isDownloadedVideo == 1;
         setPlayAsVariable();
-//        mAdapter = new OptionsAdapter(getOptionsList(), videoId, this);
+        mAdapter = new OptionsAdapter(getOptionsList(), video.id, this);
         mAdapter.changeList(getOptionsList());
         mOptionList.setAdapter(mAdapter);
         mOptionList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -372,7 +359,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         List<Options> list = new ArrayList<>();
 
         if (playerModes != null && playerModes.size() > 1) {
-            list.add(new Options(OPTION_PLAY_AS, getString(R.string.video_options_play_as_audio), -1));
+            list.add(new Options(OPTION_PLAY_AS, getString(R.string.video_options_play_as_audio), R.drawable.audio_only_icon));
         }
         if (AuthHelper.isLoggedIn()
                 || !ZypeApp.get(getContext()).getAppConfiguration().hideFavoritesActionWhenSignedOut) {
@@ -384,7 +371,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         if (ZypeConfiguration.isDownloadsEnabled(getActivity()) &&
                 (isAudioDownloadUrlExists() || isVideoDownloadUrlExists())) {
             if (mListener.getCurrentFragment() != BaseVideoActivity.TYPE_YOUTUBE && !onAir) {
-                list.add(new Options(OPTION_DOWNLOAD, getString(R.string.option_download), R.drawable.icn_downloads));
+                list.add(new Options(OPTION_DOWNLOAD, getString(R.string.option_download), R.drawable.download_icon));
             }
         }
         return list;
@@ -393,9 +380,9 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     @DrawableRes
     private int getFavoriteIcon(boolean isFavorite) {
         if (isFavorite) {
-            return R.drawable.icn_favorites;
+            return R.drawable.round_star_black_24;
         } else {
-            return R.drawable.icn_addtofavorites;
+            return R.drawable.round_star_border_black_24;
         }
     }
 
@@ -525,9 +512,8 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         return getString(R.string.fragment_name_options);
     }
 
-    // //////////
     // Data
-    //
+
     private boolean isAudioDownloadUrlExists() {
         return !TextUtils.isEmpty(DataHelper.getAudioUrl(getActivity().getContentResolver(), videoId));
     }
