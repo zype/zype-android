@@ -55,11 +55,7 @@ public class AuthHelper {
         long acceptableBuffer = 60; // 1 minute
         long interval = expirationDateInSeconds - currentTimeInSeconds;
 
-        if (interval < acceptableBuffer) {
-            return true;
-        }
-
-        return false;
+        return interval < acceptableBuffer;
     }
 
     public static boolean isPaywalledVideo(Context context, String videoId, String playlistId) {
@@ -75,34 +71,20 @@ public class AuthHelper {
                     .getPlaylistSync(playlistId);
         }
 
-        if (playlist != null) {
-            if (playlist.purchaseRequired == 1) {
+        if (playlist != null && playlist.purchaseRequired == 1) {
                 return true;
-            }
         }
 
         if (Integer.valueOf(video.purchaseRequired) == 1) {
             return true;
         }
-        if (Integer.valueOf(video.subscriptionRequired) == 1) {
-            return true;
-        }
-
-        return false;
+        return Integer.valueOf(video.subscriptionRequired) == 1;
     }
 
     public static boolean isRegistrationRequired(Context context, String videoId) {
         VideoData videoData = VideoHelper.getFullData(context.getContentResolver(), videoId);
 
-        if (videoData != null) {
-            if (videoData.isRegistrationRequired()) {
-                if (!SettingsProvider.getInstance().isLoggedIn()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return videoData != null && videoData.isRegistrationRequired() && !SettingsProvider.getInstance().isLoggedIn();
 
     }
 
@@ -139,12 +121,7 @@ public class AuthHelper {
             if (playlist.purchaseRequired == 1) {
                 if (ZypeConfiguration.isNativeTvodEnabled(context)
                         || ZypeConfiguration.isUniversalTVODEnabled(context)) {
-                    if (isLoggedIn() && video.isEntitled != null && video.isEntitled == 1) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
+                    return isLoggedIn() && video.isEntitled != null && video.isEntitled == 1;
                 }
                 else {
                     // Playlist requires purchase, but TVOD monetization options ares turned off in the app configuration
@@ -163,12 +140,7 @@ public class AuthHelper {
         if (Integer.valueOf(video.purchaseRequired) == 1) {
             if (ZypeConfiguration.isNativeTvodEnabled(context)
                     || ZypeConfiguration.isUniversalTVODEnabled(context)) {
-                if (isLoggedIn() && video.isEntitled != null && Integer.valueOf(video.isEntitled) == 1) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                return isLoggedIn() && video.isEntitled != null && Integer.valueOf(video.isEntitled) == 1;
             }
             else {
                 // Video requires purchase, but TVOD monetization options are turned off in the app configuration
@@ -178,30 +150,12 @@ public class AuthHelper {
             }
         }
         if (Integer.valueOf(video.subscriptionRequired) == 1) {
-            if (ZypeConfiguration.isNativeSubscriptionEnabled(context)) {
-                if (SubscriptionHelper.hasSubscription()) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-            else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(context)) {
-                if (SubscriptionHelper.hasSubscription()) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+            if (ZypeConfiguration.isNativeSubscriptionEnabled(context) || ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(context)) {
+                return SubscriptionHelper.hasSubscription();
             }
             else if (ZypeConfiguration.isUniversalSubscriptionEnabled(context)) {
                 if (isLoggedIn()) {
-                    if (SubscriptionHelper.hasSubscription()) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
+                    return SubscriptionHelper.hasSubscription();
                 }
                 else {
                     return false;
