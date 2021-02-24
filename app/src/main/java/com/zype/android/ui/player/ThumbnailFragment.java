@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
@@ -124,7 +125,7 @@ public class ThumbnailFragment extends Fragment {
                     imageView.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.placeholder_video));
                 }
 
-                if (AuthHelper.isVideoUnlocked(getActivity(), video.id, model.getPlaylistId())) {
+                if (SubscriptionHelper.isVideoUnlocked(getActivity(), video.id, model.getPlaylistId())) {
                     buttonWatchNow.setVisibility(View.GONE);
                 }
                 else {

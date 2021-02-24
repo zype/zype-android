@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
@@ -180,7 +181,7 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
         if (!TextUtils.isEmpty(playlistId)
                 && AuthHelper.isPaywalledVideo(holder.view.getContext(), video.id, playlistId)) {
             holder.imageLocked.setVisibility(View.VISIBLE);
-            if (AuthHelper.isVideoUnlocked(holder.view.getContext(), video.id, playlistId)) {
+            if (SubscriptionHelper.isVideoUnlocked(holder.view.getContext(), video.id, playlistId)) {
                 holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
                 UiUtils.setImageColor(holder.imageLocked,
                         ContextCompat.getColor(holder.view.getContext(), R.color.icon_unlocked));

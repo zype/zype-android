@@ -31,6 +31,7 @@ import com.google.android.libraries.cast.companionlibrary.cast.exceptions.NoConn
 import com.google.android.libraries.cast.companionlibrary.cast.exceptions.TransientNetworkDisconnectionException;
 import com.google.android.libraries.cast.companionlibrary.cast.player.VideoCastController;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
@@ -759,7 +760,7 @@ public abstract class BaseVideoActivity extends BaseActivity implements OnDetail
             }
 //            else
 //            if (!ZypeApp.get(this).getAppConfiguration().updatedPaywalls) {
-//                if (AuthHelper.isVideoUnlocked(this, mVideoId, null)) {
+//                if (SubscriptionHelper.isVideoUnlocked(this, mVideoId, null)) {
 //                    Video video = DataRepository.getInstance(getApplication()).getVideoSync(mVideoId);
 //                    if (video != null &&
 //                            (video.isZypeLive == 0 || VideoHelper.isLiveEventOnAir(video))) {

@@ -11,6 +11,7 @@ import com.android.billingclient.api.Purchase;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
@@ -264,7 +265,7 @@ public class NavigationHelper {
                         .getPlaylistSync(playlistId);
             }
 
-            if (AuthHelper.isVideoUnlocked(activity, video.id, playlistId)) {
+            if (SubscriptionHelper.isVideoUnlocked(activity, video.id, playlistId)) {
                 switchToVideoDetailsScreen(activity, video.id, playlistId, autoplay);
             }
             else {

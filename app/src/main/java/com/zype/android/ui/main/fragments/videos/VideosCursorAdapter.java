@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
@@ -460,9 +461,9 @@ public class VideosCursorAdapter extends CursorAdapter {
     }
 
     private void updateLockIcon(VideosViewHolder holder) {
-        if (AuthHelper.isPaywalledVideo(holder.thumbnail.getContext(), holder.videoId, null)) {
+        if (SubscriptionHelper.isPaywalledVideo(holder.thumbnail.getContext(), holder.videoId, null)) {
             holder.imageLocked.setVisibility(View.VISIBLE);
-            if (AuthHelper.isVideoUnlocked(holder.thumbnail.getContext(), holder.videoId, null)) {
+            if (SubscriptionHelper.isVideoUnlocked(holder.thumbnail.getContext(), holder.videoId, null)) {
                 holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
                 UiUtils.setImageColor(holder.imageLocked,
                         ContextCompat.getColor(holder.thumbnail.getContext(), R.color.icon_unlocked));

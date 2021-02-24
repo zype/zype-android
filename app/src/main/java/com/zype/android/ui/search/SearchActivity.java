@@ -4,6 +4,7 @@ import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.Purchase;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
 import com.zype.android.DataRepository;
@@ -489,7 +490,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         Logger.d("onItemClick()");
         VideosCursorAdapter.VideosViewHolder holder = (VideosCursorAdapter.VideosViewHolder) view.getTag();
         NavigationHelper navigationHelper = NavigationHelper.getInstance(this);
-        if (AuthHelper.isVideoUnlocked(this, holder.videoId, null)) {
+        if (SubscriptionHelper.isVideoUnlocked(this, holder.videoId, null)) {
             navigationHelper.switchToVideoDetailsScreen(this, holder.videoId, null, false);
         }
         else {
