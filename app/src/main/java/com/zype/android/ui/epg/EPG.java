@@ -627,7 +627,7 @@ public class EPG extends ViewGroup {
     int channelPosition = (y + mChannelLayoutMargin)
         / (mChannelLayoutHeight + mChannelLayoutMargin);
 
-    return epgData.getChannelCount() == 0 ? -1 : channelPosition;
+    return  (epgData == null || epgData.getChannelCount() == 0) ? -1 : channelPosition;
   }
 
   private int getProgramPosition(int channelPosition, long time) {

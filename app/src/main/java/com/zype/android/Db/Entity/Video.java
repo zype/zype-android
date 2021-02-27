@@ -1,8 +1,6 @@
 package com.zype.android.Db.Entity;
 
-
-import java.util.ArrayList;
-import java.util.List;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -121,6 +119,9 @@ public class Video implements PlaylistItem {
     @ColumnInfo(name = "keywords")
     public String keywords;
 
+    @ColumnInfo(name = "marketplace_ids")
+    public String marketplaceIds;
+
     @ColumnInfo(name = "mature_content")
     public String matureContent;
 
@@ -144,6 +145,9 @@ public class Video implements PlaylistItem {
 
     @ColumnInfo(name = "published_at")
     public String publishedAt;
+
+    @ColumnInfo(name = "purchase_price")
+    public String purchasePrice;
 
     @ColumnInfo(name = "PurchaseRequired")
     public String purchaseRequired;
@@ -215,6 +219,28 @@ public class Video implements PlaylistItem {
     @Override
     public String getTitle() {
         return title;
+    }
+
+    public void update(Video dbVideo) {
+        if(dbVideo == null) {
+            return;
+        }
+
+        if(TextUtils.isEmpty(downloadAudioPath)) {
+            downloadAudioPath = dbVideo.downloadAudioPath;
+        }
+
+        if(TextUtils.isEmpty(downloadAudioUrl)) {
+            downloadAudioUrl = dbVideo.downloadAudioUrl;
+        }
+
+        if(TextUtils.isEmpty(downloadVideoPath)) {
+            downloadVideoPath = dbVideo.downloadVideoPath;
+        }
+
+        if(TextUtils.isEmpty(downloadVideoUrl)) {
+            downloadVideoUrl = dbVideo.downloadVideoUrl;
+        }
     }
 
 }

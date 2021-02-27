@@ -6,11 +6,11 @@ package com.zype.android;
 
 public class ZypeSettings {
     // Zype app key
-    public static final String APP_KEY = "zCNqYpQAzxTg8aZOPeiQCovML09M7pQsQ6Mb_aRtW7riYdv1tzCcKDW7BkPMvf17";
+    public static final String APP_KEY = "";
     // OAuth credentials
-    public static final String CLIENT_ID = "03fe1c1c964ceeff2312f25dcbc7ff3b70d10bb776d78b272b943a48fba2afd0";
+    public static final String CLIENT_ID = "";
     // Playlist
-    public static final String ROOT_PLAYLIST_ID = "5c59b7be45793d112d003a7b";
+    public static final String ROOT_PLAYLIST_ID = "";
 
     // Google Analytics Tracking Id
     public static final String GA_TRACKING_ID = "";
@@ -24,13 +24,12 @@ public class ZypeSettings {
     // Monetization
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = false;
     public static final boolean NATIVE_TVOD = true;
-    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = true;
-//    public static final String[] PLAN_IDS = new String[] { "5a26c2445d3c19152e003f70" };
+    public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = false;
     public static final String[] PLAN_IDS = new String[] { "5b366329849e2d140c00002f", "5b366368849e2d141400002b" };
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = false;
     public static final boolean UNIVERSAL_SUBSCRIPTION_ENABLED = false;
-    public static final boolean UNIVERSAL_TVOD = true;
-    public static final boolean PLAYER_PAYWALL_ENABLED = false;
+    public static final boolean UNIVERSAL_TVOD = false;
+    public static final boolean PLAYER_PAYWALL_ENABLED = true;
 
     // Features
     public static final boolean AUTOPLAY = true;
@@ -59,5 +58,9 @@ public class ZypeSettings {
     public static final String LIVE_VIDEO_ID = "5c8faa013bbf420fc200bc40";
 
     public static final String THEME = ZypeConfiguration.THEME_DARK;
+
+    // Anaylitics
+    public static final boolean APPSFLYER_ANALYTICS = false;
+    public static final String APPSFLYER_ANALYTICS_DEV_KEY = "";
 }
 

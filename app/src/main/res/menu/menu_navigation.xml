@@ -30,6 +30,6 @@
     <item
         android:id="@+id/menuNavigationSettings"
         android:title="@string/menu_navigation_settings"
-        android:icon="@drawable/baseline_settings_black_24"
+        android:icon="@drawable/baseline_more_black_24"
         />
 </menu>

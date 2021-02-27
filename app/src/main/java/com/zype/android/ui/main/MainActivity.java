@@ -214,7 +214,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         // Settings
         bottomNavigationView.getMenu().add(Menu.NONE, R.id.menuNavigationSettings,
                 Menu.NONE, R.string.menu_navigation_settings)
-                .setIcon(R.drawable.baseline_settings_black_24);
+                .setIcon(R.drawable.baseline_more_black_24);
 
 
         adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
@@ -258,7 +258,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             case R.id.menuNavigationSettings: {
                 lastSelectedTabId = item.getItemId();
                 Section section = sections.get(item.getItemId());
-                pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()));
+                pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()), false);
                 setTitle(section.title);
                 return true;
             }
@@ -492,7 +492,11 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
     }
 
-//    @Override
+    @Override
+    public void onPurchaseCancelled() {
+    }
+
+    //    @Override
 //    public void openVideoFragment(String url) {
 //        Logger.d("openVideoFragment " + url);
 ////        LatestFragment f = (LatestFragment) adapterPager.getItem(0);

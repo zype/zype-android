@@ -21,6 +21,9 @@ import com.amazonaws.mobile.client.AWSStartupHandler;
 import com.amazonaws.mobile.client.AWSStartupResult;
 import com.amazonaws.mobileconnectors.pinpoint.PinpointConfiguration;
 import com.amazonaws.mobileconnectors.pinpoint.PinpointManager;
+import com.appsflyer.AppsFlyerConversionListener;
+import com.appsflyer.AppsFlyerLib;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -53,6 +56,7 @@ import com.zype.android.zypeapi.ZypeApi;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 
 /**
@@ -120,6 +124,9 @@ public class ZypeApp extends MultiDexApplication {
         AndroidThreeTen.init(this);
 
         // Analytics
+        if (appConfiguration.appsflyerAnalytics()) {
+            initAppsflyer();
+        }
         AnalyticsManager.getInstance().init();
 
         // Fabric
@@ -192,7 +199,7 @@ public class ZypeApp extends MultiDexApplication {
 
         // Setup marketplace connect
         if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)
-            || (ZypeConfiguration.isNativeTvodEnabled(this) && ZypeConfiguration.isUniversalTVODEnabled(this))) {
+            || (ZypeConfiguration.isNativeTvodEnabled(this))) {
             marketplaceGateway = new MarketplaceGateway(this, ZypeConfiguration.getAppKey(),
                     ZypeConfiguration.getPlanIds());
             marketplaceGateway.setup();
@@ -314,6 +321,37 @@ public class ZypeApp extends MultiDexApplication {
         tracker.enableAdvertisingIdCollection(true);
         tracker.enableAutoActivityTracking(true);
         tracker.send(new HitBuilders.ScreenViewBuilder().setCustomDimension(1, null).build());
+    }
+
+    private void initAppsflyer() {
+        AppsFlyerConversionListener conversionListener = new AppsFlyerConversionListener() {
+            @Override
+            public void onConversionDataSuccess(Map<String, Object> conversionData) {
+                for (String attrName : conversionData.keySet()) {
+                    Logger.d("AppsFlyerConversionListener(): attribute: " + attrName + " = " + conversionData.get(attrName));
+                }
+            }
+
+            @Override
+            public void onConversionDataFail(String errorMessage) {
+                Logger.d("AppsFlyerConversionListener(): error getting conversion data: " + errorMessage);
+            }
+
+            @Override
+            public void onAppOpenAttribution(Map<String, String> attributionData) {
+                for (String attrName : attributionData.keySet()) {
+                    Logger.d("AppsFlyerConversionListener(): attribute: " + attrName + " = " + attributionData.get(attrName));
+                }
+            }
+
+            @Override
+            public void onAttributionFailure(String errorMessage) {
+                Logger.d("AppsFlyerConversionListener(): error onAttributionFailure : " + errorMessage);
+            }
+        };
+        AppsFlyerLib.getInstance().init(appConfiguration.appsflyerAnalyticsDevKey(),
+                conversionListener, this);
+        AppsFlyerLib.getInstance().startTracking(this);
     }
 
 //    @NonNull

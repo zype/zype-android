@@ -24,7 +24,6 @@ public class ZypeSettings {
     // Monetization
     public static final boolean NATIVE_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_SUBSCRIPTION_ENABLED>");
     public static final boolean NATIVE_TVOD = Boolean.valueOf("true");
-    // NOTE: This is a gated feature that REQUIRES Zype to configure. Please reach out to Zype Support for help on setting up this feature.
     public static final boolean NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED = Boolean.valueOf("<NATIVE_TO_UNIVERSAL_SUBSCRIPTION_ENABLED>");
     public static final String[] PLAN_IDS = new String[] { "<PLAN_IDS>" };
     public static final boolean SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED = Boolean.valueOf("<SUBSCRIBE_TO_WATCH_AD_FREE_ENABLED>");
@@ -36,6 +35,7 @@ public class ZypeSettings {
     public static final boolean AUTOPLAY = Boolean.valueOf("<AUTOPLAY>");
     public static final boolean BACKGROUND_AUDIO_PLAYBACK_ENABLED = Boolean.valueOf("BACKGROUND_AUDIO_PLAYBACK_ENABLED");
     public static final boolean BACKGROUND_PLAYBACK_ENABLED = Boolean.valueOf("<BACKGROUND_PLAYBACK_ENABLED>");
+    public static final boolean CHROMECAST_SUPPORT = true;
     public static final boolean DEVICE_LINKING = Boolean.valueOf("<DEVICE_LINKING>");
     public static final String DEVICE_LINKING_URL = "<DEVICE_LINKING_URL>";
     public static final boolean DOWNLOADS_ENABLED = Boolean.valueOf("<DOWNLOADS_ENABLED>");
@@ -49,13 +49,14 @@ public class ZypeSettings {
     public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = false;
     public static final boolean PLAYLIST_GALLERY_ITEM_INLINE_TITLES = false;
     public static final boolean SHARE_VIDEO_ENABLED = false;
-    public static final boolean SHOW_LIVE = false;
     public static final boolean TRAILERS_ENABLED = false;
 
-    // Anaylitics
+    // Analytics
     public static final boolean SEGMENT_ANALYTICS = false;
     public static final String SEGMENT_ANALYTICS_WRITE_KEY = "";
 
+    // Live
+    public static final boolean SHOW_LIVE = false;
     public static final String LIVE_VIDEO_ID = "";
 
     /**
@@ -65,6 +66,10 @@ public class ZypeSettings {
      * @see ZypeConfiguration#THEME_DARK
      */
     public static final String THEME = "<THEME>";
+
+    // Anaylitics
+    public static final boolean APPSFLYER_ANALYTICS = false;
+    public static final String APPSFLYER_ANALYTICS_DEV_KEY = "";
 
 }
 

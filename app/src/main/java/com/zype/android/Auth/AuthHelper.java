@@ -137,8 +137,9 @@ public class AuthHelper {
         }
         for (Playlist playlist : playlists) {
             if (playlist.purchaseRequired == 1) {
-                if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
-                    if (video.isEntitled != null && video.isEntitled == 1) {
+                if (ZypeConfiguration.isNativeTvodEnabled(context)
+                        || ZypeConfiguration.isUniversalTVODEnabled(context)) {
+                    if (isLoggedIn() && video.isEntitled != null && video.isEntitled == 1) {
                         return true;
                     }
                     else {
@@ -146,9 +147,9 @@ public class AuthHelper {
                     }
                 }
                 else {
-                    // Playlist requires purchase, but UTVOD options is turned off in the app configuration
-                    Logger.w("Playlist " + playlist.id + " requires purchase, but universal TVOD feature " +
-                            "is turned off in the app configuration.");
+                    // Playlist requires purchase, but TVOD monetization options ares turned off in the app configuration
+                    Logger.w("Playlist " + playlist.id + " requires purchase, but TVOD monetization features " +
+                            "are turned off in the app configuration.");
                     result = false;
                 }
             }
@@ -160,8 +161,9 @@ public class AuthHelper {
             }
         }
         if (Integer.valueOf(video.purchaseRequired) == 1) {
-            if (ZypeConfiguration.isUniversalTVODEnabled(context)) {
-                if (video.isEntitled != null && Integer.valueOf(video.isEntitled) == 1) {
+            if (ZypeConfiguration.isNativeTvodEnabled(context)
+                    || ZypeConfiguration.isUniversalTVODEnabled(context)) {
+                if (isLoggedIn() && video.isEntitled != null && Integer.valueOf(video.isEntitled) == 1) {
                     return true;
                 }
                 else {
@@ -169,9 +171,9 @@ public class AuthHelper {
                 }
             }
             else {
-                // Video requires purchase, but UTVOD options is turned off in the app configuration
-                Logger.w("Video " + videoId + " requires purchase, but universal TVOD feature " +
-                        "is turned off in the app configuration.");
+                // Video requires purchase, but TVOD monetization options are turned off in the app configuration
+                Logger.w("Video " + videoId + " requires purchase, but TVOD monetization features " +
+                        "are turned off in the app configuration.");
                 result = false;
             }
         }

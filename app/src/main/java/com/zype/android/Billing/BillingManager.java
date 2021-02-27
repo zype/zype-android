@@ -46,6 +46,7 @@ public class BillingManager implements PurchasesUpdatedListener {
         void onBillingClientSetupFinished();
         void onConsumeFinished(String token, @BillingResponse int result);
         void onPurchasesUpdated(List<Purchase> purchases);
+        void onPurchaseCancelled();
     }
 
     public BillingManager(Context context, final BillingUpdatesListener updatesListener) {
@@ -235,7 +236,7 @@ public class BillingManager implements PurchasesUpdatedListener {
             mBillingUpdatesListener.onPurchasesUpdated(purchases);
         }
         else if (responseCode == BillingResponse.USER_CANCELED) {
-            Log.i(TAG, "onPurchasesUpdated() - user cancelled the purchase flow - skipping");
+            mBillingUpdatesListener.onPurchaseCancelled();
         }
         else {
             Log.w(TAG, "onPurchasesUpdated() got unknown resultCode: " + responseCode);
@@ -244,6 +245,21 @@ public class BillingManager implements PurchasesUpdatedListener {
 
     public List<Purchase> getPurchases() {
         return this.purchases;
+    }
+
+    public Purchase getPurchase(String sku) {
+        for (Purchase purchase : purchases) {
+            if (purchase.getSku().equals(sku)) return purchase;
+        }
+        return null;
+    }
+
+    public void consumePurchase(Purchase purchase) {
+        if (purchase != null) {
+            mBillingClient.consumeAsync(purchase.getPurchaseToken(), (responseCode, purchaseToken) -> {
+
+            });
+        }
     }
 
     /**

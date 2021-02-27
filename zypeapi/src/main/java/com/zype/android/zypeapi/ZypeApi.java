@@ -443,6 +443,51 @@ public class ZypeApi {
         });
     }
 
+    public void verifyVideoPurchaseGoogle(String appId, String siteId, String consumerId,
+                                         String videoId, String purchaseToken, String amount,
+                                         String receipt, String signature,
+                                         @NonNull final IZypeApiListener listener) {
+        MarketplaceConnectBody body = new MarketplaceConnectBody();
+        body.appId = appId;
+        body.consumerId = consumerId;
+        body.videoId = videoId;
+        body.purchaseToken = purchaseToken;
+        body.siteId = siteId;
+        body.amount = amount;
+        body.transactionType = "purchase";
+        MarketplaceConnectBodyData bodyData = new MarketplaceConnectBodyData();
+        bodyData.receipt = receipt;
+        bodyData.signature = signature;
+        body.data = bodyData;
+        getApi().verifyTvodPurchaseGoogle(body).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                }
+                else {
+                    try {
+                        String error = response.errorBody().string();
+                        Gson gson = new Gson();
+                        ErrorBody errorBody = gson.fromJson(error, ErrorBody.class);
+                        errorBody.status = response.code();
+                        listener.onCompleted(new ZypeApiResponse<PlayerResponse>(errorBody));
+                    }
+                    catch (Exception e) {
+                        ErrorBody errorBody = new ErrorBody();
+                        errorBody.status = response.code();
+                        listener.onCompleted(new ZypeApiResponse<PlayerResponse>(errorBody));
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse<PlaylistsResponse>(null, false));
+            }
+        });
+    }
+
     // Player
 
     public void getPlayer(@NonNull String videoId, boolean isAudio, String accessToken,
