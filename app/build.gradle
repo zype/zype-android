@@ -236,9 +236,9 @@ dependencies {
     // AWS
     implementation 'com.amazonaws:aws-android-sdk-core:2.7.+'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
-    implementation 'com.google.firebase:firebase-crashlytics:17.0.1'
-    implementation 'com.google.firebase:firebase-core:17.4.3'
-    implementation 'com.google.firebase:firebase-messaging:20.2.0'
+    implementation 'com.google.firebase:firebase-crashlytics:17.3.1'
+    implementation 'com.google.firebase:firebase-core:18.0.2'
+    implementation 'com.google.firebase:firebase-messaging:21.0.1'
 
     implementation 'com.amazonaws:aws-android-sdk-pinpoint:2.7.+'
     implementation('com.amazonaws:aws-android-sdk-mobile-client:2.7.+@aar') {
@@ -248,7 +248,7 @@ dependencies {
     // Segment Analytics
     implementation 'com.segment.analytics.android:analytics:4.7.1'
 
-    implementation 'com.google.firebase:firebase-perf:19.0.9'
+    implementation 'com.google.firebase:firebase-perf:19.1.1'
 
 }
 
