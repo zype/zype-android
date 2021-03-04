@@ -313,7 +313,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         playerViewModel.getPlayerMode().observe(this, playerModeObserver);
         playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
-        playerViewModel.onPlayerError().observe(this, playerErrorObserver);
+        playerViewModel.getPlayerError().observe(this, playerErrorObserver);
         if (playerViewModel.isTrailer().getValue()) {
             ImageButton buttonCloseTrailer = getView().findViewById(R.id.buttonCloseTrailer);
             buttonCloseTrailer.setVisibility(View.VISIBLE);
@@ -840,6 +840,12 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             }
             return super.dispatchSetPlayWhenReady(player, playWhenReady);
         }
+
+        @Override
+        public boolean dispatchSeekTo(Player player, int windowIndex, long positionMs) {
+            playerViewModel.onSeekTo(positionMs);
+            return super.dispatchSeekTo(player, windowIndex, positionMs);
+        }
     }
 
     private class PlayerEventListener implements Player.EventListener {
@@ -855,12 +861,13 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 case Player.STATE_READY: {
                     mediaSession.setActive(true);
                     if (player != null) {
+                        handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
                         if (player.getPlayWhenReady()) {
                             handlerTimer.postDelayed(runnableAnalyticsPlayback, ANALYTICS_PLAYBACK_INTERVAL);
                             playerViewModel.onPlaybackResumed();
                         }
                         else {
-                            handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
+                            playerViewModel.onPlaybackPaused();
                         }
                     }
                     break;
@@ -900,6 +907,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         @Override
         public void onPlayerError(ExoPlaybackException e) {
             Log.e(TAG, "onPlayerError(): " + e.getMessage());
+            playerViewModel.onPlayerError();
         }
 
         @Override
