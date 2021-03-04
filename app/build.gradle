@@ -16,8 +16,11 @@ buildscript {
 import java.text.SimpleDateFormat
 import groovy.json.JsonSlurper
 
+def FIREBASE_ENABLED = false
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
+if(FIREBASE_ENABLED) {
+    apply plugin: 'com.google.gms.google-services'
+}
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.firebase.firebase-perf'
 
