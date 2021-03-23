@@ -221,6 +221,10 @@ public class ZypeConfiguration {
         return ZypeSettings.PLAYER_PAYWALL_ENABLED;
     }
 
+    public static boolean signInEnabled() {
+        return ZypeSettings.SIGN_IN_ENABLED;
+    }
+
     public static boolean trailers() {
         return ZypeSettings.TRAILERS_ENABLED;
     }

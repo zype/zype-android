@@ -49,6 +49,7 @@ public class ZypeSettings {
     public static final boolean PLAYLIST_GALLERY_ITEM_TITLES = false;
     public static final boolean PLAYLIST_GALLERY_ITEM_INLINE_TITLES = false;
     public static final boolean SHARE_VIDEO_ENABLED = false;
+    public static final boolean SIGN_IN_ENABLED = true;
     public static final boolean TRAILERS_ENABLED = false;
 
     // Analytics
