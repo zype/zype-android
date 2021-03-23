@@ -100,6 +100,10 @@ public class VideoData {
     @Expose
     public String season;
 
+    @SerializedName("series_id")
+    @Expose
+    public String seriesId;
+
     @Expose
     public List<Segment> segments = new ArrayList<>();
 

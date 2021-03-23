@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.WebView;
 
 import com.amazonaws.mobile.client.AWSMobileClient;
@@ -23,7 +24,6 @@ import com.amazonaws.mobileconnectors.pinpoint.PinpointConfiguration;
 import com.amazonaws.mobileconnectors.pinpoint.PinpointManager;
 import com.appsflyer.AppsFlyerConversionListener;
 import com.appsflyer.AppsFlyerLib;
-//import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -31,6 +31,8 @@ import com.google.android.gms.cast.CastMediaControlIntent;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.cast.companionlibrary.cast.VideoCastManager;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
@@ -110,7 +112,6 @@ public class ZypeApp extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         INSTANCE = this;
-
         createNotificationChannel();
 
         StorageUtils.initStorage(this);
@@ -219,7 +220,6 @@ public class ZypeApp extends MultiDexApplication {
 
         super.onTerminate();
     }
-
 
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because

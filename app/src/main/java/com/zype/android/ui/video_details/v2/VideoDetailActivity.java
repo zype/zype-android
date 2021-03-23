@@ -180,7 +180,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         }
 
         playerViewModel.isTrailer().observe(this, playerIsTrailerObserver);
-        playerViewModel.onPlayerError().observe(this, playerErrorObserver);
+        playerViewModel.getPlayerError().observe(this, playerErrorObserver);
         playerViewModel.getPlaybackState().observe(this, state -> {
             if (state != null) {
                 Logger.d("getPlaybackState(): state=" + state);
