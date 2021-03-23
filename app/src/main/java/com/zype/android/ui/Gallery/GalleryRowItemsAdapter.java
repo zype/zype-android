@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.PlaylistItem;
 import com.zype.android.Db.Entity.Video;
@@ -190,9 +191,9 @@ public class GalleryRowItemsAdapter extends RecyclerView.Adapter<GalleryRowItems
     private void updateLockIcon(ViewHolder holder) {
         if (holder.item instanceof Video) {
             Video video = (Video) holder.item;
-            if (AuthHelper.isPaywalledVideo(holder.view.getContext(), video.id, playlistId)) {
+            if (SubscriptionHelper.isPaywalledVideo(holder.view.getContext(), video.id, playlistId)) {
                 holder.imageLocked.setVisibility(View.VISIBLE);
-                if (AuthHelper.isVideoUnlocked(holder.view.getContext(), video.id, playlistId)) {
+                if (SubscriptionHelper.isVideoUnlocked(holder.view.getContext(), video.id, playlistId)) {
                     holder.imageLocked.setImageResource(R.drawable.baseline_lock_open_white_18);
                     UiUtils.setImageColor(holder.imageLocked,
                             ContextCompat.getColor(holder.view.getContext(), R.color.icon_unlocked));

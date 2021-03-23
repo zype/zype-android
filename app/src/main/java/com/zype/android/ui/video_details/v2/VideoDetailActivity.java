@@ -27,6 +27,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
@@ -273,7 +274,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
                 // Update title
                 getSupportActionBar().setTitle(video.title);
                 // Check video authorization
-                if (AuthHelper.isVideoUnlocked(VideoDetailActivity.this,
+                if (SubscriptionHelper.isVideoUnlocked(VideoDetailActivity.this,
                         video.id, model.getPlaylistId())) {
                     // Show player view
                     if (playerViewModel.isTrailer() != null && !playerViewModel.isTrailer().getValue()) {

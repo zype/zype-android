@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.zype.android.databinding.FragmentActionBuyVideoBinding;
 
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.monetization.PaywallViewModel;
 import com.zype.android.ui.monetization.PurchaseVideoBottomDialogFragment;
@@ -71,7 +72,7 @@ public class ActionBuyVideoFragment extends Fragment {
         switch (requestCode) {
             case BundleConstants.REQUEST_LOGIN:
                 if (AuthHelper.isLoggedIn()) {
-                    if (AuthHelper.isVideoUnlocked(getActivity(), model.getVideoId(), model.getPlaylistId())) {
+                    if (SubscriptionHelper.isVideoUnlocked(getActivity(), model.getVideoId(), model.getPlaylistId())) {
                         // If a signed in user has video entitlement, we just refresh the video in the
                         // model, that causes the Video detail screen to be refreshed
                         model.setVideoId(model.getVideoId());

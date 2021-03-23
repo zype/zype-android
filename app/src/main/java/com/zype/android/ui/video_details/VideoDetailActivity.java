@@ -4,6 +4,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
@@ -153,7 +154,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     }
 
     private void checkForRegistration() {
-        if (AuthHelper.isRegistrationRequired(getApplicationContext(), mVideoId)) {
+        if (SubscriptionHelper.isRegistrationRequired(getApplicationContext(), mVideoId)) {
             NavigationHelper.getInstance(this).handleUnAuthorizedVideo(this);
         }
         else {
@@ -279,7 +280,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
         imageVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!AuthHelper.isVideoUnlocked(VideoDetailActivity.this, mVideoId, playlistId)) {
+                if (!SubscriptionHelper.isVideoUnlocked(VideoDetailActivity.this, mVideoId, playlistId)) {
                     NavigationHelper.getInstance(VideoDetailActivity.this)
                             .handleNotAuthorizedVideo(VideoDetailActivity.this, mVideoId, playlistId);
                 }
@@ -452,7 +453,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
     }
 
     private void checkVideoAuthorization() {
-        if (!AuthHelper.isVideoUnlocked(this, mVideoId, playlistId)) {
+        if (!SubscriptionHelper.isVideoUnlocked(this, mVideoId, playlistId)) {
             showVideoThumbnail();
             NavigationHelper.getInstance(this).handleNotAuthorizedVideo(this, mVideoId, playlistId);
         }
@@ -523,7 +524,7 @@ public class VideoDetailActivity extends BaseVideoActivity implements IPlaylistV
                     // Update video details
                     updateTabs();
                     // Check video authorization
-                    if (AuthHelper.isVideoUnlocked(VideoDetailActivity.this, video.id, playlistId)) {
+                    if (SubscriptionHelper.isVideoUnlocked(VideoDetailActivity.this, video.id, playlistId)) {
                         // Show player view and request player data
                         showPlayerView(video);
                     }

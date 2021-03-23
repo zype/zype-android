@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.zype.android.Auth.AuthHelper;
+import com.zype.android.subscription.SubscriptionHelper;
 import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ui.NavigationHelper;
@@ -153,7 +154,7 @@ public class PaywallActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CONSUMER:
                 if (resultCode == RESULT_OK) {
-                    if (AuthHelper.isVideoUnlocked(PaywallActivity.this,
+                    if (SubscriptionHelper.isVideoUnlocked(PaywallActivity.this,
                             model.getVideoId(), model.getPlaylistId())) {
                         openVideo();
                     }
@@ -167,7 +168,7 @@ public class PaywallActivity extends AppCompatActivity {
                 break;
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
-                    if (AuthHelper.isVideoUnlocked(PaywallActivity.this,
+                    if (SubscriptionHelper.isVideoUnlocked(PaywallActivity.this,
                             model.getVideoId(), model.getPlaylistId())) {
                         openVideo();
                     }
