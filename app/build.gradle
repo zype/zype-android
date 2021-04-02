@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
+        mavenCentral()
         google()
         jcenter()
         flatDir {
@@ -15,9 +16,14 @@ buildscript {
 import java.text.SimpleDateFormat
 import groovy.json.JsonSlurper
 
+def FIREBASE_ENABLED = false
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
+if(FIREBASE_ENABLED) {
+    apply plugin: 'com.google.gms.google-services'
+}
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.firebase-perf'
+
 // TODO: Uncomment following line to use Fabric
 //apply plugin: 'io.fabric'
 
@@ -103,6 +109,7 @@ android {
                                      onesignal_google_project_number: 'REMOTE',
                                      crashlyticsCollectionEnabled: "true",
                                      facebook_sdk_enabled: "true"
+                                     performanceMonitoringEnabled : "true"
             ]
         }
         template {
@@ -114,6 +121,7 @@ android {
                                      onesignal_google_project_number: 'REMOTE',
                                      crashlyticsCollectionEnabled: "true",
                                      facebook_sdk_enabled: "true"
+                                     performanceMonitoringEnabled : "true"
             ]
         }
     }
@@ -234,20 +242,25 @@ dependencies {
     // AWS
     implementation 'com.amazonaws:aws-android-sdk-core:2.7.+'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
-    implementation 'com.google.firebase:firebase-crashlytics:17.0.1'
-    implementation 'com.google.firebase:firebase-core:17.4.3'
-    implementation 'com.google.firebase:firebase-messaging:20.2.0'
+    implementation 'com.google.firebase:firebase-crashlytics:17.3.1'
+    implementation 'com.google.firebase:firebase-core:18.0.2'
+    implementation 'com.google.firebase:firebase-messaging:21.0.1'
 
     implementation 'com.amazonaws:aws-android-sdk-pinpoint:2.7.+'
     implementation('com.amazonaws:aws-android-sdk-mobile-client:2.7.+@aar') {
         transitive = true
     }
 
+    // Appsflyer
+    implementation 'com.appsflyer:af-android-sdk:5.4.0'
+    implementation 'com.android.installreferrer:installreferrer:1.1.2'
+
     // Segment Analytics
     implementation 'com.segment.analytics.android:analytics:4.7.1'
 
-    //facebook sdk
+//facebook sdk
     implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
+    implementation 'com.google.firebase:firebase-perf:19.1.1'
 }
 
 // Uncomment below line if using AWS Pinpoint

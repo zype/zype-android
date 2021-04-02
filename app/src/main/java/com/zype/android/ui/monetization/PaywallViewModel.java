@@ -15,10 +15,12 @@ import com.android.billingclient.api.SkuDetails;
 import com.google.gson.Gson;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
+import com.zype.android.Billing.MarketplaceGateway;
 import com.zype.android.Billing.PurchaseItem;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.Playlist;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.ZypeApp;
 import com.zype.android.ui.v2.base.BaseViewModel;
 import com.zype.android.zypeapi.model.MarketplaceIds;
 
@@ -32,11 +34,12 @@ public class PaywallViewModel extends BaseViewModel {
 
     private MutableLiveData<Boolean> isPurchased = new MutableLiveData<>();
     private MutableLiveData<List<PurchaseItem>> purchaseItems = new MutableLiveData<>();
+//    private MutableLiveData<PurchaseItem> purchaseItem = new MutableLiveData<>();
     private MutableLiveData<State> state = new MutableLiveData<>();
     private PurchaseItem selectedItem;
 
-    private String playlistId;
     private PaywallType paywallType;
+    private String playlistId;
     private String videoId;
 
     private BillingManager billingManager;
@@ -91,6 +94,10 @@ public class PaywallViewModel extends BaseViewModel {
         return purchaseItems;
     }
 
+//    public LiveData<PurchaseItem> getPurchaseItem() {
+//        return purchaseItem;
+//    }
+//
     public LiveData<State> getState() {
         return state;
     }
@@ -105,7 +112,7 @@ public class PaywallViewModel extends BaseViewModel {
 
     private void queryPurchaseItems() {
         switch (paywallType) {
-            case PLAYLIST_TVOD:
+            case PLAYLIST_TVOD: {
                 Map<String, Object> itemsToPurchase = new HashMap<>();
                 List<String> skuList = new ArrayList<>();
                 Playlist playlist = getPlaylist();
@@ -114,7 +121,6 @@ public class PaywallViewModel extends BaseViewModel {
                     itemsToPurchase.put(marketplaceId, playlist);
                     skuList.add(marketplaceId);
                 }
-                // TODO: We can also add a video to 'itemsToPurchase' and 'skuList', if we will need this option
                 billingManager.querySkuDetailsAsync(BillingClient.SkuType.INAPP, skuList,
                         (responseCode, skuDetailsList) -> {
                             if (responseCode != BillingClient.BillingResponse.OK) {
@@ -140,6 +146,35 @@ public class PaywallViewModel extends BaseViewModel {
                             }
                         });
                 break;
+            }
+            case VIDEO_TVOD: {
+                List<String> skuList = new ArrayList<>();
+                Video video = getVideo();
+                if (video != null) {
+                    String marketplaceId = getVideoMarketplaceId(video);
+                    skuList.add(marketplaceId);
+                }
+                billingManager.querySkuDetailsAsync(BillingClient.SkuType.INAPP, skuList,
+                        (responseCode, skuDetailsList) -> {
+                            if (responseCode != BillingClient.BillingResponse.OK) {
+                                Log.e(TAG, "onSkuDetailsResponse(): Error retrieving sku details from Google Play");
+                            } else {
+                                if (skuDetailsList != null) {
+                                    if (skuDetailsList.size() != skuList.size()) {
+                                        Log.e(TAG, "onSkuDetailsResponse(): Unexpected number of items (" +
+                                                skuDetailsList.size() + ") in Google Play");
+                                    } else {
+                                        PurchaseItem item = new PurchaseItem();
+                                        item.product = skuDetailsList.get(0);
+                                        item.video = video;
+                                        selectedItem = item;
+                                        setState(State.READY_FOR_PURCHASE);
+                                    }
+                                }
+                            }
+                        });
+                break;
+            }
         }
     }
 
@@ -149,9 +184,9 @@ public class PaywallViewModel extends BaseViewModel {
             public void onBillingClientSetupFinished() {
                 Log.d(TAG, "BillingManager::onBillingClientSetupFinished()");
                 if (AuthHelper.isLoggedIn()) {
-                    state.setValue(State.SIGNED_IN);
+                    setState(State.SIGNED_IN);
                 } else {
-                    state.setValue(State.SIGN_IN_REQUIRED);
+                    setState(State.SIGN_IN_REQUIRED);
                 }
             }
 
@@ -163,7 +198,18 @@ public class PaywallViewModel extends BaseViewModel {
             public void onPurchasesUpdated(List<Purchase> purchases) {
                 Log.d(TAG, "BillingManager::onPurchasesUpdated(): count=" + purchases.size());
                 if (isItemPurchased(purchases)) {
+                    if (state.getValue() == State.PURCHASE_IN_PROGRESS) {
+                        verifyVideoPurchase();
+                    }
                     isPurchased.setValue(true);
+                }
+            }
+
+            @Override
+            public void onPurchaseCancelled() {
+                Log.d(TAG, "BillingManager::onPurchaseCancelled():");
+                if (state.getValue() == State.PURCHASE_IN_PROGRESS) {
+                    setState(State.READY_FOR_PURCHASE);
                 }
             }
         };
@@ -183,15 +229,30 @@ public class PaywallViewModel extends BaseViewModel {
                     }
                 }
                 break;
+            case VIDEO_TVOD: {
+                Video video = getVideo();
+                if (video != null) {
+                    String marketplaceId = getVideoMarketplaceId(video);
+                    Log.d(TAG, "isItemPurchased(): sku=" + marketplaceId);
+                    for (Purchase purchase : purchases) {
+                        if (purchase.getSku().equals(marketplaceId)) {
+                            return true;
+                        }
+                    }
+                }
+                break;
+            }
         }
         return false;
     }
 
+    // Actions
+
     public void makePurchase(Activity activity, PurchaseItem item) {
         selectedItem = item;
         if (isPurchased.getValue()) {
-            // Force receipt validation
-            isPurchased.setValue(true);
+            setState(State.PURCHASE_IN_PROGRESS);
+            verifyVideoPurchase();
             return;
         }
         if (item.playlist != null) {
@@ -199,9 +260,42 @@ public class PaywallViewModel extends BaseViewModel {
             billingManager.initiatePurchaseFlow(activity,
                     item.product.getSku(), BillingClient.SkuType.INAPP);
         }
+        else if (item.video != null) {
+            Log.d(TAG, "makePurchase(): video, sku=" + item.product.getSku());
+            setState(State.PURCHASE_IN_PROGRESS);
+            if (isItemPurchased(billingManager.getPurchases())) {
+                verifyVideoPurchase();
+            }
+            else {
+                billingManager.initiatePurchaseFlow(activity,
+                        item.product.getSku(), BillingClient.SkuType.INAPP);
+            }
+        }
+        else {
+            Log.d(TAG, "makePurchase(): Either playlist or video must be specified");
+        }
     }
 
-    // Actions
+    private void verifyVideoPurchase() {
+        setState(State.PURCHASE_VERIFYING);
+        ZypeApp.marketplaceGateway.verifyVideoPurchase(getVideo(), selectedItem, success -> {
+            if (success) {
+//                billingManager.consumePurchase(billingManager.getPurchase(selectedItem.product.getSku()));
+                updateEntitlements(success1 -> {
+                    if (success1) {
+                        setState(State.PURCHASE_COMPLETED);
+                    }
+                    else {
+                        // TODO: Maybe add a separate error for failed loading entitlements
+                        setState(State.PURCHASE_ERROR_VERIFYING);
+                    }
+                });
+            }
+            else {
+                setState(State.PURCHASE_ERROR_VERIFYING);
+            }
+        });
+    }
 
     public void updateEntitlements(DataRepository.IDataLoading listener) {
         Handler handler = new Handler();
@@ -215,9 +309,19 @@ public class PaywallViewModel extends BaseViewModel {
         return marketplaceIds.googleplay;
     }
 
+    private String getVideoMarketplaceId(@NonNull Video video) {
+        MarketplaceIds marketplaceIds = new Gson().fromJson(video.marketplaceIds, MarketplaceIds.class);
+        return marketplaceIds.googleplay;
+    }
+
     // Util
 
     public enum State {
+        ERROR_PRODUCT_NOT_FOUND,
+        PURCHASE_COMPLETED,
+        PURCHASE_ERROR_VERIFYING,
+        PURCHASE_IN_PROGRESS,
+        PURCHASE_VERIFYING,
         READY_FOR_PURCHASE,
         SIGN_IN_REQUIRED,
         SIGNED_IN

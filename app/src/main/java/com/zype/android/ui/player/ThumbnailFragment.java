@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
+import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.video_details.VideoDetailViewModel;
@@ -130,6 +131,12 @@ public class ThumbnailFragment extends Fragment {
                     buttonWatchNow.setVisibility(View.VISIBLE);
                     buttonWatchNow.setOnClickListener(v -> NavigationHelper.getInstance(getActivity())
                             .handleLockedVideo(getActivity(), video, model.getPlaylistSync()));
+                    if (Integer.parseInt(video.purchaseRequired) == 1
+                        && ZypeConfiguration.isNativeTvodEnabled(getContext())) {
+                        // For purchase required videos, when in-pp purchases are enabled, disable
+                        // "Watch now" button, because we have a "Buy Video" button in the Video detail screen
+                        buttonWatchNow.setEnabled(false);
+                    }
                 }
             }
         };

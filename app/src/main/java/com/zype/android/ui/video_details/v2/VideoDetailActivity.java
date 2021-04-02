@@ -41,6 +41,8 @@ import com.zype.android.ui.Helpers.IPlaylistVideos;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseActivity;
 import com.zype.android.ui.base.BaseVideoActivity;
+import com.zype.android.ui.monetization.PaywallType;
+import com.zype.android.ui.monetization.PaywallViewModel;
 import com.zype.android.ui.player.PlayerViewModel;
 import com.zype.android.ui.player.ThumbnailFragment;
 import com.zype.android.ui.player.v2.PlayerFragment;
@@ -74,6 +76,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
 
     private VideoDetailViewModel model;
     private PlayerViewModel playerViewModel;
+    private PaywallViewModel paywallViewModel;
 
     Observer<Video> videoObserver = null;
     Observer<Boolean> playerIsTrailerObserver = null;
@@ -81,9 +84,11 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
 
     private FrameLayout layoutPlayer;
     private ProgressBar progressPlayer;
+    private View layoutDetails;
     private TabLayout tabs;
     private VideoDetailPager pagerSections;
     private FrameLayout layoutSummary;
+    private View actionBuyVideo;
 
     Handler handler;
     Runnable runnableHideSystemUi;
@@ -154,8 +159,9 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         String playlistId = intent.getStringExtra(EXTRA_PLAYLIST_ID);
 
         layoutPlayer = findViewById(R.id.layoutPlayer);
-
         progressPlayer = findViewById(R.id.progressPlayer);
+        layoutDetails = findViewById(R.id.layoutDetails);
+        actionBuyVideo = findViewById(R.id.actionBuyVideo);
 
         model = ViewModelProviders.of(this).get(VideoDetailViewModel.class)
                 .setVideoId(videoId)
@@ -174,7 +180,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
         }
 
         playerViewModel.isTrailer().observe(this, playerIsTrailerObserver);
-        playerViewModel.onPlayerError().observe(this, playerErrorObserver);
+        playerViewModel.getPlayerError().observe(this, playerErrorObserver);
         playerViewModel.getPlaybackState().observe(this, state -> {
             if (state != null) {
                 Logger.d("getPlaybackState(): state=" + state);
@@ -191,7 +197,11 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
             }
         });
 
-        showSections(videoId);
+        paywallViewModel = ViewModelProviders.of(this).get(PaywallViewModel.class);
+        if (ZypeConfiguration.isNativeTvodEnabled(this)) {
+            paywallViewModel.setPaywallType(PaywallType.VIDEO_TVOD);
+        }
+//        showSections(videoId);
     }
 
     private boolean hasOptions(String videoId) {
@@ -270,11 +280,14 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
                         playerViewModel.init(video.id, model.getPlaylistId(), PlayerViewModel.PlayerMode.VIDEO);
                     }
                     showPlayerFragment();
+                    showBuyAction(false);
                 }
                 else {
                     // Show paywall view
+                    paywallViewModel.setVideoId(video.id);
                     hideProgress();
                     showThumbnailFragment();
+                    showBuyAction(Integer.parseInt(video.purchaseRequired) == 1);
                 }
             }
         };
@@ -315,13 +328,18 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
 
     // UI
 
+    private void showBuyAction(boolean show) {
+        actionBuyVideo.setVisibility(show ? View.VISIBLE : GONE);
+    }
+
     private void onScreenOrientationChanged() {
         boolean fullscreen = UiUtils.isLandscapeOrientation(this);
         if (fullscreen) {
             hideSystemUI();
             findViewById(R.id.layoutRoot).setFitsSystemWindows(false);
-            tabs.setVisibility(GONE);
-            pagerSections.setVisibility(GONE);
+//            tabs.setVisibility(GONE);
+//            pagerSections.setVisibility(GONE);
+            layoutDetails.setVisibility(GONE);
             getSupportActionBar().hide();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             layoutPlayer.setLayoutParams(params);
@@ -331,10 +349,11 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
             handler.removeCallbacks(runnableHideSystemUi);
             showSystemUI();
             findViewById(R.id.layoutRoot).setFitsSystemWindows(true);
-            if (hasOptions(model.getVideo().getValue().id)) {
-                tabs.setVisibility(View.VISIBLE);
-                pagerSections.setVisibility(View.VISIBLE);
-            }
+//            if (hasOptions(model.getVideo().getValue().id)) {
+//                tabs.setVisibility(View.VISIBLE);
+//                pagerSections.setVisibility(View.VISIBLE);
+//            }
+            layoutDetails.setVisibility(View.VISIBLE);
             getSupportActionBar().show();
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             params.height = (int) getResources().getDimension(R.dimen.episode_video_height);

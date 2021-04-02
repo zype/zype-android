@@ -39,6 +39,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 import static com.zype.android.ui.monetization.PaywallActivity.EXTRA_PAYWALL_TYPE;
@@ -141,17 +142,29 @@ public class NavigationHelper {
         switchToLoginScreen(activity, null);
     }
 
-    public void handleUnAuthorizedVideo(Activity activity) {
-        Intent intent = new Intent(activity, UnAuthorizedUserActivity.class);
-        activity.startActivityForResult(intent, BundleConstants.REQUEST_USER);
-    }
-
     public void switchToLoginScreen(Activity activity, Bundle extras) {
         Intent intent = new Intent(context, LoginActivity.class);
         if (extras != null) {
             intent.putExtras(extras);
         }
         activity.startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
+    }
+
+    public void switchToLoginScreen(Fragment fragment) {
+        switchToLoginScreen(fragment, null);
+    }
+
+    public void switchToLoginScreen(Fragment fragment, Bundle extras) {
+        Intent intent = new Intent(context, LoginActivity.class);
+        if (extras != null) {
+            intent.putExtras(extras);
+        }
+        fragment.startActivityForResult(intent, BundleConstants.REQUEST_LOGIN);
+    }
+
+    public void handleUnAuthorizedVideo(Activity activity) {
+        Intent intent = new Intent(activity, UnAuthorizedUserActivity.class);
+        activity.startActivityForResult(intent, BundleConstants.REQUEST_USER);
     }
 
     public void switchToUnauthorizedUserScreen(Activity activity, Bundle extras) {
@@ -378,6 +391,12 @@ public class NavigationHelper {
                 DialogHelper.showAlert(activity,
                         context.getString(R.string.dialog_update_app_title),
                         context.getString(R.string.dialog_update_app_message));
+            }
+        }
+        else
+        if (video.registrationRequired == 1) {
+            if (!AuthHelper.isLoggedIn()) {
+                switchToUnauthorizedUserScreen(activity, extras);
             }
         }
     }

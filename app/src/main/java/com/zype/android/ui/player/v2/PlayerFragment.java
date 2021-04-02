@@ -313,7 +313,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         playerViewModel.getPlayerMode().observe(this, playerModeObserver);
         playerViewModel.getPlayerUrl().observe(this, playerUrlObserver);
-        playerViewModel.onPlayerError().observe(this, playerErrorObserver);
+        playerViewModel.getPlayerError().observe(this, playerErrorObserver);
         if (playerViewModel.isTrailer().getValue()) {
             ImageButton buttonCloseTrailer = getView().findViewById(R.id.buttonCloseTrailer);
             buttonCloseTrailer.setVisibility(View.VISIBLE);
@@ -557,17 +557,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     private void updateNextPreviousButtons() {
-        if (ZypeConfiguration.autoplayEnabled(getActivity())
-                && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
-            buttonNext.setVisibility(VISIBLE);
-            buttonPrevious.setVisibility(VISIBLE);
-            setButtonEnabled(playerViewModel.isThereNextVideo(), buttonNext);
-            setButtonEnabled(playerViewModel.isTherePreviousVideo(), buttonPrevious);
-        }
-        else {
-            buttonNext.setVisibility(GONE);
-            buttonPrevious.setVisibility(GONE);
-        }
+        buttonNext.setVisibility(VISIBLE);
+        buttonPrevious.setVisibility(VISIBLE);
+        setButtonEnabled(playerViewModel.isThereNextVideo(), buttonNext);
+        setButtonEnabled(playerViewModel.isTherePreviousVideo(), buttonPrevious);
     }
 
     private void updateFullscreenButton(boolean fullscreen) {
@@ -797,7 +790,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         // Player state management.
         long playbackPositionMs = C.TIME_UNSET;
         int windowIndex = C.INDEX_UNSET;
-        boolean playWhenReady = true;
+        boolean playWhenReady = videoViewModel.getAutoPlayback();
         if (this.currentPlayer != null) {
             int playbackState = this.currentPlayer.getPlaybackState();
             if (playbackState != Player.STATE_ENDED) {
@@ -847,6 +840,12 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             }
             return super.dispatchSetPlayWhenReady(player, playWhenReady);
         }
+
+        @Override
+        public boolean dispatchSeekTo(Player player, int windowIndex, long positionMs) {
+            playerViewModel.onSeekTo(positionMs);
+            return super.dispatchSeekTo(player, windowIndex, positionMs);
+        }
     }
 
     private class PlayerEventListener implements Player.EventListener {
@@ -862,12 +861,13 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 case Player.STATE_READY: {
                     mediaSession.setActive(true);
                     if (player != null) {
+                        handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
                         if (player.getPlayWhenReady()) {
                             handlerTimer.postDelayed(runnableAnalyticsPlayback, ANALYTICS_PLAYBACK_INTERVAL);
                             playerViewModel.onPlaybackResumed();
                         }
                         else {
-                            handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
+                            playerViewModel.onPlaybackPaused();
                         }
                     }
                     break;
@@ -907,6 +907,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         @Override
         public void onPlayerError(ExoPlaybackException e) {
             Log.e(TAG, "onPlayerError(): " + e.getMessage());
+            playerViewModel.onPlayerError();
         }
 
         @Override
@@ -1188,7 +1189,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 Logger.d("checkNextAd(): position=" + position + ", nextAdIndex="+ nextAdIndex);
                 if (position >= adSchedule.get(nextAdIndex).offset) {
                     // Disable media controls and pause the video
-                    disablePlayerControls();
+//                    disablePlayerControls();
                     pause();
                     // Request the ad
                     Logger.d("checkNextAd(): Requesting ad");
