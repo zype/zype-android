@@ -108,7 +108,7 @@ android {
                                      onesignal_app_id: "",
                                      onesignal_google_project_number: 'REMOTE',
                                      crashlyticsCollectionEnabled: "true",
-                                     facebook_sdk_enabled: "true",
+                                     facebook_sdk_enabled: "false",
                                      performanceMonitoringEnabled : "true"
             ]
         }
@@ -120,7 +120,7 @@ android {
                                      onesignal_app_id: '',
                                      onesignal_google_project_number: 'REMOTE',
                                      crashlyticsCollectionEnabled: "true",
-                                     facebook_sdk_enabled: "true",
+                                     facebook_sdk_enabled: "false",
                                      performanceMonitoringEnabled : "true"
             ]
         }
