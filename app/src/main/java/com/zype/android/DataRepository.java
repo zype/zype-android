@@ -1,6 +1,7 @@
 package com.zype.android;
 
 import android.app.Application;
+import android.text.TextUtils;
 
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Db.DbHelper;
@@ -23,7 +24,6 @@ import com.zype.android.zypeapi.model.VideoResponse;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import androidx.lifecycle.LiveData;
 
@@ -148,6 +148,7 @@ public class DataRepository {
         if (video != null) {
             if (video.isDownloadedAudio == null) video.isDownloadedAudio = 0;
             if (video.isDownloadedVideo == null) video.isDownloadedVideo = 0;
+            if (video.isFavorite == null) video.isFavorite = 0;
             if (video.isZypeLive == null) video.isZypeLive = 0;
             if (video.onAir == null) video.onAir = 0;
             if (video.playTime == null) video.playTime = 0L;
@@ -156,11 +157,30 @@ public class DataRepository {
     }
 
     public void updateVideo(Video video) {
-        db.zypeDao().updateVideo(video);
+        if(video != null) {
+            Video dbVideo = getVideoSync(video.id);
+            if(dbVideo != null) {
+                video.update(dbVideo);
+            }
+            db.zypeDao().updateVideo(video);
+        }
     }
 
     public void insertVideos(List<Video> videos) {
         db.zypeDao().insertVideos(videos);
+    }
+
+    public void updateDownloadUrl(String videoId, String url) {
+        if(TextUtils.isEmpty(videoId) || TextUtils.isEmpty(url)) {
+            return;
+        }
+
+        Video video = getVideoSync(videoId);
+
+        if(video != null) {
+            video.downloadVideoUrl = url;
+            updateVideo(video);
+        }
     }
 
     public void loadVideo(String videoId, IZypeApiListener listener) {

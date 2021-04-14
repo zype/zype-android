@@ -41,7 +41,7 @@ public class AnalyticsManager {
     }
 
     public void onPlayerEvent(String event, Video video, long position) {
-        Log.d(TAG, "onPLayerEvent(): " + event);
+        Log.d(TAG, "onPlayerEvent(): " + event);
 
         Map<String, Object> attributes = new HashMap<>();
         attributes.putAll(getVideoAttributes(video));
@@ -58,6 +58,7 @@ public class AnalyticsManager {
         result.put(AnalyticsTags.VIDEO_DURATION, (long) video.duration);
         result.put(AnalyticsTags.VIDEO_ID, video.id);
         result.put(AnalyticsTags.VIDEO_PUBLISHED_AT, video.publishedAt);
+        result.put(AnalyticsTags.VIDEO_SERIES_ID, video.seriesId);
         result.put(AnalyticsTags.VIDEO_TITLE, video.title);
         result.put(AnalyticsTags.VIDEO_UPDATED_AT, video.updatedAt);
 

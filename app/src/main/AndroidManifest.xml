@@ -249,6 +249,13 @@
             android:enabled="true"
             android:exported="false" />
 
+        <!-- Appsflyer -->
+        <receiver android:name="com.appsflyer.MultipleInstallBroadcastReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
         <!--
          Optionally, register AnalyticsReceiver and AnalyticsService to support background
          dispatching on non-Google Play devices
@@ -303,8 +310,12 @@
         </receiver>
 
       <meta-data
-        android:name="firebase_crashlytics_collection_enabled"
+        android:name="firebase_performance_collection_enabled"
         android:value="${crashlyticsCollectionEnabled}"/>
+
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="${performanceMonitoringEnabled}" />
 
     </application>
 

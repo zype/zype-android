@@ -66,6 +66,10 @@ public class VideoData {
     @Expose
     public List<String> keywords = new ArrayList<>();
 
+    @SerializedName("marketplace_ids")
+    @Expose
+    public MarketplaceIds marketplaceIds;
+
     @SerializedName("on_air")
     @Expose
     public boolean onAir;
@@ -95,6 +99,10 @@ public class VideoData {
 
     @Expose
     public String season;
+
+    @SerializedName("series_id")
+    @Expose
+    public String seriesId;
 
     @Expose
     public List<Segment> segments = new ArrayList<>();
@@ -165,7 +173,7 @@ public class VideoData {
 
     @SerializedName("purchase_price")
     @Expose
-    public float purchasePrice;
+    public String purchasePrice;
 
     @SerializedName("purchase_required")
     @Expose

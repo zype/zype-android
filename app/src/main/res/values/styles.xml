@@ -29,6 +29,12 @@
         <item name="colorAccent">@color/accent</item>
     </style>
 
+    <style name="BottomSheetDialogDark" parent="Theme.Design.BottomSheetDialog">
+    </style>
+
+    <style name="BottomSheetDialogLight" parent="Theme.Design.Light.BottomSheetDialog">
+    </style>
+
     <style name="ButtonBorder" parent="Widget.AppCompat.Button.Colored">
         <item name="colorButtonNormal">@color/white</item>
         <item name="android:textColor">?attr/colorAccent</item>

@@ -6,6 +6,7 @@ import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.BillingManager;
 import com.zype.android.Billing.SubscriptionsHelper;
+import com.zype.android.DataRepository;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.Contract;
@@ -514,6 +515,10 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         }
     }
 
+    @Override
+    public void onPurchaseCancelled() {
+    }
+
     //    -------------------SUBSCRIBE-------------------
 
     @Subscribe
@@ -537,7 +542,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
         Logger.d("handleDownloadVideo");
         String url = event.getEventData().getModelData().getResponse().getBody().getFiles().get(0).getUrl();
         String fileId = event.mFileId;
-        DownloadHelper.addVideoToDownloadList(getApplicationContext(), url, fileId);
+        DataRepository.getInstance(getApplication()).updateDownloadUrl(fileId, url);
     }
 
     @Subscribe

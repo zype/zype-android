@@ -55,6 +55,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
     private String videoId;
     private String playlistId;
+    private boolean autoPlayback = true;
 
     private Timer timer;
     private TimerTask timerTask;
@@ -114,12 +115,13 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
     private void initVideo() {
         Video video = repo.getVideoSync(videoId);
-        if(video != null)
-           videoLiveData.setValue(video);
+        if (video != null) {
+            videoLiveData.setValue(video);
+        }
 
         loadVideo(videoId);
 
-        if (video != null && video.onAir != 1) {
+        if (video != null && video.onAir != null && video.onAir != 1) {
             if (ZypeConfiguration.isDownloadsEnabled(getApplication())
                     && (ZypeConfiguration.isDownloadsForGuestsEnabled(getApplication())
                     || SettingsProvider.getInstance().isLoggedIn())) {
@@ -133,6 +135,14 @@ public class VideoDetailViewModel extends AndroidViewModel {
                 }
             }
         }
+    }
+
+    public boolean getAutoPlayback() {
+        return autoPlayback;
+    }
+
+    public void setAutoPlayback(boolean value) {
+         autoPlayback = value;
     }
 
     // Video

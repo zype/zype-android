@@ -268,7 +268,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             case R.id.menuNavigationSettings: {
                 lastSelectedTabId = item.getItemId();
                 Section section = sections.get(item.getItemId());
-                pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()));
+                pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()), false);
                 setTitle(section.title);
                 return true;
             }
@@ -511,6 +511,10 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             NavigationHelper.getInstance(this).switchToVideoDetailsScreen(this,
                     videoId, playListId, true);
         }
+    }
+
+    @Override
+    public void onPurchaseCancelled() {
     }
 
 //    @Override
