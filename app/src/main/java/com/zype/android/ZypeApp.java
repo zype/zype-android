@@ -5,6 +5,7 @@ import android.app.Application.ActivityLifecycleCallbacks;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,13 +37,17 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.onesignal.OneSignal;
 import com.squareup.otto.Subscribe;
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.Billing.MarketplaceGateway;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.analytics.AnalyticsManager;
 import com.zype.android.core.settings.SettingsProvider;
+import com.zype.android.ui.main.MainActivity;
+import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.Logger;
 import com.zype.android.utils.SharedPref;
 import com.zype.android.utils.StorageUtils;
@@ -56,8 +61,12 @@ import com.zype.android.webapi.model.app.AppData;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.zypeapi.ZypeApi;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map;
 
 
@@ -136,10 +145,7 @@ public class ZypeApp extends MultiDexApplication {
 
         // OneSignal
         if (BuildConfig.ONESIGNAL) {
-            OneSignal.startInit(this)
-                    .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
-                    .unsubscribeWhenNotificationsAreDisabled(true)
-                    .init();
+            initializeOneSignal();
         }
 
         int nightMode = AppCompatDelegate.MODE_NIGHT_NO;
@@ -384,6 +390,63 @@ public class ZypeApp extends MultiDexApplication {
         DataRepository.getInstance(this).getPlaylistsSync(ZypeConfiguration.getRootPlaylistId(this));
     }
 
+    // OneSignal
+
+    private void initializeOneSignal() {
+        if (BuildConfig.DEBUG)
+            OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
+
+        // OneSignal Initialization
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .unsubscribeWhenNotificationsAreDisabled(true).setNotificationOpenedHandler(result -> {
+
+            JSONObject jsonObject = result.toJSONObject();
+
+            if (jsonObject.has("notification")) {
+                try {
+
+                    JSONObject additionalDataObject = jsonObject.getJSONObject("notification").getJSONObject("payload").getJSONObject("additionalData");
+
+                    if (additionalDataObject.has("videoID")) {
+                        //need to check for the id
+                        final String videoId = additionalDataObject.optString("videoID");
+                        loadPush(videoId);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).init();
+    }
+
+    private void loadPush(String videoId) {
+        if (TextUtils.isEmpty(videoId)) {
+            return;
+        }
+
+        String playlistId = "";
+
+        Video video = DataRepository.getInstance(this).getVideoSync(videoId);
+
+        if (video != null) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+            if (!TextUtils.isEmpty(video.serializedPlaylistIds)) {
+                Type type = new TypeToken<List<String>>() {
+                }.getType();
+                List<String> playlistIds = new Gson().fromJson(video.serializedPlaylistIds, type);
+
+                if (playlistIds.size() > 0)
+                    playlistId = playlistIds.get(0);
+            }
+
+            intent.putExtra(BundleConstants.VIDEO_ID, videoId);
+            intent.putExtra(BundleConstants.PLAYLIST_ID, playlistId);
+            startActivity(intent);
+        }
+    }
 
     // AWS
 
