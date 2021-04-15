@@ -259,7 +259,7 @@ dependencies {
     implementation 'com.segment.analytics.android:analytics:4.7.1'
 
     //facebook sdk
-    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
+    implementation 'com.facebook.android:facebook-android-sdk:[8,9)'
     implementation 'com.google.firebase:firebase-perf:19.1.1'
 }
 
