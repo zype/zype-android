@@ -110,6 +110,7 @@ android {
                                      onesignal_app_id: "",
                                      onesignal_google_project_number: 'REMOTE',
                                      crashlyticsCollectionEnabled: "true",
+                                     facebook_sdk_enabled: "false",
                                      performanceMonitoringEnabled : "true"
             ]
         }
@@ -121,6 +122,7 @@ android {
                                      onesignal_app_id: '',
                                      onesignal_google_project_number: 'REMOTE',
                                      crashlyticsCollectionEnabled: "true",
+                                     facebook_sdk_enabled: "false",
                                      performanceMonitoringEnabled : "true"
             ]
         }
@@ -259,8 +261,9 @@ dependencies {
     // Segment Analytics
     implementation 'com.segment.analytics.android:analytics:4.7.1'
 
+    //facebook sdk
+    implementation 'com.facebook.android:facebook-android-sdk:[8,9)'
     implementation 'com.google.firebase:firebase-perf:19.1.1'
-
 }
 
 // Uncomment below line if using AWS Pinpoint
