@@ -216,8 +216,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         runnablePlaybackTime = new Runnable() {
             @Override
             public void run() {
-                if (player != null) {
-                    long currentPosition = player.getCurrentPosition();
+                if (currentPlayer != null) {
+                    long currentPosition = currentPlayer.getCurrentPosition();
                     if (!checkNextAd(currentPosition)) {
                         handlerTimer.postDelayed(this, 1000);
                     }
@@ -230,11 +230,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         // Listener to detect current playback time
         runnableAnalyticsPlayback = () -> {
-            if (player != null) {
-                long currentPosition = player.getCurrentPosition();
+            if (currentPlayer != null) {
+                long currentPosition = currentPlayer.getCurrentPosition();
                 playerViewModel.setPlaybackPosition(currentPosition);
                 playerViewModel.onPlayback();
-                if (player.getPlayWhenReady()) {
+                if (currentPlayer.getPlayWhenReady()) {
                     handlerTimer.postDelayed(runnableAnalyticsPlayback, ANALYTICS_PLAYBACK_INTERVAL);
                 }
             }
@@ -392,7 +392,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         castSessionManager.removeSessionManagerListener(castSessionManagerListener, CastSession.class);
         castSession = null;
 
-        if (player != null) {
+        if (currentPlayer != null && currentPlayer == player) {
             if (playerViewModel.isBackgroundPlaybackEnabled()) {
 //                player.setBackgrounded(true);
             }
@@ -414,7 +414,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     @Override
     public void onStop() {
         Logger.d("onStop()");
-        if (player != null) {
+        if (currentPlayer != null && currentPlayer == player) {
             if (playerViewModel.isBackgroundPlaybackEnabled()) {
                 showNotification();
             }
@@ -459,7 +459,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             Logger.d("getPlayerMode(): playerMode=" + playerMode);
             if (playerMode != null) {
                 if (playerViewModel.playbackPositionRestored()) {
-                    playerViewModel.savePlaybackPosition(player.getCurrentPosition());
+                    playerViewModel.savePlaybackPosition(currentPlayer.getCurrentPosition());
                 }
                 if (playerMode == PlayerViewModel.PlayerMode.VIDEO) {
                     playerView.setUseArtwork(false);
@@ -490,20 +490,14 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
                 attachPlayerToAnalyticsManager(playerUrl);
 
-//                MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playerUrl);
-//                if (mediaSource != null && player != null) {
-//                    if (videoViewModel.getVideoSync().onAir != 1
-//                        && !playerViewModel.isTrailer().getValue()) {
-//                        player.seekTo(playerViewModel.getPlaybackPosition());
-//                        playerViewModel.onPlaybackPositionRestored();
-//                    }
-//                    player.prepare(mediaSource, false, false);
-//                    if (!playerViewModel.isTrailer().getValue()) {
-//                        startAds();
-//                    }
-//                }
-                setCurrentPlayer(castPlayer.isCastSessionAvailable() ? castPlayer : player);
-                preparePlayer(playerUrl);
+                if (castPlayer.isCastSessionAvailable()) {
+                    setCurrentPlayer(castPlayer);
+                    prepareCastPlayer(playerUrl);
+                }
+                else {
+                    setCurrentPlayer(player);
+                    preparePlayer(playerUrl);
+                }
                 updateNextPreviousButtons();
             }
         };
@@ -706,10 +700,10 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             trackSelector = new DefaultTrackSelector();
 
             PlayerEventListener playerEventListener = new PlayerEventListener();
+            PlayerEventListener castPlayerEventListener = new PlayerEventListener();
 
             player = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
             player.addListener(playerEventListener);
-
             playerView.setPlayer(player);
             playerView.setControlDispatcher(new PlayerControlDispatcher());
 
@@ -728,7 +722,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     }
 
     private void preparePlayer(String playUrl) {
-        if (currentPlayer == player) {
+        Logger.d("preparePlayer()");
+//        if (currentPlayer == player) {
             MediaSource mediaSource = playerViewModel.getMediaSource(getActivity(), playUrl);
             if (mediaSource != null && player != null) {
                 if (videoViewModel.getVideoSync().onAir != 1
@@ -741,15 +736,25 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     startAds();
                 }
             }
-        }
-        else {
-            MediaQueueItem[] items = new MediaQueueItem[1];
-            items[0] = playerViewModel.buildMediaQueueItem(videoViewModel.getVideoSync(), playUrl);
-            castPlayer.loadItems(items,
-                    0,
-                    playerViewModel.getPlaybackPosition(),
-                    Player.REPEAT_MODE_OFF);
-        }
+//        }
+//        else {
+//            MediaQueueItem[] items = new MediaQueueItem[1];
+//            items[0] = playerViewModel.buildMediaQueueItem(videoViewModel.getVideoSync(), playUrl);
+//            castPlayer.loadItems(items,
+//                    0,
+//                    playerViewModel.getPlaybackPosition(),
+//                    Player.REPEAT_MODE_OFF);
+//        }
+    }
+
+    private void prepareCastPlayer(String playerUrl) {
+        Logger.d("prepareCastPlayer()");
+        MediaQueueItem[] items = new MediaQueueItem[1];
+        items[0] = playerViewModel.buildMediaQueueItem(videoViewModel.getVideoSync(), playerUrl);
+        castPlayer.loadItems(items,
+                0,
+                playerViewModel.getPlaybackPosition(),
+                Player.REPEAT_MODE_OFF);
     }
 
     private void releasePlayer() {
@@ -769,19 +774,19 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         }
     }
 
-    private void setCurrentPlayer(Player currentPlayer) {
-        if (this.currentPlayer == currentPlayer) {
+    private void setCurrentPlayer(Player newPlayer) {
+        if (currentPlayer == newPlayer) {
             return;
         }
 
-        Logger.d("setCurrentPlayer(): currentPlayer=" + currentPlayer.toString());
+        Logger.d("setCurrentPlayer(): newPlayer=" + newPlayer.toString());
         // View management.
-        if (currentPlayer == player) {
+        if (newPlayer == player) {
             playerView.setVisibility(View.VISIBLE);
-            castView.setVisibility(View.GONE);
+            castView.setVisibility(View.INVISIBLE);
             castControlView.hide();
         } else {
-            playerView.setVisibility(View.GONE);
+            playerView.setVisibility(View.INVISIBLE);
             castView.setVisibility(View.VISIBLE);
             castControlView.show();
             updateCastControls(castControlView);
@@ -792,38 +797,22 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         int windowIndex = C.INDEX_UNSET;
         boolean playWhenReady = videoViewModel.getAutoPlayback();
         if (this.currentPlayer != null) {
-            int playbackState = this.currentPlayer.getPlaybackState();
+            int playbackState = currentPlayer.getPlaybackState();
             if (playbackState != Player.STATE_ENDED) {
-                playbackPositionMs = this.currentPlayer.getCurrentPosition();
-                playWhenReady = this.currentPlayer.getPlayWhenReady();
-                windowIndex = this.currentPlayer.getCurrentWindowIndex();
+                playbackPositionMs = currentPlayer.getCurrentPosition();
+                playWhenReady = currentPlayer.getPlayWhenReady();
+                windowIndex = currentPlayer.getCurrentWindowIndex();
 //                if (windowIndex != currentItemIndex) {
 //                    playbackPositionMs = C.TIME_UNSET;
 //                    windowIndex = currentItemIndex;
 //                }
             }
-            this.currentPlayer.stop(false);
+            pause();
         } else {
             // This is the initial setup. No need to save any state.
         }
 
-        this.currentPlayer = currentPlayer;
-
-//        // Media queue management.
-//        castMediaQueueCreationPending = currentPlayer == castPlayer;
-//        if (currentPlayer == exoPlayer) {
-//            dynamicConcatenatingMediaSource = new DynamicConcatenatingMediaSource();
-//            for (int i = 0; i < mediaQueue.size(); i++) {
-//                dynamicConcatenatingMediaSource.addMediaSource(buildMediaSource(mediaQueue.get(i)));
-//            }
-//            exoPlayer.prepare(dynamicConcatenatingMediaSource);
-//        }
-//
-//        // Playback transition.
-//        if (windowIndex != C.INDEX_UNSET) {
-//            setCurrentItem(windowIndex, playbackPositionMs, playWhenReady);
-//        }
-
+        currentPlayer = newPlayer;
         currentPlayer.seekTo(playbackPositionMs);
         currentPlayer.setPlayWhenReady(playWhenReady);
     }
@@ -860,9 +849,9 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                     break;
                 case Player.STATE_READY: {
                     mediaSession.setActive(true);
-                    if (player != null) {
+                    if (currentPlayer != null) {
                         handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
-                        if (player.getPlayWhenReady()) {
+                        if (currentPlayer.getPlayWhenReady()) {
                             handlerTimer.postDelayed(runnableAnalyticsPlayback, ANALYTICS_PLAYBACK_INTERVAL);
                             playerViewModel.onPlaybackResumed();
                         }
@@ -883,7 +872,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                         AnalyticsManager.getInstance().trackStop();
 
                         handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
-                        playerViewModel.setPlaybackPosition(player.getCurrentPosition());
+                        playerViewModel.setPlaybackPosition(currentPlayer.getCurrentPosition());
                         playerViewModel.onPlaybackFinished();
                         playerViewModel.savePlaybackPosition(0);
 
@@ -936,15 +925,15 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
         public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
             Logger.d("PlayerEventListener::onTimelineChanged():");
             if (videoViewModel.getVideoSync().onAir == 1) {
-                updatePositionLive(timeline, player.getCurrentPosition());
+                updatePositionLive(timeline, currentPlayer.getCurrentPosition());
             }
         }
     }
 
     private void play() {
         Logger.d("play()");
-        if (player != null) {
-            player.setPlayWhenReady(true);
+        if (currentPlayer != null) {
+            currentPlayer.setPlayWhenReady(true);
             mediaSession.setActive(true);
             startAdsTimer();
         }
@@ -952,8 +941,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
     private void pause() {
         Logger.d("pause()");
-        if (player != null) {
-            player.setPlayWhenReady(false);
+        if (currentPlayer != null) {
+            currentPlayer.setPlayWhenReady(false);
             stopAdsTimer();
         }
     }
@@ -964,7 +953,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private void stop() {
         pause();
         if (playerViewModel.playbackPositionRestored()) {
-            playerViewModel.savePlaybackPosition(player.getCurrentPosition());
+            playerViewModel.savePlaybackPosition(currentPlayer.getCurrentPosition());
         }
         releasePlayer();
         mediaSession.setActive(false);
@@ -1233,7 +1222,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 isAdDisplayed = false;
                 // Update next ad to play
                 updateNextAd();
-                if (!checkNextAd(player.getCurrentPosition())) {
+                if (!checkNextAd(currentPlayer.getCurrentPosition())) {
                     // Resume video
                     enablePlayerControls();
                     play();
@@ -1262,8 +1251,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public void onAdError(AdErrorEvent adErrorEvent) {
         Logger.e("Ad error: " + adErrorEvent.getError().getMessage());
         updateNextAd();
-        if (player != null) {
-            if (!checkNextAd(player.getCurrentPosition())) {
+        if (currentPlayer != null) {
+            if (!checkNextAd(currentPlayer.getCurrentPosition())) {
                 // Resume video
                 enablePlayerControls();
                 play();
@@ -1619,14 +1608,15 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private class CastSessionAvailabilityListener implements CastPlayer.SessionAvailabilityListener {
         @Override
         public void onCastSessionAvailable() {
+            Logger.d("onCastSessionAvailable()");
             setCurrentPlayer(castPlayer);
-            preparePlayer(playerViewModel.getPlayerUrl().getValue());
+            prepareCastPlayer(playerViewModel.getPlayerUrl().getValue());
         }
 
         @Override
         public void onCastSessionUnavailable() {
+            Logger.d("onCastSessionUnavailable()");
             setCurrentPlayer(player);
-            preparePlayer(playerViewModel.getPlayerUrl().getValue());
         }
     }
 }
