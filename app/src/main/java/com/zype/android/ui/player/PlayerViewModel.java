@@ -460,8 +460,21 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
         Logger.d("setMediaTypeAvailable(): mediaType=" + mediaType + ", available=" + available);
         if (isMediaTypeAvailable(mediaType)) {
             if (!available) {
-                availablePlayerModes.getValue().remove(mediaType);
-                availablePlayerModes.setValue(availablePlayerModes.getValue());
+                List<PlayerMode> currentPlayerModes = availablePlayerModes.getValue();
+                currentPlayerModes.remove(mediaType);
+                // This is a hack for the case when we disable VIDEO player mode for audio only video.
+                // We don't have an audio player url, because the API returns empty media url list
+                // when the audio=true parameter is specified.
+                // So we just use video player url as an audion one.
+                if (mediaType == PlayerMode.VIDEO && currentPlayerModes.isEmpty()) {
+                    currentPlayerModes.add(PlayerMode.AUDIO);
+                    Video video = repo.getVideoSync(videoId);
+                    if (video != null) {
+                        video.playerAudioUrl = video.playerVideoUrl;
+                        repo.updateVideo(video);
+                    }
+                }
+                availablePlayerModes.setValue(currentPlayerModes);
             }
         }
         else {

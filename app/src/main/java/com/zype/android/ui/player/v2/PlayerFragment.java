@@ -1572,27 +1572,9 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
             private void onApplicationConnected(CastSession castSession) {
                 PlayerFragment.this.castSession = castSession;
-//                if (null != mSelectedMedia) {
-//
-//                    if (mPlaybackState == PlaybackState.PLAYING) {
-//                        mVideoView.pause();
-//                        loadRemoteMedia(mSeekbar.getProgress(), true);
-//                        return;
-//                    } else {
-//                        mPlaybackState = PlaybackState.IDLE;
-//                        updatePlaybackLocation(PlaybackLocation.REMOTE);
-//                    }
-//                }
-//                updatePlayButton(mPlaybackState);
-//                supportInvalidateOptionsMenu();
             }
 
             private void onApplicationDisconnected() {
-//                updatePlaybackLocation(PlaybackLocation.LOCAL);
-//                mPlaybackState = PlaybackState.IDLE;
-//                mLocation = PlaybackLocation.LOCAL;
-//                updatePlayButton(mPlaybackState);
-//                supportInvalidateOptionsMenu();
             }
         };
     }
