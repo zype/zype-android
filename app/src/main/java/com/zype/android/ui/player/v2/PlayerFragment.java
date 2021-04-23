@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
+import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -78,6 +79,7 @@ import com.google.android.exoplayer2.ui.TrackSelectionView;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.gms.cast.MediaQueueItem;
+import com.google.android.gms.cast.MediaStatus;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
@@ -846,6 +848,12 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                 case Player.STATE_IDLE:
                     handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
                     imageThumbnail.setVisibility(VISIBLE);
+                    if (currentPlayer == castPlayer &&
+                        castSession != null &&
+                        castSession.getRemoteMediaClient().getIdleReason() == MediaStatus.IDLE_REASON_FINISHED) {
+                        Logger.d("onPlayerStateChanged(): Casting finished");
+                        onVideoFinished();
+                    }
                     break;
                 case Player.STATE_READY: {
                     mediaSession.setActive(true);
@@ -869,17 +877,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
                         break;
                     }
                     if (playerViewModel.getPlaybackState().getValue() != playbackState) {
-                        AnalyticsManager.getInstance().trackStop();
-
-                        handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
-                        playerViewModel.setPlaybackPosition(currentPlayer.getCurrentPosition());
-                        playerViewModel.onPlaybackFinished();
-                        playerViewModel.savePlaybackPosition(0);
-
-                        if (ZypeConfiguration.autoplayEnabled(getActivity())
-                                && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
-                            onNext();
-                        }
+                        onVideoFinished();
                     }
                     break;
                 }
@@ -923,7 +921,7 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         @Override
         public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
-            Logger.d("PlayerEventListener::onTimelineChanged():");
+            Logger.d("PlayerEventListener::onTimelineChanged(): reason=" + reason + ", currentPlayer=" + currentPlayer);
             if (videoViewModel.getVideoSync().onAir == 1) {
                 updatePositionLive(timeline, currentPlayer.getCurrentPosition());
             }
@@ -969,6 +967,20 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
             }
         }
         return result;
+    }
+
+    private void onVideoFinished() {
+        AnalyticsManager.getInstance().trackStop();
+
+        handlerTimer.removeCallbacks(runnableAnalyticsPlayback);
+        playerViewModel.setPlaybackPosition(currentPlayer.getCurrentPosition());
+        playerViewModel.onPlaybackFinished();
+        playerViewModel.savePlaybackPosition(0);
+
+        if (ZypeConfiguration.autoplayEnabled(getActivity())
+                && SettingsProvider.getInstance().getBoolean(SettingsProvider.AUTOPLAY)) {
+            onNext();
+        }
     }
 
     // Media session
@@ -1534,47 +1546,62 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
             @Override
             public void onSessionEnded(CastSession session, int error) {
-                currentPlayer.stop(true);
+                Logger.d("SessionManagerListener::onSessionEnded()");
+//                currentPlayer.stop(true);
                 onApplicationDisconnected();
             }
 
             @Override
             public void onSessionResumed(CastSession session, boolean wasSuspended) {
+                Logger.d("SessionManagerListener::onSessionResumed()");
                 onApplicationConnected(session);
             }
 
             @Override
             public void onSessionResumeFailed(CastSession session, int error) {
+                Logger.d("SessionManagerListener::onSessionResumeFailed()");
                 onApplicationDisconnected();
             }
 
             @Override
             public void onSessionStarted(CastSession session, String sessionId) {
+                Logger.d("SessionManagerListener::onSessionStarted()");
                 onApplicationConnected(session);
             }
 
             @Override
             public void onSessionStartFailed(CastSession session, int error) {
+                Logger.d("SessionManagerListener::onSessionStartFailed()");
                 onApplicationDisconnected();
             }
 
             @Override
-            public void onSessionStarting(CastSession session) {}
+            public void onSessionStarting(CastSession session) {
+                Logger.d("SessionManagerListener::onSessionStarting()");
+            }
 
             @Override
-            public void onSessionEnding(CastSession session) {}
+            public void onSessionEnding(CastSession session) {
+                Logger.d("SessionManagerListener::onSessionEnding()");
+            }
 
             @Override
-            public void onSessionResuming(CastSession session, String sessionId) {}
+            public void onSessionResuming(CastSession session, String sessionId) {
+                Logger.d("SessionManagerListener::onSessionResuming()");
+            }
 
             @Override
-            public void onSessionSuspended(CastSession session, int reason) {}
+            public void onSessionSuspended(CastSession session, int reason) {
+                Logger.d("SessionManagerListener::onSessionSuspended()");
+            }
 
             private void onApplicationConnected(CastSession castSession) {
+                Logger.d("SessionManagerListener::onApplicationConnected()");
                 PlayerFragment.this.castSession = castSession;
             }
 
             private void onApplicationDisconnected() {
+                Logger.d("SessionManagerListener::onApplicationDisconnected()");
             }
         };
     }

@@ -816,6 +816,7 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     public MediaQueueItem buildMediaQueueItem(Video video, String contentUri) {
+        Logger.d("buildMediaQueueItem(): contentUri=" + contentUri);
         int mediaType;
         String contentType;
         if (playerMode.getValue() == PlayerMode.AUDIO) {
