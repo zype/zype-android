@@ -19,9 +19,15 @@ import com.zype.android.webapi.events.zobject.ZObjectEvent;
 import com.zype.android.webapi.model.playlist.PlaylistData;
 import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.webapi.model.zobjects.ZobjectData;
+import com.zype.android.zypeapi.ZypeApi;
+import com.zype.android.zypeapi.model.PlaylistsResponse;
+import com.zype.android.zypeapi.model.ZObjectTopPlaylist;
+import com.zype.android.zypeapi.model.ZObjectTopPlaylistResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -41,18 +47,20 @@ public class HeroImagesViewModel extends AndroidViewModel {
     private long TIMER_PERIOD = 7000;
 
     DataRepository repo;
-    WebApiManager api;
+    ZypeApi api;
+    WebApiManager oldApi;
 
     public HeroImagesViewModel(Application application) {
         super(application);
         repo = DataRepository.getInstance(application);
-        api = WebApiManager.getInstance();
-        api.subscribe(this);
+        api = ZypeApi.getInstance();
+        oldApi = WebApiManager.getInstance();
+        oldApi.subscribe(this);
     }
 
     @Override
     protected void onCleared() {
-        api.unsubscribe(this);
+        oldApi.unsubscribe(this);
         super.onCleared();
     }
 
@@ -99,31 +107,52 @@ public class HeroImagesViewModel extends AndroidViewModel {
     }
 
     private void loadHeroImages() {
-        ZObjectParamsBuilder builder = new ZObjectParamsBuilder()
-                .addType(ZObjectParamsBuilder.TYPE_TOP_PLAYLISTS);
-        api.executeRequest(WebApiManager.Request.Z_OBJECT, builder.build());
+        api.getZObjectTopPlayLists(response -> {
+            if (response.isSuccessful) {
+                List<HeroImage> heroImages = new ArrayList<>();
+                List<ZObjectTopPlaylist> topPlaylists = response.data.topPlaylists;
+                Collections.sort(topPlaylists, (o1, o2) -> o1.priority.compareTo(o2.priority));
+                for (ZObjectTopPlaylist item : topPlaylists) {
+                    HeroImage heroImage = new HeroImage();
+                    heroImage.playlistId = item.playlistId;
+                    heroImage.videoId = item.videoId;
+                    if (item.images != null && item.images.size() > 0) {
+                        heroImage.imageUrl = item.images.get(0).url;
+                    }
+                    heroImages.add(heroImage);
+                    if (!TextUtils.isEmpty(item.playlistId)) {
+                        loadPlaylist(item.playlistId);
+                    }
+                    loadVideo(item.videoId);
+                }
+                data.setValue(heroImages);
+            }
+        });
+//        ZObjectParamsBuilder builder = new ZObjectParamsBuilder()
+//                .addType(ZObjectParamsBuilder.TYPE_TOP_PLAYLISTS);
+//        oldApi.executeRequest(WebApiManager.Request.Z_OBJECT, builder.build());
     }
 
-    @Subscribe
-    public void handleZObject(ZObjectEvent event) {
-        Logger.d("handleZObject()");
-        List<ZobjectData> zobjectData = event.getEventData().getModelData().getResponse();
-        List<HeroImage> heroImages = new ArrayList<>();
-        for (ZobjectData item : zobjectData) {
-            HeroImage heroImage = new HeroImage();
-            heroImage.playlistId = item.playlistId;
-            heroImage.videoId = item.videoId;
-            if (item.getPictures() != null && item.getPictures().size() > 0) {
-                heroImage.imageUrl = item.getPictures().get(0).getUrl();
-            }
-            heroImages.add(heroImage);
-            if (!TextUtils.isEmpty(item.playlistId)) {
-                loadPlaylist(item.playlistId);
-            }
-            loadVideo(item.videoId);
-        }
-        data.setValue(heroImages);
-    }
+//    @Subscribe
+//    public void handleZObject(ZObjectEvent event) {
+//        Logger.d("handleZObject()");
+//        List<ZobjectData> zobjectData = event.getEventData().getModelData().getResponse();
+//        List<HeroImage> heroImages = new ArrayList<>();
+//        for (ZobjectData item : zobjectData) {
+//            HeroImage heroImage = new HeroImage();
+//            heroImage.playlistId = item.playlistId;
+//            heroImage.videoId = item.videoId;
+//            if (item.getPictures() != null && item.getPictures().size() > 0) {
+//                heroImage.imageUrl = item.getPictures().get(0).getUrl();
+//            }
+//            heroImages.add(heroImage);
+//            if (!TextUtils.isEmpty(item.playlistId)) {
+//                loadPlaylist(item.playlistId);
+//            }
+//            loadVideo(item.videoId);
+//        }
+//        data.setValue(heroImages);
+//    }
 
     /**
      * Make API request for playlist with specified id
