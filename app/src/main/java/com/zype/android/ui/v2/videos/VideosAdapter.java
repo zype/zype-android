@@ -239,20 +239,23 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
                                     .setLabel("id=" + holder.item.id)
                                     .build();
                             break;
-//                            case ITEM_SHARE:
-//                                videoActionListener.onShareVideo(holder.item.id);
-//                                event = new HitBuilders.EventBuilder()
-//                                        .setAction("Share")
-//                                        .setLabel("id=" + holder.item.id)
-//                                        .build();
-//                                break;
-                            case ITEM_DOWNLOAD_STOP:
-                                DownloadHelper.stopDownload(holder.view.getContext().getContentResolver(), holder.item.id);
-                                event = new HitBuilders.EventBuilder()
-                                        .setAction("Stop Download")
-                                        .setLabel("id=" + holder.item.id)
-                                        .build();
-                                break;
+                        case ITEM_SHARE:
+                            if (menuListener != null) {
+                                menuListener.onMenuItemSelected(VideoActionsHelper.ACTION_SHARE, holder.item);
+                            }
+//                            videoActionListener.onShareVideo(holder.item.id);
+                            event = new HitBuilders.EventBuilder()
+                                    .setAction("Share")
+                                    .setLabel("id=" + holder.item.id)
+                                    .build();
+                            break;
+                        case ITEM_DOWNLOAD_STOP:
+                            DownloadHelper.stopDownload(holder.view.getContext().getContentResolver(), holder.item.id);
+                            event = new HitBuilders.EventBuilder()
+                                    .setAction("Stop Download")
+                                    .setLabel("id=" + holder.item.id)
+                                    .build();
+                            break;
 //                            case ITEM_DOWNLOAD_AUDIO:
 //                                videoActionListener.onDownloadAudio(holder.item.id);
 //                                event = new HitBuilders.EventBuilder()
@@ -267,30 +270,30 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
 //                                        .setLabel("id=" + holder.item.id)
 //                                        .build();
 //                                break;
-                            case ITEM_DELETE_AUDIO:
-                                FileUtils.deleteAudioFile(holder.item.id, holder.view.getContext());
-                                DataHelper.setAudioDeleted(holder.view.getContext().getContentResolver(), holder.item.id);
-                                event = new HitBuilders.EventBuilder()
-                                        .setAction("Delete Downloaded Audio")
-                                        .setLabel("id=" + holder.item.id)
-                                        .build();
-                                break;
-                            case ITEM_DELETE_VIDEO:
-                                FileUtils.deleteVideoFile(holder.item.id, holder.view.getContext());
-                                DataHelper.setVideoDeleted(holder.view.getContext().getContentResolver(), holder.item.id);
-                                event = new HitBuilders.EventBuilder()
-                                        .setAction("Delete Downloaded VideoList")
-                                        .setLabel("id=" + holder.item.id)
-                                        .build();
-                                break;
-                            default:
-                                throw new IllegalStateException("unknown id=" + fragment.getList().get(position).getId());
-                        }
-                        fragment.dismiss();
-                        if (tracker != null) {
-                            tracker.send(event);
-                        }
+                        case ITEM_DELETE_AUDIO:
+                            FileUtils.deleteAudioFile(holder.item.id, holder.view.getContext());
+                            DataHelper.setAudioDeleted(holder.view.getContext().getContentResolver(), holder.item.id);
+                            event = new HitBuilders.EventBuilder()
+                                    .setAction("Delete Downloaded Audio")
+                                    .setLabel("id=" + holder.item.id)
+                                    .build();
+                            break;
+                        case ITEM_DELETE_VIDEO:
+                            FileUtils.deleteVideoFile(holder.item.id, holder.view.getContext());
+                            DataHelper.setVideoDeleted(holder.view.getContext().getContentResolver(), holder.item.id);
+                            event = new HitBuilders.EventBuilder()
+                                    .setAction("Delete Downloaded VideoList")
+                                    .setLabel("id=" + holder.item.id)
+                                    .build();
+                            break;
+                        default:
+                            throw new IllegalStateException("unknown id=" + fragment.getList().get(position).getId());
                     }
+                    fragment.dismiss();
+                    if (tracker != null) {
+                        tracker.send(event);
+                    }
+                }
             });
             fragment.show(((Activity) holder.view.getContext()).getFragmentManager(), "menu");
 //            }

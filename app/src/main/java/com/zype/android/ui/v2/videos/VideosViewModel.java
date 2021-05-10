@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_FAVORITE;
+import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_SHARE;
 import static com.zype.android.ui.v2.videos.VideoActionsHelper.ACTION_UNFAVORITE;
 
 /**
@@ -69,6 +70,9 @@ public abstract class VideosViewModel extends BaseViewModel {
                 break;
             case ACTION_UNFAVORITE:
                 VideoActionsHelper.onUnfavorite(video, getApplication(), listener);
+                break;
+            case ACTION_SHARE:
+                VideoActionsHelper.onShareVideo(video, getApplication());
                 break;
         }
     }
