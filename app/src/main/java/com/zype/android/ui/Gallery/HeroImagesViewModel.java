@@ -41,7 +41,7 @@ import androidx.lifecycle.MutableLiveData;
  */
 public class HeroImagesViewModel extends AndroidViewModel {
     private MutableLiveData<List<HeroImage>> data;
-    private MutableLiveData<Integer> currentPage;
+    private MutableLiveData<Integer> currentPage = new MutableLiveData<>();
     private Timer timer;
     private TimerTask timerTask;
     private long TIMER_PERIOD = 7000;
@@ -72,9 +72,15 @@ public class HeroImagesViewModel extends AndroidViewModel {
         return data;
     }
 
+    public void setCurrentPage(int page) {
+        if (currentPage.getValue() == null || currentPage.getValue() != page) {
+            Logger.d("setCurrentPage(): page=" + page);
+            currentPage.setValue(page);
+        }
+    }
+
     public LiveData<Integer> startTimer(int startPage) {
-        currentPage = new MutableLiveData<>();
-        currentPage.setValue(startPage);
+//        currentPage.setValue(startPage);
 
         if (timer == null) {
             timer = new Timer();
@@ -86,12 +92,12 @@ public class HeroImagesViewModel extends AndroidViewModel {
         timerTask = new TimerTask() {
             @Override
             public void run() {
-//                if (currentPage.getValue() == data.getValue().size() - 1) {
-//                    currentPage.postValue(0);
-//                }
-//                else {
+                if (currentPage.getValue() == data.getValue().size() - 1) {
+                    currentPage.postValue(0);
+                }
+                else {
                     currentPage.postValue(currentPage.getValue() + 1);
-//                }
+                }
             }
         };
         timer.schedule(timerTask, 0, TIMER_PERIOD);
