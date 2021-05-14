@@ -37,6 +37,7 @@ import java.util.TimerTask;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
@@ -52,6 +53,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
     private MutableLiveData<Video> videoLiveData = new MutableLiveData<>();
     private MutableLiveData<Boolean> onAir = new MutableLiveData<>();
     private MutableLiveData<Boolean> fullscreen = new MutableLiveData<>();
+    private MutableLiveData<Boolean> downloadsAvailableLiveData = new MutableLiveData<>();
 
     private String videoId;
     private String playlistId;
@@ -121,6 +123,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
         loadVideo(videoId);
 
+        boolean isDownloadsAvailable = false;
         if (video != null && video.onAir != null && video.onAir != 1) {
             if (ZypeConfiguration.isDownloadsEnabled(getApplication())
                     && (ZypeConfiguration.isDownloadsForGuestsEnabled(getApplication())
@@ -129,12 +132,19 @@ public class VideoDetailViewModel extends AndroidViewModel {
                     || video.isDownloadedVideo == 0) {
                     loadVideoDownloadUrl(videoId);
                 }
+                else {
+                    isDownloadsAvailable = true;
+                }
                 if (TextUtils.isEmpty(video.downloadAudioUrl)
                     || video.isDownloadedAudio == 0) {
                     loadAudioDownloadUrl(videoId);
                 }
+                else {
+                    isDownloadsAvailable = true;
+                }
             }
         }
+        downloadsAvailableLiveData.setValue(isDownloadsAvailable);
     }
 
     public boolean getAutoPlayback() {
@@ -173,6 +183,12 @@ public class VideoDetailViewModel extends AndroidViewModel {
             // When trailer playback is finished just fire video detail event with existing data
             videoLiveData.setValue(videoLiveData.getValue());
         }
+    }
+
+    // Downloads
+
+    public LiveData<Boolean> downloadsAvailable() {
+        return downloadsAvailableLiveData;
     }
 
     // On air
@@ -370,6 +386,10 @@ public class VideoDetailViewModel extends AndroidViewModel {
             Video video = repo.getVideoSync(videoId);
             video.downloadAudioUrl = url;
             repo.updateVideo(video);
+
+            if (!TextUtils.isEmpty(url)) {
+                downloadsAvailableLiveData.setValue(true);
+            }
         }
         else {
             Logger.e("handleDownloadVideo(): m4a or mp3 source not found");
@@ -427,6 +447,10 @@ public class VideoDetailViewModel extends AndroidViewModel {
             Video video = repo.getVideoSync(videoId);
             video.downloadVideoUrl = url;
             repo.updateVideo(video);
+
+            if (!TextUtils.isEmpty(url)) {
+                downloadsAvailableLiveData.setValue(true);
+            }
         }
         else {
             Logger.e("handleDownloadVideo(): mp4 source not found");

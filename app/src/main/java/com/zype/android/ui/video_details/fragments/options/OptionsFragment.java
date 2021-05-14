@@ -214,10 +214,15 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
 
         videoDetailViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
         videoDetailViewModel.getVideo().observe(this, video -> {
+            Logger.d("getVideo(): videoId=" + video.id);
             if (video != null) {
                 videoId = video.id;
                 initOptions(video);
             }
+        });
+        videoDetailViewModel.downloadsAvailable().observe(this, downloadsAvailable -> {
+            Logger.d("downloadsAvailable(): " + downloadsAvailable);
+            initOptions(videoDetailViewModel.getVideoSync());
         });
 
         playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
