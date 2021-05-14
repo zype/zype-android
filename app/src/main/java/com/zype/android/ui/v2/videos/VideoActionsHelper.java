@@ -121,6 +121,7 @@ public class VideoActionsHelper {
 
     public static void onShareVideo(Video video, Application context) {
         Intent sendIntent = new Intent();
+        sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         String title = video.getTitle();
         String imageUrl = "";
         if (video.thumbnails != null) {
@@ -132,6 +133,9 @@ public class VideoActionsHelper {
         String message = String.format(context.getString(R.string.share_message), title, context.getString(R.string.app_name));
         sendIntent.putExtra(Intent.EXTRA_TEXT, message);
         sendIntent.setType("text/html");
-        context.startActivity(Intent.createChooser(sendIntent, context.getResources().getText(R.string.menu_share)));
+
+        Intent chooserIntent = Intent.createChooser(sendIntent, context.getResources().getText(R.string.menu_share));
+        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(chooserIntent);
     }
 }
