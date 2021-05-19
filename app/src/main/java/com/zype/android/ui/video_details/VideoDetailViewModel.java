@@ -339,20 +339,24 @@ public class VideoDetailViewModel extends AndroidViewModel {
         Logger.d("loadAudioDownloadUrl(): videoId=" + videoId);
 
         if (AuthHelper.isLoggedIn()) {
-            AuthHelper.onLoggedIn(new Observer<Boolean>() {
-                @Override
-                public void onChanged(@Nullable Boolean isLoggedIn) {
-                    DownloadAudioParamsBuilder builder = new DownloadAudioParamsBuilder();
-                    if (SettingsProvider.getInstance().isLoggedIn()) {
-                        builder.addAccessToken();
-                    }
-                    else {
-                        builder.addAppKey();
-                    }
-                    builder.addAudioId(videoId);
-                    oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, builder.build());
-                }
-            });
+//            AuthHelper.onLoggedIn(new Observer<Boolean>() {
+//                @Override
+//                public void onChanged(@Nullable Boolean isLoggedIn) {
+//                    DownloadAudioParamsBuilder builder = new DownloadAudioParamsBuilder();
+//                    if (SettingsProvider.getInstance().isLoggedIn()) {
+//                        builder.addAccessToken();
+//                    }
+//                    else {
+//                        builder.addAppKey();
+//                    }
+//                    builder.addAudioId(videoId);
+//                    oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, builder.build());
+//                }
+//            });
+            DownloadAudioParamsBuilder builder = new DownloadAudioParamsBuilder();
+            builder.addAccessToken();
+            builder.addAudioId(videoId);
+            oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, builder.build());
         }
         else {
             DownloadAudioParamsBuilder builder = new DownloadAudioParamsBuilder();
@@ -405,20 +409,24 @@ public class VideoDetailViewModel extends AndroidViewModel {
         Logger.d("loadVideoDownloadUrl(): videoId=" + videoId);
 
         if (AuthHelper.isLoggedIn()) {
-            AuthHelper.onLoggedIn(new Observer<Boolean>() {
-                @Override
-                public void onChanged(@Nullable Boolean isLoggedIn) {
-                    DownloadVideoParamsBuilder builder = new DownloadVideoParamsBuilder();
-                    if (SettingsProvider.getInstance().isLoggedIn()) {
-                        builder.addAccessToken();
-                    }
-                    else {
-                        builder.addAppKey();
-                    }
-                    builder.addVideoId(videoId);
-                    oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, builder.build());
-                }
-            });
+//            AuthHelper.onLoggedIn(new Observer<Boolean>() {
+//                @Override
+//                public void onChanged(@Nullable Boolean isLoggedIn) {
+//                    DownloadVideoParamsBuilder builder = new DownloadVideoParamsBuilder();
+//                    if (SettingsProvider.getInstance().isLoggedIn()) {
+//                        builder.addAccessToken();
+//                    }
+//                    else {
+//                        builder.addAppKey();
+//                    }
+//                    builder.addVideoId(videoId);
+//                    oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, builder.build());
+//                }
+//            });
+            DownloadVideoParamsBuilder builder = new DownloadVideoParamsBuilder();
+            builder.addAccessToken();
+            builder.addVideoId(videoId);
+            oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, builder.build());
         }
         else {
             DownloadVideoParamsBuilder builder = new DownloadVideoParamsBuilder();
