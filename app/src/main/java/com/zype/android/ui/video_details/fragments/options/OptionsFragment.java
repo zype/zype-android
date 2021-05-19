@@ -12,6 +12,7 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.service.DownloadConstants;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
@@ -270,6 +271,24 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         mListener = null;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case BundleConstants.REQUEST_LOGIN:
+                if (data != null) {
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+                        String loginReason = extras.getString(BundleConstants.EXTRA_LOGIN_REASON);
+                        if (!TextUtils.isEmpty(loginReason) && loginReason.equals(BundleConstants.LOGIN_REASON_VALUE_DOWNLOADS)) {
+                            showDownloadMenu();
+                        }
+                    }
+                }
+                return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     // UI
 
     private void setPlayAsVariable() {
@@ -478,7 +497,19 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         ArrayList<String> items = new ArrayList<>();
         switch (holder.id) {
             case OPTION_DOWNLOAD:
-                showDownloadMenu();
+                if (AuthHelper.isLoggedIn()) {
+                    showDownloadMenu();
+                }
+                else {
+                    if (ZypeConfiguration.isDownloadsForGuestsEnabled(getContext())) {
+                        showDownloadMenu();
+                    }
+                    else {
+                        Bundle extras = new Bundle();
+                        extras.putString(BundleConstants.EXTRA_LOGIN_REASON, BundleConstants.LOGIN_REASON_VALUE_DOWNLOADS);
+                        NavigationHelper.getInstance(getActivity()).switchToLoginScreen(this, extras);
+                    }
+                }
                 break;
             case OPTION_FAVORITES:
                 isFavorite = !isFavorite;

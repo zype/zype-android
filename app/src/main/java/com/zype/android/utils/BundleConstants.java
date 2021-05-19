@@ -15,6 +15,8 @@ public class BundleConstants {
     public static final int REQUEST_SUBSCRIPTION = 6820;
     public static final int REQUEST_SUBSCRIBE_OR_LOGIN = 6830;
 
+    public static final String EXTRA_LOGIN_REASON = "LoginReason";
+    public static final String LOGIN_REASON_VALUE_DOWNLOADS = "Downloads";
     public static final String MEDIA_TYPE = "MediaType";
     public static final String PLAYLIST_ID = "PlaylistId";
     public static final String VIDEO_ID = "VideoId";
