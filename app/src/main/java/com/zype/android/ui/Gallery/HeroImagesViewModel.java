@@ -80,8 +80,6 @@ public class HeroImagesViewModel extends AndroidViewModel {
     }
 
     public LiveData<Integer> startTimer(int startPage) {
-//        currentPage.setValue(startPage);
-
         if (timer == null) {
             timer = new Timer();
         }
@@ -134,31 +132,7 @@ public class HeroImagesViewModel extends AndroidViewModel {
                 data.setValue(heroImages);
             }
         });
-//        ZObjectParamsBuilder builder = new ZObjectParamsBuilder()
-//                .addType(ZObjectParamsBuilder.TYPE_TOP_PLAYLISTS);
-//        oldApi.executeRequest(WebApiManager.Request.Z_OBJECT, builder.build());
     }
-
-//    @Subscribe
-//    public void handleZObject(ZObjectEvent event) {
-//        Logger.d("handleZObject()");
-//        List<ZobjectData> zobjectData = event.getEventData().getModelData().getResponse();
-//        List<HeroImage> heroImages = new ArrayList<>();
-//        for (ZobjectData item : zobjectData) {
-//            HeroImage heroImage = new HeroImage();
-//            heroImage.playlistId = item.playlistId;
-//            heroImage.videoId = item.videoId;
-//            if (item.getPictures() != null && item.getPictures().size() > 0) {
-//                heroImage.imageUrl = item.getPictures().get(0).getUrl();
-//            }
-//            heroImages.add(heroImage);
-//            if (!TextUtils.isEmpty(item.playlistId)) {
-//                loadPlaylist(item.playlistId);
-//            }
-//            loadVideo(item.videoId);
-//        }
-//        data.setValue(heroImages);
-//    }
 
     /**
      * Make API request for playlist with specified id

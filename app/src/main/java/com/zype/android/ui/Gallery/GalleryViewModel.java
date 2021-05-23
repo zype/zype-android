@@ -140,6 +140,7 @@ public class GalleryViewModel extends AndroidViewModel {
     }
 
     private void updateGalleryRows(List<GalleryRow> rows) {
+        Logger.d("updateGalleryRows(): state=" + galleryRowsState.name() + ", rows=" + (rows == null ? "null" : rows.toString()));
         List<GalleryRow> newRows;
         if (rows != null) {
             newRows = rows;
@@ -150,20 +151,20 @@ public class GalleryViewModel extends AndroidViewModel {
         switch (galleryRowsState) {
             case CREATED:
                 galleryRowsState = LOADING;
-                Logger.d("updateGalleryRows(): state=LOADING");
+                Logger.d("updateGalleryRows(): newState=LOADING");
                 galleryRows.setValue(newRows);
                 return;
             case LOADING:
                 if (allRowsReady(newRows)) {
                     galleryRowsState = READY;
-                    Logger.d("updateGalleryRows(): state=READY");
+                    Logger.d("updateGalleryRows(): newState=READY");
                     galleryRows.setValue(newRows);
                     return;
                 }
             case READY:
                 if (allRowsUpdated(newRows)) {
                     galleryRowsState = UPDATED;
-                    Logger.d("updateGalleryRows(): state=UPDATED");
+                    Logger.d("updateGalleryRows(): newState=UPDATED");
                     galleryRows.setValue(newRows);
                     return;
                 }

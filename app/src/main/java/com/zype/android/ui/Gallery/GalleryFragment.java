@@ -134,9 +134,11 @@ public class GalleryFragment extends Fragment {
                     if (heroImages.size() > 0) {
                         pagerHeroImages.setCurrentItem(1, false);
                         pagerHeroImages.setVisibility(View.VISIBLE);
-//                        if (heroImages.size() > 1) {
-//                            modelHeroImages.startTimer(0).observe(GalleryFragment.this, sliderPageObserver);
-//                        }
+                        if (model.getGalleryRowsState() == GalleryRow.State.UPDATED) {
+                            if (adapterHeroImages.getCount() > 1) {
+                                modelHeroImages.startTimer(1).observe(GalleryFragment.this, sliderPageObserver);
+                            }
+                        }
                     }
                     else {
                         pagerHeroImages.setVisibility(View.GONE);
@@ -157,9 +159,6 @@ public class GalleryFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-//        showProgress();
-//        updateGalleryRows();
-//        adapter.notifyDataSetChanged();
     }
 
     private boolean heroImagesEnabled() {
