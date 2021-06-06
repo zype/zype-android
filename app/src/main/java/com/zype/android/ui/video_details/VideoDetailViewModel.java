@@ -68,12 +68,23 @@ public class VideoDetailViewModel extends AndroidViewModel {
     // TODO: REFACTORING - Replace any usage of 'WebApiManager' to 'ZypeApi'
     private WebApiManager oldApi;
 
+    private Observer<Boolean> authObserver;
+
     public VideoDetailViewModel(Application application) {
         super(application);
         repo = DataRepository.getInstance(application);
         api = ZypeApi.getInstance();
         oldApi = WebApiManager.getInstance();
         oldApi.subscribe(this);
+
+        authObserver = isLoggedIn -> {
+            Video video = repo.getVideoSync(videoId);
+            if (video != null) {
+                downloadsAvailableLiveData.setValue(checkDownloadsAvailable(video));
+            }
+        };
+        AuthHelper.onLoggedIn(authObserver);
+
     }
 
     @Override
@@ -83,6 +94,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
             timer = null;
         }
         oldApi.unsubscribe(this);
+        AuthHelper.removeObserver(authObserver);
         super.onCleared();
     }
 
@@ -123,28 +135,32 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
         loadVideo(videoId);
 
-        boolean isDownloadsAvailable = false;
+        downloadsAvailableLiveData.setValue(checkDownloadsAvailable(video));
+    }
+
+    public boolean checkDownloadsAvailable(Video video) {
+        boolean result = false;
         if (video != null && video.onAir != null && video.onAir != 1) {
             if (ZypeConfiguration.isDownloadsEnabled(getApplication())
                     && (ZypeConfiguration.isDownloadsForGuestsEnabled(getApplication())
                     || SettingsProvider.getInstance().isLoggedIn())) {
                 if (TextUtils.isEmpty(video.downloadVideoUrl)
-                    || video.isDownloadedVideo == 0) {
+                        || video.isDownloadedVideo == 0) {
                     loadVideoDownloadUrl(videoId);
                 }
                 else {
-                    isDownloadsAvailable = true;
+                    result = true;
                 }
                 if (TextUtils.isEmpty(video.downloadAudioUrl)
-                    || video.isDownloadedAudio == 0) {
+                        || video.isDownloadedAudio == 0) {
                     loadAudioDownloadUrl(videoId);
                 }
                 else {
-                    isDownloadsAvailable = true;
+                    result = true;
                 }
             }
         }
-        downloadsAvailableLiveData.setValue(isDownloadsAvailable);
+        return result;
     }
 
     public boolean getAutoPlayback() {

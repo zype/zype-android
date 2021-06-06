@@ -392,9 +392,13 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         if (ZypeSettings.SHARE_VIDEO_ENABLED) {
             list.add(new Options(OPTION_SHARE, getString(R.string.option_share), R.drawable.icn_share));
         }
-        if (ZypeConfiguration.isDownloadsEnabled(getActivity()) &&
-                (isAudioDownloadUrlExists() || isVideoDownloadUrlExists())) {
-            if (mListener.getCurrentFragment() != BaseVideoActivity.TYPE_YOUTUBE && !onAir) {
+        if (ZypeConfiguration.isDownloadsEnabled(getActivity())) {
+            if (ZypeConfiguration.isDownloadsForGuestsEnabled(getActivity())) {
+                if (isAudioDownloadUrlExists() || isVideoDownloadUrlExists()) {
+                    list.add(new Options(OPTION_DOWNLOAD, getString(R.string.option_download), R.drawable.download_icon));
+                }
+            }
+            else {
                 list.add(new Options(OPTION_DOWNLOAD, getString(R.string.option_download), R.drawable.download_icon));
             }
         }
@@ -487,7 +491,8 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
             fragment.show(getActivity().getFragmentManager(), "menu");
         }
         else {
-            UiUtils.showErrorSnackbar(mOptionList, "Download url not found");
+            videoDetailViewModel.checkDownloadsAvailable(videoDetailViewModel.getVideoSync());
+//            UiUtils.showErrorSnackbar(getView(), "Download url not found");
             Logger.v("Still don't have url to load");
         }
     }
