@@ -268,6 +268,9 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             case R.id.menuNavigationSettings: {
                 lastSelectedTabId = item.getItemId();
                 Section section = sections.get(item.getItemId());
+                if (item.getItemId() == R.id.menuNavigationFavorites) {
+                    pagerSections.setCurrentItem(adapterSections.getSectionPosition(R.id.menuNavigationHome), false);
+                }
                 pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()), false);
                 setTitle(section.title);
                 return true;
