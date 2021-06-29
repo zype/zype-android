@@ -3,6 +3,7 @@ package com.zype.android.ui.monetization;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -241,7 +242,7 @@ public class PaywallViewModel extends BaseViewModel {
                     String marketplaceId = getVideoMarketplaceId(video);
                     Log.d(TAG, "isItemPurchased(): sku=" + marketplaceId);
                     for (Purchase purchase : purchases) {
-                        if (purchase.getSku().equals(marketplaceId)) {
+                        if (!TextUtils.isEmpty(marketplaceId) && purchase.getSku().equals(marketplaceId)) {
                             return true;
                         }
                     }
@@ -317,6 +318,9 @@ public class PaywallViewModel extends BaseViewModel {
 
     private String getVideoMarketplaceId(@NonNull Video video) {
         MarketplaceIds marketplaceIds = new Gson().fromJson(video.marketplaceIds, MarketplaceIds.class);
+        if (marketplaceIds==null)
+            return "";
+
         return marketplaceIds.googleplay;
     }
 
