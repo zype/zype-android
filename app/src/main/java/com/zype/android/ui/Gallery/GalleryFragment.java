@@ -82,10 +82,10 @@ public class GalleryFragment extends Fragment {
             @Override
             public void onPageSelected(int position) {
                 Logger.d("onPageSelected(): page=" + position);
-                if (position == 0) {
+                if (position == 0 && adapterHeroImages != null) {
                     modelHeroImages.setCurrentPage(adapterHeroImages.getCount() - 3);
                 }
-                else if (position == adapterHeroImages.getCount() - 1) {
+                else if (adapterHeroImages != null && position == adapterHeroImages.getCount() - 1) {
                     modelHeroImages.setCurrentPage(0);
                 }
                 else {
@@ -95,7 +95,7 @@ public class GalleryFragment extends Fragment {
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                if (state == SCROLL_STATE_IDLE) {
+                if (state == SCROLL_STATE_IDLE && adapterHeroImages != null) {
                     Logger.d("onPageScrollStateChanged(): page=" + pagerHeroImages.getCurrentItem());
                     if (pagerHeroImages.getCurrentItem() == 0) {
                         pagerHeroImages.setCurrentItem(adapterHeroImages.getCount() - 2, false);
@@ -130,12 +130,14 @@ public class GalleryFragment extends Fragment {
                 public void onChanged(@Nullable final List<HeroImage> heroImages) {
                     Logger.d("onChanged(): Hero images changed, size=" + heroImages.size());
                     modelHeroImages.stopTimer();
-                    adapterHeroImages.setData(heroImages);
+                    if (adapterHeroImages != null) {
+                        adapterHeroImages.setData(heroImages);
+                    }
                     if (heroImages.size() > 0) {
                         pagerHeroImages.setCurrentItem(1, false);
                         pagerHeroImages.setVisibility(View.VISIBLE);
                         if (model.getGalleryRowsState() == GalleryRow.State.UPDATED) {
-                            if (adapterHeroImages.getCount() > 1) {
+                            if (adapterHeroImages != null && adapterHeroImages.getCount() > 1) {
                                 modelHeroImages.startTimer(1).observe(GalleryFragment.this, sliderPageObserver);
                             }
                         }
@@ -169,7 +171,7 @@ public class GalleryFragment extends Fragment {
     private Observer<Integer> createSliderPageObserver() {
         return page -> {
             Logger.d("sliderPageObserver: page=" + page + ", currentPage=" + pagerHeroImages.getCurrentItem());
-            if (page != null) {
+            if (page != null && adapterHeroImages != null) {
                 if (page == 0) {
                     if (pagerHeroImages.getCurrentItem() == adapterHeroImages.getCount() - 2) {
                         pagerHeroImages.setCurrentItem(pagerHeroImages.getCurrentItem() + 1, true);
@@ -198,7 +200,7 @@ public class GalleryFragment extends Fragment {
                 adapter.setData(galleryRows);
                 hideProgress();
                 if (model.getGalleryRowsState() == GalleryRow.State.UPDATED) {
-                    if (adapterHeroImages.getCount() > 1) {
+                    if (adapterHeroImages != null && adapterHeroImages.getCount() > 1) {
                         modelHeroImages.startTimer(1).observe(GalleryFragment.this, sliderPageObserver);
                     }
                 }

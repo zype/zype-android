@@ -111,6 +111,9 @@ public class PaywallViewModel extends BaseViewModel {
     }
 
     private void queryPurchaseItems() {
+        if (paywallType==null)
+            return;
+
         switch (paywallType) {
             case PLAYLIST_TVOD: {
                 Map<String, Object> itemsToPurchase = new HashMap<>();
@@ -216,6 +219,9 @@ public class PaywallViewModel extends BaseViewModel {
     }
 
     private boolean isItemPurchased(List<Purchase> purchases) {
+        if (paywallType == null)
+            return false;
+
         switch (paywallType) {
             case PLAYLIST_TVOD:
                 Playlist playlist = repo.getPlaylistSync(playlistId);
