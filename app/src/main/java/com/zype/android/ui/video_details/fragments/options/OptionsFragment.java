@@ -12,6 +12,7 @@ import com.zype.android.core.provider.DataHelper;
 import com.zype.android.service.DownloadConstants;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
+import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.base.BaseFragment;
 import com.zype.android.ui.base.BaseVideoActivity;
 import com.zype.android.ui.dialog.CustomAlertDialog;
@@ -73,6 +74,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     private boolean isVideoDownloading;
     private boolean isVideoDownloaded;
     private boolean isAudioDownloaded;
+    private boolean isLiveVideo;
 
     private boolean onAir;
 
@@ -214,10 +216,15 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
 
         videoDetailViewModel = ViewModelProviders.of(getActivity()).get(VideoDetailViewModel.class);
         videoDetailViewModel.getVideo().observe(this, video -> {
+            Logger.d("getVideo(): videoId=" + video.id);
             if (video != null) {
                 videoId = video.id;
                 initOptions(video);
             }
+        });
+        videoDetailViewModel.downloadsAvailable().observe(this, downloadsAvailable -> {
+            Logger.d("downloadsAvailable(): " + downloadsAvailable);
+            initOptions(videoDetailViewModel.getVideoSync());
         });
 
         playerViewModel = ViewModelProviders.of(getActivity()).get(PlayerViewModel.class);
@@ -265,6 +272,24 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         mListener = null;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case BundleConstants.REQUEST_LOGIN:
+                if (data != null) {
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+                        String loginReason = extras.getString(BundleConstants.EXTRA_LOGIN_REASON);
+                        if (!TextUtils.isEmpty(loginReason) && loginReason.equals(BundleConstants.LOGIN_REASON_VALUE_DOWNLOADS)) {
+                            showDownloadMenu();
+                        }
+                    }
+                }
+                return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     // UI
 
     private void setPlayAsVariable() {
@@ -304,6 +329,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         isFavorite = video.isFavorite == 1;
         isAudioDownloaded = video.isDownloadedAudio == 1;
         isVideoDownloaded = video.isDownloadedVideo == 1;
+        isLiveVideo = video.isZypeLive == 1;
         setPlayAsVariable();
         mAdapter = new OptionsAdapter(getOptionsList(), video.id, this);
         mAdapter.changeList(getOptionsList());
@@ -368,9 +394,13 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         if (ZypeSettings.SHARE_VIDEO_ENABLED) {
             list.add(new Options(OPTION_SHARE, getString(R.string.option_share), R.drawable.icn_share));
         }
-        if (ZypeConfiguration.isDownloadsEnabled(getActivity()) &&
-                (isAudioDownloadUrlExists() || isVideoDownloadUrlExists())) {
-            if (mListener.getCurrentFragment() != BaseVideoActivity.TYPE_YOUTUBE && !onAir) {
+        if (!isLiveVideo && ZypeConfiguration.isDownloadsEnabled(getActivity())) {
+            if (ZypeConfiguration.isDownloadsForGuestsEnabled(getActivity())) {
+                if (isAudioDownloadUrlExists() || isVideoDownloadUrlExists()) {
+                    list.add(new Options(OPTION_DOWNLOAD, getString(R.string.option_download), R.drawable.download_icon));
+                }
+            }
+            else {
                 list.add(new Options(OPTION_DOWNLOAD, getString(R.string.option_download), R.drawable.download_icon));
             }
         }
@@ -463,7 +493,8 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
             fragment.show(getActivity().getFragmentManager(), "menu");
         }
         else {
-            UiUtils.showErrorSnackbar(mOptionList, "Download url not found");
+            videoDetailViewModel.checkDownloadsAvailable(videoDetailViewModel.getVideoSync());
+//            UiUtils.showErrorSnackbar(getView(), "Download url not found");
             Logger.v("Still don't have url to load");
         }
     }
@@ -473,7 +504,19 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         ArrayList<String> items = new ArrayList<>();
         switch (holder.id) {
             case OPTION_DOWNLOAD:
-                showDownloadMenu();
+                if (AuthHelper.isLoggedIn()) {
+                    showDownloadMenu();
+                }
+                else {
+                    if (ZypeConfiguration.isDownloadsForGuestsEnabled(getContext())) {
+                        showDownloadMenu();
+                    }
+                    else {
+                        Bundle extras = new Bundle();
+                        extras.putString(BundleConstants.EXTRA_LOGIN_REASON, BundleConstants.LOGIN_REASON_VALUE_DOWNLOADS);
+                        NavigationHelper.getInstance(getActivity()).switchToLoginScreen(this, extras);
+                    }
+                }
                 break;
             case OPTION_FAVORITES:
                 isFavorite = !isFavorite;

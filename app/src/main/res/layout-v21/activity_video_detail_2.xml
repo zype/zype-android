@@ -69,7 +69,7 @@
                         />
                 </FrameLayout>
             </FrameLayout>
-            <ScrollView
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/layoutDetails"
@@ -87,6 +87,7 @@
                         android:layout_marginBottom="4dp"
                         android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
+                        android:focusableInTouchMode="true"
                         app:cardBackgroundColor="@color/card_background"
                         app:cardCornerRadius="6dp"
                         app:cardElevation="0dp"
@@ -124,7 +125,7 @@
                         android:name="com.zype.android.ui.video_details.fragments.options.OptionsFragment"
                         />
                 </LinearLayout>
-            </ScrollView>
+            </androidx.core.widget.NestedScrollView>
 <!--
             <com.google.android.material.tabs.TabLayout
                 android:layout_width="match_parent"

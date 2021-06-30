@@ -421,7 +421,7 @@ public class VideoDetailActivity extends BaseActivity implements OnDetailActivit
 
     @Override
     public void onShareVideo(String videoId) {
-
+        UiUtils.shareVideo(this, videoId);
     }
 
     @Override

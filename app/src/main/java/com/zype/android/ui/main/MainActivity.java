@@ -268,6 +268,9 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             case R.id.menuNavigationSettings: {
                 lastSelectedTabId = item.getItemId();
                 Section section = sections.get(item.getItemId());
+                if (item.getItemId() == R.id.menuNavigationFavorites) {
+                    pagerSections.setCurrentItem(adapterSections.getSectionPosition(R.id.menuNavigationHome), false);
+                }
                 pagerSections.setCurrentItem(adapterSections.getSectionPosition(item.getItemId()), false);
                 setTitle(section.title);
                 return true;
@@ -545,7 +548,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             DownloadHelper.addVideoToDownloadList(getApplicationContext(), url, fileId);
         } else {
 //            throw new IllegalStateException("url is null");
-            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for video file");
+//            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for video file");
             Logger.e("Server response must contains \"mp\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
         }
     }
@@ -561,7 +564,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             DownloadHelper.addAudioToDownloadList(getApplicationContext(), url, fileId);
         } else {
 //            throw new IllegalStateException("url is null");
-            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for audio file");
+//            UiUtils.showErrorSnackbar(getBaseView(), "Server has returned an empty url for audio file");
             Logger.e("Server response must contains \"m4a\" but server has returned:" + Logger.getObjectDump(event.getEventData().getModelData().getResponse().getBody().getFiles()));
         }
     }

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.zype.android.R;
@@ -42,8 +43,9 @@ public class GalleryFragment extends Fragment {
     private HeroImagesPagerAdapter adapterHeroImages;
     private GalleryRowsAdapter adapter;
 
-    CustomViewPager pagerHeroImages;
-    ProgressBar progressBar;
+    private CustomViewPager pagerHeroImages;
+    private ProgressBar progressBar;
+    private LinearLayout emptyLayout;
 
     public static GalleryFragment newInstance(String parentPlaylistId) {
         GalleryFragment fragment = new GalleryFragment();
@@ -100,6 +102,7 @@ public class GalleryFragment extends Fragment {
         listGallery.setAdapter(adapter);
 
         progressBar = rootView.findViewById(R.id.progress);
+        emptyLayout = rootView.findViewById(R.id.layoutEmpty);
         return rootView;
     }
 
@@ -182,6 +185,12 @@ public class GalleryFragment extends Fragment {
             else {
                 adapter.setData(galleryRows);
                 hideProgress();
+                if (galleryRows.isEmpty()) {
+                    showEmpty();
+                }
+                else {
+                    hideEmpty();
+                }
             }
         };
     }
@@ -207,4 +216,11 @@ public class GalleryFragment extends Fragment {
         progressBar.setVisibility(View.GONE);
     }
 
+    private void showEmpty() {
+        emptyLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void hideEmpty() {
+        emptyLayout.setVisibility(View.GONE);
+    }
 }
