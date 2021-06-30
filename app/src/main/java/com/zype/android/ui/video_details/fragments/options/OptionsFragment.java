@@ -74,6 +74,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
     private boolean isVideoDownloading;
     private boolean isVideoDownloaded;
     private boolean isAudioDownloaded;
+    private boolean isLiveVideo;
 
     private boolean onAir;
 
@@ -328,6 +329,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         isFavorite = video.isFavorite == 1;
         isAudioDownloaded = video.isDownloadedAudio == 1;
         isVideoDownloaded = video.isDownloadedVideo == 1;
+        isLiveVideo = video.isZypeLive == 1;
         setPlayAsVariable();
         mAdapter = new OptionsAdapter(getOptionsList(), video.id, this);
         mAdapter.changeList(getOptionsList());
@@ -392,7 +394,7 @@ public class OptionsFragment extends BaseFragment implements OptionsAdapter.Opti
         if (ZypeSettings.SHARE_VIDEO_ENABLED) {
             list.add(new Options(OPTION_SHARE, getString(R.string.option_share), R.drawable.icn_share));
         }
-        if (ZypeConfiguration.isDownloadsEnabled(getActivity())) {
+        if (!isLiveVideo && ZypeConfiguration.isDownloadsEnabled(getActivity())) {
             if (ZypeConfiguration.isDownloadsForGuestsEnabled(getActivity())) {
                 if (isAudioDownloadUrlExists() || isVideoDownloadUrlExists()) {
                     list.add(new Options(OPTION_DOWNLOAD, getString(R.string.option_download), R.drawable.download_icon));
