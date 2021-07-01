@@ -98,8 +98,12 @@ public class HeroImagesViewModel extends AndroidViewModel {
                 }
             }
         };
-        timer.schedule(timerTask, 0, TIMER_PERIOD);
 
+        try {
+            timer.schedule(timerTask, 0, TIMER_PERIOD);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         return currentPage;
     }
 
