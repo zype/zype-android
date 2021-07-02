@@ -198,21 +198,21 @@ public class GalleryFragment extends Fragment {
             Logger.d("getGalleryRows()::onChanged(): size=" + galleryRows.size() + ", state=" + model.getGalleryRowsState());
             if (model.getGalleryRowsState() == GalleryRow.State.LOADING) {
                 showProgress();
-            }
-            else {
+            } else {
                 adapter.setData(galleryRows);
                 hideProgress();
                 if (model.getGalleryRowsState() == GalleryRow.State.UPDATED) {
                     if (adapterHeroImages != null && adapterHeroImages.getCount() > 1) {
                         modelHeroImages.startTimer(1).observe(GalleryFragment.this, sliderPageObserver);
                     }
-                if (galleryRows.isEmpty()) {
-                    showEmpty();
-                }
-                else {
-                    hideEmpty();
+                    if (galleryRows.isEmpty()) {
+                        showEmpty();
+                    } else {
+                        hideEmpty();
+                    }
                 }
             }
+
         };
     }
 
