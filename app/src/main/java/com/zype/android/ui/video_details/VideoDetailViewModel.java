@@ -37,6 +37,7 @@ import java.util.TimerTask;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
@@ -52,6 +53,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
     private MutableLiveData<Video> videoLiveData = new MutableLiveData<>();
     private MutableLiveData<Boolean> onAir = new MutableLiveData<>();
     private MutableLiveData<Boolean> fullscreen = new MutableLiveData<>();
+    private MutableLiveData<Boolean> downloadsAvailableLiveData = new MutableLiveData<>();
 
     private String videoId;
     private String playlistId;
@@ -66,12 +68,23 @@ public class VideoDetailViewModel extends AndroidViewModel {
     // TODO: REFACTORING - Replace any usage of 'WebApiManager' to 'ZypeApi'
     private WebApiManager oldApi;
 
+    private Observer<Boolean> authObserver;
+
     public VideoDetailViewModel(Application application) {
         super(application);
         repo = DataRepository.getInstance(application);
         api = ZypeApi.getInstance();
         oldApi = WebApiManager.getInstance();
         oldApi.subscribe(this);
+
+        authObserver = isLoggedIn -> {
+            Video video = repo.getVideoSync(videoId);
+            if (video != null) {
+                downloadsAvailableLiveData.setValue(checkDownloadsAvailable(video));
+            }
+        };
+        AuthHelper.onLoggedIn(authObserver);
+
     }
 
     @Override
@@ -81,6 +94,7 @@ public class VideoDetailViewModel extends AndroidViewModel {
             timer = null;
         }
         oldApi.unsubscribe(this);
+        AuthHelper.removeObserver(authObserver);
         super.onCleared();
     }
 
@@ -121,20 +135,32 @@ public class VideoDetailViewModel extends AndroidViewModel {
 
         loadVideo(videoId);
 
+        downloadsAvailableLiveData.setValue(checkDownloadsAvailable(video));
+    }
+
+    public boolean checkDownloadsAvailable(Video video) {
+        boolean result = false;
         if (video != null && video.onAir != null && video.onAir != 1) {
             if (ZypeConfiguration.isDownloadsEnabled(getApplication())
                     && (ZypeConfiguration.isDownloadsForGuestsEnabled(getApplication())
                     || SettingsProvider.getInstance().isLoggedIn())) {
                 if (TextUtils.isEmpty(video.downloadVideoUrl)
-                    || video.isDownloadedVideo == 0) {
+                        || video.isDownloadedVideo == 0) {
                     loadVideoDownloadUrl(videoId);
                 }
+                else {
+                    result = true;
+                }
                 if (TextUtils.isEmpty(video.downloadAudioUrl)
-                    || video.isDownloadedAudio == 0) {
+                        || video.isDownloadedAudio == 0) {
                     loadAudioDownloadUrl(videoId);
+                }
+                else {
+                    result = true;
                 }
             }
         }
+        return result;
     }
 
     public boolean getAutoPlayback() {
@@ -173,6 +199,12 @@ public class VideoDetailViewModel extends AndroidViewModel {
             // When trailer playback is finished just fire video detail event with existing data
             videoLiveData.setValue(videoLiveData.getValue());
         }
+    }
+
+    // Downloads
+
+    public LiveData<Boolean> downloadsAvailable() {
+        return downloadsAvailableLiveData;
     }
 
     // On air
@@ -323,20 +355,24 @@ public class VideoDetailViewModel extends AndroidViewModel {
         Logger.d("loadAudioDownloadUrl(): videoId=" + videoId);
 
         if (AuthHelper.isLoggedIn()) {
-            AuthHelper.onLoggedIn(new Observer<Boolean>() {
-                @Override
-                public void onChanged(@Nullable Boolean isLoggedIn) {
-                    DownloadAudioParamsBuilder builder = new DownloadAudioParamsBuilder();
-                    if (SettingsProvider.getInstance().isLoggedIn()) {
-                        builder.addAccessToken();
-                    }
-                    else {
-                        builder.addAppKey();
-                    }
-                    builder.addAudioId(videoId);
-                    oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, builder.build());
-                }
-            });
+//            AuthHelper.onLoggedIn(new Observer<Boolean>() {
+//                @Override
+//                public void onChanged(@Nullable Boolean isLoggedIn) {
+//                    DownloadAudioParamsBuilder builder = new DownloadAudioParamsBuilder();
+//                    if (SettingsProvider.getInstance().isLoggedIn()) {
+//                        builder.addAccessToken();
+//                    }
+//                    else {
+//                        builder.addAppKey();
+//                    }
+//                    builder.addAudioId(videoId);
+//                    oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, builder.build());
+//                }
+//            });
+            DownloadAudioParamsBuilder builder = new DownloadAudioParamsBuilder();
+            builder.addAccessToken();
+            builder.addAudioId(videoId);
+            oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_AUDIO, builder.build());
         }
         else {
             DownloadAudioParamsBuilder builder = new DownloadAudioParamsBuilder();
@@ -370,6 +406,10 @@ public class VideoDetailViewModel extends AndroidViewModel {
             Video video = repo.getVideoSync(videoId);
             video.downloadAudioUrl = url;
             repo.updateVideo(video);
+
+            if (!TextUtils.isEmpty(url)) {
+                downloadsAvailableLiveData.setValue(true);
+            }
         }
         else {
             Logger.e("handleDownloadVideo(): m4a or mp3 source not found");
@@ -385,20 +425,24 @@ public class VideoDetailViewModel extends AndroidViewModel {
         Logger.d("loadVideoDownloadUrl(): videoId=" + videoId);
 
         if (AuthHelper.isLoggedIn()) {
-            AuthHelper.onLoggedIn(new Observer<Boolean>() {
-                @Override
-                public void onChanged(@Nullable Boolean isLoggedIn) {
-                    DownloadVideoParamsBuilder builder = new DownloadVideoParamsBuilder();
-                    if (SettingsProvider.getInstance().isLoggedIn()) {
-                        builder.addAccessToken();
-                    }
-                    else {
-                        builder.addAppKey();
-                    }
-                    builder.addVideoId(videoId);
-                    oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, builder.build());
-                }
-            });
+//            AuthHelper.onLoggedIn(new Observer<Boolean>() {
+//                @Override
+//                public void onChanged(@Nullable Boolean isLoggedIn) {
+//                    DownloadVideoParamsBuilder builder = new DownloadVideoParamsBuilder();
+//                    if (SettingsProvider.getInstance().isLoggedIn()) {
+//                        builder.addAccessToken();
+//                    }
+//                    else {
+//                        builder.addAppKey();
+//                    }
+//                    builder.addVideoId(videoId);
+//                    oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, builder.build());
+//                }
+//            });
+            DownloadVideoParamsBuilder builder = new DownloadVideoParamsBuilder();
+            builder.addAccessToken();
+            builder.addVideoId(videoId);
+            oldApi.executeRequest(WebApiManager.Request.PLAYER_DOWNLOAD_VIDEO, builder.build());
         }
         else {
             DownloadVideoParamsBuilder builder = new DownloadVideoParamsBuilder();
@@ -427,6 +471,10 @@ public class VideoDetailViewModel extends AndroidViewModel {
             Video video = repo.getVideoSync(videoId);
             video.downloadVideoUrl = url;
             repo.updateVideo(video);
+
+            if (!TextUtils.isEmpty(url)) {
+                downloadsAvailableLiveData.setValue(true);
+            }
         }
         else {
             Logger.e("handleDownloadVideo(): mp4 source not found");

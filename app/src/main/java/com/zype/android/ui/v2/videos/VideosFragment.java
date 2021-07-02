@@ -2,6 +2,10 @@ package com.zype.android.ui.v2.videos;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -10,13 +14,19 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.zype.android.R;
+import com.zype.android.service.DownloadConstants;
 import com.zype.android.ui.NavigationHelper;
+import com.zype.android.ui.dialog.CustomAlertDialog;
 import com.zype.android.ui.v2.base.DataState;
+import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.Logger;
+import com.zype.android.utils.UiUtils;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
@@ -32,7 +42,26 @@ public class VideosFragment extends Fragment {
 
     private VideosAdapter adapter;
 
-    ProgressBar progressBar;
+    private ProgressBar progressBar;
+
+    private final BroadcastReceiver downloaderReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int action = intent.getIntExtra(DownloadConstants.ACTION_TYPE, 0);
+            switch (action) {
+                case DownloadConstants.PROGRESS_START_AUDIO:
+                case DownloadConstants.PROGRESS_START_VIDEO:
+                case DownloadConstants.PROGRESS_UPDATE_AUDIO:
+                case DownloadConstants.PROGRESS_UPDATE_VIDEO:
+                case DownloadConstants.PROGRESS_END_AUDIO:
+                case DownloadConstants.PROGRESS_END_VIDEO:
+                    adapter.notifyDataSetChanged();
+                    break;
+                default:
+                    throw new IllegalStateException("unknown action=" + action);
+            }
+        }
+    };
 
     public static VideosFragment newInstance(String playlistId) {
         VideosFragment fragment = new VideosFragment();
@@ -114,7 +143,17 @@ public class VideosFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        IntentFilter filter = new IntentFilter(DownloadConstants.ACTION);
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext())
+                .registerReceiver(downloaderReceiver, filter);
         model.retrieveVideos(false);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext())
+                .unregisterReceiver(downloaderReceiver);
     }
 
     private void showProgress() {

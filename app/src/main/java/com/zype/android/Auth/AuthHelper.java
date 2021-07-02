@@ -37,6 +37,10 @@ public class AuthHelper {
         AuthLiveData.getInstance().updateLoginState();
     }
 
+    public static void removeObserver(Observer<Boolean> observer) {
+        AuthLiveData.getInstance().removeObserver(observer);
+    }
+
     public static void onLoginStateChanged() {
         AuthLiveData.getInstance().updateLoginState();
     }

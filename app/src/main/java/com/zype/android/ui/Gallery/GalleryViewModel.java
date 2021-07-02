@@ -118,8 +118,7 @@ public class GalleryViewModel extends AndroidViewModel {
                 row.videos = repo.getPlaylistVideosSync(playlist.id);
                 if (row.videos.isEmpty()) {
                     row.state = LOADING;
-                }
-                else {
+                } else {
                     row.state = READY;
                 }
                 loadRowVideos(row);
@@ -127,8 +126,7 @@ public class GalleryViewModel extends AndroidViewModel {
                 row.nestedPlaylists = repo.getPlaylistsSync(playlist.id);
                 if (row.nestedPlaylists.isEmpty()) {
                     row.state = LOADING;
-                }
-                else {
+                } else {
                     row.state = READY;
                 }
                 loadRowPlaylists(row);
@@ -150,8 +148,14 @@ public class GalleryViewModel extends AndroidViewModel {
         }
         switch (galleryRowsState) {
             case CREATED:
-                galleryRowsState = LOADING;
-                Logger.d("updateGalleryRows(): newState=LOADING");
+
+                if (rows.isEmpty()) {
+                    galleryRowsState = UPDATED;
+                }
+                else {
+                    galleryRowsState = LOADING;
+                }
+                Logger.d("updateGalleryRows(): state=LOADING");
                 galleryRows.setValue(newRows);
                 return;
             case LOADING:
