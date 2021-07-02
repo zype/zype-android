@@ -42,13 +42,14 @@ public class AnalyticsManager {
 
     public void onPlayerEvent(String event, Video video, long position) {
         Log.d(TAG, "onPlayerEvent(): " + event);
+        if (video != null) {
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.putAll(getVideoAttributes(video));
+            attributes.put(AnalyticsTags.VIDEO_CURRENT_POSITION, position);
 
-        Map<String, Object> attributes = new HashMap<>();
-        attributes.putAll(getVideoAttributes(video));
-        attributes.put(AnalyticsTags.VIDEO_CURRENT_POSITION, position);
-
-        for (IAnalytics analyticsImpl : analyticsImpls) {
-            analyticsImpl.trackPlayerEvent(event, attributes);
+            for (IAnalytics analyticsImpl : analyticsImpls) {
+                analyticsImpl.trackPlayerEvent(event, attributes);
+            }
         }
     }
 

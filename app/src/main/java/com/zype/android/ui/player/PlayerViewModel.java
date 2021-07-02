@@ -196,6 +196,9 @@ public class PlayerViewModel extends AndroidViewModel implements CustomPlayer.In
     }
 
     private void analyticsContentCompletion() {
+        if (video == null)
+            return;
+
         if (previousPlaybackPosition < 3000 && playbackPosition >= 3000) {
             AnalyticsManager.getInstance()
                     .onPlayerEvent(AnalyticsEvents.EVENT_CONTENT_STARTED, video, playbackPosition);

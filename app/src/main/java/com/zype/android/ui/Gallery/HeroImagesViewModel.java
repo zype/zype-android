@@ -19,9 +19,15 @@ import com.zype.android.webapi.events.zobject.ZObjectEvent;
 import com.zype.android.webapi.model.playlist.PlaylistData;
 import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.webapi.model.zobjects.ZobjectData;
+import com.zype.android.zypeapi.ZypeApi;
+import com.zype.android.zypeapi.model.PlaylistsResponse;
+import com.zype.android.zypeapi.model.ZObjectTopPlaylist;
+import com.zype.android.zypeapi.model.ZObjectTopPlaylistResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,24 +41,26 @@ import androidx.lifecycle.MutableLiveData;
  */
 public class HeroImagesViewModel extends AndroidViewModel {
     private MutableLiveData<List<HeroImage>> data;
-    private MutableLiveData<Integer> currentPage;
+    private MutableLiveData<Integer> currentPage = new MutableLiveData<>();
     private Timer timer;
     private TimerTask timerTask;
     private long TIMER_PERIOD = 7000;
 
     DataRepository repo;
-    WebApiManager api;
+    ZypeApi api;
+    WebApiManager oldApi;
 
     public HeroImagesViewModel(Application application) {
         super(application);
         repo = DataRepository.getInstance(application);
-        api = WebApiManager.getInstance();
-        api.subscribe(this);
+        api = ZypeApi.getInstance();
+        oldApi = WebApiManager.getInstance();
+        oldApi.subscribe(this);
     }
 
     @Override
     protected void onCleared() {
-        api.unsubscribe(this);
+        oldApi.unsubscribe(this);
         super.onCleared();
     }
 
@@ -64,10 +72,14 @@ public class HeroImagesViewModel extends AndroidViewModel {
         return data;
     }
 
-    public LiveData<Integer> startTimer(int startPage) {
-        currentPage = new MutableLiveData<>();
-        currentPage.setValue(startPage);
+    public void setCurrentPage(int page) {
+        if (currentPage.getValue() == null || currentPage.getValue() != page) {
+            Logger.d("setCurrentPage(): page=" + page);
+            currentPage.setValue(page);
+        }
+    }
 
+    public LiveData<Integer> startTimer(int startPage) {
         if (timer == null) {
             timer = new Timer();
         }
@@ -78,16 +90,20 @@ public class HeroImagesViewModel extends AndroidViewModel {
         timerTask = new TimerTask() {
             @Override
             public void run() {
-//                if (currentPage.getValue() == data.getValue().size() - 1) {
-//                    currentPage.postValue(0);
-//                }
-//                else {
+                if (currentPage.getValue() == data.getValue().size() - 1) {
+                    currentPage.postValue(0);
+                }
+                else {
                     currentPage.postValue(currentPage.getValue() + 1);
-//                }
+                }
             }
         };
-        timer.schedule(timerTask, 0, TIMER_PERIOD);
 
+        try {
+            timer.schedule(timerTask, 0, TIMER_PERIOD);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         return currentPage;
     }
 
@@ -99,30 +115,27 @@ public class HeroImagesViewModel extends AndroidViewModel {
     }
 
     private void loadHeroImages() {
-        ZObjectParamsBuilder builder = new ZObjectParamsBuilder()
-                .addType(ZObjectParamsBuilder.TYPE_TOP_PLAYLISTS);
-        api.executeRequest(WebApiManager.Request.Z_OBJECT, builder.build());
-    }
-
-    @Subscribe
-    public void handleZObject(ZObjectEvent event) {
-        Logger.d("handleZObject()");
-        List<ZobjectData> zobjectData = event.getEventData().getModelData().getResponse();
-        List<HeroImage> heroImages = new ArrayList<>();
-        for (ZobjectData item : zobjectData) {
-            HeroImage heroImage = new HeroImage();
-            heroImage.playlistId = item.playlistId;
-            heroImage.videoId = item.videoId;
-            if (item.getPictures() != null && item.getPictures().size() > 0) {
-                heroImage.imageUrl = item.getPictures().get(0).getUrl();
+        api.getZObjectTopPlayLists(response -> {
+            if (response.isSuccessful) {
+                List<HeroImage> heroImages = new ArrayList<>();
+                List<ZObjectTopPlaylist> topPlaylists = response.data.topPlaylists;
+                Collections.sort(topPlaylists, (o1, o2) -> o1.priority.compareTo(o2.priority));
+                for (ZObjectTopPlaylist item : topPlaylists) {
+                    HeroImage heroImage = new HeroImage();
+                    heroImage.playlistId = item.playlistId;
+                    heroImage.videoId = item.videoId;
+                    if (item.images != null && item.images.size() > 0) {
+                        heroImage.imageUrl = item.images.get(0).url;
+                    }
+                    heroImages.add(heroImage);
+                    if (!TextUtils.isEmpty(item.playlistId)) {
+                        loadPlaylist(item.playlistId);
+                    }
+                    loadVideo(item.videoId);
+                }
+                data.setValue(heroImages);
             }
-            heroImages.add(heroImage);
-            if (!TextUtils.isEmpty(item.playlistId)) {
-                loadPlaylist(item.playlistId);
-            }
-            loadVideo(item.videoId);
-        }
-        data.setValue(heroImages);
+        });
     }
 
     /**
