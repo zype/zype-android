@@ -3,15 +3,20 @@ package com.zype.android.ui.v2.videos;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 
 import com.zype.android.Auth.AuthHelper;
 import com.zype.android.DataRepository;
 import com.zype.android.Db.Entity.FavoriteVideo;
 import com.zype.android.Db.Entity.Video;
+import com.zype.android.R;
 import com.zype.android.ZypeApp;
 import com.zype.android.ZypeConfiguration;
+import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.ui.NavigationHelper;
+import com.zype.android.webapi.model.video.Thumbnail;
+import com.zype.android.webapi.model.video.VideoData;
 import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
 import com.zype.android.zypeapi.ZypeApiResponse;
@@ -23,6 +28,7 @@ public class VideoActionsHelper {
 
     public static final int ACTION_FAVORITE = 1;
     public static final int ACTION_UNFAVORITE = 2;
+    public static final int ACTION_SHARE = 3;
 
     public interface IVideoActionCallback {
         void onActionCompleted(boolean success);
@@ -111,5 +117,25 @@ public class VideoActionsHelper {
         if (listener != null) {
             listener.onActionCompleted(true);
         }
+    }
+
+    public static void onShareVideo(Video video, Application context) {
+        Intent sendIntent = new Intent();
+        sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        String title = video.getTitle();
+        String imageUrl = "";
+        if (video.thumbnails != null) {
+            Thumbnail thumbnail = VideoHelper.getThumbnailByHeight(video, 240);
+            imageUrl = thumbnail.getUrl();
+        }
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, SettingsProvider.getInstance().getShareSubject());
+        String message = String.format(context.getString(R.string.share_message), title, context.getString(R.string.app_name));
+        sendIntent.putExtra(Intent.EXTRA_TEXT, message);
+        sendIntent.setType("text/html");
+
+        Intent chooserIntent = Intent.createChooser(sendIntent, context.getResources().getText(R.string.menu_share));
+        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(chooserIntent);
     }
 }

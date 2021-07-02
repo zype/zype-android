@@ -197,11 +197,13 @@ public class PaywallViewModel extends BaseViewModel {
             @Override
             public void onPurchasesUpdated(List<Purchase> purchases) {
                 Log.d(TAG, "BillingManager::onPurchasesUpdated(): count=" + purchases.size());
-                if (isItemPurchased(purchases)) {
-                    if (state.getValue() == State.PURCHASE_IN_PROGRESS) {
-                        verifyVideoPurchase();
+                if (!purchases.isEmpty()) {
+                    if (isItemPurchased(purchases)) {
+                        if (state.getValue() == State.PURCHASE_IN_PROGRESS) {
+                            verifyVideoPurchase();
+                        }
+                        isPurchased.setValue(true);
                     }
-                    isPurchased.setValue(true);
                 }
             }
 
