@@ -16,7 +16,9 @@ import com.zype.android.zypeapi.model.VideoFavoriteResponse;
 import com.zype.android.zypeapi.model.VideoFavoritesResponse;
 import com.zype.android.zypeapi.model.VideoResponse;
 import com.zype.android.zypeapi.model.VideosResponse;
+import com.zype.android.zypeapi.model.ZObjectTopPlaylistResponse;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -730,6 +732,28 @@ public class ZypeApi {
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
                         listener.onCompleted(new ZypeApiResponse<>(null, false));
+                    }
+                });
+    }
+
+    public void getZObjectTopPlayLists(@NonNull final IZypeApiListener<ZObjectTopPlaylistResponse> listener) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(ZypeApi.APP_KEY, appKey);
+        ZypeApi.getInstance().getApi().getZObjectsTopPlaylists(params)
+                .enqueue(new Callback<ZObjectTopPlaylistResponse>() {
+                    @Override
+                    public void onResponse(Call<ZObjectTopPlaylistResponse> call, Response<ZObjectTopPlaylistResponse> response) {
+                        if (response.isSuccessful()) {
+                            listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+                        }
+                        else {
+                            listener.onCompleted(new ZypeApiResponse<>(response.body(), false));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ZObjectTopPlaylistResponse> call, Throwable t) {
+                        listener.onCompleted(new ZypeApiResponse<ZObjectTopPlaylistResponse>(null, false));
                     }
                 });
     }

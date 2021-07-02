@@ -38,6 +38,7 @@ public class GalleryFragment extends Fragment {
     private GalleryViewModel model;
     private String parentPlaylistId;
 
+    private Observer<Integer> sliderPageObserver;
     private Observer<List<GalleryRow>> galleryRowsObserver;
 
     private HeroImagesPagerAdapter adapterHeroImages;
@@ -82,11 +83,22 @@ public class GalleryFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
+                Logger.d("onPageSelected(): page=" + position);
+                if (position == 0) {
+                    modelHeroImages.setCurrentPage(adapterHeroImages.getCount() - 3);
+                }
+                else if (position == adapterHeroImages.getCount() - 1) {
+                    modelHeroImages.setCurrentPage(0);
+                }
+                else {
+                    modelHeroImages.setCurrentPage(position - 1);
+                }
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
                 if (state == SCROLL_STATE_IDLE) {
+                    Logger.d("onPageScrollStateChanged(): page=" + pagerHeroImages.getCurrentItem());
                     if (pagerHeroImages.getCurrentItem() == 0) {
                         pagerHeroImages.setCurrentItem(adapterHeroImages.getCount() - 2, false);
                     }
@@ -112,6 +124,9 @@ public class GalleryFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         if (heroImagesEnabled()) {
+            if (sliderPageObserver == null) {
+                sliderPageObserver = createSliderPageObserver();
+            }
             modelHeroImages = ViewModelProviders.of(getActivity()).get(HeroImagesViewModel.class);
             modelHeroImages.getHeroImages().observe(this, new Observer<List<HeroImage>>() {
                 @Override
@@ -122,13 +137,10 @@ public class GalleryFragment extends Fragment {
                     if (heroImages.size() > 0) {
                         pagerHeroImages.setCurrentItem(1, false);
                         pagerHeroImages.setVisibility(View.VISIBLE);
-                        if (heroImages.size() > 1) {
-                            modelHeroImages.startTimer(0).observe(GalleryFragment.this, new Observer<Integer>() {
-                                @Override
-                                public void onChanged(Integer page) {
-                                    pagerHeroImages.setCurrentItem(pagerHeroImages.getCurrentItem() + 1, true);
-                                }
-                            });
+                        if (model.getGalleryRowsState() == GalleryRow.State.UPDATED) {
+                            if (adapterHeroImages.getCount() > 1) {
+                                modelHeroImages.startTimer(1).observe(GalleryFragment.this, sliderPageObserver);
+                            }
                         }
                     }
                     else {
@@ -144,16 +156,12 @@ public class GalleryFragment extends Fragment {
         model = ViewModelProviders.of(getActivity()).get(GalleryViewModel.class);
         model.setPlaylistId(parentPlaylistId);
         showProgress();
-        updateGalleryRows();
-//        adapter.notifyDataSetChanged();
+        model.getGalleryRows().observe(this, galleryRowsObserver);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-//        showProgress();
-//        updateGalleryRows();
-//        adapter.notifyDataSetChanged();
     }
 
     private boolean heroImagesEnabled() {
@@ -161,19 +169,26 @@ public class GalleryFragment extends Fragment {
                 && parentPlaylistId.equals(ZypeConfiguration.getRootPlaylistId(getActivity()));
     }
 
-    private void updateGalleryRows() {
-        showProgress();
-//        model.getGalleryRows(parentPlaylistId).observe(this, new Observer<List<GalleryRow>>() {
-//            @Override
-//            public void onChanged(@Nullable List<GalleryRow> galleryRows) {
-//                Logger.d("onChanged(): Gallery rows changed, size=" + galleryRows.size());
-////                if (allDataLoaded(galleryRows)) {
-//                    adapter.setData(galleryRows);
-//                    hideProgress();
-////                }
-//            }
-//        });
-        model.getGalleryRows().observe(this, galleryRowsObserver);
+    private Observer<Integer> createSliderPageObserver() {
+        return page -> {
+            Logger.d("sliderPageObserver: page=" + page + ", currentPage=" + pagerHeroImages.getCurrentItem());
+            if (page != null) {
+                if (page == 0) {
+                    if (pagerHeroImages.getCurrentItem() == adapterHeroImages.getCount() - 2) {
+                        pagerHeroImages.setCurrentItem(pagerHeroImages.getCurrentItem() + 1, true);
+                    }
+                }
+                else if (page == adapterHeroImages.getCount() - 3) {
+                    if (pagerHeroImages.getCurrentItem() != 0) {
+                        pagerHeroImages.setCurrentItem(page + 1, true);
+                    }
+                }
+                else {
+                    pagerHeroImages.setCurrentItem(page + 1, true);
+                }
+
+            }
+        };
     }
 
     private Observer<List<GalleryRow>> createGalleryRowObserver() {
@@ -185,6 +200,10 @@ public class GalleryFragment extends Fragment {
             else {
                 adapter.setData(galleryRows);
                 hideProgress();
+                if (model.getGalleryRowsState() == GalleryRow.State.UPDATED) {
+                    if (adapterHeroImages.getCount() > 1) {
+                        modelHeroImages.startTimer(1).observe(GalleryFragment.this, sliderPageObserver);
+                    }
                 if (galleryRows.isEmpty()) {
                     showEmpty();
                 }
@@ -194,19 +213,6 @@ public class GalleryFragment extends Fragment {
             }
         };
     }
-
-//    private boolean allDataLoaded(List<GalleryRow> galleryRows) {
-//        boolean result = true;
-//        for (GalleryRow item : galleryRows) {
-//            if ((item.videos == null || item.videos.isEmpty())
-//                    && (item.nestedPlaylists == null || item.nestedPlaylists.isEmpty())) {
-//                result = false;
-//                break;
-//            }
-//        }
-//        Logger.d("allDataLoaded(): " + result);
-//        return result;
-//    }
 
     private void showProgress() {
         progressBar.setVisibility(View.VISIBLE);

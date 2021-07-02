@@ -31,16 +31,23 @@ import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.service.DownloadHelper;
 import com.zype.android.service.DownloaderService;
 import com.zype.android.ui.Auth.LoginActivity;
+import com.zype.android.ui.Gallery.GalleryFragment;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.OnLoginAction;
 import com.zype.android.ui.OnMainActivityFragmentListener;
 import com.zype.android.ui.OnVideoItemAction;
 import com.zype.android.ui.Widget.CustomViewPager;
 import com.zype.android.ui.base.BaseActivity;
+import com.zype.android.ui.epg.EPGFragment;
 import com.zype.android.ui.main.Model.Section;
+import com.zype.android.ui.main.fragments.download.DownloadFragment;
 import com.zype.android.ui.main.fragments.playlist.PlaylistActivity;
+import com.zype.android.ui.main.fragments.playlist.PlaylistFragment;
+import com.zype.android.ui.main.fragments.settings.SettingsFragment;
 import com.zype.android.ui.main.fragments.videos.VideosActivity;
 import com.zype.android.ui.search.SearchActivity;
+import com.zype.android.ui.v2.favorites.FavoritesFragment;
+import com.zype.android.ui.v2.library.LibraryFragment;
 import com.zype.android.ui.video_details.VideoDetailActivity;
 import com.zype.android.utils.BundleConstants;
 import com.zype.android.utils.DialogHelper;
@@ -89,14 +96,13 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Logger.d("onCreate()");
+
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle(R.string.menu_navigation_home);
-
-        adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
-        setupSections();
 
         bottomNavigationView = findViewById(R.id.navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
@@ -106,13 +112,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         pagerSections.setAdapter(adapterSections);
         pagerSections.setSwipeEnabled(false);
 
-//        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-//        tabLayout.setupWithViewPager(pagerSections);
-//        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-//            TabLayout.Tab tab = tabLayout.getTabAt(i);
-//            tab.setCustomView(adapterSections.getTabView(i));
-//        }
-//
         SettingsParamsBuilder settingsParamsBuilder = new SettingsParamsBuilder();
         getApi().executeRequest(WebApiManager.Request.GET_SETTINGS, settingsParamsBuilder.build());
 
@@ -132,9 +131,6 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     @Override
     protected void onStart() {
         super.onStart();
-//        if (SettingsProvider.getInstance().isLogined()) {
-//            requestConsumerData();
-//        }
     }
 
     @Override
@@ -164,21 +160,32 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
     private void setupSections() {
         sections = new LinkedHashMap<>();
-        sections.put(R.id.menuNavigationHome, new Section(getString(R.string.menu_navigation_home)));
+        if (ZypeConfiguration.playlistGalleryView(this)) {
+            sections.put(R.id.menuNavigationHome,
+                new Section(getString(R.string.menu_navigation_home),
+                        GalleryFragment.newInstance(ZypeConfiguration.getRootPlaylistId(this))));
+        }
+        else {
+            sections.put(R.id.menuNavigationHome,
+                    new Section(getString(R.string.menu_navigation_home),
+                            PlaylistFragment.newInstance()));
+        }
         if (ZypeSettings.EPG_ENABLED) {
-            sections.put(R.id.menuNavigationGuide, new Section(getString(R.string.menu_navigation_guide)));
+            sections.put(R.id.menuNavigationGuide,
+                new Section(getString(R.string.menu_navigation_guide), EPGFragment.newInstance()));
         }
         if (ZypeSettings.SHOW_LIVE) {
-            sections.put(R.id.menuNavigationLive, new Section(getString(R.string.menu_navigation_live)));
+            sections.put(R.id.menuNavigationLive,
+                new Section(getString(R.string.menu_navigation_live),null));
         }
-        sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites)));
+        sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites), FavoritesFragment.newInstance()));
         if (ZypeConfiguration.isDownloadsEnabled(this)) {
-            sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads)));
+            sections.put(R.id.menuNavigationDownloads, new Section(getString(R.string.menu_navigation_downloads), DownloadFragment.newInstance()));
         }
         if (ZypeSettings.LIBRARY_ENABLED) {
-            sections.put(R.id.menuNavigationLibrary, new Section(getString(R.string.menu_navigation_library)));
+            sections.put(R.id.menuNavigationLibrary, new Section(getString(R.string.menu_navigation_library), LibraryFragment.newInstance()));
         }
-        sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings)));
+        sections.put(R.id.menuNavigationSettings, new Section(getString(R.string.menu_navigation_settings), SettingsFragment.newInstance()));
         adapterSections.setData(sections);
     }
 
@@ -228,6 +235,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
 
         adapterSections = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        setupSections();
         adapterSections.setData(sections);
     }
 

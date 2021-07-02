@@ -15,6 +15,7 @@ import com.zype.android.zypeapi.model.VideoFavoriteResponse;
 import com.zype.android.zypeapi.model.VideoFavoritesResponse;
 import com.zype.android.zypeapi.model.VideoResponse;
 import com.zype.android.zypeapi.model.VideosResponse;
+import com.zype.android.zypeapi.model.ZObjectTopPlaylistResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -121,5 +122,9 @@ public interface IZypeApi {
 
     @GET("https://player.zype.com/embed/{video_id}.json")
     Call<PlayerResponse> getPlayer(@Header("User-Agent") String userAgent, @Path("video_id") String videoId, @QueryMap HashMap<String, String> params);
+
+    // ZObjects
+    @GET("/zobjects/?zobject_type=top_playlists")
+    Call<ZObjectTopPlaylistResponse> getZObjectsTopPlaylists(@QueryMap HashMap<String, String> params);
 
 }

@@ -48,7 +48,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         this.context = context;
-//        initTabs();
     }
 
     public void setData(Map<Integer, Section> sections) {
@@ -61,73 +60,10 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         return keys.indexOf(id);
     }
 
-    private void initTabs() {
-        TabData tabData;
-        tabs = new ArrayList<>();
-
-        tabData = new TabData(TAB_ID_HOME, R.drawable.icn_latest, R.string.title_tab_home);
-        tabs.add(tabData);
-
-        if (ZypeConfiguration.isDownloadsEnabled(context)) {
-            tabData = new TabData(TAB_ID_DOWNLOADS, R.drawable.icn_downloads, R.string.title_tab_downloads);
-            tabs.add(tabData);
-        }
-
-        tabData = new TabData(TAB_ID_FAVORITES, R.drawable.icn_favorites, R.string.title_tab_favorites);
-        tabs.add(tabData);
-
-        if (ZypeConfiguration.isNativeTvodEnabled(context)
-                || ZypeConfiguration.isUniversalTVODEnabled(context)) {
-            tabData = new TabData(TAB_ID_LIBRARY, R.drawable.icn_downloads, R.string.main_tab_my_library);
-            tabs.add(tabData);
-        }
-
-        tabData = new TabData(TAB_ID_SETTINGS, R.drawable.icn_settings, R.string.title_tab_settings);
-        tabs.add(tabData);
-    }
-
     @Override
     public Fragment getItem(int position) {
         List<Integer> keys = new ArrayList<>(sections.keySet());
-        switch(keys.get(position)) {
-            case R.id.menuNavigationHome:
-                if (ZypeConfiguration.playlistGalleryView(context)) {
-                    return GalleryFragment.newInstance(ZypeConfiguration.getRootPlaylistId(context));
-                }
-                else {
-                    return PlaylistFragment.newInstance();
-                }
-            case R.id.menuNavigationGuide:
-                return EPGFragment.newInstance();
-            case R.id.menuNavigationFavorites:
-//                return FavoritesFragment.newInstance();
-                return FavoritesFragment.newInstance();
-            case R.id.menuNavigationLive:
-            case R.id.menuNavigationDownloads:
-                return DownloadFragment.newInstance();
-            case R.id.menuNavigationLibrary:
-                return LibraryFragment.newInstance();
-            case R.id.menuNavigationSettings:
-                return SettingsFragment.newInstance();
-        }
-//        switch (tabs.get(position).id) {
-//            case TAB_ID_HOME:
-//                if (ZypeConfiguration.playlistGalleryView(context)) {
-//                    return GalleryFragment.newInstance(ZypeConfiguration.getRootPlaylistId(context));
-//                }
-//                else {
-//                    return PlaylistFragment.newInstance();
-//                }
-//            case TAB_ID_DOWNLOADS:
-//                return DownloadFragment.newInstance();
-//            case TAB_ID_FAVORITES:
-//                return FavoritesFragment.newInstance();
-//            case TAB_ID_LIBRARY:
-//                return MyLibraryFragment.newInstance();
-//            case TAB_ID_SETTINGS:
-//                return SettingsFragment.newInstance();
-//        }
-        throw new IllegalArgumentException("Unknown navigation menu id");
+        return sections.get(keys.get(position)).fragment;
     }
 
     @Override
