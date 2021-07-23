@@ -125,6 +125,8 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public static final String TAG = PlayerFragment.class.getSimpleName();
 
     private static final String ARG_VIDEO_ID = "VideoId";
+    private static final String APP_BUNDLE = "app_bundle=";
+    private static final String APP_DOMAIN = "app_domain=";
 
     private Player currentPlayer;
 
@@ -479,6 +481,13 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     private Observer<String> createPlayerUrlObserver() {
         Logger.d("createPlayerUrlObserver()");
         return playerUrl -> {
+            if (!TextUtils.isEmpty(playerUrl)) {
+                if (playerUrl.contains("app_bundle=&"))
+                    playerUrl = playerUrl.replace(APP_BUNDLE, APP_BUNDLE + BuildConfig.APPLICATION_ID);
+
+                if (playerUrl.contains("app_domain=&"))
+                    playerUrl = playerUrl.replace(APP_DOMAIN, APP_DOMAIN + BuildConfig.APPLICATION_ID);
+            }
             Logger.d("getPlayerUrl(): playerUrl=" + playerUrl);
             if (!TextUtils.isEmpty(playerUrl)) {
                 if (player != null
