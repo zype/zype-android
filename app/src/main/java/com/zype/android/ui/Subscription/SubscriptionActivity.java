@@ -206,7 +206,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     // In-app billing
     //
     private void purchaseSubscription(Subscription item) {
-        billingManager.initiatePurchaseFlow(this, item.getMarketplace().getSku(), BillingClient.SkuType.SUBS);
+        billingManager.initiatePurchaseFlowWithSKuDetails(this, item.getMarketplace().getSku(), BillingClient.SkuType.SUBS, item.getMarketplace());
     }
 
     //
@@ -219,7 +219,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
     }
 
     @Override
-    public void onConsumeFinished(String token, @BillingClient.BillingResponse int result) {
+    public void onConsumeFinished(String token, @BillingClient.BillingResponseCode int result) {
     }
 
     @Override

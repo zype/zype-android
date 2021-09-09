@@ -95,12 +95,16 @@ public class SummaryFragment extends Fragment {
             Button buttonPlayTrailer = Objects.requireNonNull(getView()).findViewById(R.id.buttonPlayTrailer);
             if (ZypeConfiguration.trailers()) {
                 final List<String> previewIds = VideoHelper.getPreviewIdsList(video);
-                if (previewIds.isEmpty()) {
+                if (previewIds != null) {
+                    if (previewIds.isEmpty()) {
+                        buttonPlayTrailer.setVisibility(View.GONE);
+                    }
+                    else {
+                        buttonPlayTrailer.setVisibility(View.VISIBLE);
+                        buttonPlayTrailer.setOnClickListener(v -> playTrailer(previewIds.get(0)));
+                    }
+                }else {
                     buttonPlayTrailer.setVisibility(View.GONE);
-                }
-                else {
-                    buttonPlayTrailer.setVisibility(View.VISIBLE);
-                    buttonPlayTrailer.setOnClickListener(v -> playTrailer(previewIds.get(0)));
                 }
             }
             else {

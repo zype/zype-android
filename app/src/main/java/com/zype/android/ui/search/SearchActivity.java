@@ -505,7 +505,7 @@ public class SearchActivity extends BaseActivity implements ListView.OnItemClick
     }
 
     @Override
-    public void onConsumeFinished(String token, @BillingClient.BillingResponse int result) {
+    public void onConsumeFinished(String token, @BillingClient.BillingResponseCode int result) {
     }
 
     @Override

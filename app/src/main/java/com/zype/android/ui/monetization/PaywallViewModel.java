@@ -127,7 +127,7 @@ public class PaywallViewModel extends BaseViewModel {
                 }
                 billingManager.querySkuDetailsAsync(BillingClient.SkuType.INAPP, skuList,
                         (responseCode, skuDetailsList) -> {
-                            if (responseCode != BillingClient.BillingResponse.OK) {
+                            if (responseCode.getResponseCode() != BillingClient.BillingResponseCode.OK) {
                                 Log.e(TAG, "onSkuDetailsResponse(): Error retrieving sku details from Google Play");
                             } else {
                                 if (skuDetailsList != null) {
@@ -160,7 +160,7 @@ public class PaywallViewModel extends BaseViewModel {
                 }
                 billingManager.querySkuDetailsAsync(BillingClient.SkuType.INAPP, skuList,
                         (responseCode, skuDetailsList) -> {
-                            if (responseCode != BillingClient.BillingResponse.OK) {
+                            if (responseCode.getResponseCode() != BillingClient.BillingResponseCode.OK) {
                                 Log.e(TAG, "onSkuDetailsResponse(): Error retrieving sku details from Google Play");
                             } else {
                                 if (skuDetailsList != null) {
@@ -232,9 +232,12 @@ public class PaywallViewModel extends BaseViewModel {
                     String marketplaceId = getPlaylistMarketplaceId(playlist);
                     Log.d(TAG, "isItemPurchased(): sku=" + marketplaceId);
                     for (Purchase purchase : purchases) {
-                        if (purchase.getSku().equals(marketplaceId)) {
-                            return true;
+                        for (String itemSku : purchase.getSkus()){
+                            if (itemSku.equals(marketplaceId)) {
+                                return true;
+                            }
                         }
+
                     }
                 }
                 break;
@@ -244,9 +247,12 @@ public class PaywallViewModel extends BaseViewModel {
                     String marketplaceId = getVideoMarketplaceId(video);
                     Log.d(TAG, "isItemPurchased(): sku=" + marketplaceId);
                     for (Purchase purchase : purchases) {
-                        if (!TextUtils.isEmpty(marketplaceId) && purchase.getSku().equals(marketplaceId)) {
-                            return true;
+                        for (String itemSku : purchase.getSkus()){
+                            if (!TextUtils.isEmpty(marketplaceId) && itemSku.equals(marketplaceId)) {
+                                return true;
+                            }
                         }
+
                     }
                 }
                 break;
@@ -266,8 +272,8 @@ public class PaywallViewModel extends BaseViewModel {
         }
         if (item.playlist != null) {
             Log.d(TAG, "makePurchase(): playlist, sku=" + item.product.getSku());
-            billingManager.initiatePurchaseFlow(activity,
-                    item.product.getSku(), BillingClient.SkuType.INAPP);
+            billingManager.initiatePurchaseFlowWithSKuDetails(activity,
+                    item.product.getSku(), BillingClient.SkuType.INAPP, item.product);
         }
         else if (item.video != null) {
             Log.d(TAG, "makePurchase(): video, sku=" + item.product.getSku());
@@ -276,8 +282,8 @@ public class PaywallViewModel extends BaseViewModel {
                 verifyVideoPurchase();
             }
             else {
-                billingManager.initiatePurchaseFlow(activity,
-                        item.product.getSku(), BillingClient.SkuType.INAPP);
+                billingManager.initiatePurchaseFlowWithSKuDetails(activity,
+                        item.product.getSku(), BillingClient.SkuType.INAPP, item.product);
             }
         }
         else {
