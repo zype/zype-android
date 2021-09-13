@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,8 +86,10 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         ZypeApp.marketplaceGateway.getSubscriptions().observe(this, new Observer<Map<String, Subscription>>() {
             @Override
             public void onChanged(@Nullable Map<String, Subscription> subscriptions) {
+                Log.d("BillingManager","getSubscriptions: observe: "+subscriptions);
                 List<Subscription> subscriptionList = new ArrayList<>();
                 for (Map.Entry<String, Subscription> entry : subscriptions.entrySet()) {
+                    Log.d("BillingManager","getSubscriptions: map: "+entry.getValue().getMarketplace());
                     if (entry.getValue().getMarketplace() != null) {
                         subscriptionList.add(entry.getValue());
                     }
@@ -224,6 +227,7 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
 
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
+        Log.d("BillingManager","onPurchasesUpdated(: subscriptionactivity: purchases: "+purchases);
         boolean result = false;
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             if (purchases != null && !purchases.isEmpty()) {
@@ -234,10 +238,13 @@ public class SubscriptionActivity extends BaseActivity implements BillingManager
         else if (ZypeConfiguration.isNativeToUniversalSubscriptionEnabled(this)) {
             if (purchases != null && !purchases.isEmpty()) {
                 if (selectedSubscription != null) {
+                    Log.d("BillingManager","onPurchasesUpdated(: subscriptionactivity: selectedSubscription: "+selectedSubscription.getMarketplace().getPrice());
                     showProgress(getString(R.string.subscription_verify));
                     ZypeApp.marketplaceGateway.verifySubscription(selectedSubscription).observe(this, new Observer<Boolean>() {
                         @Override
                         public void onChanged(@Nullable Boolean result) {
+                            Log.d("BillingManager","onPurchasesUpdated(: subscriptionactivity: result: "+result);
+
                             hideProgress();
                             if (result) {
                                 setResult(RESULT_OK);

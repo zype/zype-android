@@ -115,7 +115,7 @@ android {
             ]
         }
         template {
-            versionName '1.0.0'
+            versionName '2.0.4'
             applicationId "com.hexabrain.test"
             manifestPlaceholders = [ manifestApplicationId: "${applicationId}",
                                      // TODO: Provide valid app_id for OneSignal
@@ -237,7 +237,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:15.0.1'
 
     // Google In-app billing
-    implementation 'com.android.billingclient:billing:4.0.0'
+    implementation 'com.android.billingclient:billing:3.0.0'
 
 //    implementation files('libs/libAkamaiExoPlayerLoader.jar')
 //    implementation files('libs/libAndroidMediaAnalytics.jar')

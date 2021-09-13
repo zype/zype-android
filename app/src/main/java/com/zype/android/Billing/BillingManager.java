@@ -2,11 +2,14 @@ package com.zype.android.Billing;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.android.billingclient.api.AcknowledgePurchaseParams;
+import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClient.FeatureType;
 import com.android.billingclient.api.BillingClient.SkuType;
@@ -22,7 +25,10 @@ import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
 
 /**
  * Created by Evgeny Cherkasov on 01.07.2017.
@@ -34,7 +40,7 @@ public class BillingManager implements PurchasesUpdatedListener {
     private final Context context;
     private BillingClient mBillingClient;
     private final BillingUpdatesListener mBillingUpdatesListener;
-    private List<Purchase> purchases;
+    public static List<Purchase> purchases;
 
     /**
      * True if billing service is connected now.
@@ -233,9 +239,31 @@ public class BillingManager implements PurchasesUpdatedListener {
     //
     @Override
     public void onPurchasesUpdated(@NonNull BillingResult billingResult, @Nullable List<Purchase> list) {
+
+
+        if (list != null) {
+            for (Purchase purchase : list) {
+                Log.d("BillingManager", "IAP4: onPurchasesUpdated: list size: " + list + ", response code: " + billingResult.getResponseCode() + ", purchase state: " + purchase.getPurchaseState());
+            }
+        }else {
+            Log.d("BillingManager", "IAP4: onPurchasesUpdated: list: "+list+" response code: "+billingResult.getResponseCode());
+        }
+
         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-            this.purchases = purchases;
-            mBillingUpdatesListener.onPurchasesUpdated(purchases);
+            purchases = Collections.emptyList();
+            purchases = list;
+            Log.d("BillingManager", "IAP4: purchases list size: "+purchases.size()+", googleListSize: "+list.size());
+            if (list != null){
+                handlePurchases(list);
+            }
+        }
+        else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
+            Purchase.PurchasesResult queryAlreadyPurchasesResult = mBillingClient.queryPurchases(SUBS);
+            List<Purchase> alreadyPurchases = queryAlreadyPurchasesResult.getPurchasesList();
+            Log.d("BillingManager","IAP4: Item already purchased: list size: "+list+", response code: "+billingResult.getResponseCode());
+            if(alreadyPurchases!=null){
+                handlePurchases(alreadyPurchases);
+            }
         }
         else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
             mBillingUpdatesListener.onPurchaseCancelled();
@@ -245,15 +273,64 @@ public class BillingManager implements PurchasesUpdatedListener {
         }
     }
 
+
+    Purchase purchase1 = null;
+    public void handlePurchases(List<Purchase>  purchases) {
+        for(Purchase purchase:purchases) {
+            Log.d("BillingManager","handlePurchases purchase state: "+purchase.getPurchaseState());
+            if (/*ITEM_SKU_SUBSCRIBE.equals(purchase.getSku()) && */purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED){
+//if item is purchased and not acknowledged
+                this.purchase1 = purchase;
+                Log.d("BillingManager","handlePurchases purchase isAcknowledged: "+purchase.isAcknowledged());
+                if (!purchase.isAcknowledged()) {
+                    AcknowledgePurchaseParams acknowledgePurchaseParams =
+                            AcknowledgePurchaseParams.newBuilder()
+                                    .setPurchaseToken(purchase.getPurchaseToken())
+                                    .build();
+                    mBillingClient.acknowledgePurchase(acknowledgePurchaseParams, ackPurchase);
+                }
+            }else {
+                mBillingUpdatesListener.onPurchasesUpdated(purchases);
+            }
+        }
+    }
+
+    AcknowledgePurchaseResponseListener ackPurchase = new AcknowledgePurchaseResponseListener() {
+        @Override
+        public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
+            if(billingResult.getResponseCode()==BillingClient.BillingResponseCode.OK){
+                //if purchase is acknowledged
+                // Grant entitlement to the user. and restart activity
+                if (purchase1 != null && !purchase1.getPurchaseToken().isEmpty()){
+                    Log.e("BillingManager","Item is Successfully Acknowledge, purchase token: "+purchase1.getPurchaseToken());
+                }else {
+                    if (purchase1 == null || purchase1.getPurchaseToken() == null){
+                        Log.e("BillingManager","Item is Successfully Acknowledge, purchase list is empty");
+                        return;
+                    }
+                }
+
+                try {
+                    Log.e("BillingManager","successfull mBillingUpdatesListener.onPurchasesUpdated()"+purchase1.getPurchaseToken());
+                    mBillingUpdatesListener.onPurchasesUpdated(purchases);
+                } catch (Exception e) {
+                    Log.e(TAG,"AcknowledgePurchaseResponseListener: Error: "+e.getMessage());
+
+                }
+            }
+        }
+    };
+
     public List<Purchase> getPurchases() {
         return this.purchases;
     }
 
     public Purchase getPurchase(String sku) {
         for (Purchase purchase : purchases) {
-            for (String itemSku : purchase.getSkus()){
+            if (purchase.getSku().equals(sku)) return purchase;
+            /*for (String itemSku : purchase.getSkus()){
                 if (itemSku.equals(sku)) return purchase;
-            }
+            }*/
 
         }
         return null;

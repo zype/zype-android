@@ -232,11 +232,14 @@ public class PaywallViewModel extends BaseViewModel {
                     String marketplaceId = getPlaylistMarketplaceId(playlist);
                     Log.d(TAG, "isItemPurchased(): sku=" + marketplaceId);
                     for (Purchase purchase : purchases) {
-                        for (String itemSku : purchase.getSkus()){
+                        if (purchase.getSku().equals(marketplaceId)) {
+                            return true;
+                        }
+                        /*for (String itemSku : purchase.getSkus()){
                             if (itemSku.equals(marketplaceId)) {
                                 return true;
                             }
-                        }
+                        }*/
 
                     }
                 }
@@ -247,11 +250,14 @@ public class PaywallViewModel extends BaseViewModel {
                     String marketplaceId = getVideoMarketplaceId(video);
                     Log.d(TAG, "isItemPurchased(): sku=" + marketplaceId);
                     for (Purchase purchase : purchases) {
-                        for (String itemSku : purchase.getSkus()){
+                        if (!TextUtils.isEmpty(marketplaceId) && purchase.getSku().equals(marketplaceId)) {
+                            return true;
+                        }
+                        /*for (String itemSku : purchase.getSkus()){
                             if (!TextUtils.isEmpty(marketplaceId) && itemSku.equals(marketplaceId)) {
                                 return true;
                             }
-                        }
+                        }*/
 
                     }
                 }
