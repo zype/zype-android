@@ -30,6 +30,11 @@ public class SubscriptionsHelper {
                 if (getSkuList().contains(item.getSku())) {
                     subscriptionCount += 1;
                 }
+                /*for (String itemSku : item.getSkus()){
+                    if (getSkuList().contains(itemSku)) {
+                        subscriptionCount += 1;
+                    }
+                }*/
             }
             Logger.d("updateSubscriptionCount(): Native purchases count: " + subscriptionCount);
             SettingsProvider.getInstance().saveSubscriptionCount(subscriptionCount);

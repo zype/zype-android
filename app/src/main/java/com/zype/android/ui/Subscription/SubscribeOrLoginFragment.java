@@ -82,6 +82,7 @@ public class SubscribeOrLoginFragment extends Fragment {
             public void onClick(View v) {
                 if (AuthHelper.isLoggedIn()) {
                     // Get first purchase from the purchase list and try to validate it
+
                     Subscription subscription = ZypeApp.marketplaceGateway.findSubscriptionBySku(purchases.get(0).getSku());
                     if (subscription != null) {
                         showProgress(getString(R.string.subscription_verify));
@@ -104,6 +105,33 @@ public class SubscribeOrLoginFragment extends Fragment {
                         Logger.e("Not found Zype Plan for existing in-app purchase, sku=" + purchases.get(0).getSku());
                         DialogHelper.showErrorAlert(getActivity(), getString(R.string.subscribe_or_login_error_restore_purchase_zype));
                     }
+
+
+                    /*for (String itemSku : purchases.get(0).getSkus()){
+                        Subscription subscription = ZypeApp.marketplaceGateway.findSubscriptionBySku(itemSku);
+                        if (subscription != null) {
+                            showProgress(getString(R.string.subscription_verify));
+                            ZypeApp.marketplaceGateway.verifySubscription(subscription).observe(SubscribeOrLoginFragment.this, new Observer<Boolean>() {
+                                @Override
+                                public void onChanged(@Nullable Boolean result) {
+                                    hideProgress();
+                                    if (result) {
+                                        getActivity().setResult(RESULT_OK);
+                                        getActivity().finish();
+                                    }
+                                    else {
+                                        DialogHelper.showErrorAlert(getActivity(),
+                                                getString(R.string.subscribe_or_login_error_validation));
+                                    }
+                                }
+                            });
+                        }
+                        else {
+                            Logger.e("Not found Zype Plan for existing in-app purchase, sku=" + itemSku);
+                            DialogHelper.showErrorAlert(getActivity(), getString(R.string.subscribe_or_login_error_restore_purchase_zype));
+                        }
+                    }*/
+
                 }
                 else {
                     navigationHelper.switchToConsumerScreen(getActivity());

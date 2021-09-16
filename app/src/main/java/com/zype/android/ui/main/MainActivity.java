@@ -503,7 +503,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     }
 
     @Override
-    public void onConsumeFinished(String token, @BillingClient.BillingResponse int result) {
+    public void onConsumeFinished(String token, @BillingClient.BillingResponseCode int result) {
     }
 
     @Override

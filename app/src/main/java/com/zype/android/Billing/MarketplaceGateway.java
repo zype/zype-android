@@ -1,8 +1,10 @@
 package com.zype.android.Billing;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsResponseListener;
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import retrofit.RetrofitError;
@@ -73,6 +76,7 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
             subscriptionsLiveData.setValue(subscriptions);
 
             for (final String planId : planIds) {
+                Log.d("BillingManager","planid: "+planId);
                 loadPlan(planId);
             }
         }
@@ -84,6 +88,7 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
     }
 
     public LiveData<Map<String, Subscription>> getSubscriptions() {
+        Log.d("BillingManager","getSubscriptions: subscriptionsLiveData: "+subscriptionsLiveData);
         if (subscriptionsLiveData == null || subscriptionsLiveData.getValue().isEmpty() || !setupCompleted()) {
             setup();
         }
@@ -121,12 +126,19 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
 //            return null;
 //        }
 
+
+        Log.d("BillingManager","verifySubscription: sku: "+subscription.getMarketplace().getSku()+", getpurchases: "+billingManager.getPurchases().size());
+
         String sku = subscription.getMarketplace().getSku();
         for (Purchase item : billingManager.getPurchases()) {
+            Log.d("BillingManager","verifySubscription: ItemSKU: "+item.getSku()+", Google sku: "+sku);
+            Log.d("BillingManager","verifySubscription: getOriginalJson: "+item.getOriginalJson());
+            Log.d("BillingManager","verifySubscription: getSignature: "+item.getSignature());
+            Log.d("BillingManager","verifySubscription: getPurchaseToken: "+item.getPurchaseToken());
+            Log.d("BillingManager","verifySubscription: planID: "+subscription.getZypePlan().id);
+            Log.d("BillingManager","verifySubscription: ConsumerID: "+SettingsProvider.getInstance().getConsumerId());
             if (item.getSku().equals(sku)) {
                 SubscriptionLiveData result = new SubscriptionLiveData(subscription);
-                Logger.d("purchase originalJson=" + item.getOriginalJson());
-                Logger.d("purchase signature=" + item.getSignature());
                 MarketplaceConnectParamsBuilder builder = new MarketplaceConnectParamsBuilder()
                         .addConsumerId(SettingsProvider.getInstance().getConsumerId())
                         .addPlanId(subscription.getZypePlan().id)
@@ -135,6 +147,20 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
                         .addSignature(item.getSignature());
                 api.executeRequest(WebApiManager.Request.MARKETPLACE_CONNECT, builder.build());
             }
+            /*for (String itemSku : item.getSkus()){
+                if (itemSku.equals(sku)) {
+                    SubscriptionLiveData result = new SubscriptionLiveData(subscription);
+                    Logger.d("purchase originalJson=" + item.getOriginalJson());
+                    Logger.d("purchase signature=" + item.getSignature());
+                    MarketplaceConnectParamsBuilder builder = new MarketplaceConnectParamsBuilder()
+                            .addConsumerId(SettingsProvider.getInstance().getConsumerId())
+                            .addPlanId(subscription.getZypePlan().id)
+                            .addPurchaseToken(item.getPurchaseToken())
+                            .addReceipt(item.getOriginalJson())
+                            .addSignature(item.getSignature());
+                    api.executeRequest(WebApiManager.Request.MARKETPLACE_CONNECT, builder.build());
+                }
+            }*/
         }
         return subscriptionVerified;
     }
@@ -183,6 +209,41 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
 //                        .addSignature(item.getSignature());
 //                api.executeRequest(WebApiManager.Request.MARKETPLACE_CONNECT, builder.build());
             }
+            /*for (String itemSku : item.getSkus()){
+                if (itemSku.equals(sku)) {
+                    Logger.d("purchase originalJson=" + item.getOriginalJson());
+                    Logger.d("purchase signature=" + item.getSignature());
+                    ZypeApi.getInstance().verifyTvodPurchaseGoogle(
+                            ZypeApp.appData.id,
+                            ZypeApp.appData.siteId,
+                            SettingsProvider.getInstance().getConsumerId(),
+                            playlist.id,
+                            item.getPurchaseToken(),
+                            String.valueOf(purchaseItem.product.getPriceAmountMicros() / 1000000),
+                            item.getOriginalJson(),
+                            item.getSignature(),
+                            response -> {
+                                if (response.isSuccessful) {
+                                    if (playlistPurchaseVerified != null) {
+                                        playlistPurchaseVerified.setValue(true);
+                                    }
+                                }
+                                else {
+                                    if (playlistPurchaseVerified != null) {
+                                        playlistPurchaseVerified.setValue(false);
+                                    }
+                                }
+                            });
+//                MarketplaceConnectParamsBuilder builder = new MarketplaceConnectParamsBuilder()
+//                        .addConsumerId(SettingsProvider.getInstance().getConsumerId())
+//                        .addPlaylistId(playlist.id)
+//                        .addPurchaseToken(item.getPurchaseToken())
+//                        .addReceipt(item.getOriginalJson())
+//                        .addSignature(item.getSignature());
+//                api.executeRequest(WebApiManager.Request.MARKETPLACE_CONNECT, builder.build());
+                }
+            }*/
+
         }
         return playlistPurchaseVerified;
     }
@@ -218,6 +279,36 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
                             }
                         });
             }
+            /*for (String itemSku : item.getSkus()){
+                if (itemSku.equals(sku)) {
+                    Logger.d("purchase originalJson=" + item.getOriginalJson());
+                    Logger.d("purchase signature=" + item.getSignature());
+                    ZypeApi.getInstance().verifyVideoPurchaseGoogle(
+                            ZypeApp.appData.id,
+                            ZypeApp.appData.siteId,
+                            SettingsProvider.getInstance().getConsumerId(),
+                            video.id,
+                            item.getPurchaseToken(),
+                            String.valueOf(purchaseItem.product.getPriceAmountMicros() / 1000000),
+                            item.getOriginalJson(),
+                            item.getSignature(),
+                            response -> {
+                                if (response.isSuccessful) {
+                                    billingManager.consumePurchase(item);
+                                }
+                                else {
+                                    if (response.errorBody.status == 400) {
+                                        Logger.e("verifyVideoPurchase(): Error verifying purchase. It is likely because it was processed earlier. Consuming this purchase.");
+                                        billingManager.consumePurchase(item);
+                                    }
+                                }
+                                if (listener != null) {
+                                    listener.onPurchaseVerified(response.isSuccessful);
+                                }
+                            });
+                }
+            }*/
+
         }
     }
 
@@ -272,31 +363,33 @@ public class MarketplaceGateway implements BillingManager.BillingUpdatesListener
     //
     private void queryGooglePlayProduct(final Subscription subscription) {
         // Get sku details from marketplace (Google Play) for specified sku
+        Log.d("BillingManager","queryGooglePlayProduct: subscription: "+subscription);
         if (subscription.getZypePlan().marketplaceIds == null) {
             Logger.d("queryGooglePlayProduct(): marketplaceIds is empty.");
             return;
         }
         final String sku = subscription.getZypePlan().marketplaceIds.googleplay;
+        Log.d("BillingManager","queryGooglePlayProduct: sku: "+sku);
         List<String> skuList = new ArrayList<>();
         skuList.add(sku);
         billingManager.querySkuDetailsAsync(BillingClient.SkuType.SUBS, skuList,
                 new SkuDetailsResponseListener() {
                     @Override
-                    public void onSkuDetailsResponse(int responseCode, List<SkuDetails> skuDetailsList) {
-                        if (responseCode != BillingClient.BillingResponse.OK) {
+                    public void onSkuDetailsResponse(@NonNull BillingResult billingResult, @Nullable List<SkuDetails> list) {
+                        if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
                             Logger.e("onSkuDetailsResponse(): Error retrieving sku details from Google Play");
                         }
                         else {
-                            if (skuDetailsList != null) {
-                                if (skuDetailsList.size() == 0) {
+                            if (list != null) {
+                                if (list.size() == 0) {
                                     Logger.e("onSkuDetailsResponse(): Sku is not found in Google Play, sku=" + sku);
                                 }
                                 else {
-                                    if (skuDetailsList.size() > 1) {
+                                    if (list.size() > 1) {
                                         Logger.w("onSkuDetailsResponse(): Unexpected number of items (" +
-                                                skuDetailsList.size() + ") in Google Play, sku=" + sku);
+                                                list.size() + ") in Google Play, sku=" + sku);
                                     }
-                                    subscription.setMarketplace(skuDetailsList.get(0));
+                                    subscription.setMarketplace(list.get(0));
                                 }
                             }
                         }
