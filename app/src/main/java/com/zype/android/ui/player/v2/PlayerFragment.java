@@ -96,6 +96,7 @@ import com.zype.android.core.provider.helpers.VideoHelper;
 import com.zype.android.core.settings.SettingsProvider;
 import com.zype.android.receiver.PhoneCallReceiver;
 import com.zype.android.receiver.RemoteControlReceiver;
+import com.zype.android.service.PlayerService;
 import com.zype.android.ui.NavigationHelper;
 import com.zype.android.ui.dialog.ErrorDialogFragment;
 import com.zype.android.ui.player.PlayerViewModel;
@@ -1407,49 +1408,56 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
 
         Video video = videoViewModel.getVideoSync();
         if (video != null) {
-            String title = video.getTitle();
+//            String title = video.getTitle();
+//
+//            Intent notificationIntent;
+//            Bundle bundle = new Bundle();
+//            bundle.putString(BundleConstants.VIDEO_ID, video.id);
+//            notificationIntent = new Intent(getActivity(), VideoDetailActivity.class);
+//            notificationIntent.putExtras(bundle);
+//            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
+//
+//            PendingIntent intent = PendingIntent.getActivity(getActivity(), 0,
+//                    notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//            NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(),
+//                    ZypeApp.NOTIFICATION_CHANNEL_ID);
+//            builder.setContentIntent(intent)
+//                    .setContentTitle(getActivity().getString(R.string.app_name))
+//                    .setContentText(title)
+//                    .setSmallIcon(R.drawable.ic_background_playback)
+//                    .setPriority(NotificationCompat.PRIORITY_MAX)
+//                    .setAutoCancel(true)
+//                    .setOngoing(true)
+//                    .setWhen(0);
+//
+//            if (player != null) {
+//                if (player.getPlayWhenReady()) {
+//                    builder.addAction(new NotificationCompat.Action(R.drawable.ic_pause_black_24dp, "Pause",
+//                            MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
+//                                    PlaybackStateCompat.ACTION_PLAY_PAUSE)));
+//                }
+//                else {
+//                    builder.addAction(new NotificationCompat.Action(R.drawable.ic_play_arrow_black_24dp, "Play",
+//                            MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
+//                                    PlaybackStateCompat.ACTION_PLAY_PAUSE)));
+//                }
+//            }
+//            builder.setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+//                    .setMediaSession(mediaSession.getSessionToken())
+//                    .setShowCancelButton(true)
+//                    .setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
+//                            PlaybackStateCompat.ACTION_STOP)));
+//
+//            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+//            notificationManager.notify(ZypeApp.NOTIFICATION_ID, builder.build());
 
-            Intent notificationIntent;
-            Bundle bundle = new Bundle();
-            bundle.putString(BundleConstants.VIDEO_ID, video.id);
-            notificationIntent = new Intent(getActivity(), VideoDetailActivity.class);
-            notificationIntent.putExtras(bundle);
-            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-
-            PendingIntent intent = PendingIntent.getActivity(getActivity(), 0,
-                    notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(),
-                    ZypeApp.NOTIFICATION_CHANNEL_ID);
-            builder.setContentIntent(intent)
-                    .setContentTitle(getActivity().getString(R.string.app_name))
-                    .setContentText(title)
-                    .setSmallIcon(R.drawable.ic_background_playback)
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
-                    .setAutoCancel(true)
-                    .setOngoing(true)
-                    .setWhen(0);
-
-            if (player != null) {
-                if (player.getPlayWhenReady()) {
-                    builder.addAction(new NotificationCompat.Action(R.drawable.ic_pause_black_24dp, "Pause",
-                            MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
-                                    PlaybackStateCompat.ACTION_PLAY_PAUSE)));
-                }
-                else {
-                    builder.addAction(new NotificationCompat.Action(R.drawable.ic_play_arrow_black_24dp, "Play",
-                            MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
-                                    PlaybackStateCompat.ACTION_PLAY_PAUSE)));
-                }
-            }
-            builder.setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-                    .setMediaSession(mediaSession.getSessionToken())
-                    .setShowCancelButton(true)
-                    .setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
-                            PlaybackStateCompat.ACTION_STOP)));
-
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
-            notificationManager.notify(ZypeApp.NOTIFICATION_ID, builder.build());
+            Intent intent = new Intent(getActivity(), PlayerService.class);
+            intent.setAction(player.getPlayWhenReady() ? PlayerService.ACTION_START_FOREGROUND_SERVICE_PLAY : PlayerService.ACTION_START_FOREGROUND_SERVICE_PAUSE);
+            intent.putExtra(PlayerService.VIDEO_TITLE_EXTRA, video.getTitle());
+            intent.putExtra(PlayerService.VIDEO_ID_EXTRA, video.id);
+            intent.putExtra(PlayerService.MEDIA_SESSION_TOKEN_EXTRA, mediaSession.getSessionToken());
+            getActivity().startService(intent);
 
             playerViewModel.setToBackground(true);
         }
@@ -1458,8 +1466,11 @@ public class PlayerFragment extends Fragment implements  AdEvent.AdEventListener
     public void hideNotification() {
         Logger.d("hideNotification()");
         if (getActivity() != null) {
-            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
-            notificationManager.cancel(ZypeApp.NOTIFICATION_ID);
+//            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getActivity());
+//            notificationManager.cancel(ZypeApp.NOTIFICATION_ID);
+            Intent intent = new Intent(getActivity(), PlayerService.class);
+            intent.setAction(PlayerService.ACTION_STOP_FOREGROUND_SERVICE);
+            getActivity().startService(intent);
         }
         else {
             Logger.d("hideNotification(): Activity is not exist");
