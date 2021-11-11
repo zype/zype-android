@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -176,7 +177,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
         }
         if (ZypeSettings.SHOW_LIVE) {
             sections.put(R.id.menuNavigationLive,
-                new Section(getString(R.string.menu_navigation_live),null));
+                new Section(getString(R.string.menu_navigation_live), DownloadFragment.newInstance()));
         }
         sections.put(R.id.menuNavigationFavorites, new Section(getString(R.string.menu_navigation_favorites), FavoritesFragment.newInstance()));
         if (ZypeConfiguration.isDownloadsEnabled(this)) {
