@@ -8,6 +8,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -68,7 +70,10 @@ import com.zype.android.webapi.events.favorite.UnfavoriteEvent;
 import com.zype.android.webapi.model.consumers.Consumer;
 import com.zype.android.webapi.model.consumers.ConsumerFavoriteVideoData;
 import com.zype.android.webapi.model.player.File;
+import com.zype.android.zypeapi.IZypeApiListener;
 import com.zype.android.zypeapi.ZypeApi;
+import com.zype.android.zypeapi.ZypeApiResponse;
+import com.zype.android.zypeapi.model.PlaylistMain;
 import com.zype.android.zypeapi.model.VideoResponse;
 
 import java.util.ArrayList;
@@ -92,6 +97,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
     SectionsPagerAdapter adapterSections;
     private int lastSelectedTabId = R.id.menuNavigationHome;
     private boolean refreshTab = false;
+    public static List<String> childrenVidIds = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +120,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
 
         SettingsParamsBuilder settingsParamsBuilder = new SettingsParamsBuilder();
         getApi().executeRequest(WebApiManager.Request.GET_SETTINGS, settingsParamsBuilder.build());
-
+        getPlaylistWithChildrenIds();
         if (ZypeConfiguration.isNativeSubscriptionEnabled(this)) {
             new BillingManager(this, this);
         }
@@ -274,6 +280,7 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             case R.id.menuNavigationGuide:
             case R.id.menuNavigationLibrary:
             case R.id.menuNavigationSettings: {
+                getPlaylistWithChildrenIds();
                 lastSelectedTabId = item.getItemId();
                 Section section = sections.get(item.getItemId());
                 if (item.getItemId() == R.id.menuNavigationFavorites) {
@@ -289,6 +296,27 @@ public class MainActivity extends BaseActivity implements BottomNavigationView.O
             }
         }
         return false;
+    }
+
+    public void getPlaylistWithChildrenIds(){
+        ZypeApi zypeApi = ZypeApi.getInstance();
+        String playlistId = ZypeConfiguration.getRootPlaylistId(this);
+
+        final IZypeApiListener listener = new IZypeApiListener() {
+            @Override
+            public void onCompleted(ZypeApiResponse response) {
+                if (response.isSuccessful){
+                    PlaylistMain playlistsResponse = (PlaylistMain) response.data;
+                    Log.d("getPlaylistWithChiIds ","respose: "+playlistsResponse.getResponse().getChildrenVideoIds().size());
+                    childrenVidIds.clear();
+                    if (playlistsResponse.getResponse().getChildrenVideoIds() != null && !playlistsResponse.getResponse().getChildrenVideoIds().isEmpty()){
+                        childrenVidIds.addAll(playlistsResponse.getResponse().getChildrenVideoIds());
+                        Log.d("getPlaylistWithChiIds ","childrenVidIds: "+childrenVidIds.size());
+                    }
+                }
+            }
+        };
+        zypeApi.getPlaylistsForChildrenIds(playlistId, listener);
     }
 
     private void switchToLiveVideo() {

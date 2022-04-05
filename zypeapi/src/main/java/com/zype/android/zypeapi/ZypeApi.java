@@ -10,6 +10,7 @@ import com.zype.android.zypeapi.model.ErrorBody;
 import com.zype.android.zypeapi.model.MarketplaceConnectBody;
 import com.zype.android.zypeapi.model.MarketplaceConnectBodyData;
 import com.zype.android.zypeapi.model.PlayerResponse;
+import com.zype.android.zypeapi.model.PlaylistMain;
 import com.zype.android.zypeapi.model.PlaylistsResponse;
 import com.zype.android.zypeapi.model.VideoEntitlementsResponse;
 import com.zype.android.zypeapi.model.VideoFavoriteResponse;
@@ -756,6 +757,24 @@ public class ZypeApi {
                         listener.onCompleted(new ZypeApiResponse<ZObjectTopPlaylistResponse>(null, false));
                     }
                 });
+    }
+
+    // Playlist
+
+    public void getPlaylistsForChildrenIds(@Nullable String parentId, @NonNull final IZypeApiListener listener) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(ZypeApi.APP_KEY, appKey);
+        getApi().getPlaylistsWithChildrenVideoIds(parentId, params).enqueue(new Callback<PlaylistMain>() {
+            @Override
+            public void onResponse(Call<PlaylistMain> call, Response<PlaylistMain> response) {
+                listener.onCompleted(new ZypeApiResponse<>(response.body(), true));
+            }
+
+            @Override
+            public void onFailure(Call<PlaylistMain> call, Throwable t) {
+                listener.onCompleted(new ZypeApiResponse<PlaylistMain>(null, false));
+            }
+        });
     }
 
 }

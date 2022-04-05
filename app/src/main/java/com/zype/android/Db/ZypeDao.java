@@ -147,4 +147,7 @@ public interface ZypeDao {
 
     @Query("DELETE FROM favorite")
     public void deleteVideoFavorites();
+
+    @Query("SELECT * from video WHERE (is_downloaded_video =1 OR is_downloaded_audio =1)")
+    List<Video> getDownloadedVideos();
 }

@@ -9,6 +9,7 @@ import com.zype.android.zypeapi.model.DevicePinResponse;
 import com.zype.android.zypeapi.model.MarketplaceConnectBody;
 import com.zype.android.zypeapi.model.MarketplaceConnectResponse;
 import com.zype.android.zypeapi.model.PlayerResponse;
+import com.zype.android.zypeapi.model.PlaylistMain;
 import com.zype.android.zypeapi.model.PlaylistsResponse;
 import com.zype.android.zypeapi.model.VideoEntitlementsResponse;
 import com.zype.android.zypeapi.model.VideoFavoriteResponse;
@@ -112,6 +113,10 @@ public interface IZypeApi {
 
     @GET("/playlists/{playlist_id}/videos")
     Call<VideosResponse> getPlaylistVideos(@Path("playlist_id") String playlistId, @Query(PARAM_PAGE) int page, @QueryMap HashMap<String, String> params);
+
+    // Playlist
+    @GET("/playlists/{playlist_id}")
+    Call<PlaylistMain> getPlaylistsWithChildrenVideoIds(@Path("playlist_id") String playlistId, @QueryMap HashMap<String, String> params);
 
     // Videos
     @GET("/videos")

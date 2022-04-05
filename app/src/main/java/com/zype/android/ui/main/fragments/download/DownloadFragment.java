@@ -2,11 +2,14 @@ package com.zype.android.ui.main.fragments.download;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import com.zype.android.DataRepository;
+import com.zype.android.Db.Entity.Video;
 import com.zype.android.R;
 import com.zype.android.ZypeConfiguration;
 import com.zype.android.core.provider.Contract;
@@ -19,9 +22,13 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
 import static com.zype.android.ui.base.BaseVideoActivity.TYPE_UNKNOWN;
+import static com.zype.android.ui.main.MainActivity.childrenVidIds;
+
+import java.util.List;
 
 public class DownloadFragment extends AbstractTabFragment {
     private static final int LOADER_DOWNLOAD_VIDEO = 0;
+    int itemSize = 0;
 
     public DownloadFragment() {
         // Required empty public constructor
@@ -35,8 +42,34 @@ public class DownloadFragment extends AbstractTabFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         mAdapter.setShowDownloadOptions(true);
+        getDownloadedVideos();
         setEmptyText(getString(R.string.downloads_empty_title), getString(R.string.downloads_empty_message));
         return view;
+    }
+
+    public void getDownloadedVideos(){
+        itemSize = 0;
+        List<Video> videoList = DataRepository.getInstance(requireActivity().getApplication()).getDownloadedVideosFromDB();
+        if (childrenVidIds.isEmpty()) {
+            for (Video video : videoList) {
+                childrenVidIds.add(video.id);
+            }
+        }
+        DataRepository.getInstance(requireActivity().getApplication()).getDownloadedVideos(response -> {
+            if (response.isSuccessful) {
+
+                itemSize++;
+
+                if (itemSize >= videoList.size()){
+                    if (mLoader == null) {
+                        mLoader = getLoaderManager();
+                    }
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(SELECTED_TAB, selectedTab);
+                    mLoader.restartLoader(LOADER_DOWNLOAD_VIDEO, bundle, this);
+                }
+            }
+        });
     }
 
     @Override
@@ -79,17 +112,26 @@ public class DownloadFragment extends AbstractTabFragment {
             int tab = args.getInt(SELECTED_TAB);
             String selection;
             String[] selectionArgs;
+            String childVideoIds = TextUtils.join("','", childrenVidIds);
+
+
             switch (tab) {
                 case 0:
-                    selection = Contract.Video.COLUMN_IS_DOWNLOADED_VIDEO + " =? OR " + Contract.Video.COLUMN_IS_DOWNLOADED_AUDIO + " =?";
-                    selectionArgs = new String[]{String.valueOf(1), String.valueOf(1)};
+
+                    String query = "("+ Contract.Video.COLUMN_IS_DOWNLOADED_VIDEO + " =? OR " + Contract.Video.COLUMN_IS_DOWNLOADED_AUDIO + " =? ) AND "+Contract.Video.COLUMN_ACTIVE+"=? AND "+Contract.Video.COLUMN_ID+" IN ('"+childVideoIds+"')";
+                    selection = query;
+                    selectionArgs = new String[]{String.valueOf(1), String.valueOf(1), String.valueOf(1)};
                     break;
                 case 1:
-                    selection = Contract.Video.COLUMN_IS_DOWNLOADED_AUDIO + " =?";
-                    selectionArgs = new String[]{String.valueOf(1)};
+                    String query_for_audio = Contract.Video.COLUMN_IS_DOWNLOADED_AUDIO + " =? AND "+Contract.Video.COLUMN_ACTIVE+"=? AND "+Contract.Video.COLUMN_ID+" IN ('"+childVideoIds+"')";
+
+                    selection = query_for_audio;
+                    selectionArgs = new String[]{String.valueOf(1), String.valueOf(1)};
                     break;
                 case 2:
-                    selection = Contract.Video.COLUMN_IS_DOWNLOADED_VIDEO + " =? ";
+                    String query_for_video = Contract.Video.COLUMN_IS_DOWNLOADED_VIDEO + " =? AND "+Contract.Video.COLUMN_ACTIVE+"=? AND "+Contract.Video.COLUMN_ID+" IN ('"+childVideoIds+"')";
+
+                    selection = query_for_video;
                     selectionArgs = new String[]{String.valueOf(1)};
                     break;
                 default:
