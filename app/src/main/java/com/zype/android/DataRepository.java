@@ -363,4 +363,34 @@ public class DataRepository {
         }
         db.zypeDao().deleteVideoFavorites();
     }
+
+    public List<Video> getDownloadedVideosFromDB(){
+        return db.zypeDao().getDownloadedVideos();
+    }
+
+    public void getDownloadedVideos(IZypeApiListener listener) {
+        List<Video> videos = db.zypeDao().getDownloadedVideos();
+
+        for (Video videosItem : videos){
+            ZypeApi.getInstance().getVideo(videosItem.id, false,
+                    (IZypeApiListener<VideoResponse>) response -> {
+                        if (response.isSuccessful) {
+                            if (response.data != null) {
+                                Video video = getVideoSync(response.data.videoData.id);
+                                List<Video> videoList = new ArrayList<>();
+                                if (video != null) {
+                                    videoList.add(DbHelper.videoUpdateEntityByApi(video, response.data.videoData));
+                                } else {
+                                    videoList.add(DbHelper.videoApiToEntity(response.data.videoData));
+                                }
+                                insertVideos(videoList);
+
+                                if (listener != null) {
+                                    listener.onCompleted(response);
+                                }
+                            }
+                        }
+                    });
+        }
+    }
 }
