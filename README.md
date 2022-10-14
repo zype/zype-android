@@ -1,9 +1,10 @@
-Don't know what Zype is? Check this [overview](http://www.zype.com/).
+Want to learn more about Zype’s solutions for OTT apps, video streaming and playout? Visit our [website](http://www.zype.com/).
 
 # Zype Android Template
 
-This SDK allows you to set up an eye-catching, easy to use Android video streaming app integrated with the Zype platform with minimal coding and configuration. The app is built with Java and Zype API. With minimal setup you can have your Android up and running.
-An example of fully functional app that is using a Zype sandbox account.
+This legacy open source app template is no longer supported by Zype. If you are looking to build streaming applications for OTT, we recommend using [Zype Apps Creator](https://www.zype.com/product/apps-creator) for the latest app building features and functionality. 
+
+The app is built with Java and Zype API. 
 
 
 ## Prerequisites
@@ -33,17 +34,15 @@ An example of fully functional app that is using a Zype sandbox account.
 - Live Streaming videos
 - Downloading videos
 - Video Favorites
-- Dynamic theme colors
 - Resume watch functionality
 - Closed Caption Support
 
 ## Monetizations Supported
 
-- Pre-roll Ads (VAST)
-- Midroll ads
-- Universal SVOD via login
-- Native SVOD via In App Purchases
-- Marketplace connect (Native to universal SVOD)
+- Pre-roll and Mid-roll Advertising (VAST)
+- Universal SVOD via Sign In
+- Native SVOD via In-App Purchases
+- Marketplace Connect (Native to Universal SVOD)
 
 ## Creating Custom App Based on the Template<a name="template"></a>
 
@@ -176,9 +175,6 @@ An example of fully functional app that is using a Zype sandbox account.
 * [Fabric](https://get.fabric.io/) - Analytics and Crashlitics
 * [OneSignal](https://onesignal.com/) - Multiplatform push notifications
 
-## Contributing
-
-Please submit pull requests to us.
 
 ## Versioning
 
