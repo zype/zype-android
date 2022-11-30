@@ -188,7 +188,7 @@ public class PlaylistCursorAdapter extends CursorAdapter {
         }
 
         if (playlistMobileThumbnail != null) {
-            UiUtils.loadImage(context, playlistMobileThumbnail.getUrl(), 0, viewHolder.thumbnail, viewHolder.progressBar);
+            UiUtils.loadImage(context, playlistMobileThumbnail.getUrl(), 0, viewHolder.thumbnail, viewHolder.progressBar, viewHolder.title);
         }
         else if (thumbnailsString != null) {
             Type thumbnailType = new TypeToken<List<Thumbnail>>() {
@@ -196,14 +196,14 @@ public class PlaylistCursorAdapter extends CursorAdapter {
             List<Thumbnail> thumbnails = (new Gson().fromJson(thumbnailsString, thumbnailType));
 
             if (thumbnails.size() > 0) {
-                UiUtils.loadImage(context, thumbnails.get(1).getUrl(), 0, viewHolder.thumbnail, viewHolder.progressBar);
+                UiUtils.loadImage(context, thumbnails.get(1).getUrl(), 0, viewHolder.thumbnail, viewHolder.progressBar, viewHolder.title);
             }
             else {
-                UiUtils.loadImage(context, placeholderUrl, 0, viewHolder.thumbnail, viewHolder.progressBar);
+                UiUtils.loadImage(context, placeholderUrl, 0, viewHolder.thumbnail, viewHolder.progressBar, viewHolder.title);
             }
         }
         else {
-            UiUtils.loadImage(context, placeholderUrl, 0, viewHolder.thumbnail, viewHolder.progressBar);
+            UiUtils.loadImage(context, placeholderUrl, 0, viewHolder.thumbnail, viewHolder.progressBar, viewHolder.title);
         }
     }
 

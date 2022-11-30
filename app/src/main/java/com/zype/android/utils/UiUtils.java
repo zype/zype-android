@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -74,7 +75,7 @@ public class UiUtils {
 
     public static void loadImage(@Nullable final Context context, @Nullable final String imgUrl,
                                  final int placeholderRes, @Nullable final ImageView img,
-                                 @Nullable final ProgressBar progressBar) {
+                                 @Nullable final ProgressBar progressBar, @Nullable final TextView title) {
         if (context == null) {
             Logger.e("Context is null");
             return;
@@ -100,12 +101,18 @@ public class UiUtils {
                 if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
                 }
+                if (title != null){
+                    title.setVisibility(View.GONE);
+                }
             }
 
             @Override
             public void onError() {
                 if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
+                }
+                if (title != null){
+                    title.setVisibility(View.VISIBLE);
                 }
                 if (placeholderRes > 0) {
                     img.setImageDrawable(ContextCompat.getDrawable(context, placeholderRes));
